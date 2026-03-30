@@ -463,25 +463,28 @@ function updatePoly() {
 let bvChart;
 function initBVChart() {
   const ctx=document.getElementById('bvChart').getContext('2d');
-  const xs=Array.from({length:15},(_,i)=>i+1);
+  const xs=Array.from({length:15},(_,i)=>i+1);  // [1..15]
   const noise=0.15;
   const bias2=xs.map(x=>2*Math.exp(-0.35*x));
   const variance=xs.map(x=>0.05+0.08*Math.pow(x-1,1.4)/15);
   const total=xs.map((x,i)=>bias2[i]+variance[i]+noise);
+  // Convert all line datasets to {x,y} so they share the linear x-axis with the scatter
+  const toXY=(arr)=>xs.map((x,i)=>({x,y:arr[i]}));
   bvChart=new Chart(ctx,{
     type:'line',
     data:{datasets:[
-      {label:'Biais²',data:bias2,borderColor:'#DC2626',backgroundColor:'rgba(220,38,38,.1)',fill:true,tension:.4,pointRadius:4},
-      {label:'Variance',data:variance,borderColor:'#0D9488',backgroundColor:'rgba(13,148,136,.1)',fill:true,tension:.4,pointRadius:4},
-      {label:'Bruit irréductible',data:xs.map(()=>noise),borderColor:'#94A3B8',borderDash:[5,5],fill:false,pointRadius:0},
-      {label:'Erreur totale',data:total,borderColor:'#1E3A5F',borderWidth:3,fill:false,tension:.4,pointRadius:4},
+      {label:'Biais²',data:toXY(bias2),borderColor:'#DC2626',backgroundColor:'rgba(220,38,38,.1)',fill:true,tension:.4,pointRadius:4},
+      {label:'Variance',data:toXY(variance),borderColor:'#0D9488',backgroundColor:'rgba(13,148,136,.1)',fill:true,tension:.4,pointRadius:4},
+      {label:'Bruit irréductible',data:xs.map(x=>({x,y:noise})),borderColor:'#94A3B8',borderDash:[5,5],fill:false,pointRadius:0},
+      {label:'Erreur totale',data:toXY(total),borderColor:'#1E3A5F',borderWidth:3,fill:false,tension:.4,pointRadius:4},
       {label:'Position actuelle',data:[],backgroundColor:'#F59E0B',borderColor:'#F59E0B',pointRadius:10,type:'scatter'},
     ]},
     options:{
       responsive:true, maintainAspectRatio:true,
       plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}},
       scales:{
-        x:{title:{display:true,text:'Complexité du modèle'},ticks:{callback:v=>['','Simple','','','Moyen','','','','Complexe','','','','','','','Très complexe'][v]||v}},
+        x:{type:'linear',min:1,max:15,title:{display:true,text:'Complexité du modèle'},
+           ticks:{stepSize:1,callback:v=>{const lbl={1:'Simple',5:'Moyen',9:'Complexe',15:'Très complexe'};return lbl[v]!==undefined?lbl[v]:v;}}},
         y:{title:{display:true,text:'Erreur'},min:0,max:2.5}
       }
     }
@@ -501,7 +504,8 @@ function updateBV() {
     const b=2*Math.exp(-0.35*i), v=0.05+0.08*Math.pow(i-1,1.4)/15, t=b+v+noise;
     if(t<optE){optE=t;optC=i;}
   }
-  bvChart.data.datasets[4].data=[{x:c-1,y:total}];
+  // x:c places the dot at the correct complexity position on the linear scale
+  bvChart.data.datasets[4].data=[{x:c,y:total}];
   bvChart.update('none');
   document.getElementById('biasVal').textContent=bias2.toFixed(3);
   document.getElementById('varVal').textContent=variance.toFixed(3);
