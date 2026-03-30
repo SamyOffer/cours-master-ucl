@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch9 — Modèles Gaussiens & FDA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  :root {
+    --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B;
+    --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; --dark:#1E293B;
+    --green:#059669; --red:#DC2626; --purple:#7C3AED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark);}
+  header{background:var(--navy);padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;left:0;top:0;width:8px;height:100%;background:var(--amber);}
+  header::after{content:'';position:absolute;left:8px;top:0;width:3px;height:100%;background:var(--teal);}
+  .header-inner{margin-left:1rem;}
+  .back{display:inline-block;color:#94A3B8;text-decoration:none;font-size:.85rem;margin-bottom:.5rem;}
+  .back:hover{color:var(--amber);}
+  header h1{color:#fff;font-size:2rem;margin-bottom:.3rem;}
+  header p{color:#94A3B8;font-size:.95rem;}
+  .badge{display:inline-block;background:var(--amber);color:var(--navy);padding:.2rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700;margin-top:.5rem;}
+
+  main{max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem;}
+
+  .section{background:var(--white);border-radius:14px;padding:2rem;margin-bottom:2.5rem;box-shadow:0 2px 10px rgba(0,0,0,.07);}
+  .section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--light);}
+  .sec-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .section-title{font-size:1.25rem;font-weight:700;color:var(--navy);}
+  .section-sub{font-size:.85rem;color:var(--gray);margin-top:.15rem;}
+
+  .theory-box{background:var(--light);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem;}
+  .theory-box h4{color:var(--navy);font-size:.95rem;margin-bottom:.5rem;}
+  .theory-box p{font-size:.88rem;color:var(--gray);line-height:1.7;}
+
+  .formula-display{background:#1E293B;color:#E2E8F0;padding:1rem 1.25rem;border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;line-height:1.8;margin:.75rem 0;overflow-x:auto;}
+  .formula-display .hl{color:var(--amber);}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  @media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+
+  .panel{background:var(--light);border-radius:10px;padding:1.25rem;}
+  .panel h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:1rem;}
+
+  /* Sliders */
+  .slider-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.7rem;}
+  .slider-row label{font-size:.82rem;color:var(--gray);width:140px;flex-shrink:0;}
+  .slider-row input[type=range]{flex:1;accent-color:var(--teal);}
+  .slider-val{font-weight:700;color:var(--teal);width:42px;text-align:right;font-size:.88rem;}
+
+  /* Canvas */
+  canvas.viz{border-radius:10px;background:#fff;border:1px solid #E2E8F0;display:block;width:100%;max-width:450px;margin:0 auto;}
+
+  /* Covariance types */
+  .cov-types{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+  .cov-btn{padding:.35rem .9rem;border-radius:20px;border:2px solid #CBD5E1;background:white;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--gray);transition:all .15s;}
+  .cov-btn.active{background:var(--teal);border-color:var(--teal);color:white;}
+  .cov-btn:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+
+  /* FDA */
+  .fda-canvas-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem;}
+
+  /* Decision boundary types */
+  .db-types{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+  .db-btn{padding:.35rem .9rem;border-radius:20px;border:2px solid #CBD5E1;background:white;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--gray);transition:all .15s;}
+  .db-btn.active{background:var(--navy);border-color:var(--navy);color:white;}
+  .db-btn:hover:not(.active){border-color:var(--navy);color:var(--navy);}
+
+  /* Summary table */
+  table.summary{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:.75rem;}
+  table.summary th{background:var(--navy);color:white;padding:.55rem .75rem;text-align:left;}
+  table.summary td{padding:.45rem .75rem;border-bottom:1px solid #E2E8F0;line-height:1.5;}
+  table.summary tr:nth-child(even) td{background:#F8FAFF;}
+  table.summary .hi{color:var(--teal);font-weight:700;}
+
+  /* Nav */
+  .ch-nav{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;}
+  .ch-nav a{padding:.5rem 1.25rem;border-radius:8px;text-decoration:none;font-size:.88rem;font-weight:700;transition:all .15s;}
+  .nav-prev{background:var(--light);color:var(--navy);border:2px solid var(--navy);}
+  .nav-prev:hover{background:var(--navy);color:white;}
+  .nav-home{background:var(--teal);color:white;}
+  .nav-home:hover{background:#0f766e;}
+
+  /* Info chip */
+  .chip{display:inline-block;padding:.2rem .65rem;border-radius:999px;font-size:.75rem;font-weight:700;margin-right:.3rem;}
+  .chip-blue{background:#DBEAFE;color:#1E40AF;}
+  .chip-green{background:#DCFCE7;color:#166534;}
+  .chip-amber{background:#FEF3C7;color:#92400E;}
+
+  /* Result box */
+  .result-box{background:#F0FDF4;border:2px solid #86EFAC;border-radius:10px;padding:1rem;margin-top:1rem;font-size:.88rem;color:#166534;line-height:1.7;}
+  .result-box strong{color:#14532D;}
+
+  footer{text-align:center;padding:2rem;color:#94A3B8;font-size:.85rem;background:var(--navy);margin-top:2rem;}
+</style>
+</head>
+<body>
+
+<!-- Sticky nav bar -->
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;">
+  <a href="index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Index</a>
+  <span style="color:#94A3B8;font-size:.82rem;">LINFO2262 — Chapitre 9</span>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="back">← Retour à l'index</a>
+    <h1>🔔 Modèles Gaussiens &amp; FDA</h1>
+    <p>LINFO2262 — Pierre Dupont — UCLouvain</p>
+    <span class="badge">Chapitre 9</span>
+    <span class="badge" style="background:var(--teal);">Classificateur Gaussien · LDA · QDA · Fisher</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ─── SECTION 1 : MOTIVATION ─── -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#DBEAFE;color:#1E3A5F;">🎯</div>
+    <div>
+      <div class="section-title">1. Motivation — Estimer P(x|y)</div>
+      <div class="section-sub">Pourquoi les modèles Gaussiens ?</div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>Le problème central</h4>
+    <p>Le classifieur MAP est optimal : <strong>ŷ = argmax P(y) · P(x|y)</strong>. Mais il faut estimer la vraisemblance P(x|y). Comment faire en grande dimension ?</p>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <h4>🔵 Modèles Discriminatifs</h4>
+      <p style="font-size:.85rem;color:var(--gray);line-height:1.7;">Estiment directement les frontières de décision globalement (SVMs, Arbres, Deep Nets…) ou localement (k-NN).</p>
+    </div>
+    <div class="panel">
+      <h4>🟢 Modèles Génératifs</h4>
+      <p style="font-size:.85rem;color:var(--gray);line-height:1.7;">Modélisent la distribution des données de chaque classe. Naive Bayes suppose l'indépendance. Le <strong>modèle Gaussien</strong> suppose une distribution normale multivariée.</p>
+    </div>
+  </div>
+
+  <div class="theory-box" style="margin-top:1rem;">
+    <h4>Hypothèse Gaussienne</h4>
+    <p>Tous les exemples de la classe y suivent une loi normale multivariée <strong>N(μ<sub>y</sub>, Σ<sub>y</sub>)</strong>. On estime μ̂<sub>y</sub> et Σ̂<sub>y</sub> par maximum de vraisemblance sur chaque sous-ensemble D<sub>y</sub>.</p>
+  </div>
+
+  <div class="formula-display">
+<span class="hl">MAP :</span>  ŷ = argmax  P̂(y) · f̂_y(x)
+           y ∈ {1,…,C}
+
+<span class="hl">MLE :</span>  μ̂_y = (1/|D_y|) Σ x_y^l       ← moyenne empirique
+         Σ̂_y = (1/|D_y|) Σ (x_y^l - μ̂_y)(x_y^l - μ̂_y)ᵀ  ← covariance
+  </div>
+</div>
+
+<!-- ─── SECTION 2 : GAUSSIENNE MULTIVARIÉE INTERACTIVE ─── -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#CCFBF1;color:#0D9488;">🔔</div>
+    <div>
+      <div class="section-title">2. Densité Gaussienne &amp; Matrice de Covariance</div>
+      <div class="section-sub">Explorateur interactif des contours de la loi N(μ, Σ)</div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>Densité Gaussienne multivariée (d dimensions)</h4>
+    <p>La densité en x est donnée par la distance de Mahalanobis de x au centre μ, pondérée par la covariance Σ :</p>
+  </div>
+  <div class="formula-display">
+f_y(x) = 1 / sqrt((2π)^d |Σ_y|)  ·  exp[ -½ (x-μ_y)ᵀ Σ_y⁻¹ (x-μ_y) ]
+                                              └────────────────────────────┘
+                                               Distance de <span class="hl">Mahalanobis²</span>
+  </div>
+
+  <p style="font-size:.88rem;color:var(--gray);margin-bottom:1rem;">Choisis un type de matrice de covariance pour voir les contours de densité :</p>
+
+  <div class="cov-types" id="covTypes">
+    <button class="cov-btn active" data-cov="identity" onclick="setCov('identity')">Identité (σ²I)</button>
+    <button class="cov-btn" data-cov="diagonal" onclick="setCov('diagonal')">Diagonale</button>
+    <button class="cov-btn" data-cov="full_pos" onclick="setCov('full_pos')">Pleine (corrélation +)</button>
+    <button class="cov-btn" data-cov="full_neg" onclick="setCov('full_neg')">Pleine (corrélation −)</button>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <canvas id="gaussCanvas" class="viz" width="400" height="350"></canvas>
+    </div>
+    <div>
+      <div class="panel" style="height:100%;">
+        <h4>Matrice de covariance Σ</h4>
+        <div id="covMatrix" style="font-family:monospace;font-size:1rem;color:var(--navy);background:#EFF6FF;padding:1rem;border-radius:8px;margin-bottom:1rem;text-align:center;"></div>
+        <div id="covExplanation" style="font-size:.85rem;color:var(--gray);line-height:1.7;"></div>
+
+        <div style="margin-top:1.25rem;">
+          <div class="slider-row">
+            <label>Variance σ² (ou σ₁²)</label>
+            <input type="range" id="covS1" min="0.3" max="3" step="0.1" value="1.0" oninput="updateGauss()">
+            <span class="slider-val" id="covS1val">1.0</span>
+          </div>
+          <div class="slider-row" id="rowS2" style="display:none">
+            <label>Variance σ₂²</label>
+            <input type="range" id="covS2" min="0.3" max="3" step="0.1" value="2.0" oninput="updateGauss()">
+            <span class="slider-val" id="covS2val">2.0</span>
+          </div>
+          <div class="slider-row" id="rowRho" style="display:none">
+            <label>Corrélation ρ</label>
+            <input type="range" id="covRho" min="-0.9" max="0.9" step="0.05" value="0.6" oninput="updateGauss()">
+            <span class="slider-val" id="covRhoval">0.60</span>
+          </div>
+        </div>
+
+        <div class="result-box" id="gaussInfo" style="margin-top:.75rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="theory-box" style="margin-top:1.5rem;">
+    <h4>Comparaison des 3 types de Σ et leur lien avec Naive Bayes</h4>
+    <p>L'hypothèse <strong>diagonale</strong> revient à supposer l'indépendance conditionnelle des coordonnées → c'est le <strong>Naive Bayes Gaussien</strong> ! Elle réduit les paramètres de O(d²) à O(d) par classe.</p>
+  </div>
+  <div class="formula-display">
+<span class="hl">Identité :</span>   Σ = σ²I       → 1 paramètre/classe, contours circulaires
+<span class="hl">Diagonale :</span>  Σ = diag(σ₁², …, σd²) → d paramètres, contours en ellipse axiale
+<span class="hl">Pleine :</span>     Σ quelconque  → O(d²) paramètres, ellipses orientées
+  </div>
+</div>
+
+<!-- ─── SECTION 3 : FRONTIÈRES DE DÉCISION ─── -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#F3E8FF;color:#7C3AED;">📐</div>
+    <div>
+      <div class="section-title">3. Frontières de Décision Gaussiennes</div>
+      <div class="section-sub">Hyperquadriques (cas général) vs Hyperplans (covariances égales)</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="theory-box">
+      <h4>Cas général : Σ₁ ≠ Σ₂ → QDA</h4>
+      <p>La frontière est une <strong>hyperquadrique</strong> (ellipse, parabole, hyperbole…). Le terme quadratique −½ xᵀ(Σ₁⁻¹ − Σ₂⁻¹)x ne s'annule pas.</p>
+    </div>
+    <div class="theory-box">
+      <h4>Covariances égales : Σ₁ = Σ₂ = Σ → LDA</h4>
+      <p>Le terme quadratique s'annule. La frontière devient un <strong>hyperplan</strong> (frontière linéaire). C'est le <strong>Linear Discriminant Analysis (LDA)</strong>.</p>
+    </div>
+  </div>
+
+  <div class="formula-display">
+<span class="hl">Fonction discriminante (log-MAP) :</span>
+  g_y(x) = -½ (x-μ_y)ᵀ Σ_y⁻¹ (x-μ_y) - ½ ln|Σ_y| + ln P(y)
+
+<span class="hl">Cas Σ₁=Σ₂=Σ :</span>
+  g(x) = g₁(x) - g₂(x) = wᵀ(x - x₀)
+  avec  w  = Σ⁻¹(μ₁ - μ₂)
+  et    x₀ = (μ₁+μ₂)/2 − ln(P(y=1)/P(y=2)) / ((μ₁-μ₂)ᵀΣ⁻¹(μ₁-μ₂)) · (μ₁-μ₂)
+  </div>
+
+  <p style="font-size:.88rem;color:var(--gray);margin:.75rem 0 1rem;">Visualise la frontière de décision selon le type de covariance :</p>
+
+  <div class="db-types">
+    <button class="db-btn active" onclick="setDB('lda')" id="db-lda">LDA (Σ₁=Σ₂)</button>
+    <button class="db-btn" onclick="setDB('qda')" id="db-qda">QDA (Σ₁≠Σ₂)</button>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <canvas id="dbCanvas" class="viz" width="400" height="370"></canvas>
+    </div>
+    <div class="panel">
+      <h4>Paramètres des classes</h4>
+      <div class="slider-row">
+        <label>μ₁ (x)</label>
+        <input type="range" id="mu1x" min="-3" max="0" step="0.1" value="-1.5" oninput="updateDB()">
+        <span class="slider-val" id="mu1xv">-1.5</span>
+      </div>
+      <div class="slider-row">
+        <label>μ₂ (x)</label>
+        <input type="range" id="mu2x" min="0" max="3" step="0.1" value="1.5" oninput="updateDB()">
+        <span class="slider-val" id="mu2xv">1.5</span>
+      </div>
+      <div class="slider-row">
+        <label>σ²  classe 1</label>
+        <input type="range" id="dbS1" min="0.3" max="2.5" step="0.1" value="0.8" oninput="updateDB()">
+        <span class="slider-val" id="dbS1v">0.8</span>
+      </div>
+      <div id="dbS2row">
+        <div class="slider-row">
+          <label>σ²  classe 2</label>
+          <input type="range" id="dbS2" min="0.3" max="2.5" step="0.1" value="1.8" oninput="updateDB()">
+          <span class="slider-val" id="dbS2v">1.8</span>
+        </div>
+      </div>
+      <div class="slider-row">
+        <label>P(y=1) prior</label>
+        <input type="range" id="prior1" min="0.1" max="0.9" step="0.05" value="0.5" oninput="updateDB()">
+        <span class="slider-val" id="prior1v">0.50</span>
+      </div>
+      <div class="result-box" id="dbInfo"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 4 : FISHER LINEAR DISCRIMINANT ─── -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#FEF3C7;color:#D97706;">📏</div>
+    <div>
+      <div class="section-title">4. Fisher Linear Discriminant (FDA)</div>
+      <div class="section-sub">Projection optimale pour discriminer les classes</div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>Idée : projeter sur une droite</h4>
+    <p>Pour tout vecteur w, la projection scalaire wᵀx réduit les données à 1D. FDA cherche la direction w qui <strong>maximise la séparation</strong> entre les moyennes projetées tout en <strong>minimisant la dispersion</strong> intra-classe.</p>
+  </div>
+
+  <div class="formula-display">
+<span class="hl">Critère de Fisher :</span>
+  J(w) = (m̃₁ - m̃₂)² / (s̃₁² + s̃₂²)
+       = wᵀ S_B w / wᵀ S_W w
+
+<span class="hl">Matrices de dispersion :</span>
+  S_y = Σ_{x∈D_y} (x - m_y)(x - m_y)ᵀ  ← scatter classe y
+  S_W = S₁ + S₂                           ← within-class scatter
+  S_B = (m₁-m₂)(m₁-m₂)ᵀ                 ← between-class scatter
+
+<span class="hl">Solution optimale :</span>
+  w = S_W⁻¹ (m₁ - m₂)
+  </div>
+
+  <div class="two-col" style="margin-top:1.25rem;">
+    <div>
+      <canvas id="fdaCanvas" class="viz" width="400" height="380"></canvas>
+    </div>
+    <div class="panel">
+      <h4>Contrôle des nuages de points</h4>
+      <div class="slider-row">
+        <label>m₁ (x moyen cl.1)</label>
+        <input type="range" id="fdaMu1" min="-3" max="0" step="0.1" value="-1.5" oninput="updateFDA()">
+        <span class="slider-val" id="fdaMu1v">-1.5</span>
+      </div>
+      <div class="slider-row">
+        <label>m₂ (x moyen cl.2)</label>
+        <input type="range" id="fdaMu2" min="0" max="3" step="0.1" value="1.5" oninput="updateFDA()">
+        <span class="slider-val" id="fdaMu2v">1.5</span>
+      </div>
+      <div class="slider-row">
+        <label>Dispersion cl.1</label>
+        <input type="range" id="fdaS1" min="0.3" max="2" step="0.1" value="0.7" oninput="updateFDA()">
+        <span class="slider-val" id="fdaS1v">0.7</span>
+      </div>
+      <div class="slider-row">
+        <label>Dispersion cl.2</label>
+        <input type="range" id="fdaS2" min="0.3" max="2" step="0.1" value="0.9" oninput="updateFDA()">
+        <span class="slider-val" id="fdaS2v">0.9</span>
+      </div>
+      <div class="result-box" id="fdaInfo" style="margin-top:.5rem;"></div>
+      <div style="margin-top:.75rem;font-size:.8rem;color:var(--gray);">
+        <span class="chip chip-blue">Bleu</span> Classe 1 &nbsp;
+        <span class="chip chip-amber">Orange</span> Classe 2 &nbsp;
+        <span class="chip chip-green">Vert</span> Direction w (FDA)
+      </div>
+    </div>
+  </div>
+
+  <div class="theory-box" style="margin-top:1.5rem;">
+    <h4>Équivalence FDA ↔ LDA ↔ Classifieur Gaussien</h4>
+    <p>Fisher DA est <strong>identique</strong> au classifieur Gaussien avec covariances égales (LDA) lorsque Σ̂ = S_W et μ̂_y = m_y. Le classifieur Gaussien avec covariances quelconques s'appelle <strong>Quadratic Discriminant Analysis (QDA)</strong>.</p>
+  </div>
+</div>
+
+<!-- ─── SECTION 5 : TABLEAU RÉCAPITULATIF ─── -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#DCFCE7;color:#059669;">📋</div>
+    <div>
+      <div class="section-title">5. Résumé — Classifieurs Gaussiens</div>
+      <div class="section-sub">LDA, QDA, FDA, Naive Bayes Gaussien</div>
+    </div>
+  </div>
+
+  <table class="summary">
+    <tr>
+      <th>Méthode</th>
+      <th>Hypothèse sur Σ</th>
+      <th>Frontière</th>
+      <th>Paramètres</th>
+      <th>Avantage</th>
+    </tr>
+    <tr>
+      <td><strong class="hi">LDA</strong></td>
+      <td>Σ₁ = Σ₂ = Σ</td>
+      <td>Hyperplan (linéaire)</td>
+      <td>O(d²) partagé</td>
+      <td>Robuste, peu de données</td>
+    </tr>
+    <tr>
+      <td><strong class="hi">QDA</strong></td>
+      <td>Σ₁, Σ₂ quelconques</td>
+      <td>Hyperquadrique</td>
+      <td>O(Cd²)</td>
+      <td>Plus flexible</td>
+    </tr>
+    <tr>
+      <td><strong class="hi">Naive Bayes Gaussien</strong></td>
+      <td>Σ_y diagonale</td>
+      <td>Quadrique (axiale)</td>
+      <td>O(Cd)</td>
+      <td>Peu de paramètres</td>
+    </tr>
+    <tr>
+      <td><strong class="hi">Gaussien identité</strong></td>
+      <td>Σ = σ²I</td>
+      <td>Hyperplan orthogonal</td>
+      <td>1 par classe</td>
+      <td>Plus simple possible</td>
+    </tr>
+    <tr>
+      <td><strong class="hi">FDA / Fisher</strong></td>
+      <td>S_W partagée (LDA)</td>
+      <td>Hyperplan (linéaire)</td>
+      <td>O(d²)</td>
+      <td>Projection optimale 1D</td>
+    </tr>
+  </table>
+
+  <div class="formula-display" style="margin-top:1.25rem;">
+<span class="hl">Points clés à retenir :</span>
+  ▶ FDA = LDA = Gaussien avec Σ₁=Σ₂   (quand Σ̂ = S_W , μ̂_y = m_y)
+  ▶ LDA → frontière linéaire : terme quadratique s'annule
+  ▶ QDA → frontière quadratique : covariances différentes
+  ▶ Diagonal Σ → Naive Bayes Gaussien (indépendance des features)
+  ▶ Mahalanobis = distance pondérée par la covariance
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="ch-nav">
+  <a href="ch8_naivebayes.html" class="nav-prev">← Ch8 : Naive Bayes</a>
+  <a href="index.html" class="nav-home">🏠 Index du cours</a>
+</div>
+
+</main>
+
+<footer>LINFO2262 Machine Learning — UCLouvain — Prof. Pierre Dupont — Chapitre 9 : Modèles Gaussiens &amp; FDA</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function setSlider(id, val) {
+  const el = document.getElementById(id);
+  if(el) el.textContent = parseFloat(val).toFixed(2).replace(/\.?0+$/,'') || val;
+}
+
+// ── Section 2 : Gaussienne interactive ───────────────────────────────────────
+let covType = 'identity';
+const covCanvas = document.getElementById('gaussCanvas');
+const covCtx = covCanvas.getContext('2d');
+
+const COV_DATA = {
+  identity: {
+    label: 'Σ = σ²I',
+    matrix: (s1) => [[s1, 0],[0, s1]],
+    explain: '<b>Features non corrélées, même variance σ²</b> dans chaque dimension. Les contours de densité sont des <b>cercles</b> centrés sur μ. C\'est le cas le plus simple.',
+    showS2: false, showRho: false
+  },
+  diagonal: {
+    label: 'Σ = diag(σ₁², σ₂²)',
+    matrix: (s1, s2) => [[s1, 0],[0, s2]],
+    explain: '<b>Features non corrélées, variances différentes</b>. Les contours sont des <b>ellipses</b> alignées sur les axes. Hypothèse Naive Bayes dans ℝᵈ.',
+    showS2: true, showRho: false
+  },
+  full_pos: {
+    label: 'Σ pleine (ρ > 0)',
+    matrix: (s1, s2, rho) => { const c = rho*Math.sqrt(s1*s2); return [[s1, c],[c, s2]]; },
+    explain: '<b>Features corrélées positivement</b>. Les contours sont des <b>ellipses inclinées</b>. Plus ρ est grand, plus l\'ellipse est allongée en diagonale (+).',
+    showS2: true, showRho: true
+  },
+  full_neg: {
+    label: 'Σ pleine (ρ < 0)',
+    matrix: (s1, s2, rho) => { const c = rho*Math.sqrt(s1*s2); return [[s1, c],[c, s2]]; },
+    explain: '<b>Features corrélées négativement</b>. Les ellipses sont inclinées en <b>sens inverse</b> (axe anti-diagonal).',
+    showS2: true, showRho: true
+  }
+};
+
+function setCov(type) {
+  covType = type;
+  document.querySelectorAll('.cov-btn').forEach(b => b.classList.toggle('active', b.dataset.cov === type));
+  const d = COV_DATA[type];
+  document.getElementById('rowS2').style.display = d.showS2 ? 'flex' : 'none';
+  document.getElementById('rowRho').style.display = d.showRho ? 'flex' : 'none';
+  if(type === 'full_neg') {
+    document.getElementById('covRho').value = -0.6;
+    document.getElementById('covRho').min = -0.9; document.getElementById('covRho').max = -0.05;
+  } else if(type === 'full_pos') {
+    document.getElementById('covRho').value = 0.6;
+    document.getElementById('covRho').min = 0.05; document.getElementById('covRho').max = 0.9;
+  }
+  updateGauss();
+}
+
+function updateGauss() {
+  const s1 = parseFloat(document.getElementById('covS1').value);
+  const s2 = parseFloat(document.getElementById('covS2').value);
+  const rho = parseFloat(document.getElementById('covRho').value);
+  document.getElementById('covS1val').textContent = s1.toFixed(1);
+  document.getElementById('covS2val').textContent = s2.toFixed(1);
+  document.getElementById('covRhoval').textContent = rho.toFixed(2);
+
+  const d = COV_DATA[covType];
+  const Sigma = d.matrix(s1, s2, rho);
+  const [a,b,c,e] = [Sigma[0][0], Sigma[0][1], Sigma[1][0], Sigma[1][1]];
+
+  // Matrix display
+  const rho_display = (a===e && b===0) ? '' : `ρ = ${rho.toFixed(2)}`;
+  document.getElementById('covMatrix').innerHTML =
+    `⎡ ${a.toFixed(2)}&nbsp;&nbsp;${b.toFixed(2)} ⎤<br>⎣ ${c.toFixed(2)}&nbsp;&nbsp;${e.toFixed(2)} ⎦`;
+  document.getElementById('covExplanation').innerHTML = d.explain;
+
+  const det = a*e - b*c;
+  document.getElementById('gaussInfo').innerHTML =
+    `<strong>Déterminant |Σ| = ${det.toFixed(3)}</strong><br>
+     Volume de l'ellipsoïde ∝ √|Σ| = ${Math.sqrt(Math.max(0,det)).toFixed(3)}<br>
+     ${det<=0 ? '⚠️ Matrice non définie positive !' : '✅ Σ définie positive'}`;
+
+  drawGaussContours(Sigma);
+}
+
+function drawGaussContours(Sigma) {
+  const W = covCanvas.width, H = covCanvas.height;
+  const cx = W/2, cy = H/2, scale = 55;
+  const [a,b,c,e] = [Sigma[0][0], Sigma[0][1], Sigma[1][0], Sigma[1][1]];
+  const det = a*e - b*c;
+  if(det <= 0.001) return;
+  const invA = e/det, invB = -b/det, invD = a/det;
+
+  const imgData = covCtx.createImageData(W, H);
+  for(let px=0; px<W; px++) for(let py=0; py<H; py++) {
+    const x = (px-cx)/scale, y = (cy-py)/scale;
+    const maha2 = x*(invA*x+invB*y) + y*(invB*x+invD*y);
+    const density = Math.exp(-0.5*maha2) / (2*Math.PI*Math.sqrt(det));
+    const t = Math.min(1, density / (1/(2*Math.PI*Math.sqrt(det))));
+    const idx = (py*W+px)*4;
+    // Color: navy → teal gradient
+    imgData.data[idx]   = Math.round(255*(1-t) + 13*t);
+    imgData.data[idx+1] = Math.round(255*(1-t) + 148*t);
+    imgData.data[idx+2] = Math.round(255*(1-t) + 136*t);
+    imgData.data[idx+3] = 255;
+  }
+  covCtx.putImageData(imgData, 0, 0);
+
+  // Contour lines
+  covCtx.clearRect(0,0,0,0);
+  covCtx.putImageData(imgData,0,0);
+  for(let level of [0.5, 1, 1.5, 2, 2.5]) {
+    // Ellipse at Mahalanobis distance = level
+    // Eigendecomposition of Σ
+    const tr = a+e, dsc = Math.sqrt(Math.max(0,(a-e)**2/4+b*c));
+    const l1 = tr/2+dsc, l2 = tr/2-dsc;
+    let angle = (Math.abs(b)<1e-9) ? 0 : Math.atan2(l1-a, b);
+    const rx = level*Math.sqrt(Math.max(0,l1))*scale;
+    const ry = level*Math.sqrt(Math.max(0,l2))*scale;
+    covCtx.save();
+    covCtx.translate(cx, cy);
+    covCtx.rotate(angle);
+    covCtx.beginPath();
+    covCtx.ellipse(0,0,rx,ry,0,0,2*Math.PI);
+    covCtx.strokeStyle = `rgba(30,58,95,${0.8-level*0.22})`;
+    covCtx.lineWidth = 1.5;
+    covCtx.stroke();
+    covCtx.restore();
+  }
+
+  // Axes
+  covCtx.strokeStyle = '#94A3B8'; covCtx.lineWidth = 1;
+  covCtx.setLineDash([4,4]);
+  covCtx.beginPath(); covCtx.moveTo(0,cy); covCtx.lineTo(W,cy); covCtx.stroke();
+  covCtx.beginPath(); covCtx.moveTo(cx,0); covCtx.lineTo(cx,H); covCtx.stroke();
+  covCtx.setLineDash([]);
+
+  // Center dot
+  covCtx.fillStyle = '#1E3A5F';
+  covCtx.beginPath(); covCtx.arc(cx,cy,5,0,2*Math.PI); covCtx.fill();
+  covCtx.fillStyle = '#fff';
+  covCtx.beginPath(); covCtx.arc(cx,cy,2.5,0,2*Math.PI); covCtx.fill();
+
+  // Labels
+  covCtx.fillStyle='#64748B'; covCtx.font='12px Segoe UI'; covCtx.textAlign='center';
+  covCtx.fillText('x₁', W-15, cy-6);
+  covCtx.textAlign='left'; covCtx.fillText('x₂', cx+6, 15);
+  covCtx.textAlign='center'; covCtx.fillStyle='#1E3A5F'; covCtx.font='bold 11px Segoe UI';
+  covCtx.fillText('μ', cx+10, cy-8);
+}
+
+// ── Section 3 : Decision Boundary ────────────────────────────────────────────
+let dbType = 'lda';
+const dbCanvas = document.getElementById('dbCanvas');
+const dbCtx = dbCanvas.getContext('2d');
+
+function setDB(type) {
+  dbType = type;
+  document.getElementById('db-lda').classList.toggle('active', type==='lda');
+  document.getElementById('db-qda').classList.toggle('active', type==='qda');
+  document.getElementById('dbS2row').style.display = type==='qda' ? 'block' : 'none';
+  updateDB();
+}
+
+function updateDB() {
+  const mu1x = parseFloat(document.getElementById('mu1x').value);
+  const mu2x = parseFloat(document.getElementById('mu2x').value);
+  const s1 = parseFloat(document.getElementById('dbS1').value);
+  const s2 = parseFloat(document.getElementById('dbS2').value);
+  const p1 = parseFloat(document.getElementById('prior1').value);
+  document.getElementById('mu1xv').textContent = mu1x.toFixed(1);
+  document.getElementById('mu2xv').textContent = mu2x.toFixed(1);
+  document.getElementById('dbS1v').textContent = s1.toFixed(1);
+  document.getElementById('dbS2v').textContent = s2.toFixed(1);
+  document.getElementById('prior1v').textContent = p1.toFixed(2);
+
+  const sEff = dbType==='lda' ? s1 : s1;
+  const s2Eff = dbType==='lda' ? s1 : s2; // LDA: shared covariance
+
+  drawDB(mu1x, 0, mu2x, 0, sEff, s2Eff, p1);
+
+  // Info text
+  if(dbType==='lda') {
+    const w0 = -0.5*(mu1x**2 - mu2x**2)/s1 + Math.log(p1/(1-p1));
+    const xBnd = -(w0)/((mu2x-mu1x)/s1);
+    document.getElementById('dbInfo').innerHTML =
+      `<strong>LDA (frontière linéaire)</strong><br>
+       w = Σ⁻¹(μ₁-μ₂) = ${((mu1x-mu2x)/s1).toFixed(2)}<br>
+       Frontière : x = <strong>${xBnd.toFixed(2)}</strong>`;
+  } else {
+    document.getElementById('dbInfo').innerHTML =
+      `<strong>QDA (frontière quadratique)</strong><br>
+       σ₁² = ${s1.toFixed(1)} &nbsp;|&nbsp; σ₂² = ${s2Eff.toFixed(1)}<br>
+       Deux frontières possibles (quadratique)`;
+  }
+}
+
+function drawDB(mu1x, mu1y, mu2x, mu2y, s1, s2, p1) {
+  const W = dbCanvas.width, H = dbCanvas.height;
+  const cx = W/2, cy = H/2, scale = 50;
+
+  const imgData = dbCtx.createImageData(W, H);
+  for(let px=0; px<W; px++) for(let py=0; py<H; py++) {
+    const x = (px-cx)/scale;
+    const y = (cy-py)/scale;
+    const d1x = x-mu1x, d1y = y-mu1y;
+    const d2x = x-mu2x, d2y = y-mu2y;
+    const log1 = -0.5*(d1x**2/s1 + d1y**2/s1) - Math.log(s1) + Math.log(p1);
+    const log2 = -0.5*(d2x**2/s2 + d2y**2/s2) - Math.log(s2) + Math.log(1-p1);
+    const isC1 = log1 > log2;
+    const idx = (py*W+px)*4;
+    const margin = Math.abs(log1-log2);
+    const conf = Math.min(1, margin/3);
+    imgData.data[idx]   = isC1 ? Math.round(219*(1-conf*0.5)) : Math.round(220*(1-conf*0.5));
+    imgData.data[idx+1] = isC1 ? Math.round(234*(1-conf*0.4)) : Math.round(252*(1-conf*0.3));
+    imgData.data[idx+2] = isC1 ? Math.round(254*(1-conf*0.2)) : Math.round(187*(1-conf*0.5));
+    imgData.data[idx+3] = 255;
+  }
+  dbCtx.putImageData(imgData,0,0);
+
+  // Decision boundary line
+  dbCtx.strokeStyle = '#1E3A5F'; dbCtx.lineWidth = 2.5;
+  dbCtx.beginPath();
+  let first = true;
+  for(let px=0; px<W; px++) {
+    const x = (px-cx)/scale;
+    // Scan vertically for boundary
+    let prevSign = null;
+    for(let py=0; py<H; py++) {
+      const y = (cy-py)/scale;
+      const d1x=x-mu1x, d1y=y-mu1y, d2x=x-mu2x, d2y=y-mu2y;
+      const diff = (-0.5*(d1x**2/s1+d1y**2/s1)-Math.log(s1)+Math.log(p1))
+                 - (-0.5*(d2x**2/s2+d2y**2/s2)-Math.log(s2)+Math.log(1-p1));
+      const sign = diff > 0;
+      if(prevSign !== null && sign !== prevSign) {
+        if(first){ dbCtx.moveTo(px,py); first=false; }
+        else dbCtx.lineTo(px,py);
+      }
+      prevSign = sign;
+    }
+  }
+  dbCtx.stroke();
+
+  // Axes
+  dbCtx.strokeStyle='rgba(100,116,139,.4)'; dbCtx.lineWidth=1; dbCtx.setLineDash([3,3]);
+  dbCtx.beginPath(); dbCtx.moveTo(0,cy); dbCtx.lineTo(W,cy); dbCtx.stroke();
+  dbCtx.beginPath(); dbCtx.moveTo(cx,0); dbCtx.lineTo(cx,H); dbCtx.stroke();
+  dbCtx.setLineDash([]);
+
+  // Class means
+  [[mu1x,mu1y,'#2563EB','μ₁'],[mu2x,mu2y,'#F59E0B','μ₂']].forEach(([mx,my,col,lbl])=>{
+    const px = cx+mx*scale, py = cy-my*scale;
+    dbCtx.fillStyle = col;
+    dbCtx.beginPath(); dbCtx.arc(px,py,7,0,2*Math.PI); dbCtx.fill();
+    dbCtx.fillStyle='#fff'; dbCtx.beginPath(); dbCtx.arc(px,py,3,0,2*Math.PI); dbCtx.fill();
+    dbCtx.fillStyle=col; dbCtx.font='bold 12px Segoe UI'; dbCtx.textAlign='center';
+    dbCtx.fillText(lbl, px, py-11);
+  });
+
+  // Legend
+  dbCtx.font='11px Segoe UI'; dbCtx.textAlign='left';
+  dbCtx.fillStyle='rgba(30,58,95,.8)'; dbCtx.fillRect(8,8,130,38);
+  dbCtx.fillStyle='#DBEAFE'; dbCtx.fillRect(12,14,20,10);
+  dbCtx.fillStyle='#FEF3C7'; dbCtx.fillRect(12,28,20,10);
+  dbCtx.fillStyle='#fff'; dbCtx.font='10px Segoe UI';
+  dbCtx.fillText('Classe 1', 36, 23);
+  dbCtx.fillText('Classe 2', 36, 37);
+}
+
+// ── Section 4 : FDA ───────────────────────────────────────────────────────────
+const fdaCanvas = document.getElementById('fdaCanvas');
+const fdaCtx = fdaCanvas.getContext('2d');
+
+// Seeded random for stable points
+function seededRand(seed) {
+  let s = seed;
+  return () => { s = (s*9301+49297)%233280; return s/233280; };
+}
+
+function generatePoints(mx, my, sx, sy, n, seed) {
+  const r = seededRand(seed);
+  const pts = [];
+  for(let i=0;i<n;i++) {
+    const u1=r(), u2=r();
+    const z1 = Math.sqrt(-2*Math.log(Math.max(1e-9,u1)))*Math.cos(2*Math.PI*u2);
+    const z2 = Math.sqrt(-2*Math.log(Math.max(1e-9,u1)))*Math.sin(2*Math.PI*u2);
+    pts.push([mx+z1*sx, my+z2*sy]);
+  }
+  return pts;
+}
+
+function updateFDA() {
+  const mu1 = parseFloat(document.getElementById('fdaMu1').value);
+  const mu2 = parseFloat(document.getElementById('fdaMu2').value);
+  const s1  = parseFloat(document.getElementById('fdaS1').value);
+  const s2  = parseFloat(document.getElementById('fdaS2').value);
+  document.getElementById('fdaMu1v').textContent = mu1.toFixed(1);
+  document.getElementById('fdaMu2v').textContent = mu2.toFixed(1);
+  document.getElementById('fdaS1v').textContent  = s1.toFixed(1);
+  document.getElementById('fdaS2v').textContent  = s2.toFixed(1);
+
+  const pts1 = generatePoints(mu1, -0.5, s1, s1*0.7, 30, 42);
+  const pts2 = generatePoints(mu2,  0.5, s2, s2*0.7, 30, 99);
+
+  // Compute scatter matrices (2D simplified: diagonal)
+  const m1x = pts1.reduce((a,p)=>a+p[0],0)/pts1.length;
+  const m1y = pts1.reduce((a,p)=>a+p[1],0)/pts1.length;
+  const m2x = pts2.reduce((a,p)=>a+p[0],0)/pts2.length;
+  const m2y = pts2.reduce((a,p)=>a+p[1],0)/pts2.length;
+
+  // SW (within-class scatter, simplified diagonal)
+  let sw00=0,sw11=0,sw01=0;
+  pts1.forEach(p=>{ sw00+=(p[0]-m1x)**2; sw11+=(p[1]-m1y)**2; sw01+=(p[0]-m1x)*(p[1]-m1y); });
+  pts2.forEach(p=>{ sw00+=(p[0]-m2x)**2; sw11+=(p[1]-m2y)**2; sw01+=(p[0]-m2x)*(p[1]-m2y); });
+
+  // SW⁻¹ * (m1-m2)
+  const det = sw00*sw11 - sw01**2;
+  const dx = m1x-m2x, dy = m1y-m2y;
+  let wx, wy;
+  if(Math.abs(det) < 1e-6) { wx=dx; wy=dy; }
+  else { wx=(sw11*dx - sw01*dy)/det; wy=(sw00*dy - sw01*dx)/det; }
+
+  const wLen = Math.sqrt(wx**2+wy**2);
+  wx /= wLen; wy /= wLen;
+
+  // Fisher criterion
+  const m1p = wx*m1x+wy*m1y, m2p = wx*m2x+wy*m2y;
+  const s1p = pts1.reduce((a,p)=>{const proj=wx*p[0]+wy*p[1]; return a+(proj-m1p)**2;},0)/pts1.length;
+  const s2p = pts2.reduce((a,p)=>{const proj=wx*p[0]+wy*p[1]; return a+(proj-m2p)**2;},0)/pts2.length;
+  const J = (m1p-m2p)**2 / (s1p+s2p);
+
+  document.getElementById('fdaInfo').innerHTML =
+    `<strong>Résultat FDA :</strong><br>
+     w = (${wx.toFixed(2)}, ${wy.toFixed(2)}) (normalisé)<br>
+     m̃₁ = ${m1p.toFixed(2)} &nbsp;|&nbsp; m̃₂ = ${m2p.toFixed(2)}<br>
+     <strong>J(w) = ${J.toFixed(2)}</strong> ← critère de Fisher`;
+
+  drawFDA(pts1, pts2, wx, wy, m1x, m1y, m2x, m2y);
+}
+
+function drawFDA(pts1, pts2, wx, wy, m1x, m1y, m2x, m2y) {
+  const W = fdaCanvas.width, H = fdaCanvas.height;
+  const cx = W/2, cy = H/2, scale = 55;
+
+  fdaCtx.clearRect(0,0,W,H);
+  fdaCtx.fillStyle = '#F8FAFF';
+  fdaCtx.fillRect(0,0,W,H);
+
+  // Projection line (FDA direction)
+  const linLen = Math.min(W,H)*0.5;
+  fdaCtx.strokeStyle = '#059669'; fdaCtx.lineWidth = 2.5;
+  fdaCtx.beginPath();
+  fdaCtx.moveTo(cx - wx*linLen, cy + wy*linLen);
+  fdaCtx.lineTo(cx + wx*linLen, cy - wy*linLen);
+  fdaCtx.stroke();
+
+  // Label w direction
+  fdaCtx.fillStyle = '#059669'; fdaCtx.font = 'bold 12px Segoe UI'; fdaCtx.textAlign = 'center';
+  fdaCtx.fillText('w (FDA)', cx + wx*linLen*0.8, cy - wy*linLen*0.8 - 10);
+
+  // Axes
+  fdaCtx.strokeStyle = 'rgba(100,116,139,.35)'; fdaCtx.lineWidth=1; fdaCtx.setLineDash([3,3]);
+  fdaCtx.beginPath(); fdaCtx.moveTo(0,cy); fdaCtx.lineTo(W,cy); fdaCtx.stroke();
+  fdaCtx.beginPath(); fdaCtx.moveTo(cx,0); fdaCtx.lineTo(cx,H); fdaCtx.stroke();
+  fdaCtx.setLineDash([]);
+
+  // Points class 1
+  pts1.forEach(p => {
+    const px = cx+p[0]*scale, py = cy-p[1]*scale;
+    // Projection onto w
+    const proj = wx*p[0]+wy*p[1];
+    const ppx = cx+proj*wx*scale, ppy = cy-proj*wy*scale;
+    fdaCtx.strokeStyle='rgba(37,99,235,.25)'; fdaCtx.lineWidth=1;
+    fdaCtx.beginPath(); fdaCtx.moveTo(px,py); fdaCtx.lineTo(ppx,ppy); fdaCtx.stroke();
+    fdaCtx.fillStyle = 'rgba(37,99,235,.75)';
+    fdaCtx.beginPath(); fdaCtx.arc(px,py,4,0,2*Math.PI); fdaCtx.fill();
+  });
+  // Points class 2
+  pts2.forEach(p => {
+    const px = cx+p[0]*scale, py = cy-p[1]*scale;
+    const proj = wx*p[0]+wy*p[1];
+    const ppx = cx+proj*wx*scale, ppy = cy-proj*wy*scale;
+    fdaCtx.strokeStyle='rgba(245,158,11,.25)'; fdaCtx.lineWidth=1;
+    fdaCtx.beginPath(); fdaCtx.moveTo(px,py); fdaCtx.lineTo(ppx,ppy); fdaCtx.stroke();
+    fdaCtx.fillStyle = 'rgba(245,158,11,.85)';
+    fdaCtx.beginPath(); fdaCtx.arc(px,py,4,0,2*Math.PI); fdaCtx.fill();
+  });
+
+  // Means
+  [[m1x,m1y,'#1D4ED8','m₁'],[m2x,m2y,'#D97706','m₂']].forEach(([mx,my,col,lbl])=>{
+    const px=cx+mx*scale, py=cy-my*scale;
+    fdaCtx.fillStyle=col;
+    fdaCtx.beginPath(); fdaCtx.arc(px,py,7,0,2*Math.PI); fdaCtx.fill();
+    fdaCtx.fillStyle='#fff'; fdaCtx.beginPath(); fdaCtx.arc(px,py,3,0,2*Math.PI); fdaCtx.fill();
+    fdaCtx.fillStyle=col; fdaCtx.font='bold 11px Segoe UI'; fdaCtx.textAlign='center';
+    fdaCtx.fillText(lbl, px, py-11);
+  });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+setCov('identity');
+setDB('lda');
+updateFDA();
+</script>
+</body>
+</html>
