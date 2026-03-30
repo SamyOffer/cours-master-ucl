@@ -303,18 +303,18 @@
 
   <div class="grid2">
     <div>
-      <div class="formula-box"><div class="label">Probabilité conjointe</div>P(A∩B) = P(A|B)·P(B) = P(B|A)·P(A)</div>
-  <div class="pending-math" data-phrase="La probabilité conjointe P(A∩B) décompose la cooccurrence de deux événements selon leur dépendance conditionnelle." data-latex="P(A\cap B) = P(A\mid B)\cdot P(B) = P(B\mid A)\cdot P(A)" data-latex2="A\perp B \iff P(A\mid B)=P(A) \iff P(A\cap B)=P(A)\cdot P(B)" data-vars='[{"sym": "P(A\\cap B)", "desc": "Probabilité que A ET B se produisent simultanément"}, {"sym": "P(A\\mid B)", "desc": "Probabilité conditionnelle de A sachant que B s&apos;est produit"}, {"sym": "A\\perp B", "desc": "Indépendance : savoir B n&apos;apporte aucune info sur A"}]' data-example="Tirer 2 cartes: P(As de pique) = P(As|pique)×P(pique) = (1/13)×(1/4) = 1/52."></div>
-      <div class="formula-box"><div class="label">Indépendance</div>A ⊥ B ⟺ P(A|B) = P(A) ⟺ P(A∩B) = P(A)·P(B)</div>
-      <div class="formula-box"><div class="label">Espérance (discrète)</div>E[X] = Σₓ x·P(X=x)</div>
+      <!-- formula-box caché automatiquement par .enhanced car suivi d'un math-block -->
+      <div class="formula-box"><div class="label">Probabilité conjointe &amp; Indépendance</div>P(A∩B) = P(A|B)·P(B) = P(B|A)·P(A)</div>
+      <div class="pending-math" data-phrase="La probabilité conjointe P(A∩B) décompose la cooccurrence de deux événements selon leur dépendance conditionnelle." data-latex="P(A\cap B) = P(A\mid B)\cdot P(B) = P(B\mid A)\cdot P(A)" data-latex2="A\perp B \iff P(A\mid B)=P(A) \iff P(A\cap B)=P(A)\cdot P(B)" data-vars='[{"sym": "P(A\\cap B)", "desc": "Probabilité que A ET B se produisent simultanément"}, {"sym": "P(A\\mid B)", "desc": "Probabilité conditionnelle de A sachant que B s&apos;est produit"}, {"sym": "A\\perp B", "desc": "Indépendance : savoir B n&apos;apporte aucune info sur A"}]' data-example="Tirer 2 cartes: P(As de pique) = P(As|pique)×P(pique) = (1/13)×(1/4) = 1/52."></div>
     </div>
     <div>
-      <div class="formula-box"><div class="label">Variance</div>Var(X) = E[(X-μ)²] = E[X²] - E[X]²</div>
-  <div class="pending-math" data-phrase="La variance mesure la dispersion d'une variable aléatoire autour de sa moyenne, et la covariance mesure la dépendance linéaire entre deux variables." data-latex="\mathrm{Var}(X) = \mathbb{E}[(X-\mu)^2] = \mathbb{E}[X^2]-\mathbb{E}[X]^2" data-latex2="\mathrm{Cov}(X,Y)=\mathbb{E}[(X-\mu_X)(Y-\mu_Y)], \quad P(A)=\sum_i P(A\mid B_i)P(B_i)" data-vars='[{"sym": "\\mu = \\mathbb{E}[X]", "desc": "Espérance / moyenne de X"}, {"sym": "\\mathrm{Var}(X)", "desc": "Variance — toujours ≥ 0. σ = √Var est l&apos;écart-type"}, {"sym": "\\mathrm{Cov}(X,Y)", "desc": "> 0 si X et Y varient dans le même sens, < 0 si opposé, = 0 si indépendants"}]' data-example="Dé à 6 faces : E[X]=(1+2+3+4+5+6)/6=3.5. E[X²]=(1+4+9+16+25+36)/6=15.17. Var=15.17-12.25=2.92. σ=√2.92≈1.71."></div>
-      <div class="formula-box"><div class="label">Covariance</div>Cov(X,Y) = E[(X-μₓ)(Y-μᵧ)]</div>
-      <div class="formula-box"><div class="label">Proba totale</div>P(A) = Σᵢ P(A|Bᵢ)·P(Bᵢ)  (si Bᵢ partition)</div>
+      <!-- formula-box caché automatiquement par .enhanced car suivi d'un math-block -->
+      <div class="formula-box"><div class="label">Variance, Covariance &amp; Proba totale</div>Var(X) = E[(X-μ)²] = E[X²] - E[X]²</div>
+      <div class="pending-math" data-phrase="La variance mesure la dispersion d'une variable aléatoire autour de sa moyenne, et la covariance mesure la dépendance linéaire entre deux variables." data-latex="\mathrm{Var}(X) = \mathbb{E}[(X-\mu)^2] = \mathbb{E}[X^2]-\mathbb{E}[X]^2" data-latex2="\mathrm{Cov}(X,Y)=\mathbb{E}[(X-\mu_X)(Y-\mu_Y)], \quad P(A)=\sum_i P(A\mid B_i)P(B_i)" data-vars='[{"sym": "\\mu = \\mathbb{E}[X]", "desc": "Espérance / moyenne de X"}, {"sym": "\\mathrm{Var}(X)", "desc": "Variance — toujours ≥ 0. σ = √Var est l&apos;écart-type"}, {"sym": "\\mathrm{Cov}(X,Y)", "desc": "> 0 si X et Y varient dans le même sens, < 0 si opposé, = 0 si indépendants"}]' data-example="Dé à 6 faces : E[X]=(1+2+3+4+5+6)/6=3.5. E[X²]=(1+4+9+16+25+36)/6=15.17. Var=15.17-12.25=2.92. σ=√2.92≈1.71."></div>
     </div>
   </div>
+  <!-- Espérance placée en dehors de la grille pour éviter l'asymétrie -->
+  <div class="formula-box" style="margin-top:1rem;"><div class="label">Espérance (discrète)</div>E[X] = Σₓ x·P(X=x) &nbsp;—&nbsp; valeur moyenne pondérée par les probabilités</div>
 </div>
 
 </main>
@@ -370,13 +370,17 @@ function initNormalChart(){
   normalChart=new Chart(ctx,{
     type:'line',
     data:{datasets:[
-      {label:'N(μ, σ²)',data:[],borderColor:'#1E3A5F',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(13,148,136,.15)'},
-      {label:'Zone ±1σ',data:[],borderColor:'transparent',fill:true,backgroundColor:'rgba(13,148,136,.3)',pointRadius:0},
-      {label:'Zone ±2σ',data:[],borderColor:'transparent',fill:true,backgroundColor:'rgba(13,148,136,.15)',pointRadius:0},
+      {label:'N(μ, σ²)',data:[],borderColor:'#1E3A5F',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(13,148,136,.15)',tension:0.4},
+      {label:'Zone ±1σ',data:[],borderColor:'rgba(13,148,136,.5)',fill:true,backgroundColor:'rgba(13,148,136,.35)',pointRadius:0,tension:0.4},
+      {label:'Zone ±2σ',data:[],borderColor:'rgba(245,158,11,.4)',fill:true,backgroundColor:'rgba(245,158,11,.18)',pointRadius:0,tension:0.4},
     ]},
     options:{responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false,callbacks:{label:p=>`f(x) = ${p.parsed.y.toFixed(4)}`}}},
-      scales:{x:{title:{display:true,text:'x'}},y:{title:{display:true,text:'Densité f(x)'},min:0}}}
+      plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false,callbacks:{label:p=>`f(x) = ${p.parsed.y?.toFixed(4)??''}`}}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'x'},ticks:{maxTicksLimit:9,callback:v=>v.toFixed(1)}},
+        y:{title:{display:true,text:'Densité f(x)'},min:0}
+      }
+    }
   });
 }
 function updateNormal(){
@@ -384,19 +388,23 @@ function updateNormal(){
   const sigma=+document.getElementById('sigma').value;
   document.getElementById('muVal').textContent=mu.toFixed(1);
   document.getElementById('sigmaVal').textContent=sigma.toFixed(1);
-  const xs=Array.from({length:200},(_,i)=>mu-4*sigma+i*(8*sigma/199));
-  const all=xs.map(x=>({x:x.toFixed(3),y:normalPDF(x,mu,sigma)}));
-  const z1=xs.map(x=>({x:x.toFixed(3),y:Math.abs(x-mu)<=sigma?normalPDF(x,mu,sigma):null}));
-  const z2=xs.map(x=>({x:x.toFixed(3),y:Math.abs(x-mu)<=2*sigma&&Math.abs(x-mu)>sigma?normalPDF(x,mu,sigma):null}));
+  const N=300;
+  const xs=Array.from({length:N},(_,i)=>mu-4*sigma+i*(8*sigma/(N-1)));
+  // All three datasets share the same x values — numeric, no strings
+  const all=xs.map(x=>({x,y:normalPDF(x,mu,sigma)}));
+  // ±1σ zone: fill under the curve between mu-sigma and mu+sigma
+  const z1=xs.map(x=>({x,y:Math.abs(x-mu)<=sigma?normalPDF(x,mu,sigma):null}));
+  // ±2σ zone: fill under the curve between 1σ and 2σ on each side
+  const z2=xs.map(x=>({x,y:(Math.abs(x-mu)>sigma&&Math.abs(x-mu)<=2*sigma)?normalPDF(x,mu,sigma):null}));
   normalChart.data.datasets[0].data=all;
   normalChart.data.datasets[1].data=z1;
   normalChart.data.datasets[2].data=z2;
-  normalChart.data.labels=xs.map(x=>x.toFixed(1));
   normalChart.options.scales.x.min=mu-4*sigma;
   normalChart.options.scales.x.max=mu+4*sigma;
   normalChart.update('none');
   document.getElementById('varianceVal').textContent=(sigma*sigma).toFixed(2);
   document.getElementById('modeVal').textContent=mu.toFixed(2);
+  // P(μ±kσ) is constant for any normal: always 68.27% and 95.45%
   const p1=(normalCDF(1)-normalCDF(-1))*100;
   const p2=(normalCDF(2)-normalCDF(-2))*100;
   document.getElementById('p1sigma').textContent=`≈ ${p1.toFixed(2)}%`;
