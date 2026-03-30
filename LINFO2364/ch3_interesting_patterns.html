@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 3 — Patterns Intéressants</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+            --white: #FFFFFF;
+            --gray: #64748B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--navy);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        header > div {
+            display: flex;
+            align-items: stretch;
+        }
+
+        header .color-bar-amber {
+            background: var(--amber);
+            width: 6px;
+            flex-shrink: 0;
+        }
+
+        header .color-bar-teal {
+            background: var(--teal);
+            width: 4px;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        header .header-content {
+            padding: 16px 20px;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .course-title {
+            color: var(--amber);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header .course-name {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        header a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        header a:hover {
+            color: var(--amber);
+        }
+
+        .breadcrumb {
+            padding: 20px 30px;
+            font-size: 14px;
+            color: var(--gray);
+            background: var(--white);
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb a {
+            color: var(--teal);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--navy);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .section h2 {
+            color: var(--navy);
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: var(--teal);
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .section h4 {
+            color: var(--navy);
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .section p {
+            margin-bottom: 12px;
+        }
+
+        .section ul, .section ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid var(--amber);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+
+        .explain-intro .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid var(--teal);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .math-block .formula-label {
+            color: var(--navy);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .math-block .formula-content {
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(13, 148, 136, 0.05);
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .theory-box {
+            background: var(--light);
+            border-left: 4px solid var(--navy);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box h4 {
+            color: var(--navy);
+            margin-bottom: 10px;
+        }
+
+        .symbol-table {
+            background: rgba(30, 58, 95, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .symbol-table p {
+            margin: 6px 0;
+        }
+
+        .symbol-table strong {
+            color: var(--navy);
+        }
+
+        .example-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--amber);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .example-box strong {
+            color: var(--navy);
+        }
+
+        .tip {
+            background: #dcfce7;
+            border-left: 4px solid #22c55e;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .tip strong {
+            color: var(--navy);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background: var(--navy);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        table tr:hover {
+            background: #f8fafc;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #fef3c7 0%, #dbeafe 100%);
+            border: 2px solid var(--amber);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .interactive-demo h3 {
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        .interactive-section {
+            margin: 20px 0;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--light);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--navy);
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+        }
+
+        .control-group input[type="number"],
+        .control-group input[type="text"] {
+            padding: 8px;
+            border: 2px solid var(--light);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .control-group input[type="number"]:focus {
+            border-color: var(--teal);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        .btn-secondary:hover {
+            background: var(--amber);
+            color: white;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card h4 {
+            color: var(--navy);
+            margin-bottom: 12px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 700;
+            color: var(--gray);
+        }
+
+        .result-value {
+            color: var(--navy);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-positive {
+            background: #22c55e;
+        }
+
+        .status-negative {
+            background: #ef4444;
+        }
+
+        .status-neutral {
+            background: #94a3b8;
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 20px 0;
+        }
+
+        .contingency-table {
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        .contingency-table input {
+            width: 60px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            border: 2px solid var(--navy);
+            background: white;
+            color: var(--navy);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: var(--navy);
+            color: white;
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        footer .footer-title {
+            color: var(--amber);
+            font-weight: 700;
+        }
+
+        footer .footer-subtitle {
+            color: #94A3B8;
+            margin-top: 8px;
+        }
+
+        .pending-math {
+            display: inline-block;
+            margin: 0 4px;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .interpretation-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border-left: 4px solid var(--teal);
+        }
+
+        .interpretation-box p {
+            margin: 6px 0;
+        }
+
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        .gauge {
+            width: 200px;
+            height: 100px;
+            border-radius: 100px 100px 0 0;
+            background: linear-gradient(90deg, #ef4444 0%, #eab308 50%, #22c55e 100%);
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .gauge-needle {
+            position: absolute;
+            width: 4px;
+            height: 80px;
+            background: var(--navy);
+            bottom: 0;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 2px;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--navy);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="color-bar-amber"></div>
+            <div class="color-bar-teal"></div>
+            <div class="header-content">
+                <div>
+                    <div class="course-title">LINFO2364</div>
+                    <div class="course-name">Mining Patterns in Data</div>
+                </div>
+                <a href="index.html">← Accueil</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        🏠 <a href="index.html">Accueil</a> → <strong>Chapitre 3: Patterns Intéressants & Autres Types</strong>
+    </div>
+
+    <main>
+        <!-- Section 1 -->
+        <div class="section">
+            <h2>Section 1 — Le Problème : Trop de Patterns !</h2>
+
+            <div class="explain-intro">
+                <span class="badge">⚠️ Le Paradoxe</span>
+                <p style="margin-bottom: 15px;">
+                    Tu as miné <span class="highlight">10 000 règles d'association</span>. C'est comme avoir 10 000 conseils
+                    d'un ami : la plupart sont évidents ou inutiles. Comment trouver les perles ?
+                </p>
+            </div>
+
+            <h3>Exemple Concret</h3>
+
+            <p>
+                Considérons une grande pharmacie avec 10 000 clients. On observe que :
+            </p>
+
+            <table>
+                <tr>
+                    <td><strong>Statut</strong></td>
+                    <td><strong>Valeur</strong></td>
+                </tr>
+                <tr>
+                    <td>Clients qui achètent A</td>
+                    <td>6 000 (60%)</td>
+                </tr>
+                <tr>
+                    <td>Clients qui achètent B</td>
+                    <td>7 500 (75%)</td>
+                </tr>
+                <tr>
+                    <td>Clients qui achètent A ET B</td>
+                    <td>4 000 (40%)</td>
+                </tr>
+            </table>
+
+            <div class="math-block">
+                <div class="formula-label">La règle A ⇒ B semble bonne :</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="support(A \cup B) = 40\%"></div>
+                </div>
+                <div class="formula-content" style="margin-top: 8px;">
+                    <div class="pending-math" data-latex="conf(A \Rightarrow B) = \frac{4000}{6000} = 66.7\%"></div>
+                </div>
+            </div>
+
+            <div class="theory-box">
+                <h4>⚡ MAIS ATTENTION !</h4>
+                <p>
+                    P(B) = 75% (probabilité d'acheter B sans condition)<br>
+                    conf(A ⇒ B) = 66.7% (probabilité d'acheter B si on a acheté A)<br>
+                    <strong>66.7% &lt; 75% !</strong>
+                </p>
+                <p style="margin-top: 12px;">
+                    <strong>Conclusion :</strong> Acheter A <strong>DIMINUE</strong> la chance d'acheter B !
+                    Cette règle est <strong>TROMPEUSE</strong>.
+                </p>
+            </div>
+
+            <p>
+                Il nous faut donc une <strong>mesure de corrélation</strong> pour distinguer les vraies relations
+                des simples coïncidences.
+            </p>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section">
+            <h2>Section 2 — Le Lift : Mesure de Corrélation</h2>
+
+            <div class="math-block">
+                <div class="formula-label">Formule du Lift</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="lift(A, B) = \frac{P(A \cup B)}{P(A) \cdot P(B)}"></div>
+                </div>
+                <div class="formula-content" style="margin-top: 8px;">
+                    <div class="pending-math" data-latex="lift(A, B) = \frac{P(B|A)}{P(B)} = \frac{conf(A \Rightarrow B)}{P(B)}"></div>
+                </div>
+            </div>
+
+            <div class="theory-box">
+                <h4>Interprétation du Lift</h4>
+                <ul style="margin-top: 12px;">
+                    <li><strong>lift &lt; 1</strong> → Corrélation NÉGATIVE (A et B s'évitent)</li>
+                    <li><strong>lift = 1</strong> → Indépendance (pas de relation)</li>
+                    <li><strong>lift &gt; 1</strong> → Corrélation POSITIVE (A et B vont ensemble)</li>
+                </ul>
+            </div>
+
+            <h3>Application au Problème Précédent</h3>
+
+            <div class="math-block">
+                <p>Calcul du lift :</p>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="lift(A, B) = \frac{0.40}{0.60 \times 0.75} = \frac{0.40}{0.45} = 0.88"></div>
+                </div>
+                <div class="example-box" style="margin-top: 15px;">
+                    <strong>Résultat :</strong> lift(A, B) = 0.88 &lt; 1<br>
+                    ➜ Corrélation NÉGATIVE confirmée ! La règle A ⇒ B est trompeuse.
+                </div>
+            </div>
+
+            <h3>Interactive Demo 1: Calculateur de Lift</h3>
+
+            <div class="interactive-demo">
+                <h3>📊 Calculateur Interactif du Lift</h3>
+
+                <div class="input-group">
+                    <div class="control-group">
+                        <label>P(A): <span id="pADisplay">0.60</span></label>
+                        <input type="range" id="pASlider" min="0.01" max="0.99" value="0.6" step="0.01">
+                    </div>
+                    <div class="control-group">
+                        <label>P(B): <span id="pBDisplay">0.75</span></label>
+                        <input type="range" id="pBSlider" min="0.01" max="0.99" value="0.75" step="0.01">
+                    </div>
+                    <div class="control-group">
+                        <label>P(A∩B): <span id="pABDisplay">0.40</span></label>
+                        <input type="range" id="pABSlider" min="0.01" max="0.50" value="0.4" step="0.01">
+                    </div>
+                </div>
+
+                <div id="resultCard" class="result-card">
+                    <h4>Résultats</h4>
+                    <div class="result-item">
+                        <span class="result-label">P(A)</span>
+                        <span class="result-value" id="resPA">0.60</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">P(B)</span>
+                        <span class="result-value" id="resPB">0.75</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">P(A∩B)</span>
+                        <span class="result-value" id="resPAB">0.40</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">conf(A ⇒ B)</span>
+                        <span class="result-value" id="resConf">66.7%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Lift(A, B)</span>
+                        <span class="result-value" id="resLift">0.88</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Interprétation</span>
+                        <span class="result-value" id="resInterpret" style="color: #ef4444;">Négative</span>
+                    </div>
+                </div>
+
+                <div class="gauge-container" id="gaugeContainer">
+                    <div style="position: relative; width: 200px;">
+                        <div class="gauge">
+                            <div class="gauge-needle" id="gaugeNeedle"></div>
+                        </div>
+                        <div class="gauge-value" id="gaugeValue">0.88</div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const pASlider = document.getElementById('pASlider');
+                const pBSlider = document.getElementById('pBSlider');
+                const pABSlider = document.getElementById('pABSlider');
+                const pADisplay = document.getElementById('pADisplay');
+                const pBDisplay = document.getElementById('pBDisplay');
+                const pABDisplay = document.getElementById('pABDisplay');
+
+                function updateLiftCalculation() {
+                    const pA = parseFloat(pASlider.value);
+                    const pB = parseFloat(pBSlider.value);
+                    const pAB = parseFloat(pABSlider.value);
+
+                    // Constraint: P(A∩B) <= min(P(A), P(B))
+                    const maxPAB = Math.min(pA, pB);
+                    if (pAB > maxPAB) {
+                        pABSlider.value = maxPAB;
+                    }
+                    pABSlider.max = Math.min(pA, pB);
+
+                    pADisplay.textContent = pA.toFixed(2);
+                    pBDisplay.textContent = pB.toFixed(2);
+                    pABDisplay.textContent = pAB.toFixed(2);
+
+                    // Calculate metrics
+                    const conf = pA > 0 ? (pAB / pA * 100).toFixed(1) : 0;
+                    const lift = (pA > 0 && pB > 0) ? (pAB / (pA * pB)).toFixed(2) : 0;
+
+                    // Update results
+                    document.getElementById('resPA').textContent = pA.toFixed(2);
+                    document.getElementById('resPB').textContent = pB.toFixed(2);
+                    document.getElementById('resPAB').textContent = pAB.toFixed(2);
+                    document.getElementById('resConf').textContent = conf + '%';
+                    document.getElementById('resLift').textContent = lift;
+
+                    // Interpretation
+                    let interpretation = 'Neutre';
+                    let color = '#94A3B8';
+                    if (lift < 0.95) {
+                        interpretation = 'Négative ❌';
+                        color = '#EF4444';
+                    } else if (lift > 1.05) {
+                        interpretation = 'Positive ✓';
+                        color = '#22C55E';
+                    }
+
+                    document.getElementById('resInterpret').textContent = interpretation;
+                    document.getElementById('resInterpret').style.color = color;
+
+                    // Update gauge
+                    const gaugeValue = Math.max(0, Math.min(2, lift));
+                    const rotation = (gaugeValue / 2) * 180;
+                    document.getElementById('gaugeNeedle').style.transform = `rotate(${rotation}deg)`;
+                    document.getElementById('gaugeValue').textContent = lift;
+                }
+
+                pASlider.addEventListener('input', updateLiftCalculation);
+                pBSlider.addEventListener('input', updateLiftCalculation);
+                pABSlider.addEventListener('input', updateLiftCalculation);
+
+                updateLiftCalculation();
+            </script>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section">
+            <h2>Section 3 — Chi-Carré (χ²)</h2>
+
+            <div class="explain-intro">
+                <span class="badge">📊 Test Statistique</span>
+                <p>
+                    Imagine qu'on te demande si les gens qui portent des lunettes sont plus ou moins susceptibles
+                    d'aimer les maths. Le test <strong>chi-carré</strong> répond exactement à cette question en
+                    utilisant une approche statistique rigoureuse !
+                </p>
+            </div>
+
+            <h3>Formule du Chi-Carré</h3>
+
+            <div class="math-block">
+                <div class="formula-label">Statistique Chi-Carré</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="\chi^2 = \sum_{i=1}^{c} \sum_{j=1}^{r} \frac{(o_{ij} - e_{ij})^2}{e_{ij}}"></div>
+                </div>
+                <p style="margin-top: 12px;">Où les fréquences attendues sont :</p>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="e_{ij} = \frac{count(A=a_i) \times count(B=b_j)}{n}"></div>
+                </div>
+                <div class="symbol-table" style="margin-top: 12px;">
+                    <p><strong>o<sub>ij</sub></strong> = fréquence observée</p>
+                    <p><strong>e<sub>ij</sub></strong> = fréquence attendue (sous indépendance)</p>
+                    <p><strong>n</strong> = nombre total d'observations</p>
+                </div>
+            </div>
+
+            <h3>Table de Contingence</h3>
+
+            <p>Pour les données du problème initial :</p>
+
+            <table style="font-size: 14px;">
+                <tr>
+                    <td style="background: #f0f4f8; font-weight: bold;"></td>
+                    <td style="background: var(--navy); color: white; font-weight: bold;">A</td>
+                    <td style="background: var(--navy); color: white; font-weight: bold;">Ā</td>
+                    <td style="background: var(--navy); color: white; font-weight: bold;">Σ lignes</td>
+                </tr>
+                <tr>
+                    <td style="background: var(--navy); color: white; font-weight: bold;">B</td>
+                    <td>4000</td>
+                    <td>3500</td>
+                    <td>7500</td>
+                </tr>
+                <tr>
+                    <td style="background: var(--navy); color: white; font-weight: bold;">B̄</td>
+                    <td>2000</td>
+                    <td>500</td>
+                    <td>2500</td>
+                </tr>
+                <tr>
+                    <td style="background: var(--navy); color: white; font-weight: bold;">Σ colonnes</td>
+                    <td>6000</td>
+                    <td>4000</td>
+                    <td>10000</td>
+                </tr>
+            </table>
+
+            <h3>Calcul des Fréquences Attendues</h3>
+
+            <div class="example-box">
+                <strong>e(A, B) = (6000 × 7500) / 10000 = 4500</strong><br>
+                e(A, B̄) = (6000 × 2500) / 10000 = 1500<br>
+                e(Ā, B) = (4000 × 7500) / 10000 = 3000<br>
+                e(Ā, B̄) = (4000 × 2500) / 10000 = 1000
+            </div>
+
+            <h3>Calcul du Chi-Carré</h3>
+
+            <div class="math-block">
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="\chi^2 = \frac{(4000-4500)^2}{4500} + \frac{(3500-3000)^2}{3000} + \frac{(2000-1500)^2}{1500} + \frac{(500-1000)^2}{1000}"></div>
+                </div>
+                <div class="formula-content" style="margin-top: 8px;">
+                    <div class="pending-math" data-latex="= 55.56 + 83.33 + 166.67 + 250 = 555.56"></div>
+                </div>
+                <div class="example-box" style="margin-top: 15px;">
+                    <strong>χ² = 555.56</strong> (très significatif, indépendance rejetée)
+                </div>
+            </div>
+
+            <h3>Interactive Demo 2: Test Chi-Carré Interactif</h3>
+
+            <div class="interactive-demo">
+                <h3>📈 Calculateur Chi-Carré</h3>
+
+                <p style="margin-bottom: 15px; font-weight: 700; color: var(--navy);">
+                    Entrez les valeurs observées dans la table de contingence :
+                </p>
+
+                <table class="contingency-table">
+                    <tr>
+                        <td style="background: #f0f4f8; font-weight: bold;"></td>
+                        <td style="background: var(--navy); color: white; font-weight: bold; padding: 12px;">Item X</td>
+                        <td style="background: var(--navy); color: white; font-weight: bold; padding: 12px;">¬Item X</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--navy); color: white; font-weight: bold; padding: 12px;">Item Y</td>
+                        <td style="padding: 12px;"><input type="number" id="cellXY" value="4000" min="0"></td>
+                        <td style="padding: 12px;"><input type="number" id="cellNotXY" value="3500" min="0"></td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--navy); color: white; font-weight: bold; padding: 12px;">¬Item Y</td>
+                        <td style="padding: 12px;"><input type="number" id="cellXNotY" value="2000" min="0"></td>
+                        <td style="padding: 12px;"><input type="number" id="cellNotXNotY" value="500" min="0"></td>
+                    </tr>
+                </table>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="chiBtn">Calculer χ²</button>
+                    <button class="btn-secondary" id="chiResetBtn">Réinitialiser</button>
+                </div>
+
+                <div id="chiResultCard" class="result-card" style="display: none;">
+                    <h4>Résultats du Test Chi-Carré</h4>
+                    <div class="result-item">
+                        <span class="result-label">Total d'observations :</span>
+                        <span class="result-value" id="chiTotal">10000</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">χ² calculé :</span>
+                        <span class="result-value" id="chiValue">555.56</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Significativité :</span>
+                        <span class="result-value" id="chiSig" style="color: #22c55e;">Très significatif</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Conclusion :</span>
+                        <span class="result-value" id="chiConc">Items corrélés</span>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.getElementById('chiBtn').addEventListener('click', function() {
+                    const xy = parseFloat(document.getElementById('cellXY').value) || 0;
+                    const notxy = parseFloat(document.getElementById('cellNotXY').value) || 0;
+                    const xnoty = parseFloat(document.getElementById('cellXNotY').value) || 0;
+                    const notxnoty = parseFloat(document.getElementById('cellNotXNotY').value) || 0;
+
+                    const n = xy + notxy + xnoty + notxnoty;
+                    if (n === 0) {
+                        alert('Entrez des valeurs');
+                        return;
+                    }
+
+                    // Calculate margins
+                    const rowY = xy + notxy;
+                    const rowNotY = xnoty + notxnoty;
+                    const colX = xy + xnoty;
+                    const colNotX = notxy + notxnoty;
+
+                    // Calculate expected frequencies
+                    const exy = (colX * rowY) / n;
+                    const enotxy = (colNotX * rowY) / n;
+                    const exnoty = (colX * rowNotY) / n;
+                    const enotxnoty = (colNotX * rowNotY) / n;
+
+                    // Calculate chi-square
+                    const chi2 = Math.pow(xy - exy, 2) / exy +
+                                Math.pow(notxy - enotxy, 2) / enotxy +
+                                Math.pow(xnoty - exnoty, 2) / exnoty +
+                                Math.pow(notxnoty - enotxnoty, 2) / enotxnoty;
+
+                    // Determine significance (critical value for df=1 is 3.841)
+                    let sig = 'Non significatif';
+                    let color = '#ef4444';
+                    if (chi2 > 10.8) {
+                        sig = 'Très significatif (p < 0.001)';
+                        color = '#22c55e';
+                    } else if (chi2 > 6.6) {
+                        sig = 'Significatif (p < 0.01)';
+                        color = '#22c55e';
+                    } else if (chi2 > 3.8) {
+                        sig = 'Modérément significatif (p < 0.05)';
+                        color = '#f59e0b';
+                    }
+
+                    document.getElementById('chiTotal').textContent = n;
+                    document.getElementById('chiValue').textContent = chi2.toFixed(2);
+                    document.getElementById('chiSig').textContent = sig;
+                    document.getElementById('chiSig').style.color = color;
+                    document.getElementById('chiConc').textContent = chi2 > 3.8 ? 'Items corrélés' : 'Items indépendants';
+                    document.getElementById('chiResultCard').style.display = 'block';
+                });
+
+                document.getElementById('chiResetBtn').addEventListener('click', function() {
+                    document.getElementById('cellXY').value = 4000;
+                    document.getElementById('cellNotXY').value = 3500;
+                    document.getElementById('cellXNotY').value = 2000;
+                    document.getElementById('cellNotXNotY').value = 500;
+                    document.getElementById('chiResultCard').style.display = 'none';
+                });
+            </script>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section">
+            <h2>Section 4 — Autres Mesures de Corrélation</h2>
+
+            <p>Voici un aperçu comparatif des différentes mesures :</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mesure</th>
+                        <th>Formule</th>
+                        <th>Avantages</th>
+                        <th>Inconvénients</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Support</strong></td>
+                        <td>support(A∪B)</td>
+                        <td>Simple et rapide</td>
+                        <td>Ignore fréquence individuelle</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Confiance</strong></td>
+                        <td>conf(A⇒B) = P(B|A)</td>
+                        <td>Directionnelle, intuitive</td>
+                        <td>Peut être trompeuse</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lift</strong></td>
+                        <td>P(A∩B)/P(A)P(B)</td>
+                        <td>Symétrique, détecte corrélation</td>
+                        <td>Sensible aux itemsets rares</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Chi-Carré</strong></td>
+                        <td>Σ(o-e)²/e</td>
+                        <td>Test rigoureux, p-value</td>
+                        <td>Complexe, demande gros n</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conviction</strong></td>
+                        <td>(1-P(B))/(1-conf)</td>
+                        <td>Asymétrique, bonne interprétation</td>
+                        <td>Moins utilisée</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <strong>💡 En pratique :</strong> Utilisez <strong>lift</strong> pour une première analyse rapide,
+                et <strong>chi-carré</strong> pour une analyse plus rigoureuse avec validation statistique.
+            </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section">
+            <h2>Section 5 — Patterns Fermés et Maximaux</h2>
+
+            <div class="explain-intro">
+                <span class="badge">♻️ Réduction de Redondance</span>
+                <p>
+                    Parmi tous les sous-ensembles de {pain, beurre, lait}, certains sont redondants car ils ont
+                    exactement le même support. Les <strong>patterns fermés</strong> gardent l'information
+                    <strong>sans la redondance</strong> !
+                </p>
+            </div>
+
+            <h3>Définitions</h3>
+
+            <div class="theory-box">
+                <h4>Itemset Maximal Fréquent</h4>
+                <p>
+                    Un itemset fréquent I est <strong>maximal</strong> si aucun sur-ensemble de I n'est fréquent.
+                </p>
+            </div>
+
+            <div class="theory-box">
+                <h4>Itemset Fermé Fréquent</h4>
+                <p>
+                    Un itemset I est <strong>fermé</strong> si aucun sur-ensemble strict J ⊃ I n'a le même support.
+                </p>
+                <div class="formula-content" style="margin-top: 12px;">
+                    <div class="pending-math" data-latex="I \text{ est fermé} \iff \forall J \supset I, support(J) < support(I)"></div>
+                </div>
+            </div>
+
+            <h3>Relation entre les trois types</h3>
+
+            <div style="background: linear-gradient(135deg, #dbeafe 0%, #f0fdf4 100%); padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid var(--teal);">
+                <p style="text-align: center; font-size: 14px; color: var(--navy); margin-bottom: 12px;">
+                    <strong>Fréquent ⊇ Fermé fréquent ⊇ Maximal fréquent</strong>
+                </p>
+                <p style="text-align: center; color: var(--gray); font-size: 12px;">
+                    Tout itemset maximal est fermé, mais l'inverse n'est pas vrai.
+                </p>
+            </div>
+
+            <h3>Interactive Demo 3: Visualisation Closed/Maximal</h3>
+
+            <div class="interactive-demo">
+                <h3>🔍 Visualiseur de Lattice d'Itemsets</h3>
+
+                <div class="control-group" style="margin-bottom: 20px;">
+                    <label>Support Minimum: <span id="closedSupport">40</span>%</label>
+                    <input type="range" id="closedSlider" min="20" max="80" value="40">
+                    <button class="btn-primary" id="updateClosedBtn">Mettre à jour</button>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="closedCanvas"></canvas>
+                </div>
+
+                <div style="background: #eff6ff; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <p style="font-size: 13px; color: var(--navy); margin-bottom: 8px;"><strong>Légende :</strong></p>
+                    <p style="margin: 6px 0; font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; background: #0D9488; border-radius: 50%; margin-right: 6px;"></span> Orange = Frequent</p>
+                    <p style="margin: 6px 0; font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; background: #3B82F6; border-radius: 50%; margin-right: 6px;"></span> Bleu = Closed Frequent</p>
+                    <p style="margin: 6px 0; font-size: 12px;"><span style="display: inline-block; width: 12px; height: 12px; background: #A855F7; border-radius: 50%; margin-right: 6px;"></span> Violet = Maximal Frequent</p>
+                </div>
+            </div>
+
+            <script>
+                const closedCanvas = document.getElementById('closedCanvas');
+                const closedCtx = closedCanvas.getContext('2d');
+                const closedSlider = document.getElementById('closedSlider');
+
+                closedCanvas.width = closedCanvas.offsetWidth;
+                closedCanvas.height = closedCanvas.offsetHeight;
+
+                // Itemsets with their support values
+                const closedItemsets = {
+                    'A': 0.65,
+                    'B': 0.60,
+                    'C': 0.55,
+                    'AB': 0.50,
+                    'AC': 0.45,
+                    'BC': 0.40,
+                    'ABC': 0.35
+                };
+
+                const closedInfo = {
+                    'A': { x: 150, y: 50, isClosed: true, isMaximal: false },
+                    'B': { x: 350, y: 50, isClosed: true, isMaximal: false },
+                    'C': { x: 550, y: 50, isClosed: true, isMaximal: false },
+                    'AB': { x: 250, y: 150, isClosed: false, isMaximal: false },
+                    'AC': { x: 450, y: 150, isClosed: false, isMaximal: false },
+                    'BC': { x: 350, y: 150, isClosed: true, isMaximal: false },
+                    'ABC': { x: 350, y: 250, isClosed: true, isMaximal: true }
+                };
+
+                function drawClosedLattice(minSupport) {
+                    closedCtx.clearRect(0, 0, closedCanvas.width, closedCanvas.height);
+
+                    const colors = {
+                        frequent: '#0D9488',
+                        closed: '#3B82F6',
+                        maximal: '#A855F7'
+                    };
+
+                    Object.entries(closedItemsets).forEach(([name, support]) => {
+                        const info = closedInfo[name];
+                        const isFrequent = support >= (minSupport / 100);
+
+                        if (isFrequent) {
+                            let color = colors.frequent;
+                            if (info.isMaximal) color = colors.maximal;
+                            else if (info.isClosed) color = colors.closed;
+
+                            drawClosedNode(info.x, info.y, name, color, support);
+                        }
+                    });
+                }
+
+                function drawClosedNode(x, y, label, color, support) {
+                    closedCtx.fillStyle = color;
+                    closedCtx.beginPath();
+                    closedCtx.arc(x, y, 30, 0, Math.PI * 2);
+                    closedCtx.fill();
+
+                    closedCtx.fillStyle = 'white';
+                    closedCtx.font = 'bold 14px Arial';
+                    closedCtx.textAlign = 'center';
+                    closedCtx.textBaseline = 'middle';
+                    closedCtx.fillText(label, x, y - 10);
+
+                    closedCtx.fillStyle = 'white';
+                    closedCtx.font = '11px Arial';
+                    closedCtx.fillText((support * 100).toFixed(0) + '%', x, y + 10);
+                }
+
+                document.getElementById('updateClosedBtn').addEventListener('click', function() {
+                    drawClosedLattice(closedSlider.value);
+                });
+
+                closedSlider.addEventListener('input', function() {
+                    document.getElementById('closedSupport').textContent = this.value;
+                });
+
+                drawClosedLattice(closedSlider.value);
+            </script>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section">
+            <h2>Section 6 — Patterns Rares et Négatifs</h2>
+
+            <h3>Patterns Rares</h3>
+
+            <p>
+                Les patterns <strong>rares</strong> sont des itemsets dont le support est inférieur au seuil minimum
+                habituel. Bien que rares, ils peuvent être très importants dans certains contextes :
+            </p>
+
+            <ul style="margin-left: 20px; line-height: 2;">
+                <li><strong>Détection de fraude :</strong> Les transactions frauduleuses sont rares mais cruciales</li>
+                <li><strong>Diagnostic médical :</strong> Les maladies rares doivent être identifiées</li>
+                <li><strong>Anomalies en production :</strong> Les défauts sont rares mais coûteux</li>
+            </ul>
+
+            <h3>Patterns Négatifs</h3>
+
+            <p>
+                Un pattern <strong>négatif</strong> est une corrélation inverse entre items. Il peut être détecté via :
+            </p>
+
+            <ul style="margin-left: 20px; line-height: 2;">
+                <li><strong>Lift &lt; 1 :</strong> Les items se n'achètent rarement ensemble</li>
+                <li><strong>Chi-carré significatif + indépendance rejetée :</strong> Preuve statistique d'une relation inverse</li>
+            </ul>
+
+            <div class="example-box">
+                <strong>Exemple :</strong> "Les clients qui achètent du café n'achètent presque jamais de lait"<br>
+                C'est un pattern négatif utile pour comprendre les comportements d'achat.
+            </div>
+
+            <div class="tip">
+                <strong>💡 À retenir :</strong> Les patterns rares et négatifs peuvent être plus importants que
+                les patterns fréquents dans certains domaines critiques (fraude, anomalies).
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="ch2_frequent_itemsets.html" class="nav-button">← Chapitre 2</a>
+            <a href="ch4.html" class="nav-button">Chapitre 4 →</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="footer-subtitle">Prof. Hélène Verhaeghe · UCLouvain · 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        // KaTeX rendering for all math expressions
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                try {
+                    katex.render(el.dataset.latex, el, {displayMode: true, throwOnError: false});
+                } catch(e) {
+                    console.log('KaTeX error:', e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

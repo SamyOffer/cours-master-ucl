@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours Master UCL — Portail</title>
+<style>
+  :root {
+    --navy:  #1E3A5F;
+    --teal:  #0D9488;
+    --amber: #F59E0B;
+    --light: #EFF6FF;
+    --white: #FFFFFF;
+    --gray:  #64748B;
+    --dark:  #1E293B;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:var(--dark); }
+
+  header {
+    background: var(--navy);
+    border-bottom: 5px solid var(--amber);
+    overflow: hidden;
+  }
+  .header-inner { display:flex; align-items:stretch; }
+  .stripe-teal  { width:10px; background:var(--teal);  flex-shrink:0; }
+  .stripe-amber { width:6px;  background:var(--amber); flex-shrink:0; margin-left:4px; }
+  .header-content { padding:2.5rem 2.5rem; flex:1; }
+  .header-content h1 { color:#fff; font-size:2.4rem; font-weight:800; letter-spacing:-0.5px; }
+  .header-content p  { color:#94A3B8; font-size:1.05rem; margin-top:.4rem; }
+  .badge {
+    display:inline-block; background:var(--teal); color:#fff;
+    padding:.25rem .75rem; border-radius:999px; font-size:.8rem; margin-top:.6rem;
+  }
+  .header-stats { display:flex; gap:2.5rem; margin-top:1.5rem; }
+  .stat .n { font-size:1.8rem; font-weight:800; color:var(--amber); }
+  .stat .l { font-size:.8rem; color:#94A3B8; }
+
+  main { max-width:1100px; margin:0 auto; padding:3rem 1.5rem; }
+  .section-title {
+    font-size:1.5rem; font-weight:700; color:var(--navy);
+    margin-bottom:1.5rem; padding-bottom:.5rem;
+    border-bottom:3px solid var(--teal);
+  }
+
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(320px,1fr));
+    gap:1.5rem;
+  }
+
+  .card {
+    background:var(--white); border-radius:14px; overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    transition:transform .2s, box-shadow .2s;
+    text-decoration:none; color:inherit;
+    display:flex; flex-direction:column;
+  }
+  .card:hover { transform:translateY(-5px); box-shadow:0 10px 28px rgba(0,0,0,.15); }
+
+  .card-header {
+    padding:1.25rem 1.25rem .75rem;
+    display:flex; align-items:center; gap:.75rem;
+  }
+  .card-icon {
+    width:54px; height:54px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem; flex-shrink:0;
+  }
+  .card-code { font-size:.75rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.05em; }
+  .card-name { font-size:1.05rem; font-weight:700; color:var(--navy); line-height:1.3; margin-top:.15rem; }
+
+  .card-body { padding:.5rem 1.25rem 1rem; flex:1; }
+  .card-desc { font-size:.88rem; color:var(--gray); line-height:1.6; margin-bottom:.75rem; }
+  .ch-item { font-size:.8rem; color:var(--teal); font-weight:600; margin-bottom:.2rem; }
+  .ch-more { font-size:.78rem; color:var(--gray); font-style:italic; }
+
+  .card-footer {
+    padding:.75rem 1.25rem;
+    text-align:center; color:#fff; font-weight:700; font-size:.9rem;
+    transition:filter .2s;
+  }
+  .card:hover .card-footer { filter:brightness(1.15); }
+
+  footer {
+    text-align:center; padding:2rem;
+    color:var(--gray); font-size:.85rem;
+    border-top:1px solid #e2e8f0; margin-top:2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="stripe-teal"></div>
+    <div class="stripe-amber"></div>
+    <div class="header-content">
+      <h1>Cours Master UCL</h1>
+      <p>Portail des notes de cours interactives · Master en Informatique</p>
+      <div class="badge">UCL · Master M2</div>
+      <div class="header-stats">
+        <div class="stat"><div class="n">5</div><div class="l">cours</div></div>
+        <div class="stat"><div class="n">42</div><div class="l">chapitres</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="section-title">Tous les cours</div>
+  <div class="grid">
+    
+        <a class="card" href="LINFO2146/index.html">
+          <div class="card-header" style="border-left:5px solid #0D9488">
+            <div class="card-icon" style="background:#0D948822;color:#0D9488">📡</div>
+            <div>
+              <div class="card-code">LINFO2146</div>
+              <div class="card-name">Mobile & Embedded Computing</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-desc">IoT, protocoles sans fil, systèmes embarqués</div>
+            <div class="chapters"><div class="ch-item">→ Chapitre 10 : Routage RPL | LINFO2146</div>
+<div class="ch-item">→ Chapitre 11 : MQTT & CoAP | LINFO2146</div>
+<div class="ch-item">→ Ch1 — Introduction & IoT | LINFO2146</div>
+<div class="ch-item">→ Ch2 — Systèmes d'exploitation | LINFO2146</div>
+<div class="ch-more">+ 8 chapitres…</div></div>
+          </div>
+          <div class="card-footer" style="background:#0D9488">
+            12 chapitres &nbsp;·&nbsp; Ouvrir →
+          </div>
+        </a>
+        <a class="card" href="LINFO2211/index.html">
+          <div class="card-header" style="border-left:5px solid #F59E0B">
+            <div class="card-icon" style="background:#F59E0B22;color:#F59E0B">💼</div>
+            <div>
+              <div class="card-code">LINFO2211</div>
+              <div class="card-name">Entrepreneuriat & Business</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-desc">Business planning, modèles d'affaires, financials</div>
+            <div class="chapters"><div class="ch-item">→ Ch.0 – Introduction | EPL 2211</div>
+<div class="ch-item">→ Ch.1 – Business Planning | EPL 2211</div>
+<div class="ch-item">→ Ch.2 – Opportunités Commerciales | EPL 2211</div>
+<div class="ch-item">→ Ch.3 – Positionnement Stratégique | EPL 2211</div>
+<div class="ch-more">+ 4 chapitres…</div></div>
+          </div>
+          <div class="card-footer" style="background:#F59E0B">
+            8 chapitres &nbsp;·&nbsp; Ouvrir →
+          </div>
+        </a>
+        <a class="card" href="LINFO2262/index.html">
+          <div class="card-header" style="border-left:5px solid #8B5CF6">
+            <div class="card-icon" style="background:#8B5CF622;color:#8B5CF6">🧠</div>
+            <div>
+              <div class="card-code">LINFO2262</div>
+              <div class="card-name">Machine Learning</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-desc">Classification, évaluation, algorithmes ML</div>
+            <div class="chapters"><div class="ch-item">→ Ch.1 — Introduction ML & Biais-Variance</div>
+<div class="ch-item">→ Ch.2 — Probabilités & Statistiques</div>
+<div class="ch-item">→ Ch.3 — Arbres de Décision & Random Forests</div>
+<div class="ch-item">→ Ch.4 — Discriminants Linéaires</div>
+<div class="ch-more">+ 4 chapitres…</div></div>
+          </div>
+          <div class="card-footer" style="background:#8B5CF6">
+            8 chapitres &nbsp;·&nbsp; Ouvrir →
+          </div>
+        </a>
+        <a class="card" href="LINFO2364/index.html">
+          <div class="card-header" style="border-left:5px solid #EC4899">
+            <div class="card-icon" style="background:#EC489922;color:#EC4899">🔍</div>
+            <div>
+              <div class="card-code">LINFO2364</div>
+              <div class="card-name">Mining Patterns in Data</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-desc">Itemsets fréquents, séquences, fouille de données</div>
+            <div class="chapters"><div class="ch-item">→ Chapitre 1: Introduction - LINFO2364</div>
+<div class="ch-item">→ Chapitre 2 — Frequent Itemset Mining</div>
+<div class="ch-item">→ Chapitre 3 — Patterns Intéressants</div>
+<div class="ch-item">→ Chapitre 4 — Patterns Compressés et Contraintes</div>
+<div class="ch-more">+ 3 chapitres…</div></div>
+          </div>
+          <div class="card-footer" style="background:#EC4899">
+            7 chapitres &nbsp;·&nbsp; Ouvrir →
+          </div>
+        </a>
+        <a class="card" href="LINFO2365/index.html">
+          <div class="card-header" style="border-left:5px solid #3B82F6">
+            <div class="card-icon" style="background:#3B82F622;color:#3B82F6">⚙️</div>
+            <div>
+              <div class="card-code">LINFO2365</div>
+              <div class="card-name">Constraint Programming</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-desc">Programmation par contraintes, MiniCP</div>
+            <div class="chapters"><div class="ch-item">→ Chapitre 1 — Introduction à la Programmation par Contraintes</div>
+<div class="ch-item">→ Chapitre 2 — Architecture de MiniCP</div>
+<div class="ch-item">→ Chapitre 3 — Contraintes Sum & Element</div>
+<div class="ch-item">→ Chapitre 4 — Contraintes de Table</div>
+<div class="ch-more">+ 3 chapitres…</div></div>
+          </div>
+          <div class="card-footer" style="background:#3B82F6">
+            7 chapitres &nbsp;·&nbsp; Ouvrir →
+          </div>
+        </a>
+  </div>
+</main>
+
+<footer>
+  Dernière mise à jour : 30/03/2026 à 10:36
+</footer>
+
+</body>
+</html>

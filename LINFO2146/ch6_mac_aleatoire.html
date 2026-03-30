@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 6 : Accès aléatoire & CSMA/CA | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .math-block h3 {
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: block;
+            margin: 1rem 0;
+            max-width: 100%;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+        }
+
+        .controls {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .control-group {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--navy);
+            min-width: 150px;
+        }
+
+        .control-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d5db;
+            outline: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 100px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--teal);
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .variant-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 0.7rem 1.5rem;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background: #0f766e;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 6 : Accès aléatoire & CSMA/CA</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 6 : Accès aléatoire & CSMA/CA</h1>
+
+        <p>Quand on ne peut pas pré-assigner des ressources (comme TDMA/FDMA), les appareils doivent partager le médium de manière plus flexible. Cette section explore l'accès aléatoire : du simple Polling au protocole ALOHA, puis CSMA et CSMA/CA utilisés par WiFi.</p>
+
+        <!-- Polling & Token Ring -->
+        <h2>1. Polling et Token Ring</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Concept clé</div>
+            <div class="analogy">
+                👨‍🏫 <strong>Polling :</strong> Un professeur interroge chaque élève un par un : "Alice, tu peux parler ?", "Non", "Bob, tu peux parler ?", "Oui", etc. Chaque élève a son tour.
+            </div>
+            <div class="analogy" style="margin-top: 1rem;">
+                🎤 <strong>Token Ring :</strong> Un bâton de parole circule entre les élèves. Celui qui a le bâton peut parler. Quand il finit, il passe le bâton au suivant.
+            </div>
+        </div>
+
+        <div style="background: #dbeafe; border-left: 3px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+            <p><strong>Avantages :</strong> Pas de collision, accès déterministe, équitable.</p>
+            <p><strong>Inconvénients :</strong> Latence si beaucoup d'appareils, si un appareil meurt (Token Ring), surcharge du coordinateur (Polling).</p>
+            <p><strong>Utilisation réelle :</strong> Token Ring (années 1980-2000, réseaux d'entreprise). Polling utilisé en IoT (ex: ZigBee).</p>
+        </div>
+
+        <!-- ALOHA -->
+        <h2>2. ALOHA</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Histoire</div>
+            <p>ALOHA a été inventé en 1970 à l'université d'Hawaii par Norm Abramson pour connecter les îles sans câbles. L'acronyme signifie "A LOha - Hawaiian greetings". C'est le précurseur de l'Ethernet et du WiFi !</p>
+            <div class="analogy">
+                🏝️ <strong>Concept :</strong> Chacun émet quand il a des données. S'il y a une collision (deux émissions en même temps), on attend aléatoirement et on réessaie. Aucune coordination préalable.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Formules ALOHA</h3>
+            <div class="formula">
+                <strong>Pure ALOHA :</strong> Les appareils émettent à tout moment.
+                <div class="pending-math" data-latex="S = G \cdot e^{-2G}"></div>
+            </div>
+
+            <div class="formula">
+                <strong>Slotted ALOHA :</strong> Le temps est divisé en slots, les appareils émettent au début d'un slot.
+                <div class="pending-math" data-latex="S = G \cdot e^{-G}"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                        <th>Gamme typique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>S</td>
+                        <td>Débit utile (throughput) = fraction de paquets transmis avec succès</td>
+                        <td>0 à 0.368 (slotted) ou 0.184 (pure)</td>
+                    </tr>
+                    <tr>
+                        <td>G</td>
+                        <td>Charge offerte = nombre de paquets générés par unité de temps</td>
+                        <td>0 à 3+</td>
+                    </tr>
+                    <tr>
+                        <td>e</td>
+                        <td>Nombre d'Euler</td>
+                        <td>≈ 2.718</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background: white; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                <strong>Exemple chiffré :</strong> Si G=0.5 (50% de paquets en excès)
+                <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+                    <li>Pure ALOHA: S = 0.5 × e<sup>-2×0.5</sup> = 0.5 × e<sup>-1</sup> ≈ 0.5 × 0.368 ≈ <strong>0.184</strong> (18.4% succès)</li>
+                    <li>Slotted ALOHA: S = 0.5 × e<sup>-0.5</sup> ≈ 0.5 × 0.606 ≈ <strong>0.303</strong> (30.3% succès)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>📊 Démo interactive : Comparaison Pure vs Slotted ALOHA</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Charge offerte G :</label>
+                    <input type="range" id="alohaG" min="0" max="3" step="0.05" value="0.5">
+                    <span class="value-display" id="alohaGVal">0.50</span>
+                </div>
+            </div>
+            <div class="chart-container"><canvas id="alohaChart"></canvas></div>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 4px;">
+                <p><strong>📌 Observations :</strong></p>
+                <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                    <li>Le maximum de Slotted ALOHA est S_max = 1/e ≈ 0.368 (36.8%) à G=1</li>
+                    <li>Le maximum de Pure ALOHA est S_max = 1/(2e) ≈ 0.184 (18.4%) à G=0.5</li>
+                    <li>Slotted ALOHA est 2x plus efficace que Pure ALOHA</li>
+                    <li>Au-delà du maximum, augmenter G ne fait que diminuer S (plus de collisions)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="retenir">
+            ⚠️ ALOHA est très inefficace pour les charges élevées. C'est pourquoi CSMA (qui écoute avant d'émettre) a été créé pour améliorer les choses.
+        </div>
+
+        <!-- CSMA -->
+        <h2>3. CSMA (Carrier Sense Multiple Access)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Amélioration majeure</div>
+            <p>CSMA = "Écoute avant de parler". Avant d'émettre, on vérifie que le canal est libre.</p>
+            <div class="analogy">
+                🎧 <strong>Analogie :</strong> À une fête bruyante, vous écoutez d'abord si quelqu'un parle avant de prendre la parole. Si c'est libre, vous commencez. Si c'est occupé, vous attendez.
+            </div>
+        </div>
+
+        <div class="variant-box">
+            <h3>Trois variantes CSMA</h3>
+            <p><strong>1. CSMA 1-persistent :</strong></p>
+            <ul style="margin-left: 2rem;">
+                <li>Si le canal est libre → émettre immédiatement (probabilité 1)</li>
+                <li>Si le canal est occupé → attendre jusqu'à ce qu'il se libère, puis émettre immédiatement</li>
+                <li>Problème : forte probabilité de collision quand le canal se libère</li>
+            </ul>
+
+            <p style="margin-top: 1rem;"><strong>2. CSMA non-persistent :</strong></p>
+            <ul style="margin-left: 2rem;">
+                <li>Si le canal est libre → émettre</li>
+                <li>Si le canal est occupé → attendre un délai aléatoire, puis réessayer</li>
+                <li>Avantage : moins de collision, mais plus de latence</li>
+            </ul>
+
+            <p style="margin-top: 1rem;"><strong>3. CSMA p-persistent :</strong></p>
+            <ul style="margin-left: 2rem;">
+                <li>Si le canal est libre → émettre avec probabilité p</li>
+                <li>Si le canal est occupé → attendre</li>
+                <li>Compromis entre 1-persistent et non-persistent</li>
+            </ul>
+        </div>
+
+        <!-- CSMA/CA -->
+        <h2>4. CSMA/CA (WiFi - IEEE 802.11 DCF)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">WiFi</div>
+            <p>CSMA/CA = CSMA + Collision Avoidance. C'est le protocole utilisé par WiFi pour partager le médium radio.</p>
+            <div class="analogy">
+                📶 <strong>Concept :</strong> Écoute le canal. Si libre, attend DIFS. Puis attend un délai de backoff aléatoire. Envoie le paquet. S'il y a ACK rapide (SIFS) → succès. Pas d'ACK → augmente le backoff et réessaie.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Formule : Fenêtre de Contention</h3>
+            <div class="formula">
+                <div class="pending-math" data-latex="CW = \min(2^{attempt} \times CW_{min}, CW_{max})"></div>
+                Le délai d'attente est choisi aléatoirement: <div class="pending-math" data-latex="\text{backoff} = \text{random}(0, CW) \times \text{SlotTime}"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Signification</th>
+                        <th>Valeur WiFi 802.11</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DIFS</td>
+                        <td>Délai Inter-trame DCF (attendre avant d'accéder)</td>
+                        <td>34 µs</td>
+                    </tr>
+                    <tr>
+                        <td>SIFS</td>
+                        <td>Délai Inter-trame court (pour l'ACK)</td>
+                        <td>10 µs</td>
+                    </tr>
+                    <tr>
+                        <td>SlotTime</td>
+                        <td>Durée d'un slot pour le compteur de backoff</td>
+                        <td>20 µs</td>
+                    </tr>
+                    <tr>
+                        <td>CW_min</td>
+                        <td>Fenêtre de contention minimale</td>
+                        <td>31</td>
+                    </tr>
+                    <tr>
+                        <td>CW_max</td>
+                        <td>Fenêtre de contention maximale</td>
+                        <td>1023</td>
+                    </tr>
+                    <tr>
+                        <td>attempt</td>
+                        <td>Nombre de tentatives échouées (0-7)</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background: white; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                <strong>Exemple chiffré :</strong> Après 2 essais échoués
+                <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+                    <li>CW = min(2² × 31, 1023) = min(124, 1023) = 124</li>
+                    <li>Backoff aléatoire ∈ [0, 124] slots × 20µs = [0, 2480µs]</li>
+                    <li>La station attend donc entre 0 et ~2.5 ms avant de réessayer</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>📡 Démo animée : CSMA/CA avec accès au canal</h3>
+            <canvas id="csmaCanvas" style="width:100%;height:320px;"></canvas>
+            <div class="controls">
+                <button id="csmaPlayBtn">▶ Lancer simulation</button>
+                <button id="csmaResetBtn">🔄 Réinitialiser</button>
+            </div>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 4px; font-size: 0.9rem;">
+                <p><strong>Légende :</strong></p>
+                <ul style="margin-left: 2rem;">
+                    <li><span style="color: #3B82F6;">■</span> <strong>Bleu :</strong> Émission en cours</li>
+                    <li><span style="color: #10B981;">■</span> <strong>Vert :</strong> ACK reçu (succès)</li>
+                    <li><span style="color: #EF4444;">■</span> <strong>Rouge :</strong> Pas d'ACK (collision détectée)</li>
+                    <li><span style="color: #F59E0B;">■</span> <strong>Orange :</strong> Backoff en attente</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Hidden Terminal Problem -->
+        <h2>5. Hidden Terminal Problem & RTS/CTS</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Problème majeur</div>
+            <p>Deux stations A et C ne peuvent pas s'entendre, mais émettent toutes les deux vers B. Comment peut-on détecter une collision si on n'entend pas l'autre station ?</p>
+            <div class="analogy">
+                📡 <strong>Visualisation :</strong>
+                <div style="margin-top: 0.8rem;">
+                    A (à gauche) → B (au centre) ← C (à droite)
+                    <br>
+                    A n'entend pas C, et C n'entend pas A. Seul B peut tout entendre. Si A et C émettent tous les deux, B reçoit une collision, mais A et C pensent que tout va bien !
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #fee2e2; border-left: 3px solid #dc2626; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+            <p><strong>Problème :</strong> Avec CSMA/CA seul, Carrier Sense n'aide pas si on n'entend pas l'autre émetteur. On détecte les collisions seulement par absence d'ACK → latence importante.</p>
+        </div>
+
+        <div class="variant-box">
+            <h3>Solution : RTS/CTS (Request To Send / Clear To Send)</h3>
+            <p>Avant d'envoyer le paquet complet :</p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>Station A envoie RTS</strong> (paquet très court) → "Je veux envoyer"</li>
+                <li><strong>Station B répond CTS</strong> → "D'accord, le canal est à toi"</li>
+                <li><strong>Tous les autres</strong> (dont C) <strong>entendent le CTS</strong> et savent que le canal est réservé pour la durée annoncée (NAV = Network Allocation Vector)</li>
+                <li><strong>Station A envoie les données</strong> → personne d'autre ne va émettre</li>
+            </ul>
+            <p style="margin-top: 1rem;"><strong>✓ Avantage :</strong> C entend le CTS et attend, donc pas de collision.</p>
+            <p><strong>✗ Inconvénient :</strong> Surcharge pour les petits paquets (RTS+CTS+DATA+ACK = 4 trames au lieu de 2).</p>
+            <p style="margin-top: 0.5rem;"><strong>Utilisation :</strong> WiFi active RTS/CTS optionnellement, surtout pour les gros paquets ou quand des collisions sont détectées.</p>
+        </div>
+
+        <div class="retenir">
+            ✅ CSMA/CA est la base de WiFi (802.11). RTS/CTS améliore les performances en milieu à forte interférence ou avec le problème du terminal caché.
+        </div>
+    </div>
+
+    <!-- ========== SECTION RÉCAP : INTERVALLES DE GARDE + SLOTTED ALOHA ========== -->
+    <div class="section">
+        <h2>📐 Récap : Intervalles de garde et exigences de synchronisation</h2>
+
+        <div class="explain-intro">
+            <div class="badge">🧒 Pourquoi des "garde-fous" entre les transmissions ?</div>
+            <p>Quand plusieurs nœuds partagent un canal (FDMA, TDMA), ils doivent laisser des <strong>espaces de protection</strong> entre eux pour éviter les chevauchements dus aux imperfections du matériel et à la propagation.</p>
+        </div>
+
+        <h3>Intervalles de garde selon la méthode d'accès</h3>
+        <table class="info-table" style="width:100%">
+            <tr><th>Méthode</th><th>Type d'intervalle</th><th>Rôle</th><th>Conséquence</th></tr>
+            <tr>
+                <td><strong>FDMA</strong></td>
+                <td>🎚️ Bande de garde (guard band)</td>
+                <td>Gap de fréquence entre canaux adjacents pour éviter les interférences inter-canaux</td>
+                <td>Perte de bande passante utile</td>
+            </tr>
+            <tr>
+                <td><strong>TDMA</strong></td>
+                <td>⏱️ Temps de garde (guard time)</td>
+                <td>Petit délai entre slots consécutifs pour absorber le délai de propagation et les imperfections de synchronisation</td>
+                <td>Perte de capacité temporelle</td>
+            </tr>
+            <tr>
+                <td><strong>CDMA</strong></td>
+                <td>🔢 Codes orthogonaux</td>
+                <td>Les codes doivent être parfaitement orthogonaux pour éviter les interférences entre utilisateurs</td>
+                <td>Produit scalaire = 0 requis</td>
+            </tr>
+        </table>
+
+        <h3 style="margin-top:1.5rem;">Slotted ALOHA : exigence de synchronisation</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0;">
+            <div style="background:#fee2e2;border-radius:10px;padding:1rem;">
+                <strong>❌ Pure ALOHA (non synchronisé)</strong><br>
+                <p style="margin-top:.5rem;font-size:.9rem;">Les nœuds émettent à n'importe quel moment → les trames se chevauchent partiellement → fenêtre de collision = 2T<br><strong>Efficacité max : S = 1/(2e) ≈ 18.4%</strong></p>
+            </div>
+            <div style="background:#d1fae5;border-radius:10px;padding:1rem;">
+                <strong>✅ Slotted ALOHA (synchronisé)</strong><br>
+                <p style="margin-top:.5rem;font-size:.9rem;"><strong>Tous les nœuds doivent avoir une horloge commune</strong> pour savoir quand commence chaque slot → les trames se chevauchent complètement ou pas du tout → fenêtre de collision = T<br><strong>Efficacité max : S = 1/e ≈ 36.8%</strong></p>
+            </div>
+        </div>
+        <div class="retenir">Slotted ALOHA nécessite la <strong>synchronisation globale de tous les nœuds</strong> (horloge partagée). C'est une contrainte importante dans les réseaux de capteurs sans infrastructure centrale.</div>
+
+        <h3 style="margin-top:1.5rem;">Récap comparatif : toutes les méthodes d'accès</h3>
+        <table class="info-table" style="width:100%">
+            <tr><th>Méthode</th><th>Principe</th><th>Coordination</th><th>Efficacité</th><th>Usage IoT</th></tr>
+            <tr><td>SDMA</td><td>Séparation spatiale</td><td>Antennes directionnelles</td><td>Bonne (si distance suffisante)</td><td>Rare (infra. complexe)</td></tr>
+            <tr><td>FDMA</td><td>Sous-bandes dédiées</td><td>Filtrage fréquentiel</td><td>Bonne mais perte en guard bands</td><td>GSM, LoRa</td></tr>
+            <tr><td>TDMA</td><td>Slots temporels</td><td>Synchronisation requise</td><td>Bonne si charge connue</td><td>GSM, TSCH 802.15.4</td></tr>
+            <tr><td>CDMA</td><td>Codes orthogonaux</td><td>Gestion des codes</td><td>Bonne avec peu d'utilisateurs</td><td>3G/WCDMA</td></tr>
+            <tr><td>Pure ALOHA</td><td>Aléatoire libre</td><td>Aucune</td><td>18.4% max</td><td>Non (trop inefficace)</td></tr>
+            <tr><td>Slotted ALOHA</td><td>Aléatoire en slots</td><td>Sync. horloge</td><td>36.8% max</td><td>LoRaWAN</td></tr>
+            <tr><td>CSMA/CA</td><td>Écoute avant émission</td><td>IFS + backoff</td><td>Variable (meilleure sous faible charge)</td><td>✅ WiFi, 802.15.4</td></tr>
+        </table>
+    </div>
+
+    <!-- ===== SECTION : IFS DETAILS ===== -->
+    <div class="section">
+        <h2>⏱️ Les intervalles IFS dans CSMA/CA — Détail</h2>
+
+        <div class="explain-intro">
+            <div class="badge">📘 Pourquoi plusieurs types d'IFS ?</div>
+            <p>Dans CSMA/CA (utilisé par WiFi et IEEE 802.15.4), il existe différents <strong>Inter-Frame Spacing (IFS)</strong> permettant de donner des priorités différentes aux types de trames.</p>
+        </div>
+
+        <table class="info-table" style="width:100%">
+            <tr><th>IFS</th><th>Durée</th><th>Utilisé pour</th><th>Priorité</th></tr>
+            <tr>
+                <td><strong>SIFS</strong><br>(Short IFS)</td>
+                <td>La plus courte</td>
+                <td>Trames de contrôle à haute priorité : ACK, CTS, réponse à un polling</td>
+                <td>🔴 Maximale</td>
+            </tr>
+            <tr>
+                <td><strong>PIFS</strong><br>(PCF IFS)</td>
+                <td>Moyenne</td>
+                <td>Utilisé par le Point Coordinator (AP en mode PCF) pour prendre le contrôle du canal</td>
+                <td>🟡 Haute</td>
+            </tr>
+            <tr>
+                <td><strong>DIFS</strong><br>(DCF IFS)</td>
+                <td>La plus longue</td>
+                <td>Trames de données normales (DCF mode)</td>
+                <td>🟢 Normale</td>
+            </tr>
+        </table>
+
+        <div style="background:#f0fdf4;border-left:4px solid #0D9488;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <strong>Principe de priorité par IFS :</strong>
+            <p style="margin-top:.5rem;">Après une transmission, le canal est libre. Le premier à transmettre est celui qui attend le moins longtemps. Comme SIFS &lt; PIFS &lt; DIFS, les ACKs sont toujours envoyés avant que les autres nœuds puissent tenter d'envoyer des données. Cela garantit que les accusés de réception arrivent à temps.</p>
+        </div>
+    </div>
+
+    <!-- ===== SECTION : BINARY EXPONENTIAL BACKOFF ===== -->
+    <div class="section">
+        <h2>📈 Binary Exponential Backoff (BEB)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">🧒 Comment éviter que tout le monde réessaie en même temps ?</div>
+            <p>Après une collision, si tous les nœuds attendent le même temps avant de réessayer, ils vont recollisionner immédiatement. Il faut un mécanisme de <strong>backoff progressif</strong>.</p>
+        </div>
+
+        <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#3b82f6;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Théorie : BEB dans Ethernet (CSMA/CD)</div>
+            <p>Dans Ethernet original (avec collision detection), le Binary Exponential Backoff fonctionne ainsi :</p>
+            <ul style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+                <li><strong>1ère collision</strong> : attendre aléatoirement 0 ou 51.2 μs</li>
+                <li><strong>2ème collision</strong> : attendre aléatoirement 0, 51.2, 102.4 ou 153.6 μs (2× plus de choix)</li>
+                <li><strong>3ème collision</strong> : attendre dans {0, 51.2, 102.4, ..., 7×51.2 μs} (8 choix)</li>
+                <li>…La fenêtre de backoff <strong>double à chaque collision</strong></li>
+            </ul>
+            <p style="margin-top:.6rem;">Ce mécanisme réduit la probabilité de re-collision : plus les collisions sont fréquentes (réseau surchargé), plus les attentes deviennent longues et aléatoires. Le réseau s'autorégule.</p>
+        </div>
+
+        <div style="background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;">💡 À retenir : BEB = compromis entre latence et équité. Sous faible charge → backoff court (bonne latence). Sous forte charge → backoff long (évite l'effondrement du réseau).</div>
+    </div>
+
+    <!-- ===== SECTION : AUTRES PROTOCOLES MAC ===== -->
+    <div class="section">
+        <h2>📚 La diversité des protocoles MAC pour réseaux de capteurs</h2>
+
+        <div style="background:#fffbeb;border-left:4px solid #F59E0B;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#F59E0B;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Théorie</div>
+            <p>De très nombreux protocoles MAC ont été développés spécifiquement pour les réseaux de capteurs, cherchant chacun à optimiser différents critères :</p>
+            <ul style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+                <li><strong>Économie d'énergie</strong> : S-MAC, T-MAC, X-MAC, B-MAC — le récepteur dort et ne se réveille que périodiquement</li>
+                <li><strong>Fiabilité industrielle</strong> : WiseMAC, TRAMA — adaptés aux applications temps-réel</li>
+                <li><strong>Faible latence</strong> : protocols optimisés pour données urgentes</li>
+                <li><strong>Équité entre nœuds</strong> : protocoles évitant que certains nœuds monopolisent le canal</li>
+            </ul>
+            <p style="margin-top:.6rem;">Exemples de protocoles : µ-MAC, B-MAC, DMAC, E2-MAC, LMAC, LPL, MMAC, S-MAC, SCP-MAC, T-MAC, X-MAC, Z-MAC…</p>
+            <p style="margin-top:.6rem;">La <strong>recherche actuelle</strong> se concentre surtout sur l'optimisation des protocoles MAC pour les réseaux cellulaires haute vitesse (5G et au-delà). Peu de ces protocoles de recherche ont été adoptés par des technologies populaires — parmi les exceptions notables : CSMA/CA (WiFi, 802.15.4) et TSCH (802.15.4e).</p>
+        </div>
+        <div style="background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;">💡 À retenir : Il existe des centaines de protocoles MAC proposés dans la littérature. En pratique, seuls quelques-uns ont été standardisés et réellement déployés.</div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch5_mac_fixe.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="ch7_802154.html">Chapitre suivant →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // ALOHA Chart
+        const alohaGSlider = document.getElementById('alohaG');
+        const alohaGVal = document.getElementById('alohaGVal');
+        const alohaCanvas = document.getElementById('alohaChart');
+        let alohaChart = null;
+
+        function updateAlohaChart() {
+            const G = parseFloat(alohaGSlider.value);
+            alohaGVal.textContent = G.toFixed(2);
+
+            const gValues = [];
+            const pureValues = [];
+            const slottedValues = [];
+
+            for (let g = 0; g <= 3; g += 0.05) {
+                gValues.push(g.toFixed(2));
+                pureValues.push(g * Math.exp(-2 * g));
+                slottedValues.push(g * Math.exp(-g));
+            }
+
+            const ctx = alohaCanvas.getContext('2d');
+
+            if (alohaChart) {
+                // Update data in place to avoid destroy/recreate loop
+                alohaChart.data.labels = gValues;
+                alohaChart.data.datasets[0].data = pureValues;
+                alohaChart.data.datasets[1].data = slottedValues;
+                alohaChart.update('none');
+                return;
+            }
+
+            alohaChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: gValues,
+                    datasets: [
+                        {
+                            label: 'Pure ALOHA: S = G·e^(-2G)',
+                            data: pureValues,
+                            borderColor: '#EF4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Slotted ALOHA: S = G·e^(-G)',
+                            data: slottedValues,
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0,
+                            borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.2,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: { size: 12, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Charge offerte (G)', font: { size: 12, weight: 'bold' } },
+                            grid: { color: '#e5e7eb' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Débit utile (S)', font: { size: 12, weight: 'bold' } },
+                            min: 0,
+                            max: 0.4,
+                            grid: { color: '#e5e7eb' }
+                        }
+                    }
+                }
+            });
+        }
+
+        alohaGSlider.addEventListener('input', updateAlohaChart);
+        updateAlohaChart();
+
+        // CSMA/CA Animation
+        const csmaCanvas = document.getElementById('csmaCanvas');
+        const csmaCtx = csmaCanvas.getContext('2d');
+        const csmaPlayBtn = document.getElementById('csmaPlayBtn');
+        const csmaResetBtn = document.getElementById('csmaResetBtn');
+
+        let csmaState = 'idle'; // idle, listening, backoff, sending, ack, collision, done
+        let csmaFrame = 0;
+        let csmaMaxFrames = 100;
+
+        function drawCSMA(frame) {
+            const W = csmaCanvas.parentElement ? csmaCanvas.parentElement.clientWidth - 32 : 700;
+            csmaCanvas.width  = W > 0 ? W : 700;
+            csmaCanvas.height = 320;
+            const width  = csmaCanvas.width;
+            const height = csmaCanvas.height;
+
+            csmaCtx.fillStyle = '#f9fafb';
+            csmaCtx.fillRect(0, 0, width, height);
+
+            const timelineY = 100;
+            const timelineHeight = 150;
+
+            // Timeline scale
+            csmaCtx.fillStyle = '#333';
+            csmaCtx.font = 'bold 14px Arial';
+            csmaCtx.fillText('Temps →', 20, 30);
+
+            csmaCtx.strokeStyle = '#333';
+            csmaCtx.lineWidth = 2;
+            csmaCtx.beginPath();
+            csmaCtx.moveTo(60, timelineY + timelineHeight);
+            csmaCtx.lineTo(width - 40, timelineY + timelineHeight);
+            csmaCtx.stroke();
+
+            // Draw timeline ticks and labels
+            const tickCount = 10;
+            for (let i = 0; i <= tickCount; i++) {
+                const x = 60 + (i / tickCount) * (width - 100);
+                csmaCtx.beginPath();
+                csmaCtx.moveTo(x, timelineY + timelineHeight);
+                csmaCtx.lineTo(x, timelineY + timelineHeight + 5);
+                csmaCtx.stroke();
+                csmaCtx.font = '10px Arial';
+                csmaCtx.textAlign = 'center';
+                csmaCtx.fillText((i * 10) + 'ms', x, timelineY + timelineHeight + 20);
+            }
+
+            const stages = [
+                { label: 'État', y: timelineY - 50, color: '#333' },
+                { label: 'Canal libre ?', y: timelineY + 20, color: '#3B82F6' },
+                { label: 'Backoff CW', y: timelineY + 60, color: '#F59E0B' },
+                { label: 'Émission', y: timelineY + 100, color: '#3B82F6' }
+            ];
+
+            let currentPhase = 'listening';
+            let phaseFrame = frame % 100;
+
+            // Determine current phase and draw events
+            if (phaseFrame < 15) {
+                currentPhase = 'listening';
+                // Draw "listening" indicator
+                csmaCtx.fillStyle = '#3B82F6';
+                csmaCtx.fillRect(60 + phaseFrame * (width - 100) / 100, timelineY, 3, timelineHeight);
+            } else if (phaseFrame < 35) {
+                currentPhase = 'backoff';
+                // Draw backoff
+                csmaCtx.fillStyle = '#F59E0B';
+                csmaCtx.fillRect(60, timelineY + 60, (phaseFrame - 15) * 2, 20);
+            } else if (phaseFrame < 55) {
+                currentPhase = 'sending';
+                // Draw transmission
+                csmaCtx.fillStyle = '#3B82F6';
+                csmaCtx.fillRect(60, timelineY + 100, 100, 25);
+            } else if (phaseFrame < 60) {
+                currentPhase = 'ack';
+                // Draw ACK
+                csmaCtx.fillStyle = '#10B981';
+                csmaCtx.fillRect(170, timelineY + 100, 30, 25);
+            } else {
+                currentPhase = 'done';
+                csmaCtx.fillStyle = '#10B981';
+                csmaCtx.fillRect(60, timelineY + 60, 200, 70);
+            }
+
+            // Status text
+            csmaCtx.fillStyle = '#333';
+            csmaCtx.font = 'bold 13px Arial';
+            csmaCtx.textAlign = 'left';
+            csmaCtx.fillText('Status: ' + currentPhase.toUpperCase(), 60, 70);
+
+            // Legend
+            const legendY = height - 60;
+            csmaCtx.font = '11px Arial';
+            csmaCtx.fillText('Bleu: Écoute/Émission', 60, legendY);
+            csmaCtx.fillText('Orange: Backoff', 300, legendY);
+            csmaCtx.fillText('Vert: ACK/Succès', 500, legendY);
+        }
+
+        csmaPlayBtn.addEventListener('click', () => {
+            csmaPlayBtn.disabled = true;
+            csmaResetBtn.disabled = false;
+            csmaFrame = 0;
+
+            const interval = setInterval(() => {
+                drawCSMA(csmaFrame);
+                csmaFrame++;
+                if (csmaFrame >= 200) {
+                    clearInterval(interval);
+                    csmaPlayBtn.disabled = false;
+                }
+            }, 50);
+        });
+
+        csmaResetBtn.addEventListener('click', () => {
+            csmaFrame = 0;
+            drawCSMA(0);
+            csmaPlayBtn.disabled = false;
+        });
+
+        drawCSMA(0);
+
+        // Responsive canvas
+        window.addEventListener('resize', () => {
+            updateAlohaChart();
+            drawCSMA(csmaFrame);
+        });
+    </script>
+</body>
+</html>

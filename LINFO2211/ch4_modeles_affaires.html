@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.4 – Modèles d'Affaires | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:white;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom,var(--amber),var(--teal));}
+.header-inner{padding:32px 48px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:.82rem;color:#94a3b8;margin-bottom:10px;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+.chapter-badge{display:inline-block;background:linear-gradient(135deg,#ec4899,#f43f5e);color:white;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+header h1{font-size:1.9rem;font-weight:800;margin-bottom:6px;}
+header p.subtitle{color:#94a3b8;font-size:.95rem;}
+.header-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.1);color:#e2e8f0;font-size:.8rem;padding:4px 12px;border-radius:20px;}
+nav{background:white;border-bottom:1px solid #e2e8f0;padding:12px 48px;}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;}
+.nav-link{padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--gray);transition:all .2s;}
+.nav-link:hover,.nav-link.active{background:var(--teal);color:white;}
+main{max-width:1100px;margin:0 auto;padding:36px 48px;}
+.section{background:white;border-radius:14px;box-shadow:0 2px 16px rgba(30,58,95,.07);padding:32px;margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.section-icon{font-size:1.6rem;}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--navy);}
+.section-subtitle{font-size:.85rem;color:var(--gray);margin-top:2px;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.explain-intro .badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.explain-intro p{font-size:.9rem;line-height:1.7;color:#451a03;}
+.analogy{background:#fef3c7;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88rem;color:#78350f;border-left:3px solid #f59e0b;}
+.retenir{background:#fffbeb;border:1.5px solid var(--amber);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:.88rem;font-weight:600;color:#92400e;}
+.math-block{background:#f0fdf4;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.math-block .badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.theory-box{background:#eff6ff;border-radius:10px;padding:18px 22px;margin:14px 0;border:1px solid #bfdbfe;}
+.theory-box h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.theory-box p{font-size:.88rem;line-height:1.65;color:#1e40af;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:16px 0;}
+.icon-item{background:#f8fafc;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0;}
+.icon-item .emoji{font-size:1.8rem;margin-bottom:8px;}
+.icon-item .label{font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.icon-item .desc{font-size:.72rem;color:var(--gray);line-height:1.4;}
+.demo-box{background:#f8fafc;border-radius:12px;padding:24px;border:2px dashed #cbd5e1;margin-top:20px;}
+.demo-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.btn{background:var(--teal);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;margin:4px;}
+.btn:hover{background:#0f766e;}
+.btn-secondary{background:#f1f5f9;color:var(--navy);}
+canvas{max-width:100%;}
+/* Ansoff Matrix */
+.ansoff{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;margin:16px 0;border-radius:10px;overflow:hidden;}
+.ansoff-cell{padding:20px;cursor:pointer;transition:all .2s;}
+.ansoff-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.ansoff-title{font-size:.95rem;font-weight:800;margin-bottom:6px;}
+.ansoff-desc{font-size:.78rem;line-height:1.5;}
+.ansoff-example{font-size:.75rem;font-weight:600;margin-top:8px;border-radius:6px;padding:4px 8px;display:inline-block;}
+/* 4P */
+.fourp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+.fourp-card{border-radius:12px;padding:18px;border:1.5px solid;}
+/* Value chain */
+.vchain{display:flex;gap:0;margin:16px 0;overflow-x:auto;}
+.vchain-item{background:#f8fafc;border:1px solid #e2e8f0;padding:12px 16px;min-width:120px;text-align:center;position:relative;flex-shrink:0;}
+.vchain-item::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--teal);font-weight:700;font-size:1.1rem;z-index:1;}
+.vchain-item:last-child::after{display:none;}
+.vchain-item .v-icon{font-size:1.3rem;margin-bottom:6px;}
+.vchain-item .v-label{font-size:.72rem;font-weight:700;color:var(--navy);}
+.vchain-item.highlight{background:#d1fae5;border-color:#0D9488;}
+/* BM innovations */
+.bm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:16px 0;}
+.bm-tag{background:#f1f5f9;border-radius:8px;padding:8px 10px;font-size:.78rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .2s;border:1.5px solid transparent;}
+.bm-tag:hover,.bm-tag.active{background:var(--teal);color:white;border-color:var(--teal);}
+.bm-detail{background:white;border-radius:10px;padding:16px;margin-top:14px;border:1.5px solid var(--teal);display:none;}
+.bm-detail.show{display:block;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:24px;font-size:.82rem;margin-top:40px;}
+footer span{color:var(--amber);}
+@media(max-width:700px){.header-inner,nav,main{padding-left:20px;padding-right:20px;} header h1{font-size:1.4rem;} .fourp-grid{grid-template-columns:1fr;} .ansoff{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 4</div>
+    <div class="chapter-badge">Chapitre 4</div>
+    <h1>Modèles d'Affaires</h1>
+    <p class="subtitle">Définir son business model : product/market, value proposition, chaîne de valeur, 4P</p>
+    <div class="header-chips">
+      <span class="chip">🗺️ Ansoff Matrix</span>
+      <span class="chip">💎 Value Proposition</span>
+      <span class="chip">🔗 Value Chain</span>
+      <span class="chip">4️⃣ 4P</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#definition" class="nav-link active">Définition BM</a>
+    <a href="#ansoff" class="nav-link">Matrice Ansoff</a>
+    <a href="#fourp" class="nav-link">4P / Value Prop</a>
+    <a href="#valuechain" class="nav-link">Chaîne de valeur</a>
+    <a href="#innovations" class="nav-link">Innovations BM</a>
+    <a href="#servitization" class="nav-link">Servitisation</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : DÉFINITION ========== -->
+<div class="section" id="definition">
+  <div class="section-header">
+    <span class="section-icon">📖</span>
+    <div>
+      <div class="section-title">Définir son Business Model</div>
+      <div class="section-subtitle">Un business model = une histoire qui explique comment l'entreprise crée de la valeur</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un Business Model ?</div>
+    <p>Un business model, c'est la logique qui explique comment une entreprise crée, délivre et capture de la valeur. C'est la réponse à : "À quoi tu joues, exactement ?" Netflix "joue" à la subscription mensuelle de streaming. Spotify joue à la même chose. Mais Google "joue" à un modèle publicitaire où les utilisateurs sont le PRODUIT (gratuit pour l'utilisateur, payant pour les annonceurs). Même secteur digital, business models radicalement différents.</p>
+    <div class="analogy">
+      🍽️ <strong>Exemple restaurant :</strong> McDonald's et un restaurant gastronomique vendent tous les deux de la nourriture. Mais leurs business models sont opposés : McDonald's (standardisation, volume, bas prix, franchises) vs gastronomique (personnalisation, faible volume, prix élevé, expérience unique). Même activité, business models incompatibles — on ne peut pas "faire les deux à la fois".
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">🎯</div><div class="label">Product/Market</div><div class="desc">Que vendre à qui ?</div></div>
+      <div class="icon-item"><div class="emoji">🔗</div><div class="label">Value Chain</div><div class="desc">Comment créer et délivrer l'offre ?</div></div>
+      <div class="icon-item"><div class="emoji">💰</div><div class="label">Revenue Model</div><div class="desc">Comment capturer la valeur créée ?</div></div>
+      <div class="icon-item"><div class="emoji">🛡️</div><div class="label">Defensibility</div><div class="desc">Pourquoi c'est difficile à copier ?</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : BM = Position produit/marché + Position chaîne de valeur. Une technologie peut mener à de nombreux BM différents. Le BM détermine souvent plus le succès que la technologie elle-même.</div>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : ANSOFF ========== -->
+<div class="section" id="ansoff">
+  <div class="section-header">
+    <span class="section-icon">🗺️</span>
+    <div>
+      <div class="section-title">La Matrice Ansoff</div>
+      <div class="section-subtitle">4 stratégies de croissance : pénétration, développement marché/produit, diversification</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la matrice Ansoff ?</div>
+    <p>Igor Ansoff a proposé en 1957 un framework simple pour choisir comment croître. L'idée : selon que tu vends des produits existants ou nouveaux, à des marchés existants ou nouveaux, le risque et la stratégie sont complètement différents.</p>
+    <div class="analogy">
+      🚗 <strong>Toyota en pratique :</strong>
+      Pénétration → vendre plus de Corolla aux conducteurs japonais (même produit, même marché).
+      Développement marché → exporter la Corolla aux USA (même produit, nouveau marché).
+      Développement produit → lancer le Prius hybride au Japon (nouveau produit, même marché).
+      Diversification → créer Toyota Financial Services (nouveau produit, nouveau marché).
+      → La diversification est la stratégie la plus risquée !
+    </div>
+    <div class="retenir">💡 À retenir : Plus on s'éloigne de son cœur de métier (produit ET marché nouveaux), plus le risque est élevé. La diversification réussit rarement sans synergies claires avec l'activité existante.</div>
+  </div>
+
+  <div class="ansoff">
+    <div class="ansoff-cell" style="background:#dbeafe;" onclick="selectAnsoff(this,'penetration')">
+      <div class="ansoff-label" style="color:#1e40af;">Produit existant × Marché existant</div>
+      <div class="ansoff-title" style="color:#1d4ed8;">📈 Pénétration de marché</div>
+      <div class="ansoff-desc" style="color:#1e40af;">Vendre plus à tes clients actuels. Augmenter la fréquence d'achat, conquérir des clients de concurrents.</div>
+      <span class="ansoff-example" style="background:#bfdbfe;color:#1e3a8a;">🔵 Risque faible</span>
+    </div>
+    <div class="ansoff-cell" style="background:#d1fae5;" onclick="selectAnsoff(this,'product_dev')">
+      <div class="ansoff-label" style="color:#065f46;">Produit nouveau × Marché existant</div>
+      <div class="ansoff-title" style="color:#059669;">🆕 Développement produit</div>
+      <div class="ansoff-desc" style="color:#065f46;">Créer de nouveaux produits pour tes clients actuels. Extension de gamme, nouvelles fonctionnalités.</div>
+      <span class="ansoff-example" style="background:#a7f3d0;color:#064e3b;">🟢 Risque moyen</span>
+    </div>
+    <div class="ansoff-cell" style="background:#fef3c7;" onclick="selectAnsoff(this,'market_dev')">
+      <div class="ansoff-label" style="color:#92400e;">Produit existant × Marché nouveau</div>
+      <div class="ansoff-title" style="color:#d97706;">🌍 Développement marché</div>
+      <div class="ansoff-desc" style="color:#78350f;">Vendre tes produits actuels sur de nouveaux marchés géographiques ou segments.</div>
+      <span class="ansoff-example" style="background:#fde68a;color:#78350f;">🟡 Risque moyen</span>
+    </div>
+    <div class="ansoff-cell" style="background:#fee2e2;" onclick="selectAnsoff(this,'diversification')">
+      <div class="ansoff-label" style="color:#991b1b;">Produit nouveau × Marché nouveau</div>
+      <div class="ansoff-title" style="color:#dc2626;">🎲 Diversification</div>
+      <div class="ansoff-desc" style="color:#991b1b;">Aller sur un terrain totalement nouveau. Très risqué mais peut créer de nouvelles sources de croissance.</div>
+      <span class="ansoff-example" style="background:#fecaca;color:#7f1d1d;">🔴 Risque élevé</span>
+    </div>
+  </div>
+  <div id="ansoff_detail" style="margin-top:14px;padding:16px;background:#f8fafc;border-radius:10px;border-left:4px solid var(--teal);display:none;font-size:.88rem;color:#1e293b;"></div>
+</div>
+
+<!-- ========== SECTION 3 : 4P ========== -->
+<div class="section" id="fourp">
+  <div class="section-header">
+    <span class="section-icon">💎</span>
+    <div>
+      <div class="section-title">Value Proposition et les 4P</div>
+      <div class="section-subtitle">Concevoir son offre : Product, Price, Place, Promotion</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi les 4P ?</div>
+    <p>Les 4P (Marketing Mix) de Philip Kotler sont les 4 leviers que tu contrôles pour définir et délivrer ton offre aux clients. C'est comme les 4 ingrédients d'une recette marketing : change un seul ingrédient, et le plat change complètement. Amazon Prime combine : Produit (livraison 1 jour, streaming), Prix (99$/an abonnement), Place (partout online), Promotion (offre groupée de services). La magie : chaque élément renforce les autres !</p>
+    <div class="retenir">💡 À retenir : La "proposition de valeur unique" (USP) répond à la question : "People don't buy drills, they buy holes" (Levitt, 1960) — le client achète le BÉNÉFICE (le trou dans le mur), pas le produit (la perceuse). Comprendre ce bénéfice désiré est la clé du marketing.</div>
+  </div>
+
+  <div class="fourp-grid">
+    <div class="fourp-card" style="background:#eff6ff;border-color:#3b82f6;">
+      <div style="font-size:1.3rem;margin-bottom:8px;">📦</div>
+      <strong style="color:#1e40af;">Product</strong>
+      <p style="font-size:.85rem;color:#1e3a8a;margin-top:6px;line-height:1.6;">Spécifications du bien ou service qui répond aux besoins du client. Inclut : design, branding, packaging, fonctionnalités, qualité, garanties.</p>
+      <p style="font-size:.8rem;color:#3b82f6;margin-top:8px;font-style:italic;">Ex: iPhone = design premium + écosystème iOS + App Store + mise à jour régulière</p>
+    </div>
+    <div class="fourp-card" style="background:#f0fdf4;border-color:#10b981;">
+      <div style="font-size:1.3rem;margin-bottom:8px;">💰</div>
+      <strong style="color:#065f46;">Price</strong>
+      <p style="font-size:.85rem;color:#064e3b;margin-top:6px;line-height:1.6;">Le coût que le client paie (monétaire ou non). Prix de lancement, skimming, pénétration, freemium, par abonnement, pay-per-use...</p>
+      <p style="font-size:.8rem;color:#10b981;margin-top:8px;font-style:italic;">Ex: Tesla → prix élevé = signal de qualité ET financement de la R&D</p>
+    </div>
+    <div class="fourp-card" style="background:#fff7ed;border-color:#f97316;">
+      <div style="font-size:1.3rem;margin-bottom:8px;">📍</div>
+      <strong style="color:#9a3412;">Place</strong>
+      <p style="font-size:.85rem;color:#7c2d12;margin-top:6px;line-height:1.6;">Comment et où le produit est accessible au client. Canaux directs (web, retail propre) vs indirects (distributeurs, franchises, marketplaces).</p>
+      <p style="font-size:.8rem;color:#f97316;margin-top:8px;font-style:italic;">Ex: Nespresso = boutiques propres + online + grands magasins (pas supermarchés)</p>
+    </div>
+    <div class="fourp-card" style="background:#fdf4ff;border-color:#a855f7;">
+      <div style="font-size:1.3rem;margin-bottom:8px;">📣</div>
+      <strong style="color:#581c87;">Promotion</strong>
+      <p style="font-size:.85rem;color:#6b21a8;margin-top:6px;line-height:1.6;">Communications pour informer et convaincre les clients. Publicité, PR, marketing digital, content marketing, word-of-mouth, influenceurs.</p>
+      <p style="font-size:.8rem;color:#a855f7;margin-top:8px;font-style:italic;">Ex: Red Bull = événements extrêmes + contenu viral → pas de pub TV classique</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📐 Les 5 niveaux du produit (Kotler)</h4>
+    <p>Chaque produit a 5 niveaux de valeur : <strong>Core</strong> (ce pour quoi le client paie vraiment — le "trou"), <strong>Basic</strong> (fonctionnalités minimales — la "perceuse"), <strong>Expected</strong> (ce que le client s'attend à trouver), <strong>Augmented</strong> (features au-delà des attentes — ex: SAV 24h), <strong>Potential</strong> (futures évolutions possibles). La compétition se déroule principalement au niveau "Augmented" dans les marchés matures.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 4 : VALUE CHAIN ========== -->
+<div class="section" id="valuechain">
+  <div class="section-header">
+    <span class="section-icon">🔗</span>
+    <div>
+      <div class="section-title">La Chaîne de Valeur</div>
+      <div class="section-subtitle">Comment délivrer l'offre : design → opérations → clients</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la chaîne de valeur ?</div>
+    <p>La chaîne de valeur décrit toutes les activités qu'une entreprise réalise pour créer et délivrer son offre. C'est comme la "cuisine" de l'entreprise — tout ce qui se passe en coulisses pour que le produit arrive au client. Porter a identifié les activités primaires (conception → production → vente → service) et les activités de support (RH, finances, management).</p>
+    <div class="analogy">
+      🍕 <strong>Pizza vs Deliveroo :</strong> Une pizzeria traditionnelle fait tout elle-même (commander ingrédients + cuisiner + servir + livrer). Deliveroo externalise la production (restaurants partenaires) et se concentre sur la plateforme (tech, logistique, marketing). Même "valeur" délivrée au client, mais chaîne de valeur radicalement différente → marges et business models différents.
+    </div>
+    <div class="retenir">💡 À retenir : La décision "Make or Buy" (internaliser vs externaliser) dans la chaîne de valeur est une décision stratégique majeure. Elle dépend de : coûts, qualité, confidentialité, contrôle, flexibilité et avantage compétitif potentiel.</div>
+  </div>
+
+  <div class="vchain">
+    <div class="vchain-item"><div class="v-icon">🔬</div><div class="v-label">R&D / Design</div></div>
+    <div class="vchain-item"><div class="v-icon">📦</div><div class="v-label">Approvisionnement</div></div>
+    <div class="vchain-item highlight"><div class="v-icon">🏭</div><div class="v-label">Production</div></div>
+    <div class="vchain-item highlight"><div class="v-icon">🚚</div><div class="v-label">Logistique</div></div>
+    <div class="vchain-item"><div class="v-icon">🛒</div><div class="v-label">Ventes & Marketing</div></div>
+    <div class="vchain-item highlight"><div class="v-icon">🤝</div><div class="v-label">Service client</div></div>
+    <div class="vchain-item"><div class="v-icon">🔄</div><div class="v-label">Fin de vie</div></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--teal);margin-bottom:16px;">💡 Les étapes en vert = étapes où l'entreprise peut créer le plus de valeur différenciatrice.</p>
+
+  <div class="theory-box">
+    <h4>🏢 Gouvernance & Support (activités transversales)</h4>
+    <p>Au-dessus de toute la chaîne primaire : <strong>Management & infrastructure</strong> (finances, légal, administration), <strong>RH</strong> (recrutement, formation, culture), <strong>Partenariats</strong> (alliances, outsourcing), <strong>Technology</strong> (SI, digitalisation). Ces activités de support peuvent être des sources d'avantages compétitifs majeurs (ex : la culture d'Amazon comme avantage compétitif).</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 5 : INNOVATIONS BM ========== -->
+<div class="section" id="innovations">
+  <div class="section-header">
+    <span class="section-icon">💡</span>
+    <div>
+      <div class="section-title">Innovations de Modèles d'Affaires</div>
+      <div class="section-subtitle">Les grands patterns d'innovation : produit, prix, place, chaîne de valeur</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi l'innovation de BM ?</div>
+    <p>L'innovation de business model, c'est changer la "logique" de ton business — pas seulement améliorer le produit. Parfois, une innovation de BM crée plus de valeur qu'une innovation technologique. Netflix n'a pas inventé la vidéo → il a réinventé la façon de la distribuer et de la monétiser. Airbnb n'a pas construit d'hôtels → il a réinventé la façon d'accéder aux hébergements.</p>
+    <div class="retenir">💡 À retenir : Il existe 55+ patterns d'innovation de BM identifiés (Gassmann, 2013). La plupart des "disruptions" combinent plusieurs patterns à la fois (ex : Uber = platform + pay-per-use + crowdsourcing + mobile-first).</div>
+  </div>
+
+  <p style="font-size:.88rem;color:var(--gray);margin-bottom:12px;">🖱️ Clique sur un pattern pour voir l'explication :</p>
+  <div class="bm-grid">
+    <div class="bm-tag" onclick="showBM(this,'freemium','🎯 Freemium','Version de base gratuite, features avancées payantes. Ex: LinkedIn (gratuit pour les chercheurs, payant pour les recruteurs), Spotify, Dropbox. Avantage: acquisition virale, conversion progressive. Risque: difficulté à convertir les free users.')">🎁 Freemium</div>
+    <div class="bm-tag" onclick="showBM(this,'subscription','📅 Subscription','Abonnement récurrent mensuel/annuel. Ex: Netflix (15€/mois), Salesforce, Adobe. Avantage: revenus prévisibles, churn faible si valeur élevée. Risque: coût d\'acquisition client élevé au départ.')">📅 Subscription</div>
+    <div class="bm-tag" onclick="showBM(this,'platform','🌐 Platform/Marketplace','Mise en relation de 2 groupes d\'utilisateurs. Ex: Airbnb, Uber, Amazon. Avantage: effets réseau exponentiels. Risque: problème de démarrage (chicken-and-egg).')">🌐 Platform</div>
+    <div class="bm-tag" onclick="showBM(this,'addon','➕ Add-on','Prix de base bas + options payantes. Ex: Ryanair (billet 20€ + bagages 50€ + repas 10€…). Avantage: apparaît comme le moins cher. Risque: perception négative si trop agressif.')">➕ Add-on</div>
+    <div class="bm-tag" onclick="showBM(this,'razor','🪒 Razor-Blade','Produit de base peu cher + consommables très chers. Ex: Gillette (rasoir 10€ + lames 40€), Nespresso, imprimantes. Avantage: revenus récurrents. Risque: copie facile.')">🪒 Razor-Blade</div>
+    <div class="bm-tag" onclick="showBM(this,'sharing','🤝 Sharing/P2P','Partage de ressources sous-utilisées entre particuliers. Ex: Airbnb, BlaBlaCar, Cambio. Avantage: coûts marginaux faibles. Risque: réglementation, qualité variable.')">🤝 Sharing</div>
+    <div class="bm-tag" onclick="showBM(this,'data','📊 Data Mining','Données = actif principal. Ex: Google, Facebook (gratuit pour user, payant pour annonceurs). Avantage: scalabilité infinie. Risque: réglementation RGPD, confiance des utilisateurs.')">📊 Data</div>
+    <div class="bm-tag" onclick="showBM(this,'leasing','📃 Leasing','Location plutôt que vente. Ex: Xerox (premières photocopieuses en leasing), rolls-royce moteurs (facturation à l\'heure de vol). Avantage: revenus récurrents, barrière à l\'entrée pour clients.')">📃 Leasing</div>
+    <div class="bm-tag" onclick="showBM(this,'crowd','👥 Crowdfunding','Financement par la foule pour valider et financer. Ex: Kickstarter, Indiegogo. Avantage: validation marché + financement. Risque: projets surestimés, obligations de livraison.')">👥 Crowd</div>
+  </div>
+  <div id="bm_detail" class="bm-detail"></div>
+
+  <div class="theory-box" style="margin-top:18px;">
+    <h4>📖 Typologie de l'innovation : WHAT vs HOW (Gailly, 2018)</h4>
+    <p>Gailly propose une distinction fondamentale entre deux axes d'innovation des modèles d'affaires :</p>
+    <p style="margin-top:8px;"><strong>Axe "WHAT" (Quoi)</strong> — Que propose-t-on ? Cela recouvre : <em>l'innovation produit</em> (nouvelles fonctionnalités, performances), <em>l'innovation de service</em> (nouvelle façon de délivrer de la valeur) et <em>l'innovation de la proposition de valeur</em> (repositionnement de ce qu'on offre).</p>
+    <p style="margin-top:8px;"><strong>Axe "HOW" (Comment)</strong> — Comment le fait-on ? Cela recouvre : <em>l'innovation de processus</em> (façon de produire, d'opérer), <em>l'innovation organisationnelle</em> (structure, gouvernance) et <em>l'innovation de business model</em> (modèle de revenus, chaîne de valeur, relations client).</p>
+    <p style="margin-top:8px;">Les innovations les plus impactantes combinent les deux axes simultanément — ex : Tesla (nouveau produit + nouvelle façon de vendre en direct sans concessionnaires). <em>(Gailly, Navigating Innovation, 2018)</em></p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px; background:#fff7ed; border-color:#f97316;">
+    <h4>⏱️ "Premier arrivé" n'est pas toujours le premier servi (Gailly, 2018)</h4>
+    <p style="color:#9a3412;">Le timing de l'innovation de business model est stratégique. Gailly souligne que le premier innovateur à introduire un nouveau modèle d'affaires n'en est pas forcément le principal bénéficiaire. Les <strong>fast-followers</strong> profitent souvent de plusieurs avantages : ils évitent les coûts d'éducation du marché, ils apprennent des erreurs du pionnier, et ils entrent avec une version améliorée quand le marché est prêt. Exemples : Facebook (pas le premier réseau social), Google (pas le premier moteur de recherche), iPhone (pas le premier smartphone). La vraie question n'est pas "être premier" mais "avoir la meilleure proposition de valeur quand le marché est mature".</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 5b : SERVITISATION (Gailly) ========== -->
+<div class="section" id="servitization">
+  <div class="section-header">
+    <span class="section-icon">🔄</span>
+    <div>
+      <div class="section-title">Servitisation — Du Produit au Service</div>
+      <div class="section-subtitle">Comment les entreprises de produits créent de nouveaux modèles d'affaires basés sur les services</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la servitisation ?</div>
+    <p>La servitisation (ou "servitization") est le mouvement par lequel des entreprises de produits industriels transforment leur modèle d'affaires en proposant des <strong>solutions complètes</strong> plutôt que de simples produits. Au lieu de "vendre une machine", on vend "la capacité que la machine fournit". Ce changement de perspective ouvre de nouvelles sources de revenus récurrents et de fidélisation client.</p>
+    <div class="analogy">
+      ✈️ <strong>Exemple Rolls-Royce :</strong> Rolls-Royce (moteurs d'avion) ne vend plus seulement des moteurs à 20M€ pièce — ils proposent le "Power by the Hour" : les compagnies aériennes paient à l'heure de vol. Rolls-Royce assure la maintenance, les mises à jour, les réparations. Résultat : revenus récurrents, relation long terme, meilleure collecte de données d'usage → amélioration continue. Aujourd'hui, 50%+ de leurs revenus proviennent des services. <em>(Gailly, 2018)</em>
+    </div>
+    <div class="retenir">💡 À retenir : La servitisation permet de passer de ventes ponctuelles à des revenus récurrents tout en augmentant la valeur client (Customer Lifetime Value). Elle crée aussi une barrière à l'entrée puisque le fournisseur devient un partenaire opérationnel difficile à remplacer.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th>Niveau</th><th>Modèle</th><th>Exemple</th><th>Avantage principal</th></tr>
+    <tr>
+      <td>1️⃣ Produit pur</td>
+      <td>Vente de produit + garantie basique</td>
+      <td>Vente d'une perceuse à 100€</td>
+      <td>Transaction simple, marge sur volume</td>
+    </tr>
+    <tr>
+      <td>2️⃣ Produit + services</td>
+      <td>Vente de produit + maintenance, formation, pièces</td>
+      <td>Vente d'une machine industrielle + contrat de maintenance annuel</td>
+      <td>Revenus additionnels, fidélisation</td>
+    </tr>
+    <tr>
+      <td>3️⃣ Service intégré</td>
+      <td>Vente du résultat plutôt que du produit</td>
+      <td>Rolls-Royce "Power by the Hour", Michelin "tonne-kilomètre" pour camions</td>
+      <td>Revenus récurrents, alignement d'intérêts</td>
+    </tr>
+    <tr>
+      <td>4️⃣ Solution complète</td>
+      <td>Prise en charge complète d'un processus client</td>
+      <td>IBM "outsourcing IT" — IBM gère toute l'infrastructure informatique du client</td>
+      <td>Lock-in fort, marges élevées, données d'usage</td>
+    </tr>
+  </table>
+
+  <div class="theory-box" style="margin-top:14px;">
+    <h4>📖 Servitisation et innovation marketing</h4>
+    <p>Gailly souligne que la servitisation va souvent de pair avec de nouvelles formes d'<strong>innovation marketing</strong> : nouveaux canaux de distribution (direct-to-consumer vs distribution traditionnelle), nouveaux messages (vendre une capacité plutôt qu'une caractéristique), nouvelles formes de tarification (usage-based, outcome-based). Ces innovations marketing sont souvent sous-estimées par les ingénieurs mais représentent un avantage compétitif durable car elles sont difficiles à imiter rapidement. <em>(Gailly, Navigating Innovation, 2018)</em></p>
+  </div>
+</div>
+
+<!-- ========== SECTION 6 : DÉMO ========== -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <span class="section-icon">🎮</span>
+    <div>
+      <div class="section-title">Démo Interactive — Comparateur de Revenue Models</div>
+      <div class="section-subtitle">Compare la rentabilité de différents modèles de revenus pour le même produit</div>
+    </div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">💰 Simulateur : Quel modèle de revenus choisir ?</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:16px;">Paramètre ta base de clients et compare sur 36 mois : vente directe vs subscription vs freemium.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:20px;">
+      <div>
+        <label style="display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:4px;">👥 Nouveaux clients/mois</label>
+        <input type="range" min="10" max="500" step="10" value="100" id="new_clients" oninput="updateRevenueModel()" style="width:100%;accent-color:var(--teal);">
+        <span id="v_nc" style="font-weight:700;color:var(--teal);">100</span> clients
+      </div>
+      <div>
+        <label style="display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:4px;">💵 Prix vente directe (€)</label>
+        <input type="range" min="10" max="500" step="5" value="100" id="direct_price" oninput="updateRevenueModel()" style="width:100%;accent-color:var(--teal);">
+        <span id="v_dp" style="font-weight:700;color:var(--teal);">100</span>€
+      </div>
+      <div>
+        <label style="display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:4px;">📅 Prix subscription/mois (€)</label>
+        <input type="range" min="1" max="50" value="10" id="sub_price" oninput="updateRevenueModel()" style="width:100%;accent-color:var(--teal);">
+        <span id="v_sp" style="font-weight:700;color:var(--teal);">10</span>€/m
+      </div>
+      <div>
+        <label style="display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:4px;">🔄 Churn mensuel (%)</label>
+        <input type="range" min="1" max="20" value="5" id="churn" oninput="updateRevenueModel()" style="width:100%;accent-color:var(--teal);">
+        <span id="v_ch" style="font-weight:700;color:var(--teal);">5</span>%
+      </div>
+    </div>
+
+    <canvas id="revenueChart" style="max-height:300px;"></canvas>
+    <div id="revenue_summary" style="margin-top:16px;background:white;border-radius:10px;padding:14px;border:1px solid #e2e8f0;font-size:.88rem;"></div>
+    <button class="btn btn-secondary" onclick="resetRevenue()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="ch3_positionnement.html" style="color:var(--amber);">← Ch.3 Positionnement</a> &nbsp;|&nbsp; <a href="ch5_organisations.html" style="color:var(--amber);">Ch.5 Organisations →</a></p>
+</footer>
+
+<script>
+// ============ ANSOFF ============
+const ansoffData = {
+  penetration: '<strong>📈 Pénétration de marché</strong> — Risque le plus FAIBLE. Tu connais bien tes clients et ton produit. Stratégies : baisser les prix, augmenter le marketing, améliorer le service, fidéliser. <em>Ex : Coca-Cola lance une offre "achetez 2, obtenez 1 gratuit" pour ses clients existants.</em>',
+  product_dev: '<strong>🆕 Développement produit</strong> — Risque MOYEN. Tu connais les clients mais pas le produit. Nécessite une R&D forte. <em>Ex : Amazon lance AWS pour ses clients existants de commerce électronique. Apple lance l\'iPhone à ses fans Mac.</em>',
+  market_dev: '<strong>🌍 Développement marché</strong> — Risque MOYEN. Tu connais le produit mais pas le marché. Nécessite une adaptation locale (prix, distribution, communication). <em>Ex : McDonald\'s ouvre au Japon (même produit, marché nouveau) → adaptation : Teriyaki Burger, desserts à l\'azuki.</em>',
+  diversification: '<strong>🎲 Diversification</strong> — Risque le plus ÉLEVÉ. Ni le produit ni le marché ne sont connus. Nécessite énormément de ressources. 80% des diversifications échouent. <em>Ex : Virgin (musique → aviation → téléphonie → spatial). Amazon (commerce → cloud → Hollywood → pharmacie).</em>'
+};
+function selectAnsoff(el, key) {
+  const detail = document.getElementById('ansoff_detail');
+  detail.innerHTML = ansoffData[key];
+  detail.style.display = 'block';
+}
+
+// ============ BM PATTERNS ============
+function showBM(el, key, title, desc) {
+  document.querySelectorAll('.bm-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const d = document.getElementById('bm_detail');
+  d.innerHTML = '<h4 style="color:var(--navy);margin-bottom:6px;">' + title + '</h4><p>' + desc + '</p>';
+  d.classList.add('show');
+}
+
+// ============ REVENUE MODEL COMPARISON ============
+let revChart = null;
+function updateRevenueModel() {
+  const nc = +document.getElementById('new_clients').value;
+  const dp = +document.getElementById('direct_price').value;
+  const sp = +document.getElementById('sub_price').value;
+  const churn = +document.getElementById('churn').value / 100;
+
+  document.getElementById('v_nc').textContent = nc;
+  document.getElementById('v_dp').textContent = dp;
+  document.getElementById('v_sp').textContent = sp;
+  document.getElementById('v_ch').textContent = (churn*100).toFixed(0);
+
+  const months = 36;
+  const labels = Array.from({length:months}, (_,i) => 'M'+(i+1));
+  const directRevs = [], subRevs = [], freemiumRevs = [], cumDirect = [], cumSub = [];
+  let subBase = 0;
+  let cumD = 0, cumS = 0;
+
+  for (let m = 0; m < months; m++) {
+    // Direct: every new client pays once
+    const dRev = nc * dp;
+    cumD += dRev;
+    directRevs.push(dRev);
+    cumDirect.push(cumD);
+
+    // Subscription: growing subscriber base with churn
+    subBase = subBase * (1 - churn) + nc;
+    const sRev = subBase * sp;
+    cumS += sRev;
+    subRevs.push(Math.round(sRev));
+    cumSub.push(Math.round(cumS));
+
+    // Freemium: 20% conversion rate, 0.5x subscription price
+    const freeBase = subBase * 0.15;
+    freemiumRevs.push(Math.round(freeBase * sp * 0.8));
+  }
+
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  if (revChart) revChart.destroy();
+  revChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Vente directe (€/mois)', data: directRevs, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', fill: true, tension: 0.1 },
+        { label: 'Subscription (€/mois)', data: subRevs, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)', fill: true, tension: 0.1 },
+        { label: 'Freemium (€/mois)', data: freemiumRevs, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.1)', fill: true, tension: 0.1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { title: { display: true, text: 'Revenus mensuels sur 36 mois selon le modèle' } },
+      scales: { y: { title: { display: true, text: '€/mois' } } }
+    }
+  });
+
+  const fmt = v => v >= 1e6 ? (v/1e6).toFixed(1)+'M€' : v >= 1e3 ? (v/1e3).toFixed(0)+'k€' : v.toFixed(0)+'€';
+  document.getElementById('revenue_summary').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="text-align:center;padding:10px;background:#eff6ff;border-radius:8px;">
+        <div style="font-size:.75rem;font-weight:700;color:#1e40af;">Vente directe (cumul 36m)</div>
+        <div style="font-size:1.2rem;font-weight:800;color:#2563eb;">${fmt(cumDirect[35])}</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:#f0fdf4;border-radius:8px;">
+        <div style="font-size:.75rem;font-weight:700;color:#065f46;">Subscription (cumul 36m)</div>
+        <div style="font-size:1.2rem;font-weight:800;color:#059669;">${fmt(cumSub[35])}</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:#fffbeb;border-radius:8px;">
+        <div style="font-size:.75rem;font-weight:700;color:#92400e;">Revenue M36 subscription</div>
+        <div style="font-size:1.2rem;font-weight:800;color:#d97706;">${fmt(subRevs[35])}/mois</div>
+      </div>
+    </div>
+    <p style="margin-top:10px;font-size:.82rem;color:var(--gray);">💡 La subscription génère moins au début mais dépasse la vente directe grâce à l'effet cumulatif du "recurring revenue".</p>
+  `;
+}
+function resetRevenue() {
+  document.getElementById('new_clients').value = 100;
+  document.getElementById('direct_price').value = 100;
+  document.getElementById('sub_price').value = 10;
+  document.getElementById('churn').value = 5;
+  updateRevenueModel();
+}
+window.addEventListener('load', updateRevenueModel);
+</script>
+</body>
+</html>

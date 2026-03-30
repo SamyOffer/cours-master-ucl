@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 5 : Accès au médium - Assignation fixe | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .pros-cons div {
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .pros {
+            background: #dcfce7;
+            border-left: 3px solid #16a34a;
+        }
+
+        .cons {
+            background: #fee2e2;
+            border-left: 3px solid #dc2626;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .math-block h3 {
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: block;
+            margin: 1rem 0;
+        }
+
+        .controls {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .control-group {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--navy);
+            min-width: 150px;
+        }
+
+        .control-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d5db;
+            outline: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--teal);
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .icon-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 4px;
+            border: 2px solid var(--light);
+            text-align: center;
+        }
+
+        .icon-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .icon-item p {
+            color: var(--navy);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 5 : Accès au médium - Assignation fixe</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 5 : Accès au médium - Assignation fixe</h1>
+
+        <p>Quand plusieurs appareils doivent partager le même canal de communication, il faut organiser l'accès. Cette section explore quatre approches d'assignation fixe : SDMA, FDMA, TDMA et CDMA.</p>
+
+        <!-- SDMA Section -->
+        <h2>1. SDMA (Space Division Multiple Access)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Concept clé</div>
+            <p>SDMA divise l'espace géographique. Chaque zone géographique a son propre canal.</p>
+            <div class="analogy">
+                💡 <strong>Analogie :</strong> Imaginez un grand bus avec plusieurs rangées. Chaque rangée est isolée et les conversations dedans ne gênent pas les autres rangées. SDMA c'est pareil : on divise l'espace en zones différentes.
+            </div>
+        </div>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <strong>✓ Avantages</strong>
+                <ul>
+                    <li>Pas d'interférences entre zones</li>
+                    <li>Utilisation efficace du spectre</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <strong>✗ Inconvénients</strong>
+                <ul>
+                    <li>Besoin d'énorme distance entre zones</li>
+                    <li>Une station de base par appareil dans chaque zone</li>
+                    <li>Très coûteux à déployer</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="retenir">
+            🎯 SDMA est rarement utilisé en pratique à cause des distances énormes nécessaires et du coût d'infrastructure.
+        </div>
+
+        <!-- FDMA Section -->
+        <h2>2. FDMA (Frequency Division Multiple Access)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Concept clé</div>
+            <p>FDMA divise le spectre de fréquence. Chaque appareil reçoit une bande de fréquence unique.</p>
+            <div class="analogy">
+                📻 <strong>Analogie :</strong> Les stations de radio FM. Chaque station (87.5-108MHz) a sa propre fréquence. Vous pouvez écouter France Inter (88MHz) ou NRJ (100.3MHz) simultanément sur le même appareil sans interférence.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Formule FDMA</h3>
+            <div class="formula">
+                Pour chaque appareil i reçoit une bande de fréquence :
+                <div class="pending-math" data-latex="B_i = f_{high,i} - f_{low,i}"></div>
+                La bande totale utilisée: <div class="pending-math" data-latex="B_{total} = \sum_i B_i"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>B<sub>i</sub></td>
+                        <td>Largeur de bande pour appareil i</td>
+                        <td>1 MHz (station radio)</td>
+                    </tr>
+                    <tr>
+                        <td>f<sub>low</sub>, f<sub>high</sub></td>
+                        <td>Fréquences basse et haute</td>
+                        <td>88 MHz - 89 MHz</td>
+                    </tr>
+                    <tr>
+                        <td>Δf</td>
+                        <td>Garde entre bandes (pour éviter les interférences)</td>
+                        <td>100 kHz</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="demo-box">
+            <h3>📊 Démo interactive : Allocation spectrale FDMA</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Nombre de stations :</label>
+                    <input type="range" id="fdmaStations" min="1" max="10" value="4">
+                    <span class="value-display" id="fdmaStationsVal">4</span>
+                </div>
+                <div class="control-group">
+                    <label>Largeur de bande (MHz) :</label>
+                    <input type="range" id="fdmaBandwidth" min="1" max="5" value="2" step="0.5">
+                    <span class="value-display" id="fdmaBandwidthVal">2 MHz</span>
+                </div>
+            </div>
+            <canvas id="fdmaCanvas" width="900" height="300"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                Chaque couleur représente une station avec sa propre bande de fréquence. Les bandes ne se chevauchent pas.
+            </p>
+        </div>
+
+        <!-- Tableaux de comparaison -->
+        <div class="math-block">
+            <h3>Exemples réels de systèmes FDMA</h3>
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Système</th>
+                        <th>Bande basse</th>
+                        <th>Bande haute</th>
+                        <th>Largeur totale</th>
+                        <th>Année</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AM Radio</td>
+                        <td>0.5 MHz</td>
+                        <td>1.7 MHz</td>
+                        <td>1.2 MHz</td>
+                        <td>1906</td>
+                    </tr>
+                    <tr>
+                        <td>FM Radio</td>
+                        <td>87.5 MHz</td>
+                        <td>108 MHz</td>
+                        <td>20.5 MHz</td>
+                        <td>1940</td>
+                    </tr>
+                    <tr>
+                        <td>WiFi 2.4GHz</td>
+                        <td>2400 MHz</td>
+                        <td>2484 MHz</td>
+                        <td>84 MHz (3 canaux non-overlappant)</td>
+                        <td>1997</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="retenir">
+            ✅ FDMA est utilisé en pratique : radios, télécommunications mobiles 1G/2G, mais moins pour le WiFi et 4G qui préfèrent OFDM.
+        </div>
+
+        <!-- TDMA Section -->
+        <h2>3. TDMA (Time Division Multiple Access)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Concept clé</div>
+            <p>TDMA divise le temps. Chaque appareil reçoit des créneaux horaires (time slots) pour émettre/recevoir.</p>
+            <div class="analogy">
+                ✈️ <strong>Analogie :</strong> À l'aéroport, les avions décollent par créneaux horaires (8h00, 8h15, 8h30, etc.). Un seul avion par créneau. C'est TDMA : chaque appareil a son créneau pour communiquer sur le même canal.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Formule d'efficacité TDMA</h3>
+            <div class="formula">
+                <div class="pending-math" data-latex="\text{Efficacité} = \frac{T_{slot} - T_{guard}}{T_{slot}} = 1 - \frac{T_{guard}}{T_{slot}}"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                        <th>Valeur typique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>T<sub>slot</sub></td>
+                        <td>Durée du créneau horaire</td>
+                        <td>0.577 ms (GSM)</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>guard</sub></td>
+                        <td>Temps de garde (pour éviter les chevauchements)</td>
+                        <td>~30 µs</td>
+                    </tr>
+                    <tr>
+                        <td>Efficacité</td>
+                        <td>Proportion utilisable du créneau</td>
+                        <td>~95% (GSM)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="demo-box">
+            <h3>⏱️ Démo animée : TDMA - Partage du temps</h3>
+            <p>Trois stations partagent le même canal en alternant leurs créneaux horaires :</p>
+            <canvas id="tdmaCanvas" width="900" height="250"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                <strong>Rouge :</strong> Station A | <strong>Bleu :</strong> Station B | <strong>Vert :</strong> Station C | <strong>Gris :</strong> Inactif
+            </p>
+            <div class="controls" style="margin-top: 1.5rem;">
+                <button id="tdmaPlayBtn" style="padding: 0.7rem 1.5rem; background: var(--teal); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                    ▶ Démarrer animation
+                </button>
+            </div>
+        </div>
+
+        <div class="retenir">
+            ✅ TDMA est utilisé dans GSM (2G), qui a révolutionné la téléphonie mobile. Aussi utilisé dans certains systèmes IoT.
+        </div>
+
+        <!-- CDMA Section -->
+        <h2>4. CDMA (Code Division Multiple Access)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Concept clé</div>
+            <p>CDMA utilise des codes pour distinguer les utilisateurs. Tous les appareils émettent simultanément sur la même fréquence, au même moment, mais avec des codes différents.</p>
+            <div class="analogy">
+                🎭 <strong>Analogie :</strong> Imaginez une pièce où 4 personnes parlent en même temps. Pour la personne A, elle écoute seulement les phrases en anglais (son "code"). Pour la personne B, elle écoute seulement les phrases en espagnol. Chacun ne capte que "son" code, même si tout le monde parle en même temps.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Corrélation CDMA</h3>
+            <div class="formula">
+                Le signal reçu par chaque utilisateur est décodé par une opération de corrélation :
+                <div class="pending-math" data-latex="s(t) = \sum_{i=1}^{N} d_i(t) \cdot c_i(t)"></div>
+                où d<sub>i</sub>(t) est le signal utilisateur i et c<sub>i</sub>(t) est le code CDMA.
+            </div>
+
+            <div class="formula">
+                Pour récupérer le signal d'un utilisateur j :
+                <div class="pending-math" data-latex="s_j = \frac{1}{N} \sum_{n=0}^{N-1} r(n) \cdot c_j(n)"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>N</td>
+                        <td>Nombre de chips (bits de code) par symbole</td>
+                    </tr>
+                    <tr>
+                        <td>c<sub>i</sub>(n)</td>
+                        <td>Le n-ème chip du code utilisateur i (typiquement +1 ou -1)</td>
+                    </tr>
+                    <tr>
+                        <td>r(n)</td>
+                        <td>Le signal reçu au chip n</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="demo-box">
+            <h3>🔍 Démo interactive : Décodage CDMA</h3>
+            <p>Voyez comment deux utilisateurs avec des codes différents peuvent partager le même canal :</p>
+
+            <div class="controls">
+                <div style="background: white; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <h4 style="color: var(--navy); margin-bottom: 0.5rem;">Codes d'exemple</h4>
+                    <p><strong>Code A :</strong> [-1, +1, -1, -1, +1, +1]</p>
+                    <p><strong>Code B :</strong> [+1, +1, -1, +1, -1, +1]</p>
+                </div>
+
+                <div class="control-group">
+                    <label>Bit utilisateur A :</label>
+                    <select id="cdmaBitA" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <option value="1">1 (multiplier par code A)</option>
+                        <option value="0">0 (multiplier par -code A)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Bit utilisateur B :</label>
+                    <select id="cdmaBitB" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <option value="1">1 (multiplier par code B)</option>
+                        <option value="0">0 (multiplier par -code B)</option>
+                    </select>
+                </div>
+            </div>
+
+            <canvas id="cdmaCanvas" width="900" height="400"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                <strong>Haut :</strong> Codes multipliés par les bits | <strong>Milieu :</strong> Signal superposé | <strong>Bas :</strong> Résultats de corrélation
+            </p>
+        </div>
+
+        <div class="retenir">
+            ✅ CDMA a été utilisé en 3G (UMTS, CDMA2000) et IS-95. Avantage : grande capacité. Inconvénient : complexité et puissance consommée pour le décodage.
+        </div>
+
+        <!-- DSSS et étalement de spectre -->
+        <h2>5. 📡 DSSS et étalement de spectre dans CDMA</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Concept clé</div>
+            <p>CDMA fonctionne grâce à la technique d'étalement de spectre appelée DSSS (Direct Sequence Spread Spectrum). C'est le mécanisme physique qui permet à plusieurs utilisateurs de partager le même canal avec des codes différents.</p>
+            <div class="analogy">
+                🎵 <strong>Analogie :</strong> Imaginez une symphonie où chaque instrument joue la même note sur un très large bande de fréquences au lieu d'une seule fréquence précise. Le récepteur d'un instrument particulier applique un filtre pour récupérer seulement sa "note" même si tout le monde joue ensemble sur le même spectre large.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Processus DSSS - Étalement du signal</h3>
+            <div class="formula">
+                <strong>Étapes de la transmission :</strong>
+                <ol style="margin-top: 0.8rem; margin-left: 1.5rem; line-height: 1.8;">
+                    <li><strong>Signal original :</strong> bit de données (1 ou 0) avec période T</li>
+                    <li><strong>Code PN (Pseudo-Noise) :</strong> séquence rapide de chips, chaque chip a une durée T_chip ≪ T</li>
+                    <li><strong>Multiplication :</strong> chaque bit de données est multiplié par la séquence PN complète</li>
+                    <li><strong>Signal étalé :</strong> un bit de données devient N chips (où N = T / T_chip)</li>
+                    <li><strong>Transmission :</strong> le signal étalé est transmis sur un spectre large de bande passante</li>
+                </ol>
+            </div>
+
+            <div class="formula">
+                <strong>Formule mathématique de DSSS :</strong>
+                <div class="pending-math" data-latex="s_{DSSS}(t) = d(t) \cdot PN(t)"></div>
+                où d(t) est le bit de données et PN(t) est le code pseudo-aléatoire.
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Signification</th>
+                        <th>Exemple 802.11b</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>T</td>
+                        <td>Période d'un bit de données</td>
+                        <td>1 µs (débit 1 Mbit/s)</td>
+                    </tr>
+                    <tr>
+                        <td>T_chip</td>
+                        <td>Durée d'un chip du code PN</td>
+                        <td>100 ns (chip rate 10 Mchip/s)</td>
+                    </tr>
+                    <tr>
+                        <td>N</td>
+                        <td>Nombre de chips par bit (facteur d'étalement)</td>
+                        <td>10 chips/bit</td>
+                    </tr>
+                    <tr>
+                        <td>PN(t)</td>
+                        <td>Séquence pseudo-bruit (typiquement ±1)</td>
+                        <td>Barker sequence [+1, +1, +1, -1, +1, -1, +1, -1, -1, -1, -1]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="math-block">
+            <h3>Désétalage à la réception</h3>
+            <div class="formula">
+                À la réception, le récepteur effectue une <strong>corrélation</strong> avec le même code PN :
+                <div class="pending-math" data-latex="d_{recovered} = \sum_{i=1}^{N} s_{DSSS}(t_i) \cdot PN(t_i)"></div>
+                <p style="margin-top: 0.8rem; font-size: 0.95rem;">Si le code PN est exact, la corrélation produit un pic (énergie concentrée). Si le code est incorrect, le résultat reste étalé (bruit).</p>
+            </div>
+
+            <div class="formula">
+                <strong>Gain de traitement (Processing Gain) :</strong>
+                <div class="pending-math" data-latex="PG = \frac{B_{spread}}{B_{original}} = \frac{R_{chip}}{R_{bit}} = N"></div>
+                <p style="margin-top: 0.8rem; font-size: 0.95rem;">Plus le facteur d'étalement est grand, plus le gain de traitement est élevé, ce qui améliore la résistance aux interférences.</p>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>B_spread</td>
+                        <td>Largeur de bande du signal étalé</td>
+                        <td>10 MHz (802.11b)</td>
+                    </tr>
+                    <tr>
+                        <td>B_original</td>
+                        <td>Largeur de bande du signal originel</td>
+                        <td>1 MHz (1 Mbit/s)</td>
+                    </tr>
+                    <tr>
+                        <td>R_chip</td>
+                        <td>Débit de chips (chip rate)</td>
+                        <td>10 Mchip/s</td>
+                    </tr>
+                    <tr>
+                        <td>R_bit</td>
+                        <td>Débit de bits (bit rate)</td>
+                        <td>1 Mbit/s</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <strong>✓ Avantages de DSSS</strong>
+                <ul>
+                    <li><strong>Résistance aux interférences :</strong> le gain de traitement permet de rejeter les interférences en bande étroite</li>
+                    <li><strong>LPI (Low Probability of Intercept) :</strong> le signal étalé ressemble à du bruit pour un observateur non autorisé</li>
+                    <li><strong>Multiple access :</strong> plusieurs utilisateurs peuvent partager la même bande avec des codes différents</li>
+                    <li><strong>Anti-jamming :</strong> difficile de brouiller un signal large bande en utilisant des jammeuses en bande étroite</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <strong>✗ Limitations de DSSS</strong>
+                <ul>
+                    <li><strong>Complexité du récepteur :</strong> la corrélation demande une puissance de calcul importante</li>
+                    <li><strong>Synchronisation :</strong> le récepteur doit être synchronisé avec le code PN (acquisition de code)</li>
+                    <li><strong>Consommation énergétique :</strong> opérations de corrélation et de synchronisation coûteuses</li>
+                    <li><strong>Utilisation du spectre :</strong> la bande passante réelle utilisée est large (10 MHz pour 802.11b à 1 Mbit/s)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Applications de DSSS dans les standards</h3>
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Standard</th>
+                        <th>Bande</th>
+                        <th>Chip rate</th>
+                        <th>Débit max</th>
+                        <th>Code PN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>802.11b WiFi</strong></td>
+                        <td>2.4 GHz</td>
+                        <td>11 Mchip/s</td>
+                        <td>11 Mbit/s</td>
+                        <td>Barker code (11 chips)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IEEE 802.15.4</strong></td>
+                        <td>2.4 GHz</td>
+                        <td>2 Mchip/s (O-QPSK)</td>
+                        <td>250 kbit/s</td>
+                        <td>16-ary spreading code</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDMA 3G</strong></td>
+                        <td>800 MHz - 2 GHz</td>
+                        <td>3.84 Mchip/s (UMTS)</td>
+                        <td>10 Mbit/s (UMTS)</td>
+                        <td>Walsh codes (orthogonaux)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="explain-intro">
+            <div class="badge">Distinction : DSSS vs FHSS</div>
+            <p><strong>DSSS (Direct Sequence) :</strong> le signal est étalé sur un spectre large et reste sur ce spectre pendant toute la transmission d'un bit. Un seul "canal large".</p>
+            <p style="margin-top: 0.8rem;"><strong>FHSS (Frequency Hopping Spread Spectrum) :</strong> le signal saute d'une fréquence à l'autre rapidement selon une séquence pseudo-aléatoire. Le spectre utilisé change constamment, mais à chaque instant, une seule fréquence est utilisée.</p>
+            <p style="margin-top: 0.8rem;"><strong>Comparaison :</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>DSSS :</strong> étalement instantané et continu → utilisation dense du spectre → plus rapide mais nécessite une réception plus précise</li>
+                <li><strong>FHSS :</strong> saut de fréquence dans le temps → utilisation moins dense → plus lente mais meilleure résistance aux interférences localisées</li>
+                <li><strong>DSSS :</strong> plus courant en WiFi, 3G, 802.15.4</li>
+                <li><strong>FHSS :</strong> utilisé en Bluetooth, quelques standards militaires</li>
+            </ul>
+        </div>
+
+        <div class="retenir">
+            ✅ DSSS est le fondement physique de CDMA et de 802.11b WiFi. Le gain de traitement permet une coexistence de plusieurs utilisateurs sur la même bande. La complexité du décodage est le prix à payer pour cette flexibilité.
+        </div>
+
+        <!-- Conclusions et comparaison des méthodes d'accès fixe -->
+        <h2>6. 📊 Conclusions et comparaison des méthodes d'accès fixe</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Vue d'ensemble</div>
+            <p>Nous avons exploré quatre approches différentes pour l'accès au medium : SDMA, FDMA, TDMA et CDMA. Chacune a ses propres caractéristiques, avantages et limitations. Cette section propose une synthèse comparative.</p>
+        </div>
+
+        <div class="math-block">
+            <h3>Tableau comparatif : SDMA vs FDMA vs TDMA vs CDMA</h3>
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Critère</th>
+                        <th>SDMA</th>
+                        <th>FDMA</th>
+                        <th>TDMA</th>
+                        <th>CDMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Principe</strong></td>
+                        <td>Séparation spatiale (distance, antennes directionnelles)</td>
+                        <td>Séparation fréquentielle (sous-bandes)</td>
+                        <td>Séparation temporelle (slots horaires)</td>
+                        <td>Séparation par codes (orthogonalité des codes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mécanisme de garde</strong></td>
+                        <td>Distance physique entre zones</td>
+                        <td>Guard band (espace entre fréquences)</td>
+                        <td>Guard time (espace entre slots)</td>
+                        <td>Orthogonalité des codes (produit scalaire = 0)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Synchronisation requise</strong></td>
+                        <td>Aucune</td>
+                        <td>Aucune (filtrage fréquentiel indépendant)</td>
+                        <td><strong>Requise</strong> (horloge commune)</td>
+                        <td>Partiellement (synchronisation temporelle et de code)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Efficacité spectrale</strong></td>
+                        <td>Moyenne (fonction de la distance requise)</td>
+                        <td>Moyenne (pertes en guard bands)</td>
+                        <td>Bonne si charge connue et stable</td>
+                        <td>Bonne (utilise toute la bande, tous les utilisateurs à la fois)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nombre d'utilisateurs</strong></td>
+                        <td>Limité par la géométrie</td>
+                        <td>Limité par la bande passante</td>
+                        <td>Limité par le nombre de slots</td>
+                        <td>Théoriquement illimité (mais dégradation avec charge)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cas d'usage typique</strong></td>
+                        <td>Cellules/zones cellulaires (rares)</td>
+                        <td>Radio FM, GSM (1G/2G)</td>
+                        <td>GSM (2G), certains réseaux IoT (TSCH 802.15.4)</td>
+                        <td>3G WCDMA/CDMA2000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Complexité</strong></td>
+                        <td>Moyenne (antennes)</td>
+                        <td>Faible (filtres FDM)</td>
+                        <td>Moyenne (synchronisation)</td>
+                        <td><strong>Haute</strong> (corrélation, codes)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="math-block">
+            <h3>OFDMA : Extension moderne de FDMA</h3>
+            <p><strong>OFDMA (Orthogonal Frequency Division Multiple Access)</strong> est une généralisation de FDMA qui combine les avantages de FDMA avec une meilleure gestion des ressources.</p>
+
+            <div class="formula">
+                <strong>Principe :</strong> Au lieu de diviser la bande en larges sous-canaux (FDMA classique), OFDMA divise la bande en très nombreux <strong>sous-porteuses (subcarriers)</strong> étroites et orthogonales. Chaque utilisateur peut recevoir une allocation dynamique d'un ensemble de subcarriers.
+                <div class="pending-math" data-latex="N_{subcarriers} \in [64, 256, 1024, 2048, \ldots]"></div>
+                <p style="margin-top: 0.8rem; font-size: 0.95rem;">L'orthogonalité entre les subcarriers élimine le besoin de guard bands (gain spectral majeur).</p>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Standard</th>
+                        <th>Bande</th>
+                        <th>Subcarriers</th>
+                        <th>Cas d'usage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>LTE (4G)</strong></td>
+                        <td>700 MHz - 2.6 GHz</td>
+                        <td>72 - 1200</td>
+                        <td>Telephonie mobile, données hauts débits</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WiFi 6 (802.11ax)</strong></td>
+                        <td>2.4 GHz, 5 GHz, 6 GHz</td>
+                        <td>242 - 996</td>
+                        <td>Réseaux locaux sans fil</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5G (NR)</strong></td>
+                        <td>0.6 GHz - 100 GHz</td>
+                        <td>960 - 3600</td>
+                        <td>Communications ultra-mobiles, IoT</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DVB-T (Télévision numérique)</strong></td>
+                        <td>174 - 862 MHz</td>
+                        <td>2048 - 8192</td>
+                        <td>Diffusion vidéo terrestre</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="explain-intro">
+                <strong>Avantages de OFDMA :</strong>
+                <ul style="margin-top: 0.8rem; margin-left: 1.5rem;">
+                    <li><strong>Efficacité spectrale :</strong> pas de guard bands → plus de subcarriers utiles</li>
+                    <li><strong>Flexibilité :</strong> chaque utilisateur peut avoir un nombre variable de subcarriers selon ses besoins</li>
+                    <li><strong>Robustesse au multipath :</strong> le préfixe cyclique (cyclic prefix) absorbe les échos de propagation</li>
+                    <li><strong>Gestion adaptative :</strong> allocation des subcarriers peut se faire dynamiquement selon la qualité du canal</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="explain-intro">
+            <div class="badge">Quand utiliser quelle méthode ?</div>
+            <p><strong>SDMA :</strong> Réseaux cellulaires classiques avec stations de base. Peu utilisé seul, plutôt combiné avec FDMA/TDMA/CDMA.</p>
+            <p style="margin-top: 0.8rem;"><strong>FDMA :</strong> Systèmes de diffusion (radio FM), communication broadcast. Utilisé en 1G/2G cellulaire, LoRa.</p>
+            <p style="margin-top: 0.8rem;"><strong>TDMA :</strong> Systèmes avec besoins temporels prévisibles. GSM (2G), Time-Slotted Channel Hopping (TSCH) dans 802.15.4. Nécessite synchronisation horloge.</p>
+            <p style="margin-top: 0.8rem;"><strong>CDMA :</strong> 3G (WCDMA, CDMA2000). Offre grande capacité mais complexité et consommation énergétique plus élevées.</p>
+            <p style="margin-top: 0.8rem;"><strong>OFDMA :</strong> Standards modernes : 4G LTE, WiFi 6 (802.11ax), 5G NR. Excellent compromis flexibilité/efficacité. Demande équipements plus sophistiqués.</p>
+        </div>
+
+        <div class="math-block">
+            <h3>Cas spécial : réseaux IoT et accès aléatoire</h3>
+            <p>Les méthodes d'accès fixe (SDMA, FDMA, TDMA, CDMA) supposent que l'ensemble des utilisateurs est <strong>connu a priori</strong> et que les ressources sont <strong>allouées statiquement</strong>.</p>
+
+            <p style="margin-top: 1rem;">Or, dans les réseaux <strong>802.15.4 (Zigbee, Thread)</strong> et les <strong>réseaux de capteurs</strong>, le nombre d'appareils varie dynamiquement et imprévisiblement. Les appareils peuvent apparaître et disparaître à tout moment. Allouer des ressources fixes à chaque appareil serait inefficace et gaspillerait de la bande passante.</p>
+
+            <p style="margin-top: 1rem;"><strong>Solution :</strong> <span style="background: #fbbf24; padding: 0.2rem 0.5rem; border-radius: 3px; font-weight: 600;">CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance)</span> — un protocole d'accès <strong>aléatoire et dynamique</strong> expliqué au chapitre 6.</p>
+
+            <ul style="margin-top: 1rem; margin-left: 1.5rem;">
+                <li>Chaque appareil émet quand il a besoin, sans allocation préalable</li>
+                <li>Écoute d'abord le canal (Carrier Sense) pour éviter les collisions</li>
+                <li>Pas de synchronisation globale requise</li>
+                <li>Scalable : ajouter/retirer des appareils est transparent</li>
+            </ul>
+        </div>
+
+        <div class="retenir">
+            ✅ Résumé : SDMA, FDMA, TDMA et CDMA sont des techniques d'assignation fixe. OFDMA en est une évolution flexible. Pour les réseaux IoT dynamiques sans infrastructure, les méthodes aléatoires (CSMA/CA) sont préférées. Chaque approche répond à des besoins différents.
+        </div>
+    </div>
+
+    <!-- ===== SECTION : ORTHOGONALITE DES CODES CDMA ===== -->
+    <div class="theory-box" style="margin:1.5rem 2rem;border-radius:14px;padding:1.8rem;">
+        <h2 style="color:#1E3A5F;font-size:1.2rem;margin-bottom:1rem;">📐 Orthogonalité des codes CDMA — Théorie détaillée</h2>
+
+        <p>En CDMA, les codes attribués aux différentes stations doivent être <strong>mutuellement orthogonaux</strong>. L'orthogonalité garantit que le récepteur peut extraire le signal d'un émetteur spécifique parmi tous les signaux superposés.</p>
+
+        <div style="background:#f0fdf4;border-left:4px solid #0D9488;border-radius:0 8px 8px 0;padding:1rem;margin:1rem 0;">
+            <strong>Définition mathématique de l'orthogonalité :</strong>
+            <div style="text-align:center;font-size:1.1rem;margin:.8rem 0;">
+                (a₀a₁…aₙ) · (b₀b₁…bₙ) = Σᵢ aᵢbᵢ = 0
+            </div>
+        </div>
+
+        <p><strong>Exemple de codes NON orthogonaux (problème) :</strong></p>
+        <ul style="padding-left:1.2rem;line-height:1.8;">
+            <li>Station A : code (+1 +1)</li>
+            <li>Station B : code (-1 +1)</li>
+            <li>Produit : (+1)(-1) + (+1)(+1) = -1 + 1 = 0 → ces deux-là sont orthogonaux !</li>
+        </ul>
+        <p style="margin-top:.6rem;">En pratique, les systèmes réels utilisent des codes <strong>plus longs que le minimum mathématique</strong>, créant une plus grande distance entre les codes. Cela rend le décodage plus robuste aux erreurs et permet de choisir des codes orthogonaux même si les émetteurs ne démarrent pas exactement au même moment (codes décalés de 1, 2, etc. pas).</p>
+
+        <h3 style="color:#0D9488;margin:1rem 0 .5rem;">⚠️ Problème near-far en CDMA</h3>
+        <p>CDMA nécessite que <strong>tous les signaux arrivent avec à peu près la même puissance</strong> au récepteur. Si un émetteur A est beaucoup plus proche du récepteur que l'émetteur B :</p>
+        <ul style="padding-left:1.2rem;line-height:1.8;">
+            <li>Le signal de A arrive bien plus fort que celui de B</li>
+            <li>Lors de la corrélation pour extraire le signal de B, le signal dominant de A crée du bruit</li>
+            <li>→ Le récepteur ne peut pas décoder B correctement</li>
+        </ul>
+        <p style="margin-top:.6rem;"><strong>Solution dans les systèmes UMTS/3G :</strong> Le récepteur mesure la puissance reçue de chaque émetteur et envoie une information de retour (feedback) aux émetteurs, qui adaptent dynamiquement leur puissance d'émission. Ce mécanisme de <strong>contrôle de puissance en boucle fermée</strong> est essentiel au bon fonctionnement du CDMA.</p>
+        <div style="background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;">💡 À retenir : Le problème near-far est l'un des principaux défis du CDMA. Sans contrôle de puissance, les nœuds proches du récepteur "noient" les signaux des nœuds éloignés.</div>
+    </div>
+
+    <nav class="navigation">
+        <a href="index.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="ch6_mac_aleatoire.html">Chapitre suivant →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // FDMA Demo
+        const fdmaStationsSlider = document.getElementById('fdmaStations');
+        const fdmaBandwidthSlider = document.getElementById('fdmaBandwidth');
+        const fdmaStationsVal = document.getElementById('fdmaStationsVal');
+        const fdmaBandwidthVal = document.getElementById('fdmaBandwidthVal');
+        const fdmaCanvas = document.getElementById('fdmaCanvas');
+        const fdmaCtx = fdmaCanvas.getContext('2d');
+
+        const colors = [
+            '#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1', '#06B6D4'
+        ];
+
+        function drawFDMA() {
+            const stations = parseInt(fdmaStationsSlider.value);
+            const bandwidth = parseFloat(fdmaBandwidthSlider.value);
+
+            fdmaStationsVal.textContent = stations;
+            fdmaBandwidthVal.textContent = bandwidth + ' MHz';
+
+            fdmaCanvas.width = fdmaCanvas.offsetWidth;
+            const width = fdmaCanvas.width;
+            const height = fdmaCanvas.height;
+
+            fdmaCtx.fillStyle = '#f9fafb';
+            fdmaCtx.fillRect(0, 0, width, height);
+
+            // Draw frequency scale
+            fdmaCtx.strokeStyle = '#d1d5db';
+            fdmaCtx.fillStyle = '#666';
+            fdmaCtx.font = '12px Arial';
+            fdmaCtx.textAlign = 'center';
+
+            const startFreq = 0;
+            const endFreq = stations * bandwidth + (stations - 1) * 0.5;
+            const spacing = width / (endFreq + 1);
+
+            // Axes
+            fdmaCtx.strokeStyle = '#333';
+            fdmaCtx.lineWidth = 2;
+            fdmaCtx.beginPath();
+            fdmaCtx.moveTo(50, height - 40);
+            fdmaCtx.lineTo(width - 20, height - 40);
+            fdmaCtx.stroke();
+
+            fdmaCtx.fillStyle = '#333';
+            fdmaCtx.font = 'bold 12px Arial';
+            fdmaCtx.fillText('Fréquence (MHz)', width / 2, height - 10);
+
+            // Draw frequency bands
+            let currentFreq = 0;
+            for (let i = 0; i < stations; i++) {
+                const x = 50 + currentFreq * spacing;
+                const w = bandwidth * spacing;
+
+                fdmaCtx.fillStyle = colors[i % colors.length];
+                fdmaCtx.fillRect(x, height - 150, w, 80);
+
+                fdmaCtx.strokeStyle = '#333';
+                fdmaCtx.lineWidth = 2;
+                fdmaCtx.strokeRect(x, height - 150, w, 80);
+
+                // Label
+                fdmaCtx.fillStyle = 'white';
+                fdmaCtx.font = 'bold 14px Arial';
+                fdmaCtx.textAlign = 'center';
+                fdmaCtx.fillText('Station ' + (i + 1), x + w / 2, height - 105);
+
+                // Frequency labels
+                fdmaCtx.fillStyle = '#666';
+                fdmaCtx.font = '11px Arial';
+                fdmaCtx.textAlign = 'center';
+                fdmaCtx.fillText(currentFreq.toFixed(1) + ' MHz', x + w / 2, height - 25);
+
+                currentFreq += bandwidth + 0.5;
+            }
+        }
+
+        fdmaStationsSlider.addEventListener('input', drawFDMA);
+        fdmaBandwidthSlider.addEventListener('input', drawFDMA);
+        drawFDMA();
+
+        // TDMA Demo
+        const tdmaCanvas = document.getElementById('tdmaCanvas');
+        const tdmaCtx = tdmaCanvas.getContext('2d');
+        const tdmaPlayBtn = document.getElementById('tdmaPlayBtn');
+        let tdmaAnimating = false;
+
+        function drawTDMA(frame) {
+            tdmaCanvas.width = tdmaCanvas.offsetWidth;
+            const width = tdmaCanvas.width;
+            const height = tdmaCanvas.height;
+
+            tdmaCtx.fillStyle = '#f9fafb';
+            tdmaCtx.fillRect(0, 0, width, height);
+
+            const slotWidth = width / 12;
+            const stationHeight = (height - 40) / 3;
+
+            // Title
+            tdmaCtx.fillStyle = '#333';
+            tdmaCtx.font = 'bold 14px Arial';
+            tdmaCtx.fillText('Time → ', 10, 20);
+
+            const stations = ['Station A', 'Station B', 'Station C'];
+            const stationColors = ['#EF4444', '#3B82F6', '#10B981'];
+
+            for (let s = 0; s < 3; s++) {
+                const y = 40 + s * stationHeight;
+
+                // Label
+                tdmaCtx.fillStyle = '#333';
+                tdmaCtx.font = '12px Arial';
+                tdmaCtx.textAlign = 'right';
+                tdmaCtx.fillText(stations[s], 45, y + stationHeight / 2 + 5);
+
+                // Slots
+                for (let i = 0; i < 12; i++) {
+                    const x = 60 + i * slotWidth;
+                    const isActive = (i % 3) === s;
+                    const isCurrentFrame = (frame % 12) === i;
+
+                    if (isActive) {
+                        tdmaCtx.fillStyle = stationColors[s];
+                        if (isCurrentFrame) {
+                            tdmaCtx.globalAlpha = 0.8;
+                            tdmaCtx.shadowColor = '#000';
+                            tdmaCtx.shadowBlur = 10;
+                        }
+                    } else {
+                        tdmaCtx.fillStyle = '#d1d5db';
+                        tdmaCtx.globalAlpha = 0.5;
+                    }
+
+                    tdmaCtx.fillRect(x, y, slotWidth - 4, stationHeight - 4);
+                    tdmaCtx.globalAlpha = 1;
+                    tdmaCtx.shadowColor = 'transparent';
+
+                    tdmaCtx.strokeStyle = '#999';
+                    tdmaCtx.lineWidth = 1;
+                    tdmaCtx.strokeRect(x, y, slotWidth - 4, stationHeight - 4);
+
+                    // Slot number
+                    tdmaCtx.fillStyle = '#333';
+                    tdmaCtx.font = '10px Arial';
+                    tdmaCtx.textAlign = 'center';
+                    tdmaCtx.fillText(i.toString(), x + slotWidth / 2 - 2, y + stationHeight - 8);
+                }
+            }
+        }
+
+        tdmaPlayBtn.addEventListener('click', () => {
+            if (tdmaAnimating) return;
+            tdmaAnimating = true;
+            tdmaPlayBtn.disabled = true;
+            tdmaPlayBtn.textContent = '⏸ En cours...';
+
+            let frame = 0;
+            const interval = setInterval(() => {
+                drawTDMA(frame);
+                frame = (frame + 1) % 12;
+            }, 300);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                tdmaAnimating = false;
+                tdmaPlayBtn.disabled = false;
+                tdmaPlayBtn.textContent = '▶ Démarrer animation';
+                drawTDMA(0);
+            }, 3600);
+        });
+
+        drawTDMA(0);
+
+        // CDMA Demo
+        const cdmaBitA = document.getElementById('cdmaBitA');
+        const cdmaBitB = document.getElementById('cdmaBitB');
+        const cdmaCanvas = document.getElementById('cdmaCanvas');
+        const cdmaCtx = cdmaCanvas.getContext('2d');
+
+        const codeA = [-1, 1, -1, -1, 1, 1];
+        const codeB = [1, 1, -1, 1, -1, 1];
+
+        function drawCDMA() {
+            const bitA = parseInt(cdmaBitA.value);
+            const bitB = parseInt(cdmaBitB.value);
+
+            cdmaCanvas.width = cdmaCanvas.offsetWidth;
+            const width = cdmaCanvas.width;
+            const height = cdmaCanvas.height;
+
+            cdmaCtx.fillStyle = '#f9fafb';
+            cdmaCtx.fillRect(0, 0, width, height);
+
+            const chipWidth = (width - 60) / 6;
+            const panelHeight = (height - 80) / 3;
+
+            // Helper function to draw a panel
+            function drawPanel(y, title, values, color) {
+                // Title
+                cdmaCtx.fillStyle = '#333';
+                cdmaCtx.font = 'bold 12px Arial';
+                cdmaCtx.textAlign = 'left';
+                cdmaCtx.fillText(title, 10, y + 20);
+
+                // Grid
+                cdmaCtx.strokeStyle = '#e5e7eb';
+                cdmaCtx.lineWidth = 1;
+                for (let i = 0; i <= 6; i++) {
+                    const x = 60 + i * chipWidth;
+                    cdmaCtx.beginPath();
+                    cdmaCtx.moveTo(x, y + 30);
+                    cdmaCtx.lineTo(x, y + 30 + panelHeight - 40);
+                    cdmaCtx.stroke();
+                }
+
+                // Baseline
+                const baseline = y + 30 + (panelHeight - 40) / 2;
+                cdmaCtx.strokeStyle = '#999';
+                cdmaCtx.lineWidth = 1;
+                cdmaCtx.setLineDash([2, 2]);
+                cdmaCtx.beginPath();
+                cdmaCtx.moveTo(50, baseline);
+                cdmaCtx.lineTo(width - 10, baseline);
+                cdmaCtx.stroke();
+                cdmaCtx.setLineDash([]);
+
+                // Bars
+                cdmaCtx.fillStyle = color;
+                const scale = (panelHeight - 40) / 4;
+                for (let i = 0; i < values.length; i++) {
+                    const x = 60 + i * chipWidth;
+                    const h = values[i] * scale;
+                    if (values[i] > 0) {
+                        cdmaCtx.fillRect(x + 2, baseline - h, chipWidth - 4, h);
+                    } else {
+                        cdmaCtx.fillRect(x + 2, baseline, chipWidth - 4, -h);
+                    }
+
+                    // Chip label
+                    cdmaCtx.fillStyle = '#666';
+                    cdmaCtx.font = '10px Arial';
+                    cdmaCtx.textAlign = 'center';
+                    cdmaCtx.fillText(i.toString(), x + chipWidth / 2, y + panelHeight - 5);
+                }
+
+                cdmaCtx.strokeStyle = '#333';
+                cdmaCtx.lineWidth = 2;
+                cdmaCtx.strokeRect(50, y + 30, 6 * chipWidth, panelHeight - 40);
+            }
+
+            // Compute transmitted signals
+            const signalA = codeA.map(c => c * (bitA ? 1 : -1));
+            const signalB = codeB.map(c => c * (bitB ? 1 : -1));
+            const superposed = signalA.map((v, i) => v + signalB[i]);
+
+            // Compute correlations
+            const corrA = signalA.reduce((s, v, i) => s + v * superposed[i], 0) / 6;
+            const corrB = signalB.reduce((s, v, i) => s + v * superposed[i], 0) / 6;
+
+            drawPanel(10, 'Signal A (après multiplication par code A + bit)', signalA, '#EF4444');
+            drawPanel(10 + panelHeight + 20, 'Signal B (après multiplication par code B + bit)', signalB, '#3B82F6');
+            drawPanel(10 + 2 * (panelHeight + 20), 'Signal superposé (A + B sur le canal)', superposed, '#F59E0B');
+
+            // Show correlations
+            const corrY = height - 60;
+            cdmaCtx.fillStyle = '#333';
+            cdmaCtx.font = 'bold 14px Arial';
+            cdmaCtx.textAlign = 'left';
+            cdmaCtx.fillText('Résultats de corrélation :', 60, corrY);
+
+            cdmaCtx.fillStyle = '#EF4444';
+            cdmaCtx.fillText('Corrélation A = ' + corrA.toFixed(2), 60, corrY + 25);
+
+            cdmaCtx.fillStyle = '#3B82F6';
+            cdmaCtx.fillText('Corrélation B = ' + corrB.toFixed(2), 300, corrY + 25);
+
+            cdmaCtx.fillStyle = '#666';
+            cdmaCtx.font = '11px Arial';
+            cdmaCtx.fillText('Les bits sont récupérés en signe(corrélation)', 60, corrY + 45);
+        }
+
+        cdmaBitA.addEventListener('change', drawCDMA);
+        cdmaBitB.addEventListener('change', drawCDMA);
+        drawCDMA();
+
+        // Responsive canvas redraw on window resize
+        window.addEventListener('resize', () => {
+            drawFDMA();
+            drawTDMA(0);
+            drawCDMA();
+        });
+    </script>
+</body>
+</html>

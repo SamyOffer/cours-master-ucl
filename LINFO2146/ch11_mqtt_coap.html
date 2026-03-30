@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 11 : MQTT & CoAP | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .control-group {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--navy);
+            min-width: 150px;
+        }
+
+        .control-group input[type="text"] {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+
+        .control-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+        }
+
+        .checkbox-label input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .match-result {
+            background: #dcfce7;
+            border: 2px solid #16a34a;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+        }
+
+        .no-match {
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .http-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .http-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .http-box h4 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 11 : MQTT & CoAP</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 11 : MQTT & CoAP</h1>
+
+        <p>MQTT et CoAP sont les deux protocoles applicatifs majeurs pour l'IoT. HTTP est trop lourd (700+ bytes d'en-têtes). MQTT et CoAP offrent de légères alternatives : MQTT utilise une architecture publisher-broker-subscriber, CoAP suit le modèle REST d'HTTP mais en binaire compact sur UDP.</p>
+
+        <!-- REST et HTTP -->
+        <h2>1. REST et HTTP</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Fondations du Web</div>
+            <p>REST = Representational State Transfer. Un style architectural basé sur HTTP avec 4 verbes : GET, POST, PUT, DELETE.</p>
+            <div class="analogy">
+                🌐 <strong>Analogie :</strong> HTTP c'est le langage du Web. REST ajoute de la structure : les ressources ont des URL (ex: /users/123), et les verbes HTTP indiquent les actions (GET = lire, POST = créer, PUT = modifier, DELETE = supprimer).
+            </div>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Verbe HTTP</th>
+                    <th>Signification</th>
+                    <th>Safe ?</th>
+                    <th>Idempotent ?</th>
+                    <th>Exemple</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>GET</strong></td>
+                    <td>Lire une ressource</td>
+                    <td>✅ Oui</td>
+                    <td>✅ Oui</td>
+                    <td>GET /sensors/temp</td>
+                </tr>
+                <tr>
+                    <td><strong>POST</strong></td>
+                    <td>Créer une ressource</td>
+                    <td>❌ Non</td>
+                    <td>❌ Non</td>
+                    <td>POST /logs (crée un nouveau log)</td>
+                </tr>
+                <tr>
+                    <td><strong>PUT</strong></td>
+                    <td>Modifier/remplacer une ressource</td>
+                    <td>❌ Non</td>
+                    <td>✅ Oui</td>
+                    <td>PUT /config/interval=60</td>
+                </tr>
+                <tr>
+                    <td><strong>DELETE</strong></td>
+                    <td>Supprimer une ressource</td>
+                    <td>❌ Non</td>
+                    <td>✅ Oui</td>
+                    <td>DELETE /logs/old</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background: #fee2e2; border-left: 3px solid #dc2626; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+            <p><strong>⚠️ Problème HTTP pour IoT :</strong> Une requête HTTP simple avec headers = 700+ bytes. Sur 802.15.4 (127 bytes max), impossible ! D'où CoAP.</p>
+        </div>
+
+        <!-- CoAP -->
+        <h2>2. CoAP (Constrained Application Protocol)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">HTTP pour IoT</div>
+            <p>CoAP = "HTTP for constrained devices". Même concepts (GET/POST/PUT/DELETE, URIs), mais en binaire compact sur UDP.</p>
+            <div class="analogy">
+                📦 <strong>Analogie :</strong> Si HTTP est une lettre détaillée avec beaucoup d'information inutile, CoAP est un texto qui dit la même chose avec 10x moins de caractères.
+            </div>
+        </div>
+
+        <div class="http-comparison">
+            <div class="http-box">
+                <h4>HTTP/REST</h4>
+                <p><strong>Requête GET :</strong></p>
+                <code style="display: block; margin: 0.5rem 0; white-space: pre-wrap; word-break: break-all;">GET /sensors/temp HTTP/1.1
+Host: 192.168.1.1
+User-Agent: curl/7.64
+Accept: */*
+Connection: close
+
+[700+ bytes d'en-tête]</code>
+                <p style="margin-top: 1rem;"><strong>✗ Problèmes :</strong></p>
+                <ul style="margin-left: 2rem;">
+                    <li>Texte brut (inefficace)</li>
+                    <li>TCP (heavy, pas idéal pour IoT)</li>
+                    <li>Énormément d'en-têtes</li>
+                </ul>
+            </div>
+
+            <div class="http-box">
+                <h4>CoAP</h4>
+                <p><strong>Requête GET :</strong></p>
+                <code style="display: block; margin: 0.5rem 0; white-space: pre-wrap;">V T TKL C MID
+ 0 0  0  1  [12]
+           GET /sensors/temp
+
+[~20 bytes total]</code>
+                <p style="margin-top: 1rem;"><strong>✓ Avantages :</strong></p>
+                <ul style="margin-left: 2rem;">
+                    <li>Binaire (compact)</li>
+                    <li>UDP (léger, rapide)</li>
+                    <li>En-tête de 4 bytes !</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Format d'en-tête CoAP (4 bytes fixes)</h3>
+            <div class="formula">
+                <div class="pending-math" data-latex="\text{CoAP Header} = \text{Ver (2b)} | \text{Type (2b)} | \text{TKL (4b)} | \text{Code (8b)} | \text{Message ID (16b)}"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Bits</th>
+                        <th>Signification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ver</td>
+                        <td>2</td>
+                        <td>Version (toujours 01 = version 1)</td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td>2</td>
+                        <td>CON (0) = Confirmable, NON (1) = Non-Confirmable, ACK (2), RST (3)</td>
+                    </tr>
+                    <tr>
+                        <td>TKL</td>
+                        <td>4</td>
+                        <td>Token Length (0-8 bytes de token)</td>
+                    </tr>
+                    <tr>
+                        <td>Code</td>
+                        <td>8</td>
+                        <td>Classe (3b) + Détail (5b) ex: 0.01=GET, 2.05=Content, 4.04=Not Found</td>
+                    </tr>
+                    <tr>
+                        <td>Message ID</td>
+                        <td>16</td>
+                        <td>Identifie la requête (pour dédupliquer)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background: white; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                <strong>Code CoAP :</strong> Structure c.dd (classe . détail)
+                <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+                    <li>0.xx = Requête (0.01=GET, 0.02=POST, 0.03=PUT, 0.04=DELETE)</li>
+                    <li>2.xx = Succès (2.01=Created, 2.04=Changed, 2.05=Content)</li>
+                    <li>4.xx = Erreur client (4.04=Not Found, 4.05=Method Not Allowed)</li>
+                    <li>5.xx = Erreur serveur (5.00=Internal Server Error)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>🔄 Démo interactive : Requête CoAP</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Ressource :</label>
+                    <input type="text" id="coapResource" value="/sensors/temperature" placeholder="/path/to/resource">
+                </div>
+                <div class="control-group">
+                    <label>Verbe HTTP :</label>
+                    <select id="coapMethod" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <option value="0">GET (0.01)</option>
+                        <option value="1">POST (0.02)</option>
+                        <option value="2">PUT (0.03)</option>
+                        <option value="3">DELETE (0.04)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Type :</label>
+                    <select id="coapType" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <option value="0">CON (Confirmable)</option>
+                        <option value="1">NON (Non-Confirmable)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 4px; margin-top: 1.5rem; border: 2px solid var(--teal);">
+                <h4 style="color: var(--teal); margin-bottom: 1rem;">Paquet CoAP généré :</h4>
+                <div style="background: white; padding: 1rem; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em;">
+                    <div>Ver: 01 (v1)</div>
+                    <div>Type: <span id="coapTypeVal">CON</span> (<span id="coapTypeBin">00</span>)</div>
+                    <div>Code: <span id="coapCodeVal">GET</span> (<span id="coapCodeBin">00.01</span>)</div>
+                    <div>Message ID: <span id="coapMsgID">1234</span></div>
+                    <div style="margin-top: 0.5rem; border-top: 1px solid #d1d5db; padding-top: 0.5rem;">
+                        <strong>URI-Path:</strong> <span id="coapURI">sensors/temperature</span>
+                    </div>
+                    <div style="margin-top: 1rem; background: #fffbeb; padding: 0.5rem; border-radius: 3px;">
+                        <strong>Taille totale:</strong> <span id="coapSize">~40</span> bytes
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CoAP Observe -->
+        <h2>3. CoAP Observe (Push)</h2>
+
+        <div class="theory-box">
+            <h3>Extension Observe : subscription pour IoT</h3>
+            <p>Le client envoie <code>GET /sensors/temp</code> avec l'option <code>Observe: 0</code> (subscribe).</p>
+            <p style="margin-top: 0.5rem;">Le serveur répond avec <code>2.05 Content + Observe: 1</code> et la valeur initiale.</p>
+            <p style="margin-top: 0.5rem;">Chaque fois que la valeur change, le serveur envoie automatiquement une notification au client avec le nouveau "Observe: 2", "Observe: 3", etc.</p>
+            <p style="margin-top: 0.5rem;"><strong>Avantage :</strong> Le client ne doit pas faire de polling ! C'est du push real-time.</p>
+        </div>
+
+        <!-- MQTT -->
+        <h2>4. MQTT (Message Queuing Telemetry Transport)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Pub/Sub model</div>
+            <p>MQTT = "MQ Telemetry Transport". Architecture publish-subscribe avec un broker central. Très différent de CoAP.</p>
+            <div class="analogy">
+                📰 <strong>Analogie :</strong> MQTT c'est comme un tableau d'affichage (bulletin board). Les capteurs (publishers) écrivent les données sur le tableau. Les applications (subscribers) lisent le tableau. Le serveur MQTT (broker) gère le tableau. Avantage : 1 capteur alimente 1000 applis !
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 1.5rem 0;">
+            <div style="background: white; border: 2px solid var(--light); padding: 1.5rem; border-radius: 4px;">
+                <h4 style="color: var(--navy); margin-bottom: 1rem;">CoAP (Request-Response)</h4>
+                <p style="margin-bottom: 1rem;">Client A → CoAP Server (GET /sensors/temp) ← Server B</p>
+                <p style="font-size: 0.9rem; color: #666;">Chaque client demande directement au serveur. Point-à-point synchrone.</p>
+            </div>
+
+            <div style="background: white; border: 2px solid var(--light); padding: 1.5rem; border-radius: 4px;">
+                <h4 style="color: var(--navy); margin-bottom: 1rem;">MQTT (Pub/Sub)</h4>
+                <p style="margin-bottom: 1rem;">Publisher → MQTT Broker ← Subscribers</p>
+                <p style="font-size: 0.9rem; color: #666;">Découplage total. Pub/Sub asynchrone. 1 source, N applis.</p>
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <h3>Topics MQTT hiérarchiques</h3>
+            <p>Topics sont organisés en hiérarchie avec <code>/</code> : <code>ucl/barb/room10/temperature</code></p>
+            <p style="margin-top: 0.5rem;"><strong>Subscribing :</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><code>ucl/barb/room10/temperature</code> = cette topic exacte</li>
+                <li><code>ucl/barb/room10/+</code> = temperature, humidity, pressure, ... (un seul niveau)</li>
+                <li><code>ucl/barb/#</code> = tout sous ucl/barb (plusieurs niveaux)</li>
+                <li><code>ucl/#</code> = tout sous ucl (très large)</li>
+            </ul>
+
+            <h3 style="margin-top:1.2rem;">📌 Wildcards en détail : <code>+</code> et <code>#</code></h3>
+            <table style="width:100%;border-collapse:collapse;margin-top:.8rem;font-size:.9rem;">
+                <thead>
+                    <tr style="background:#1e3a5f;color:#fff;">
+                        <th style="padding:10px;text-align:left;">Wildcard</th>
+                        <th style="padding:10px;text-align:left;">Nom</th>
+                        <th style="padding:10px;text-align:left;">Règle</th>
+                        <th style="padding:10px;text-align:left;">Exemple subscription</th>
+                        <th style="padding:10px;text-align:left;">Match ✅</th>
+                        <th style="padding:10px;text-align:left;">No match ❌</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background:#eff6ff;">
+                        <td style="padding:10px;"><code style="background:#1e3a5f;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700">+</code></td>
+                        <td style="padding:10px;"><strong>Single-level wildcard</strong></td>
+                        <td style="padding:10px;">Remplace <strong>exactement un</strong> niveau de topic</td>
+                        <td style="padding:10px;"><code>home/+/temperature</code></td>
+                        <td style="padding:10px;color:#065f46;"><code>home/room1/temperature</code><br><code>home/kitchen/temperature</code></td>
+                        <td style="padding:10px;color:#991b1b;"><code>home/floor1/room1/temperature</code><br>(2 niveaux, pas 1)</td>
+                    </tr>
+                    <tr style="background:#f0fdf4;">
+                        <td style="padding:10px;"><code style="background:#0d9488;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700">#</code></td>
+                        <td style="padding:10px;"><strong>Multi-level wildcard</strong></td>
+                        <td style="padding:10px;">Remplace <strong>zéro ou plusieurs</strong> niveaux. Doit être le <strong>dernier caractère</strong>.</td>
+                        <td style="padding:10px;"><code>home/#</code></td>
+                        <td style="padding:10px;color:#065f46;"><code>home/temperature</code><br><code>home/room1/temp</code><br><code>home/floor1/room1/temp</code></td>
+                        <td style="padding:10px;color:#991b1b;">Invalide : <code>home/#/temp</code><br>(# pas en dernier)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background:#fef3c7;border-radius:8px;padding:1rem;margin-top:1rem;border-left:4px solid #f59e0b;">
+                <strong>⚠️ Règles importantes :</strong>
+                <ul style="margin-left:1.2rem;margin-top:.5rem;line-height:1.8;font-size:.9rem;">
+                    <li><code>#</code> seul (sans préfixe) = abonnement à <strong>TOUS</strong> les topics</li>
+                    <li><code>+</code> peut apparaître plusieurs fois : <code>+/+/temperature</code> = tous les topics à 2 niveaux se terminant par /temperature</li>
+                    <li><code>#</code> ne peut apparaître qu'une fois et uniquement à la fin</li>
+                    <li>Topics commençant par <code>$</code> (ex: <code>$SYS/broker/clients</code>) sont réservés au broker — le wildcard <code>#</code> ne les capture PAS</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>🎯 Démo interactive : Wildcards MQTT</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Topic source :</label>
+                    <input type="text" id="mqttTopic" value="home/kitchen/temperature" placeholder="home/kitchen/temperature">
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <p style="font-weight: 600; margin-bottom: 0.5rem;">Test de subscriptions :</p>
+                    <div id="mqttMatches"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QoS MQTT -->
+        <h2>5. QoS MQTT</h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>QoS Level</th>
+                    <th>Nom</th>
+                    <th>Sémantique</th>
+                    <th>Messages de contrôle</th>
+                    <th>Usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="background: #fee2e2;"><strong>QoS 0</strong></td>
+                    <td style="background: #fee2e2;">At most once</td>
+                    <td style="background: #fee2e2;">Pas de garantie de livraison</td>
+                    <td style="background: #fee2e2;">Aucun (fire and forget)</td>
+                    <td style="background: #fee2e2;">Capteurs de température (perte acceptable)</td>
+                </tr>
+                <tr>
+                    <td><strong>QoS 1</strong></td>
+                    <td>At least once</td>
+                    <td>Au moins une livraison (possibles doublons)</td>
+                    <td>PUBLISH → PUBACK</td>
+                    <td>Événements importants, certaines pertes acceptables</td>
+                </tr>
+                <tr>
+                    <td style="background: #dcfce7;"><strong>QoS 2</strong></td>
+                    <td style="background: #dcfce7;">Exactly once</td>
+                    <td style="background: #dcfce7;">Livraison garantie, pas de doublons</td>
+                    <td style="background: #dcfce7;">PUBLISH → PUBREC → PUBREL → PUBCOMP (4 messages)</td>
+                    <td style="background: #dcfce7;">Transactions financières, données critiques</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Comparaison finale -->
+        <h2>6. CoAP vs MQTT</h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>CoAP</th>
+                    <th>MQTT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Architecture</strong></td>
+                    <td>Client-Server (REST)</td>
+                    <td>Pub-Sub (Broker)</td>
+                </tr>
+                <tr>
+                    <td><strong>Transport</strong></td>
+                    <td>UDP (sans connexion)</td>
+                    <td>TCP (avec connexion)</td>
+                </tr>
+                <tr>
+                    <td><strong>En-tête</strong></td>
+                    <td>4 bytes (binaire)</td>
+                    <td>2 bytes minimum (binaire)</td>
+                </tr>
+                <tr>
+                    <td><strong>Synchrone/Asynchrone</strong></td>
+                    <td>Synchrone (Request-Response)</td>
+                    <td>Asynchrone (Publish-Subscribe)</td>
+                </tr>
+                <tr>
+                    <td><strong>QoS</strong></td>
+                    <td>Implicite (type de message)</td>
+                    <td>Explicite (QoS 0/1/2)</td>
+                </tr>
+                <tr>
+                    <td><strong>Push</strong></td>
+                    <td>Observe option</td>
+                    <td>Natif (Publish)</td>
+                </tr>
+                <tr>
+                    <td><strong>Cas d'usage</strong></td>
+                    <td>IoT direct, 802.15.4, capteurs simples</td>
+                    <td>Hub IoT, intégration applis multiples</td>
+                </tr>
+                <tr style="background: #ecfdf5;">
+                    <td style="background: #ecfdf5;"><strong>Taille de paquet</strong></td>
+                    <td style="background: #ecfdf5;">~20-50 bytes</td>
+                    <td style="background: #ecfdf5;">~2-10 bytes (header seul)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="retenir">
+            ✅ <strong>Règle de pouce :</strong>
+            <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+                <li><strong>CoAP</strong> pour des appareils bas débit parlant directement à un serveur ou entre eux (réseaux maillés 6LoWPAN).</li>
+                <li><strong>MQTT</strong> pour des architectures d'entreprise où les données des capteurs alimentent plusieurs applications (intégration complexe).</li>
+                <li><strong>HTTP(S)</strong> pour les applications mobiles et web (navigateur).</li>
+            </ul>
+        </div>
+
+        <!-- CoAP Reliable Messaging -->
+        <h2>7. CoAP — Types de messages et fiabilité</h2>
+
+        <div class="theory-box">
+            <h3>Les 4 types de messages CoAP (champ T)</h3>
+            <p>CoAP définit 4 types de messages encodés dans le champ T (2 bits) de l'en-tête :</p>
+            <table class="info-table" style="margin-top:0.7rem;">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Valeur T</th>
+                        <th>Rôle</th>
+                        <th>ACK requis ?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CON</strong> (Confirmable)</td>
+                        <td>0</td>
+                        <td>Message fiable. Le destinataire doit répondre par ACK ou RST.</td>
+                        <td>✅ Oui</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NON</strong> (Non-Confirmable)</td>
+                        <td>1</td>
+                        <td>Message léger sans garantie. Utile pour lectures répétées de capteurs.</td>
+                        <td>❌ Non</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ACK</strong> (Acknowledgment)</td>
+                        <td>2</td>
+                        <td>Confirme la réception d'un CON. Peut contenir la réponse (piggybacking).</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RST</strong> (Reset)</td>
+                        <td>3</td>
+                        <td>Indique que le message CON ou NON a été reçu mais rejeté (token invalide, message inattendu).</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top:0.8rem;">Un CON vide (code 0.00) peut servir de <strong>ping</strong> : le destinataire répond par RST, confirmant qu'il est en ligne.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Exponential back-off pour les messages CON</h3>
+            <p>Quand un message CON n'est pas acquitté, l'émetteur le retransmet avec un délai exponentiel :</p>
+            <ol style="padding-left:1.4rem; margin-top:0.5rem; line-height:2;">
+                <li>Timeout initial := valeur aléatoire dans [<code>ACK_TIMEOUT</code>, <code>ACK_TIMEOUT × ACK_RANDOM_FACTOR</code>]</li>
+                <li>Envoyer le message CON, attendre ACK ou RST.</li>
+                <li>Si pas de réponse et <code>retransmission_counter &lt; MAX_RETRANSMIT</code> : doubler le timeout, incrémenter le compteur, retransmettre.</li>
+                <li>Abandonner après MAX_RETRANSMIT tentatives.</li>
+            </ol>
+            <div style="background:#fef3c7; border-left:4px solid #F59E0B; padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin-top:0.8rem;">
+                <strong>Valeurs par défaut :</strong> ACK_TIMEOUT = 2 s, ACK_RANDOM_FACTOR = 1.5, MAX_RETRANSMIT = 4. Durée max totale ≈ 45 s.
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <h3>Échange synchrone vs asynchrone</h3>
+            <table class="info-table" style="margin-top:0.5rem;">
+                <thead>
+                    <tr>
+                        <th>Mode</th>
+                        <th>Séquence</th>
+                        <th>Avantage / Inconvénient</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Synchrone</strong> (piggybacking)</td>
+                        <td>Client envoie CON → Serveur répond avec ACK contenant directement la réponse</td>
+                        <td>✅ Efficace (2 messages). ❌ Le serveur doit répondre rapidement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Asynchrone</strong> (separate response)</td>
+                        <td>Client envoie CON → Serveur répond d'abord avec ACK vide (code 0.00) → puis envoie la réponse dans un nouveau CON</td>
+                        <td>✅ Serveur peut prendre son temps. ❌ 4 messages au lieu de 2. Les tokens permettent d'associer la réponse à la requête initiale.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top:0.8rem;">Les messages CON et NON peuvent être <strong>mélangés</strong> : ex. requête en NON, réponse en CON, ou l'inverse.</p>
+        </div>
+
+        <!-- CoAP Security, Multicast, Caching -->
+        <h2>8. CoAP — Sécurité, multicast, découverte et cache</h2>
+
+        <div class="theory-box">
+            <h3>Sécurité CoAP : DTLS et tokens aléatoires</h3>
+            <p>CoAP peut utiliser <strong>DTLS</strong> (Datagram Transport Layer Security) pour chiffrer et authentifier les échanges, via le schéma <code>coaps://</code> sur le port 5684.</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li>DTLS = version de TLS pour les protocoles datagram (UDP). Protège contre l'espionnage et la falsification.</li>
+                <li>Sans DTLS, les clients doivent utiliser des <strong>tokens aléatoires longs</strong> pour empêcher les <em>attaques par spoofing</em> : un attaquant envoyant une fausse réponse ne connaît pas le token → la réponse est ignorée par le client.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Multicast et découverte de ressources</h3>
+            <p>CoAP supporte les requêtes vers des <strong>groupes multicast IP</strong>, ce qui est particulièrement utile dans les réseaux IoT :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li>Les serveurs ne doivent pas envoyer de RST en réponse à un NON-CON multicast non désiré (pour éviter une tempête d'erreurs).</li>
+                <li>Les serveurs doivent attendre un <strong>délai aléatoire</strong> avant de répondre (éviter la congestion simultanée).</li>
+            </ul>
+            <p style="margin-top:0.8rem;"><strong>Découverte de ressources (RFC 6690) :</strong> Un client peut envoyer <code>GET /.well-known/core</code> à un serveur (ou en multicast). Le serveur répond avec la liste de toutes ses ressources et leurs types. Très utile pour l'intégration automatique d'appareils IoT dans un réseau (M2M).</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Caching dans CoAP</h3>
+            <p>CoAP intègre un mécanisme de cache simple, particulièrement utile dans les proxies pour servir les données de nœuds endormis :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li><strong>Option Max-Age :</strong> indique la durée de validité du cache (en secondes). Passé ce délai, le proxy revalide la ressource.</li>
+                <li><strong>ETag (Entity Tag) :</strong> le serveur inclut un identifiant unique de version dans sa réponse. Le client peut renvoyer cet ETag dans une requête ultérieure → si la ressource n'a pas changé, le serveur répond <code>2.03 Valid</code> (sans renvoyer le contenu) au lieu de <code>2.05 Content</code>.</li>
+                <li><strong>If-Match :</strong> option utilisée dans les requêtes PUT pour n'écrire la nouvelle valeur que si l'ETag correspond — protection contre les écrasements accidentels concurrents.</li>
+            </ul>
+        </div>
+
+        <!-- CoAP Block-wise + Spoofing -->
+        <h2>9. CoAP — Transfert par blocs et attaques de spoofing</h2>
+
+        <div class="theory-box">
+            <h3>Block-wise transfer (RFC 7959)</h3>
+            <p>UDP ne fragmente pas les messages, et la fragmentation IP est déconseillée sur 802.15.4. Pour accéder à de grandes ressources, CoAP utilise le transfert par blocs :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li>Le client envoie des requêtes GET successives avec une <strong>option Block</strong> précisant la plage souhaitée : "octets 0–1023", "octets 1024–2047", etc.</li>
+                <li>Chaque bloc est acquitté individuellement si le message est de type CON.</li>
+                <li>Utile pour récupérer des fichiers de configuration, des firmware updates, ou des logs de capteurs.</li>
+            </ul>
+            <div style="background:#f0fdf4; border-left:4px solid #0D9488; padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin-top:0.8rem;">
+                <strong>Exemple :</strong> Mettre à jour le firmware d'un nœud IoT en envoyant 20 blocs de 512 octets, chacun acquitté séparément.
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <h3>Attaques de spoofing CoAP</h3>
+            <p>CoAP tourne sur UDP, sans handshake ni numéros de séquence TCP. Cela ouvre plusieurs vecteurs d'attaque :</p>
+            <table class="info-table" style="margin-top:0.7rem;">
+                <thead>
+                    <tr>
+                        <th>Attaque</th>
+                        <th>Mécanisme</th>
+                        <th>Défense</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Spoofing de réponse</strong></td>
+                        <td>Un tiers envoie une fausse réponse à la place du vrai serveur</td>
+                        <td>Tokens aléatoires longs (le tiers ne connaît pas le token) ou DTLS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Spoofing de RST</strong></td>
+                        <td>Un tiers envoie un faux message RST pour interrompre une communication en cours</td>
+                        <td>DTLS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Amplification/Reflection</strong></td>
+                        <td>Un attaquant usurpe l'IP d'une victime et envoie des requêtes multicast CoAP → la victime reçoit une avalanche de réponses</td>
+                        <td>Limiter les réponses multicast, filtrage réseau</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- MQTT Last Will, Retained, MQTT-SN -->
+        <h2>10. MQTT — Last Will, messages retenus et MQTT-SN</h2>
+
+        <div class="theory-box">
+            <h3>Last Will & Testament (LWT)</h3>
+            <p>Le <strong>Last Will</strong> permet au publisher de configurer, lors de la connexion (<code>CONNECT</code>), un message qui sera automatiquement envoyé par le broker à ses subscribers si la connexion est perdue de manière inattendue.</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li><strong>Keep-Alive :</strong> le client envoie périodiquement un message <code>PINGREQ</code>. Si le broker ne reçoit aucun message du client pendant <code>keep_alive × 1.5</code> secondes, il considère le client comme déconnecté et diffuse le Last Will.</li>
+                <li><strong>Exemple :</strong> <code>sensor/status → "OFFLINE"</code> — les autres appareils savent immédiatement que le capteur est tombé.</li>
+                <li><strong>Exception :</strong> si le client se déconnecte proprement avec un message <code>DISCONNECT</code>, le Last Will n'est pas envoyé.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Messages retenus (Retained Messages)</h3>
+            <p>Par défaut, le broker transfère un message uniquement aux subscribers déjà abonnés au moment de la publication. Un subscriber qui s'abonne plus tard ne reçoit rien.</p>
+            <p style="margin-top:0.7rem;">En marquant un message comme <strong>Retained</strong> (flag dans le <code>PUBLISH</code>), le broker le stocke et l'envoie immédiatement à tout nouveau subscriber.</p>
+            <div style="background:#fef3c7; border-left:4px solid #F59E0B; padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin-top:0.8rem;">
+                <strong>Exemple :</strong> Un capteur de température publie sa dernière valeur comme message retenu. Une nouvelle application qui s'abonne reçoit instantanément la dernière valeur connue, sans devoir attendre la prochaine publication.
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <h3>MQTT-SN — MQTT pour les réseaux de capteurs</h3>
+            <p>MQTT classique repose sur TCP et utilise les noms de topics en UTF-8, ce qui est trop lourd pour les réseaux 802.15.4. <strong>MQTT-SN</strong> (MQTT for Sensor Networks) adapte MQTT aux réseaux contraints :</p>
+            <table class="info-table" style="margin-top:0.7rem;">
+                <thead>
+                    <tr>
+                        <th>Caractéristique</th>
+                        <th>MQTT</th>
+                        <th>MQTT-SN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Transport</td>
+                        <td>TCP (ports 1883/8883)</td>
+                        <td>UDP (sans connexion, plus léger)</td>
+                    </tr>
+                    <tr>
+                        <td>Nom de topic</td>
+                        <td>Chaîne UTF-8 (variable)</td>
+                        <td>ID numérique sur 2 octets ou 1 octet prédéfini</td>
+                    </tr>
+                    <tr>
+                        <td>QoS spécial</td>
+                        <td>—</td>
+                        <td>QoS -1 : publish sans connexion préalable (idéal pour nœuds qui dorment souvent)</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway</td>
+                        <td>—</td>
+                        <td>Passerelle MQTT-SN ↔ MQTT classique obligatoire</td>
+                    </tr>
+                    <tr>
+                        <td>Nœuds endormis</td>
+                        <td>Non géré nativement</td>
+                        <td>La gateway stocke les messages pendant le sommeil du nœud</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top:0.8rem;"><strong>Architecture :</strong> <code>IoT device ←[MQTT-SN/UDP]→ Gateway ←[MQTT/TCP]→ Broker</code>. Les clients peuvent enregistrer leurs noms de topics auprès de la gateway, qui leur attribue un ID court.</p>
+        </div>
+
+        <div class="retenir">
+            ✅ CoAP et MQTT couvrent deux paradigmes complémentaires : CoAP (REST over UDP, fiabilité optionnelle, adapté aux réseaux 802.15.4) et MQTT (pub/sub over TCP, Last Will, retained messages, MQTT-SN pour l'IoT contraint). La sécurité passe par DTLS pour CoAP et TLS/SSL pour MQTT.
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch10_rpl.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="index.html">↑ Accueil</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // CoAP Generator
+        const coapResource = document.getElementById('coapResource');
+        const coapMethod = document.getElementById('coapMethod');
+        const coapType = document.getElementById('coapType');
+        const coapTypeVal = document.getElementById('coapTypeVal');
+        const coapTypeBin = document.getElementById('coapTypeBin');
+        const coapCodeVal = document.getElementById('coapCodeVal');
+        const coapCodeBin = document.getElementById('coapCodeBin');
+        const coapMsgID = document.getElementById('coapMsgID');
+        const coapURI = document.getElementById('coapURI');
+        const coapSize = document.getElementById('coapSize');
+
+        const methods = [
+            { code: '0.01', label: 'GET' },
+            { code: '0.02', label: 'POST' },
+            { code: '0.03', label: 'PUT' },
+            { code: '0.04', label: 'DELETE' }
+        ];
+
+        const types = [
+            { name: 'CON', bin: '00' },
+            { name: 'NON', bin: '01' }
+        ];
+
+        function updateCoAP() {
+            const method = methods[parseInt(coapMethod.value)];
+            const type = types[parseInt(coapType.value)];
+            const resource = coapResource.value;
+
+            coapTypeVal.textContent = type.name;
+            coapTypeBin.textContent = type.bin;
+            coapCodeVal.textContent = method.label;
+            coapCodeBin.textContent = method.code;
+
+            const msgID = Math.floor(Math.random() * 65536);
+            coapMsgID.textContent = msgID;
+
+            const uri = resource.split('/').filter(x => x).join('/');
+            coapURI.textContent = uri;
+
+            // Calculate size: 4 (header) + URI-Path option + token + payload
+            const uriLength = uri.length;
+            const optionSize = 2 + uriLength; // Rough estimate
+            const totalSize = 4 + optionSize;
+            coapSize.textContent = totalSize;
+        }
+
+        coapResource.addEventListener('input', updateCoAP);
+        coapMethod.addEventListener('change', updateCoAP);
+        coapType.addEventListener('change', updateCoAP);
+        updateCoAP();
+
+        // MQTT Wildcards
+        const mqttTopic = document.getElementById('mqttTopic');
+        const mqttMatches = document.getElementById('mqttMatches');
+
+        const testSubscriptions = [
+            'home/kitchen/temperature',
+            'home/kitchen/+',
+            'home/+/temperature',
+            'home/#',
+            'home/kitchen/humidity',
+            'home/bedroom/temperature',
+            'garden/temperature',
+            '+/kitchen/temperature'
+        ];
+
+        function updateMQTTMatches() {
+            const topic = mqttTopic.value.trim();
+            let html = '';
+
+            testSubscriptions.forEach(sub => {
+                const matches = matchesMQTT(topic, sub);
+                const className = matches ? 'match-result' : 'match-result no-match';
+                const result = matches ? '✓ Match' : '✗ No match';
+                html += `<div class="${className}"><code>${sub}</code> ${result}</div>`;
+            });
+
+            mqttMatches.innerHTML = html;
+        }
+
+        function matchesMQTT(topic, subscription) {
+            const topicParts = topic.split('/');
+            const subParts = subscription.split('/');
+
+            for (let i = 0; i < subParts.length; i++) {
+                const subPart = subParts[i];
+
+                if (subPart === '#') {
+                    return i === subParts.length - 1; // # must be last
+                }
+
+                if (subPart === '+') {
+                    if (i >= topicParts.length) return false;
+                    continue;
+                }
+
+                if (i >= topicParts.length || topicParts[i] !== subPart) {
+                    return false;
+                }
+            }
+
+            return topicParts.length === subParts.length;
+        }
+
+        mqttTopic.addEventListener('input', updateMQTTMatches);
+        updateMQTTMatches();
+    </script>
+</body>
+</html>

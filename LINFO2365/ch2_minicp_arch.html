@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 2 — Architecture de MiniCP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); display:flex; align-items:center; gap:10px; }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; font-size:0.95rem; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:center; }
+  .control-group { display:flex; flex-direction:column; gap:4px; min-width:140px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#d97706; }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+  canvas { max-width:100%; }
+  .code-block { background:#1e293b; color:#e2e8f0; border-radius:10px; padding:18px 22px; font-family:'Courier New',monospace; font-size:0.83rem; line-height:1.6; overflow-x:auto; margin:14px 0; }
+  .code-block .kw { color:#7dd3fc; }
+  .code-block .cm { color:#6b7280; }
+  .sparse-vis { display:flex; gap:6px; flex-wrap:wrap; margin:12px 0; align-items:center; }
+  .cell { width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:700; font-size:1rem; border:2px solid #e2e8f0; transition:all 0.3s; }
+  .cell.active { background:var(--teal); color:white; border-color:var(--teal); }
+  .cell.removed { background:#fee2e2; color:#ef4444; border-color:#fca5a5; text-decoration:line-through; opacity:0.5; }
+  .cell.separator { width:4px; background:var(--amber); border-radius:4px; border:none; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 2 — Architecture de MiniCP</h1>
+      <p>Domaines, Sparse Set, Variables, Contraintes, Propagation & Fixpoint</p>
+      <span class="chapter-badge">Chapitre 2 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- SECTION 1: Domaines -->
+<div class="section">
+  <h2>📦 Les Domaines — Qu'est-ce qu'un domaine ?</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi un domaine ?</span>
+    <p>Un <strong>domaine</strong>, c'est l'ensemble des valeurs qu'une variable peut encore prendre. Au début, si ta variable représente "le chiffre d'une case de Sudoku", son domaine est {1, 2, 3, 4, 5, 6, 7, 8, 9}. Au fur et à mesure que tu résous le problème, des valeurs sont <em>éliminées</em> du domaine.</p>
+    <p><strong>Règle d'or :</strong> On ne fait qu'<em>enlever</em> des valeurs d'un domaine, jamais en ajouter. Si le domaine devient vide → contradiction → backtrack !</p>
+    <div class="retenir">💡 Le domaine = ce qui reste possible. Plus il rétrécit, plus on est proche d'une solution (ou d'un échec).</div>
+  </div>
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">🔍</div><h4>contains(v)</h4><p>v est-il encore dans le domaine ?</p></div>
+    <div class="icon-item"><div class="icon">➖</div><h4>remove(v)</h4><p>Supprimer v du domaine</p></div>
+    <div class="icon-item"><div class="icon">📏</div><h4>size()</h4><p>Nombre de valeurs restantes</p></div>
+    <div class="icon-item"><div class="icon">✅</div><h4>isFixed()</h4><p>Le domaine est-il un singleton ?</p></div>
+  </div>
+</div>
+
+<!-- SECTION 2: Sparse Set -->
+<div class="section">
+  <h2>⚡ Le Sparse Set — Structure de données O(1)</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi un Sparse Set ?</span>
+    <p>Imagine une liste de personnes dans une salle. Si quelqu'un sort, au lieu de décaler tous les autres (lent !), tu mets la dernière personne à la place de celle qui est sortie. Ça prend <strong>O(1)</strong> — un seul échange !</p>
+    <p>C'est exactement ça, le Sparse Set. C'est un tableau avec deux pointeurs (values et indices) qui permet de retirer des éléments en temps constant, ET de revenir en arrière (backtrack) facilement en restaurant juste un entier.</p>
+    <p><strong>Deux tableaux :</strong> <code>values[i]</code> = la valeur à la position i. <code>indices[v]</code> = la position de la valeur v. Et <code>size</code> = le nombre d'éléments actifs (tout ce qui est avant l'indice size est "dans" le domaine).</p>
+    <div class="retenir">💡 Propriété clé : ∀v ∈ {0..n-1} : values[indices[v]] = v</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Invariant du Sparse Set</span>
+    <p class="phrase">📌 "Les valeurs actives sont toujours dans les positions [0, size-1] du tableau values"</p>
+    <div class="pending-math" data-latex="\forall v \in \{0..n-1\}: \text{values}[\text{indices}[v]] = v"></div>
+    <table>
+      <tr><th>Terme</th><th>Signification</th></tr>
+      <tr><td>values[i]</td><td>La valeur à la position i dans le tableau</td></tr>
+      <tr><td>indices[v]</td><td>La position de la valeur v dans le tableau</td></tr>
+      <tr><td>size</td><td>Nombre d'éléments actifs. Les éléments actifs sont values[0..size-1]</td></tr>
+      <tr><td>remove(v)</td><td>Échanger v avec values[size-1], puis décrémenter size → O(1)</td></tr>
+    </table>
+  </div>
+
+  <!-- DEMO SPARSE SET -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Sparse Set Interactif</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px;">Clique sur une valeur pour la retirer du domaine. Observe comment l'échange se fait en O(1).</p>
+    <div id="sparseVis" class="sparse-vis"></div>
+    <div id="sparseArrays" style="margin:12px 0;font-size:0.83rem;font-family:monospace;color:#334155;"></div>
+    <div class="stats-row">
+      <div class="stat-chip">Taille active : <span id="sparseSize">9</span></div>
+      <div class="stat-chip">Opérations remove : <span id="sparseOps">0</span></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn btn-amber" onclick="resetSparse()">↺ Réinitialiser</button>
+      <button class="btn" onclick="saveRestoreSparse()" style="margin-left:8px;" id="saveBtn">💾 Sauvegarder l'état</button>
+      <button class="btn btn-amber" onclick="restoreSparse()" style="margin-left:8px;display:none;" id="restoreBtn">↩ Restaurer (Backtrack)</button>
+    </div>
+    <div id="sparseLog" style="margin-top:12px;font-size:0.82rem;color:var(--gray);background:#f1f5f9;border-radius:8px;padding:10px;max-height:100px;overflow-y:auto;"></div>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Pourquoi pas juste un HashSet ?</strong> Un HashSet standard ne supporte pas le backtrack efficacement — pour défaire les suppressions, il faudrait logger chaque opération séparément. Le Sparse Set avec <code>StateInt size</code> (StateInt = entier dont la valeur est sauvegardée/restaurée automatiquement) permet le backtrack en O(1) : on restaure juste la valeur de size !</p>
+  </div>
+</div>
+
+<!-- SECTION 3: Variables & Propagation -->
+<div class="section">
+  <h2>🔗 Variables & Propagation — Comment les contraintes communiquent</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi la propagation ?</span>
+    <p>Imagine un Sudoku : quand tu places un "5" dans une case, tu dois immédiatement retirer le "5" de toutes les cases de la même ligne, colonne et région. C'est ça, la <strong>propagation</strong> : un changement dans un domaine déclenche automatiquement des vérifications dans les domaines liés.</p>
+    <p>Dans MiniCP, chaque contrainte s'<em>abonne</em> aux événements des variables (ex: "préviens-moi quand x est fixé"). Quand un événement se produit, la contrainte se réveille et réexécute son filtre.</p>
+    <div class="retenir">💡 Propagation = réaction en chaîne d'éliminations. Comme des dominos qui tombent.</div>
+  </div>
+
+  <ul class="steps">
+    <li><p><strong>post()</strong> : la contrainte s'enregistre pour recevoir des notifications. Ex : "quand x change, appelle propagate()"</p></li>
+    <li><p><strong>propagate()</strong> : la contrainte examine ses variables et retire les valeurs qui violent la contrainte</p></li>
+    <li><p>Si un domaine change → les autres contraintes liées sont réveillées → elles propagent à leur tour</p></li>
+    <li><p>Le tout se répète jusqu'au <strong>fixpoint</strong> : plus aucune contrainte ne peut éliminer de valeur</p></li>
+  </ul>
+
+  <div class="theory-box">
+    <p><strong>Événements supportés dans MiniCP :</strong></p>
+    <p>• <code>propagateOnDomainChange(c)</code> : appeler c.propagate() quand le domaine change</p>
+    <p>• <code>propagateOnFix(c)</code> : appeler c.propagate() quand la variable est fixée</p>
+    <p>• <code>propagateOnBoundChange(c)</code> : appeler c.propagate() quand min ou max change</p>
+  </div>
+</div>
+
+<!-- SECTION 4: Fixpoint Algorithm -->
+<div class="section">
+  <h2>🔄 L'Algorithme de Fixpoint</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le fixpoint ?</span>
+    <p>Pense à une machine à laver : elle continue de tourner jusqu'à ce que le linge soit propre (= plus rien à faire). Le fixpoint, c'est pareil : le solveur continue de propager les contraintes jusqu'à ce qu'<em>aucune</em> nouvelle valeur ne puisse être éliminée.</p>
+    <p><strong>File de propagation :</strong> Quand une contrainte modifie un domaine, elle ajoute les contraintes affectées dans une file d'attente. Le solveur vide cette file, une contrainte à la fois.</p>
+    <div class="retenir">💡 Le fixpoint garantit qu'on a tiré tout ce qu'on pouvait des contraintes avant de faire le prochain choix dans l'arbre de recherche.</div>
+  </div>
+
+  <ul class="steps">
+    <li><p>Ajouter toutes les contraintes actives dans une <strong>file de propagation</strong></p></li>
+    <li><p>Prendre la première contrainte de la file, appeler <code>propagate()</code></p></li>
+    <li><p>Si propagate() modifie un domaine → les contraintes liées sont ajoutées à la file</p></li>
+    <li><p>Répéter jusqu'à ce que la file soit <strong>vide</strong> → fixpoint atteint</p></li>
+    <li><p>Si un domaine devient vide → lever une exception <code>InconsistencyException</code> → backtrack</p></li>
+  </ul>
+
+  <!-- DEMO FIXPOINT -->
+  <div class="demo-box">
+    <h3>📊 Visualisation — Propagation en cascade</h3>
+    <canvas id="fixpointChart" height="180"></canvas>
+    <div class="controls" style="margin-top:14px;">
+      <button class="btn" onclick="animateFixpoint()">▶ Animer la propagation</button>
+      <button class="btn btn-amber" onclick="resetFixpoint()">↺ Reset</button>
+    </div>
+    <div id="fixpointLog" style="margin-top:10px;font-size:0.82rem;color:#334155;background:#f1f5f9;border-radius:8px;padding:10px;min-height:60px;">Clique sur Animer pour voir la propagation...</div>
+  </div>
+</div>
+
+<!-- SECTION 5: StateManager -->
+<div class="section">
+  <h2>💾 StateManager & Backtrack — Revenir en arrière</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le StateManager ?</span>
+    <p>Imagine que tu joues à un jeu vidéo et que tu peux sauvegarder à tout moment. Si tu meurs, tu charges ta sauvegarde et tu recommences depuis ce point. Le <strong>StateManager</strong>, c'est exactement ça pour MiniCP.</p>
+    <p>Chaque fois qu'on explore une branche de l'arbre de recherche, on <strong>sauvegarde l'état</strong> (les tailles des domaines). Si on arrive à un échec, on <strong>restaure l'état</strong> (backtrack) et on essaie une autre valeur.</p>
+    <p>Les <code>StateInt</code> sont des entiers "magiques" qui savent comment se sauvegarder et se restaurer automatiquement.</p>
+    <div class="retenir">💡 StateManager = système de sauvegarde/restauration pour les recherches DFS avec backtrack.</div>
+  </div>
+
+  <div class="demo-box">
+    <h3>🎮 Démo — Simulation de Backtrack</h3>
+    <canvas id="btreeCanvas" width="600" height="300" style="max-width:100%;display:block;margin:0 auto;"></canvas>
+    <div class="controls" style="margin-top:14px;">
+      <button class="btn" onclick="nextBTStep()">▶ Étape suivante</button>
+      <button class="btn btn-amber" onclick="resetBTree()">↺ Reset</button>
+    </div>
+    <div id="btLog" style="margin-top:10px;font-size:0.85rem;color:#334155;background:#f1f5f9;border-radius:8px;padding:10px;">Appuie sur "Étape suivante" pour explorer l'arbre de recherche...</div>
+  </div>
+</div>
+
+</main>
+<footer><strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 2 : Architecture</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    const latex = el.dataset.latex;
+    if (latex) el.innerHTML = katex.renderToString(latex, {displayMode:true, throwOnError:false});
+  });
+  resetSparse();
+  resetFixpoint();
+  resetBTree();
+});
+
+// ===== SPARSE SET DEMO =====
+let sparseState = { values:[], indices:[], size:9, ops:0, saved:null };
+function resetSparse() {
+  sparseState = { values:[0,1,2,3,4,5,6,7,8], indices:[0,1,2,3,4,5,6,7,8], size:9, ops:0, saved:null };
+  document.getElementById('sparseOps').textContent = '0';
+  document.getElementById('restoreBtn').style.display = 'none';
+  document.getElementById('sparseLog').innerHTML = '';
+  renderSparse();
+}
+function renderSparse() {
+  const vis = document.getElementById('sparseVis');
+  vis.innerHTML = '';
+  const { values, size } = sparseState;
+  for (let i = 0; i < values.length; i++) {
+    if (i === size && i < values.length) {
+      const sep = document.createElement('div');
+      sep.className = 'cell separator';
+      sep.title = '← actif | inactif →';
+      vis.appendChild(sep);
+    }
+    const cell = document.createElement('div');
+    cell.className = 'cell ' + (i < size ? 'active' : 'removed');
+    cell.textContent = values[i];
+    cell.title = `Cliquer pour retirer ${values[i]}`;
+    const v = values[i];
+    if (i < size) cell.onclick = () => sparseRemove(v);
+    vis.appendChild(cell);
+  }
+  document.getElementById('sparseSize').textContent = sparseState.size;
+  const arrDiv = document.getElementById('sparseArrays');
+  arrDiv.innerHTML = `<strong>values[]</strong> = [${sparseState.values.join(', ')}] &nbsp;&nbsp; <strong>indices[]</strong> = [${sparseState.indices.join(', ')}] &nbsp;&nbsp; <strong>size</strong> = ${sparseState.size}`;
+}
+function sparseRemove(v) {
+  const { values, indices, size } = sparseState;
+  if (indices[v] >= size) { log(`${v} est déjà hors du domaine.`); return; }
+  const posV = indices[v];
+  const last = values[size - 1];
+  values[posV] = last;
+  indices[last] = posV;
+  values[size - 1] = v;
+  indices[v] = size - 1;
+  sparseState.size--;
+  sparseState.ops++;
+  document.getElementById('sparseOps').textContent = sparseState.ops;
+  log(`✂️ Remove(${v}) : échange values[${posV}] (=${v}) et values[${size-1}] (=${last}), size=${sparseState.size}`);
+  renderSparse();
+}
+function saveRestoreSparse() {
+  sparseState.saved = { values:[...sparseState.values], indices:[...sparseState.indices], size:sparseState.size };
+  document.getElementById('saveBtn').textContent = '💾 État sauvegardé !';
+  document.getElementById('restoreBtn').style.display = 'inline-block';
+  log(`💾 État sauvegardé (size=${sparseState.size})`);
+}
+function restoreSparse() {
+  if (!sparseState.saved) return;
+  sparseState.values = [...sparseState.saved.values];
+  sparseState.indices = [...sparseState.saved.indices];
+  sparseState.size = sparseState.saved.size;
+  document.getElementById('saveBtn').textContent = '💾 Sauvegarder l\'état';
+  log(`↩️ Backtrack ! État restauré (size=${sparseState.size})`);
+  renderSparse();
+}
+function log(msg) {
+  const logEl = document.getElementById('sparseLog');
+  logEl.innerHTML += `<div>${msg}</div>`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// ===== FIXPOINT CHART =====
+let fixChart = null;
+const fpVars = ['x₁', 'x₂', 'x₃', 'x₄'];
+const fpInitSizes = [9, 7, 5, 8];
+const fpHistory = [fpInitSizes.slice()];
+const fpMessages = [
+  'État initial : domaines de taille maximale',
+  'Contrainte C1 propagée → x₁ réduit à 5 valeurs, x₂ à 4',
+  'Contrainte C2 propagée → x₃ réduit à 2 valeurs',
+  'Contrainte C3 propagée → x₄ réduit à 3 valeurs, x₁ à 3',
+  'Fixpoint atteint : aucune réduction possible → 0 valeurs éliminées'
+];
+let fpStep = 0;
+function resetFixpoint() {
+  fpStep = 0;
+  drawFixpoint([[9,7,5,8]]);
+  document.getElementById('fixpointLog').textContent = fpMessages[0];
+}
+function drawFixpoint(history) {
+  const ctx = document.getElementById('fixpointChart').getContext('2d');
+  if (fixChart) fixChart.destroy();
+  const datasets = history.map((sizes, i) => ({
+    label: `Étape ${i}`,
+    data: sizes,
+    backgroundColor: i === history.length - 1 ? ['#0D9488','#0D9488','#0D9488','#0D9488'] : ['rgba(13,148,136,0.2)','rgba(13,148,136,0.2)','rgba(13,148,136,0.2)','rgba(13,148,136,0.2)'],
+    borderRadius: 4,
+  }));
+  fixChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: fpVars, datasets },
+    options: { responsive: true, scales: { y: { min: 0, max: 10, title: { display: true, text: 'Taille du domaine' } } }, plugins: { legend: { display: false } } }
+  });
+}
+function animateFixpoint() {
+  const steps = [[9,7,5,8],[5,4,5,8],[5,4,2,8],[5,4,2,3],[3,4,2,3]];
+  fpStep = 0;
+  const history = [steps[0]];
+  const timer = setInterval(() => {
+    fpStep++;
+    if (fpStep >= steps.length) { clearInterval(timer); return; }
+    history.push(steps[fpStep]);
+    drawFixpoint(history);
+    document.getElementById('fixpointLog').textContent = fpMessages[fpStep];
+  }, 900);
+}
+
+// ===== BACKTRACK TREE =====
+let btStep = 0;
+const btSteps = [
+  { nodes: [[300,30]], edges:[], current:0, msg:"Racine : Aucune variable fixée" },
+  { nodes:[[300,30],[150,100],[450,100]], edges:[[0,1],[0,2]], current:1, msg:"Branchement : x₁=1 (gauche) ou x₁=2 (droite)" },
+  { nodes:[[300,30],[150,100],[450,100],[75,170],[225,170]], edges:[[0,1],[0,2],[1,3],[1,4]], current:3, msg:"x₁=1 → Branchement : x₂=1 ou x₂=3" },
+  { nodes:[[300,30],[150,100],[450,100],[75,170],[225,170]], edges:[[0,1],[0,2],[1,3],[1,4]], current:4, msg:"x₂=1 échoue (conflit) → Backtrack ! Essai x₂=3", fail:3 },
+  { nodes:[[300,30],[150,100],[450,100],[75,170],[225,170],[175,240],[275,240]], edges:[[0,1],[0,2],[1,3],[1,4],[4,5],[4,6]], current:5, msg:"x₁=1, x₂=3 → Branchement sur x₃" },
+  { nodes:[[300,30],[150,100],[450,100],[75,170],[225,170],[175,240],[275,240]], edges:[[0,1],[0,2],[1,3],[1,4],[4,5],[4,6]], current:6, msg:"✅ Solution trouvée : x₁=1, x₂=3, x₃=2 !", solved:6 },
+];
+function resetBTree() { btStep = 0; drawBTree(btSteps[0]); document.getElementById('btLog').textContent = btSteps[0].msg; }
+function nextBTStep() { if (btStep < btSteps.length-1) btStep++; drawBTree(btSteps[btStep]); document.getElementById('btLog').textContent = btSteps[btStep].msg; }
+function drawBTree(state) {
+  const canvas = document.getElementById('btreeCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+  (state.edges||[]).forEach(([a,b]) => {
+    const [ax,ay] = state.nodes[a]; const [bx,by] = state.nodes[b];
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+  });
+  state.nodes.forEach((pos,i) => {
+    const [x,y] = pos;
+    ctx.beginPath();
+    ctx.arc(x,y,20,0,Math.PI*2);
+    if (i === state.current) ctx.fillStyle = '#0D9488';
+    else if (state.fail === i) ctx.fillStyle = '#ef4444';
+    else if (state.solved === i) ctx.fillStyle = '#F59E0B';
+    else ctx.fillStyle = '#cbd5e1';
+    ctx.fill(); ctx.strokeStyle = '#475569'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = 'white'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    if (state.fail === i) ctx.fillText('✕',x,y);
+    else if (state.solved === i) ctx.fillText('✓',x,y);
+    else ctx.fillText(i,x,y);
+  });
+}
+</script>
+</body>
+</html>

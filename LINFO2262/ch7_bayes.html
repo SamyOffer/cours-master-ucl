@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.7 — Apprentissage Bayésien</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#fff;--gray:#64748B;--dark:#1E293B;--green:#059669;--red:#DC2626;--blue:#2563EB}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark)}
+  nav{background:var(--navy);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+  nav a{color:#94A3B8;text-decoration:none;font-size:.9rem} nav a:hover{color:#fff}
+  nav span{color:#fff;font-weight:700}
+  header{background:var(--navy);padding:2rem 2rem 1.5rem;border-left:8px solid var(--blue)}
+  header h1{color:#fff;font-size:2rem;margin-bottom:.3rem}
+  header p{color:#94A3B8;font-size:.95rem}
+  main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+  .section{background:var(--white);border-radius:12px;padding:1.75rem;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+  .section h2{color:var(--navy);font-size:1.3rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+  .section p.intro{color:var(--gray);font-size:.9rem;margin-bottom:1.25rem;line-height:1.7}
+  .tag{background:var(--blue);color:#fff;font-size:.7rem;padding:.15rem .5rem;border-radius:999px;font-weight:700}
+  .formula-box{background:#DBEAFE;border:1px solid #93C5FD;border-radius:8px;padding:1rem 1.25rem;margin:.75rem 0;font-family:monospace;font-size:.93rem;color:var(--dark)}
+  .formula-box .label{font-size:.75rem;font-weight:700;color:var(--blue);text-transform:uppercase;margin-bottom:.3rem;font-family:'Segoe UI',sans-serif}
+  .controls{display:flex;flex-wrap:wrap;gap:1.5rem;margin:1rem 0;align-items:flex-end}
+  .ctrl{display:flex;flex-direction:column;gap:.3rem;min-width:200px}
+  .ctrl label{font-size:.85rem;font-weight:600;color:var(--navy)}
+  .ctrl input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
+  .ctrl .val{font-size:.9rem;font-weight:700;color:var(--blue)}
+  canvas{max-height:320px}
+  .note{background:#FEF3C7;border-left:4px solid var(--amber);padding:.75rem 1rem;border-radius:0 8px 8px 0;font-size:.88rem;color:var(--dark);margin:.75rem 0;line-height:1.6}
+  .btn{background:var(--blue);color:#fff;border:none;padding:.5rem 1.25rem;border-radius:8px;cursor:pointer;font-weight:700;margin-right:.5rem}
+  .metrics{display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0}
+  .metric{flex:1;min-width:130px;background:var(--light);border-radius:8px;padding:.75rem 1rem;text-align:center}
+  .metric .n{font-size:1.4rem;font-weight:800}
+  .metric .l{font-size:.78rem;color:var(--gray)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .result-box{background:#CCFBF1;border:1px solid #5EEAD4;border-radius:8px;padding:.75rem 1rem;margin:.5rem 0;font-size:.95rem;font-weight:700;color:var(--dark)}
+  .result-box .rl{font-size:.75rem;font-weight:400;color:var(--teal);margin-bottom:.2rem}
+  .coin-display{display:flex;gap:.3rem;flex-wrap:wrap;margin:.75rem 0;min-height:36px}
+  .coin{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0}
+
+  /* ===== MATH BLOCK PANELS (KaTeX enhanced) ===== */
+  .math-block{background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1.5px solid #6EE7B7;border-left:4px solid #0D9488;border-radius:12px;padding:1.25rem 1.4rem;margin:.5rem 0 1.25rem;}
+  .math-phrase{font-size:.87rem;color:#064E3B;font-style:italic;margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px dashed #A7F3D0;line-height:1.5;}
+  .math-phrase strong{color:#0D9488;font-style:normal;}
+  .math-eq{text-align:center;padding:.6rem .5rem;margin:.5rem 0;overflow-x:auto;background:rgba(255,255,255,.7);border-radius:8px;}
+  .math-eq .katex-display{margin:.3rem 0;}
+  .math-vars-wrap{margin:.75rem 0;}
+  .math-vars-title{font-size:.72rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.35rem;}
+  .math-vars-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .math-vars-table td{padding:.28rem .4rem;border-bottom:1px solid #D1FAE5;vertical-align:top;}
+  .math-vars-table td:first-child{white-space:nowrap;padding-right:.75rem;min-width:70px;font-weight:600;color:#065F46;}
+  .math-vars-table tr:last-child td{border-bottom:none;}
+  .math-vars-table .katex{font-size:.85em;}
+  .math-example{background:#FFFBEB;border-radius:7px;padding:.6rem .85rem;margin-top:.65rem;border-left:3px solid #F59E0B;}
+  .math-example .ex-title{font-size:.72rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;}
+  .math-example p{font-size:.82rem;color:#78350F;line-height:1.65;margin:0;}
+  /* hide original formula-box once math-block is present */
+  .formula-box.enhanced{display:none!important;}
+  .formula-display.enhanced{display:none!important;}
+  
+  /* ===== BEGINNER EXPLANATION BLOCKS ===== */
+  .explain-intro{background:linear-gradient(135deg,#FFFBEB 0%,#FFF7ED 100%);border:1.5px solid #FCD34D;border-left:5px solid #F59E0B;border-radius:0 14px 14px 0;padding:1.3rem 1.5rem;margin:0 0 1.5rem;}
+  .ei-badge{display:inline-flex;align-items:center;gap:.35rem;background:#F59E0B;color:white;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:.22rem .7rem;border-radius:999px;margin-bottom:.7rem;}
+  .explain-intro p{font-size:.91rem;color:#78350F;line-height:1.82;margin:.45rem 0;}
+  .explain-intro p strong{color:#92400E;font-weight:700;}
+  .explain-intro p em{color:#B45309;font-style:italic;}
+  .explain-analogy{background:white;border-radius:10px;padding:.9rem 1.15rem;margin:.9rem 0;font-size:.88rem;line-height:1.82;border:1.5px solid #FDE68A;color:#78350F;}
+  .explain-analogy .an-title{font-size:.72rem;font-weight:800;color:#D97706;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem;display:block;}
+  .explain-visual{display:flex;gap:.5rem;flex-wrap:wrap;margin:.85rem 0;}
+  .ev-item{background:white;border-radius:10px;padding:.6rem .85rem;font-size:.82rem;color:#78350F;border:1.5px solid #FDE68A;text-align:center;flex:1;min-width:110px;}
+  .ev-item .ev-emoji{font-size:1.5rem;display:block;margin-bottom:.25rem;}
+  .ev-item .ev-label{font-weight:700;color:#92400E;font-size:.8rem;display:block;margin-bottom:.15rem;}
+  .explain-steps{list-style:none;padding:0;margin:.7rem 0;}
+  .explain-steps li{padding:.35rem 0 .35rem 1.5rem;position:relative;font-size:.88rem;color:#78350F;line-height:1.7;border-bottom:1px dashed #FDE68A;}
+  .explain-steps li:last-child{border-bottom:none;}
+  .explain-steps li::before{content:"→";position:absolute;left:0;color:#F59E0B;font-weight:700;}
+  .explain-key{background:#FEF3C7;border-radius:8px;padding:.65rem .95rem;margin-top:.8rem;font-size:.86rem;color:#92400E;font-weight:600;line-height:1.65;border-left:3px solid #F59E0B;}
+  .explain-key::before{content:"💡 À retenir : ";}
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+</head>
+<body>
+<nav><a href="index.html">← Accueil</a><span>Chapitre 7 — Apprentissage Bayésien</span></nav>
+<header>
+  <h1>🔬 Apprentissage Bayésien</h1>
+  <p>MAP, Maximum de Vraisemblance, MDL, Optimalité, Coûts</p>
+</header>
+<main>
+
+<!-- SECTION 1: BAYESIAN COIN FLIP -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> Mise à jour Bayésienne — Estimation du biais d'une pièce</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Mettre à jour ses croyances avec des preuves</div>
+  <p>Imagine que tu trouves une pièce de monnaie dans la rue. Est-elle truquée ? <strong>Avant de la lancer</strong>, tu penses qu'elle est probablement équitable (50-50) — c'est ton <em>prior</em> (croyance initiale). Tu la lances 10 fois et tu obtiens 7 piles. Tu révises ta croyance : elle est peut-être biaisée vers piles — c'est ton <em>posterior</em> (croyance mise à jour).</p>
+  <p>C'est l'apprentissage bayésien : <strong>combiner une croyance initiale avec des observations</strong> pour obtenir une croyance améliorée. Plus tu accumules de données, plus le posterior domine sur le prior.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Prior conjugué Beta — pourquoi c'est élégant</span>Pour une pièce de monnaie (paramètre θ = probabilité de pile) :<br><br>🔵 <strong>Prior :</strong> θ ~ Beta(α, β). Si α=β=1 : prior uniforme (toute valeur de θ possible). Si α=β=10 : croyance forte que θ≈0.5 (pièce équitable).<br><br>📊 <strong>Après n_H piles et n_T faces :</strong> posterior = Beta(α+n_H, β+n_T).<br>Pas de calcul compliqué : on <em>ajoute juste les comptages</em> ! C'est la magie du prior conjugué.<br><br>🎯 <strong>Estimation MAP</strong> = mode du posterior = (α+n_H-1)/(α+β+n_H+n_T-2)<br>🎯 <strong>Estimation ML</strong> = fréquence observée = n_H/(n_H+n_T)<br><br>Avec beaucoup de données, MAP ≈ ML (les données dominent le prior). Avec peu de données, le prior régularise l'estimation !</div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">🔵</span><span class="ev-label">Prior Beta(α,β)</span>Ta croyance avant de voir des données.</div>
+    <div class="ev-item"><span class="ev-emoji">🪙</span><span class="ev-label">Données</span>n_H piles, n_T faces observées.</div>
+    <div class="ev-item"><span class="ev-emoji">🟢</span><span class="ev-label">Posterior Beta(α+nH, β+nT)</span>Ta croyance mise à jour. Plus pointue avec plus de données !</div>
+    <div class="ev-item"><span class="ev-emoji">📈</span><span class="ev-label">Convergence</span>Avec beaucoup de données, le posterior se concentre autour de la vraie valeur.</div>
+  </div>
+  <div class="explain-key">Plus tu observes de données, plus le posterior est 'sûr' (variance petite). Le prior a de moins en moins d'influence. L'apprentissage bayésien est une manière rigoureuse de combiner connaissances a priori et observations.</div>
+</div>
+
+  <p class="intro">On observe des lancers de pièce et on veut estimer θ = P(Pile). L'approche bayésienne met à jour un <strong>prieur</strong> à chaque observation pour obtenir un <strong>postérieur</strong>.</p>
+
+  <div class="formula-box">
+    <div class="label">Prieur Beta + Vraisemblance Binomiale = Postérieur Beta (conjugué)</div>
+    Prieur : θ ~ Beta(α, β)   |   Données : n_H piles, n_T faces
+    <br>Postérieur : θ | données ~ Beta(α + n_H, β + n_T)
+    <br>MAP = (α + n_H - 1) / (α + β + n - 2)   |   ML = n_H / n
+  </div>
+  <div class="pending-math" data-phrase="Le prior conjugué Beta se combine exactement avec la vraisemblance binomiale pour donner un posterior Beta — on met à jour simplement en ajoutant les comptages." data-latex="\underbrace{\theta\sim\mathrm{Beta}(\alpha,\beta)}_{\text{prior}} + \underbrace{n_H\text{ piles},\;n_T\text{ faces}}_{\text{données}} \;\Rightarrow\; \underbrace{\theta\mid D\sim\mathrm{Beta}(\alpha+n_H,\;\beta+n_T)}_{\text{posterior (conjugué !)}}" data-latex2="\hat{\theta}_\mathrm{MAP}=\frac{\alpha+n_H-1}{\alpha+\beta+n_H+n_T-2}, \quad \hat{\theta}_\mathrm{ML}=\frac{n_H}{n_H+n_T}" data-vars='[{"sym": "\\alpha,\\beta", "desc": "Hyperparamètres du prior Beta — équivalents à α-1 piles et β-1 faces &apos;fictives&apos;"}, {"sym": "n_H", "desc": "Nombre de piles observées dans les données"}, {"sym": "n_T", "desc": "Nombre de faces observées dans les données"}, {"sym": "\\hat{\\\\theta}_{MAP}", "desc": "Estimation MAP = mode du posterior (estimation la plus probable)"}, {"sym": "\\hat{\\\\theta}_{ML}", "desc": "Estimation ML = fréquence observée (ignore le prior)"}]' data-example="Prior α=β=2 (on croit que θ≈0.5). On observe 7 piles, 3 faces (n_H=7, n_T=3). MAP = (2+7-1)/(2+2+7+3-2) = 8/12 = 0.667. ML = 7/10 = 0.700. Le prior tire MAP vers 0.5 : régularisation !"></div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Prieur Alpha (α) — croyances en Pile : <span class="val" id="alphaVal">2</span></label>
+      <input type="range" id="alpha" min="1" max="20" step="0.5" value="2">
+    </div>
+    <div class="ctrl">
+      <label>Prieur Beta (β) — croyances en Face : <span class="val" id="betaVal">2</span></label>
+      <input type="range" id="beta" min="1" max="20" step="0.5" value="2">
+    </div>
+    <div class="ctrl">
+      <label>Vrai biais de la pièce θ* : <span class="val" id="trueBiasVal">0.7</span></label>
+      <input type="range" id="trueBias" min="0.1" max="0.9" step="0.05" value="0.7">
+    </div>
+  </div>
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin:.5rem 0">
+    <button class="btn" onclick="flipCoins(1)">Lancer 1×</button>
+    <button class="btn" onclick="flipCoins(5)">Lancer 5×</button>
+    <button class="btn" onclick="flipCoins(20)">Lancer 20×</button>
+    <button class="btn" onclick="flipCoins(100)">Lancer 100×</button>
+    <button class="btn" style="background:var(--gray)" onclick="resetCoins()">↺ Reset</button>
+  </div>
+  <div class="coin-display" id="coinDisplay"></div>
+  <div class="chart-wrap"><canvas id="posteriorChart"></canvas></div>
+  <div class="metrics">
+    <div class="metric"><div class="n" id="nTotal" style="color:var(--navy)">0</div><div class="l">Lancers total</div></div>
+    <div class="metric"><div class="n" id="nHeads" style="color:var(--blue)">0</div><div class="l">Piles (H)</div></div>
+    <div class="metric"><div class="n" id="mlEstimate" style="color:var(--teal)">—</div><div class="l">Estimation ML (n_H/n)</div></div>
+    <div class="metric"><div class="n" id="mapEstimate" style="color:var(--amber)">—</div><div class="l">Estimation MAP</div></div>
+    <div class="metric"><div class="n" id="posteriorMean" style="color:var(--blue)">—</div><div class="l">Moyenne postérieure</div></div>
+  </div>
+  <div class="note" id="bayesLearningNote">💡 Lance des pièces et observe comment MAP converge vers ML avec beaucoup de données (le prieur devient négligeable).</div>
+</div>
+
+<!-- SECTION 2: MAP vs ML -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> MAP vs ML — Régression avec Régularisation</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Régularisation = croyance a priori</div>
+  <p>Quand tu entraînes un modèle sur peu de données, il peut 'halluciner' — trouver des patterns qui n'existent pas vraiment dans les données (overfitting). La <strong>régularisation</strong> est une technique pour contraindre le modèle à rester raisonnable.</p>
+  <p>Ce qui est fascinant, c'est que la régularisation Ridge (ajouter λ‖w‖² à la perte) est <strong>exactement équivalente</strong> à l'estimation MAP avec un prior gaussien sur les poids ! En d'autres termes, Ridge = 'Je crois que les vrais poids sont proches de zéro'.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 ML vs MAP vs Ridge — trois perspectives sur le même problème</span>📈 <strong>ML (Maximum de Vraisemblance)</strong> = 'Je fais confiance à 100% aux données, sans a priori.'<br>→ Risque d'overfitting si peu de données. Les poids peuvent exploser.<br><br>🎯 <strong>MAP (Maximum A Posteriori)</strong> = 'Je crois a priori que les poids sont petits (prior gaussien).'<br>→ Équivalent à Ridge. Les poids sont contraints à rester petits.<br><br>🧹 <strong>Lasso (λ‖w‖₁)</strong> = 'Je crois que la plupart des poids sont nuls (prior de Laplace).'<br>→ Donne des modèles creux (sparse) : beaucoup de poids = exactement 0 !<br><br>📐 <strong>λ = 0</strong> : ML pur (pas de régularisation). <strong>λ grand</strong> : forte croyance que les poids sont nuls → modèle très simple.</div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">λ=0</span><span class="ev-label">ML pur</span>Fit parfait sur train, overfitting possible.</div>
+    <div class="ev-item"><span class="ev-emoji">λ=1</span><span class="ev-label">Ridge (MAP)</span>Poids atténués, meilleure généralisation.</div>
+    <div class="ev-item"><span class="ev-emoji">λ=10</span><span class="ev-label">Forte régul.</span>Modèle très simple, sous-ajustement possible.</div>
+    <div class="ev-item"><span class="ev-emoji">λ opt.</span><span class="ev-label">Cross-val !</span>Le bon λ dépend de tes données — à chercher !</div>
+  </div>
+  <div class="explain-key">Toute régularisation peut être vue comme un prior bayésien. C'est une connexion profonde entre l'optimisation (ML/DL) et la statistique bayésienne. Ridge = prior gaussien. Lasso = prior de Laplace.</div>
+</div>
+
+  <p class="intro">MAP avec un <strong>prieur gaussien</strong> sur les poids est équivalent à une <strong>régression Ridge</strong>. C'est un exemple direct du lien entre bayésien et régularisation.</p>
+
+  <div class="formula-box">
+    <div class="label">Équivalences fondamentales</div>
+    h_MAP (prior Gaussien sur w) = argmin MSE + λ||w||²   (= Ridge)
+    <br>h_MAP (prior Laplace sur w) = argmin MSE + λ||w||₁  (= Lasso)
+    <br>h_ML = h_MAP quand P(h) est uniforme = argmin MSE (moindres carrés)
+  </div>
+  <div class="pending-math" data-phrase="L'estimation MAP avec un prior gaussien est exactement équivalente à la régression Ridge : le prior joue le rôle de la régularisation pour contrôler l'overfitting." data-latex="\hat{w}_\mathrm{MAP} = \underset{w}{\arg\min}\;\underbrace{\sum_s(y^s-w^\top x^s)^2}_{\text{fidélité aux données}}+\underbrace{\lambda\|w\|_2^2}_{\text{Ridge = prior } \mathcal{N}(0,1/\lambda)}" data-latex2="\hat{w}_\mathrm{ML} = \hat{w}_\mathrm{MAP}\big|_{\lambda=0} = \underset{w}{\arg\min}\;\text{MSE}\quad\text{(prior uniforme)}" data-vars='[{"sym": "\\hat{w}_{MAP}", "desc": "Poids MAP — maximise la probabilité a posteriori P(w|données)"}, {"sym": "\\hat{w}_{ML}", "desc": "Poids ML — maximise seulement la vraisemblance P(données|w)"}, {"sym": "\\lambda", "desc": "Hyperparamètre de régularisation (lié à la précision du prior gaussien)"}, {"sym": "\\|w\\|_2^2", "desc": "Norme L2 au carré — prior gaussien → Ridge (poids petits mais non nuls)"}, {"sym": "\\|w\\|_1", "desc": "Norme L1 — prior de Laplace → Lasso (poids creux/sparse)"}]' data-example="Sans régularisation (λ=0, ML) : w peut être énorme et osciller (overfitting). Avec λ=1 (MAP, prior gaussien) : poids atténués, courbe plus douce. Ridge = ML + 'n'aie pas des poids trop grands !'"></div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Régularisation λ (~ 1/prieur) : <span class="val" id="lambdaVal">0.1</span></label>
+      <input type="range" id="lambda" min="0" max="2" step="0.01" value="0.1">
+    </div>
+    <div class="ctrl">
+      <label>Degré du polynôme : <span class="val" id="mapDegVal">5</span></label>
+      <input type="range" id="mapDeg" min="1" max="9" step="1" value="5">
+    </div>
+  </div>
+  <canvas id="mapVsMLChart" style="max-height:300px"></canvas>
+  <div class="metrics">
+    <div class="metric"><div class="n" id="mapMSE" style="color:var(--amber)">—</div><div class="l">MSE (MAP / Ridge)</div></div>
+    <div class="metric"><div class="n" id="mlMSE" style="color:var(--teal)">—</div><div class="l">MSE (ML / OLS)</div></div>
+    <div class="metric"><div class="n" id="mapNormW" style="color:var(--blue)">—</div><div class="l">||w|| MAP</div></div>
+    <div class="metric"><div class="n" id="mlNormW" style="color:var(--navy)">—</div><div class="l">||w|| ML</div></div>
+  </div>
+  <div class="note">Le MAP avec λ grand force les poids à être petits → modèle plus lisse → moins d'overfitting. Avec λ=0, MAP = ML = moindres carrés.</div>
+</div>
+
+<!-- SECTION 3: DECISION COSTS -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> Minimisation du Risque avec Coûts Asymétriques</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Quand les erreurs n'ont pas le même prix</div>
+  <p>Jusqu'ici, on supposait que toutes les erreurs se valent. Mais dans la vraie vie, <strong>rater un cancer est bien plus grave que faire une fausse alarme</strong>. Un test de sécurité nucléaire doit avoir zéro faux négatif, même au prix de nombreux faux positifs. Comment intégrer ça dans le modèle ?</p>
+  <p>La <strong>décision optimale avec coûts asymétriques</strong> est simple : au lieu de choisir la classe la plus probable (seuil = 0.5), on choisit la classe dont le <em>risque espéré</em> (probabilité × coût) est le plus bas.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Exemple : filtre anti-spam vs détection de cancer</span>📧 <strong>Filtre anti-spam :</strong><br>• FN (spam qui passe) : annoying mais tolérable. Coût FN = 1<br>• FP (email légitime en spam) : catastrophique ! Coût FP = 10<br>→ Seuil optimal = 10/(10+1) = 91% → ne classifie spam QUE si très sûr.<br><br>🏥 <strong>Détection de cancer :</strong><br>• FN (cancer manqué) : fatal. Coût FN = 100<br>• FP (fausse alarme) : stressant mais gérable. Coût FP = 1<br>→ Seuil optimal = 1/(100+1) ≈ 1% → classifie cancer si probabilité > 1% !<br><br>⚖️ <strong>Seuil optimal = C_FP / (C_FN + C_FP)</strong></div>
+  <ul class="explain-steps">
+    <li>Ajuste les curseurs de coût FN et FP et observe comment le seuil optimal change.</li>
+    <li>Grand C_FN → seuil bas → on prédit souvent 'positif' pour ne rien rater.</li>
+    <li>Grand C_FP → seuil haut → on prédit 'positif' seulement si très confiant.</li>
+  </ul>
+  <div class="explain-key">La règle de décision optimale de Bayes n'est PAS toujours 'prendre la classe la plus probable'. Elle dépend des coûts relatifs des différents types d'erreurs. En médecine et sécurité, c'est crucial !</div>
+</div>
+
+  <p class="intro">En pratique, les erreurs n'ont pas toutes le même coût. Un faux négatif dans un test médical est bien pire qu'un faux positif. Le classifieur optimal dépend des coûts.</p>
+
+  <div class="formula-box">
+    <div class="label">Règle de décision avec coûts</div>
+    Choisir C₁ si : P(C₁|x)/P(C₂|x) > C(C₁|C₂)/C(C₂|C₁)
+    <br>C(Cᵢ|Cⱼ) = coût de prédire Cᵢ alors que la vraie classe est Cⱼ
+  </div>
+  <div class="pending-math" data-phrase="La règle de décision bayésienne optimale tient compte des coûts asymétriques des erreurs : manquer un malade (FN) peut être bien plus grave qu'une fausse alarme (FP)." data-latex="\text{Choisir }C_1\text{ si }\;\frac{P(C_1\mid x)}{P(C_2\mid x)} > \frac{\mathcal{C}(C_1\mid C_2)}{\mathcal{C}(C_2\mid C_1)}" data-latex2="\text{Seuil optimal} = \frac{\mathcal{C}_{FP}}{\mathcal{C}_{FN}+\mathcal{C}_{FP}}" data-vars='[{"sym": "P(C_1\\mid x)", "desc": "Probabilité a posteriori de la classe C₁ sachant l&apos;exemple x"}, {"sym": "\\\\mathcal{C}(C_i\\mid C_j)", "desc": "Coût de prédire Cᵢ quand la vraie classe est Cⱼ"}, {"sym": "\\\\mathcal{C}_{FN}", "desc": "Coût d&apos;un faux négatif (manquer un positif — ex : ne pas détecter une maladie)"}, {"sym": "\\\\mathcal{C}_{FP}", "desc": "Coût d&apos;un faux positif (fausse alarme — ex : déclarer sain un malade)"}]' data-example="Dépistage cancer : C_FN=10 (grave !), C_FP=1 (tolérable). Seuil = 1/(10+1) = 0.09. On classifie '+' dès que P(cancer|x) > 9% pour ne rater aucun malade. Avec coûts égaux : seuil = 0.5."></div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>P(classe +) a priori : <span class="val" id="priorPosVal">50%</span></label>
+      <input type="range" id="priorPos" min="0.01" max="0.99" step="0.01" value="0.5">
+    </div>
+    <div class="ctrl">
+      <label>Coût FN (C(-|+)) — manquer un positif : <span class="val" id="costFNVal">10</span></label>
+      <input type="range" id="costFN" min="1" max="50" value="10">
+    </div>
+    <div class="ctrl">
+      <label>Coût FP (C(+|-)) — fausse alarme : <span class="val" id="costFPVal">1</span></label>
+      <input type="range" id="costFP" min="1" max="50" value="1">
+    </div>
+  </div>
+
+  <canvas id="costChart" style="max-height:260px"></canvas>
+
+  <div class="metrics">
+    <div class="metric"><div class="n" id="optThreshCost" style="color:var(--amber)">—</div><div class="l">Seuil optimal θ*</div></div>
+    <div class="metric"><div class="n" id="decisionRule" style="font-size:.9rem">—</div><div class="l">Règle de décision</div></div>
+    <div class="metric"><div class="n" id="costRatio" style="color:var(--blue)">—</div><div class="l">Ratio de coûts C(-|+)/C(+|-)</div></div>
+  </div>
+  <div class="note" id="costNote">Ajuste les coûts et vois le seuil de décision optimal se déplacer.</div>
+</div>
+
+</main>
+<script>
+// ======================== COIN FLIP ========================
+let nH=0, nT=0;
+let posteriorChart;
+
+function betaPDF(x, a, b){
+  if(x<=0||x>=1) return 0;
+  function logGamma(n){
+    if(n<1) return logGamma(n+1)-Math.log(n);
+    if(n<2) return (n-1)*(1-Math.log(n-1)+logGamma(n-1)/(n-1));
+    let r=0.5*Math.log(2*Math.PI/n)+(n-0.5)*Math.log(n)-n;
+    return r;
+  }
+  // Use log for stability
+  const logB=lgamma(a)+lgamma(b)-lgamma(a+b);
+  return Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)-logB);
+}
+function lgamma(n){
+  if(n<=0) return Infinity;
+  if(n<0.5) return Math.log(Math.PI/Math.sin(Math.PI*n))-lgamma(1-n);
+  n-=1;
+  const g=7, c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  let x=c[0];
+  for(let i=1;i<g+2;i++) x+=c[i]/(n+i);
+  const t=n+g+0.5;
+  return 0.5*Math.log(2*Math.PI)+(n+0.5)*Math.log(t)-t+Math.log(x);
+}
+
+function initPosteriorChart(){
+  posteriorChart=new Chart(document.getElementById('posteriorChart').getContext('2d'),{
+    type:'line',
+    data:{datasets:[
+      {label:'Prieur Beta(α,β)',data:[],borderColor:'#94A3B8',borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false},
+      {label:'Postérieur Beta(α+nH,β+nT)',data:[],borderColor:'#2563EB',borderWidth:3,fill:true,backgroundColor:'rgba(37,99,235,.1)',pointRadius:0},
+      {label:'MAP',data:[],backgroundColor:'#F59E0B',borderColor:'#F59E0B',pointRadius:12,type:'scatter'},
+      {label:'ML',data:[],backgroundColor:'#0D9488',borderColor:'#0D9488',pointRadius:12,type:'scatter',pointStyle:'triangle'},
+      {label:'Vrai θ',data:[],backgroundColor:'#DC2626',borderColor:'#DC2626',pointRadius:8,type:'scatter',pointStyle:'star'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},
+      scales:{x:{type:'linear',min:0,max:1,title:{display:true,text:'θ = P(Pile)'}},y:{title:{display:true,text:'Densité'},min:0}}}
+  });
+}
+function updatePosterior(){
+  const a=+document.getElementById('alpha').value, b=+document.getElementById('beta').value;
+  const tb=+document.getElementById('trueBias').value;
+  const aPost=a+nH, bPost=b+nT;
+  const xs=Array.from({length:100},(_,i)=>0.01+i*.0099);
+  const priorData=xs.map(x=>{try{return{x,y:betaPDF(x,a,b)};}catch(e){return{x,y:0};}});
+  const postData=xs.map(x=>{try{return{x,y:betaPDF(x,aPost,bPost)};}catch(e){return{x,y:0};}});
+  const mapEst=aPost>1&&bPost>1?(aPost-1)/(aPost+bPost-2):aPost/(aPost+bPost);
+  const mlEst=nH+nT>0?nH/(nH+nT):null;
+  const postMean=aPost/(aPost+bPost);
+  const mapY=betaPDF(mapEst,aPost,bPost);
+  posteriorChart.data.datasets[0].data=priorData;
+  posteriorChart.data.datasets[1].data=postData;
+  posteriorChart.data.datasets[2].data=[{x:mapEst,y:mapY}];
+  posteriorChart.data.datasets[3].data=mlEst!==null?[{x:mlEst,y:betaPDF(mlEst,aPost,bPost)}]:[];
+  posteriorChart.data.datasets[4].data=[{x:tb,y:betaPDF(tb,aPost,bPost)}];
+  posteriorChart.update('none');
+  document.getElementById('nTotal').textContent=nH+nT;
+  document.getElementById('nHeads').textContent=nH;
+  document.getElementById('mlEstimate').textContent=mlEst!==null?mlEst.toFixed(3):'N/A';
+  document.getElementById('mapEstimate').textContent=mapEst.toFixed(3);
+  document.getElementById('posteriorMean').textContent=postMean.toFixed(3);
+  const n=nH+nT;
+  document.getElementById('bayesLearningNote').textContent=
+    n===0?'💡 Lance des pièces ! Le prieur est centré sur '+(a/(a+b)).toFixed(2)+' (α/(α+β))'
+    :n<5?'📊 Peu de données : le prieur domine encore. MAP ≈ '+mapEst.toFixed(3)+', ML ≈ '+(mlEst||0).toFixed(3)
+    :n<30?'📈 Les données commencent à avoir de l\'influence. MAP se rapproche de ML.'
+    :'✅ Avec '+ n+' lancers, MAP ('+mapEst.toFixed(3)+') converge vers ML ('+mlEst.toFixed(3)+'). Prieur négligeable.';
+}
+function flipCoins(k){
+  const theta=+document.getElementById('trueBias').value;
+  const coinDiv=document.getElementById('coinDisplay');
+  for(let i=0;i<k;i++){
+    const isH=Math.random()<theta;
+    if(isH) nH++; else nT++;
+    if(nH+nT<=50){
+      const el=document.createElement('div');
+      el.className='coin';
+      el.style.background=isH?'#2563EB':'#64748B';
+      el.textContent=isH?'H':'T';
+      coinDiv.appendChild(el);
+    }
+  }
+  if(nH+nT>50) coinDiv.lastChild&&(coinDiv.lastChild.textContent='...');
+  updatePosterior();
+}
+function resetCoins(){
+  nH=0;nT=0;
+  document.getElementById('coinDisplay').innerHTML='';
+  updatePosterior();
+}
+['alpha','beta','trueBias'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+  document.getElementById(id+'Val').textContent=(+document.getElementById(id).value).toFixed(id==='trueBias'?2:0);
+  resetCoins();
+}));
+
+// ======================== MAP vs ML ========================
+let mapVsMLChart;
+const trueF2=x=>Math.sin(2*Math.PI*x)+.3*x;
+const data2=[];
+for(let i=0;i<15;i++){const x=i/14;data2.push({x,y:trueF2(x)+(Math.random()-.5)*.8});}
+
+function zeros2(r,c){return Array.from({length:r},()=>new Array(c).fill(0));}
+function matMul2(A,B){const r=A.length,k=B.length,c=B[0].length,R=zeros2(r,c);for(let i=0;i<r;i++)for(let j=0;j<c;j++)for(let l=0;l<k;l++)R[i][j]+=A[i][l]*B[l][j];return R;}
+function trans2(A){return A[0].map((_,j)=>A.map(r=>r[j]));}
+function solveRidge(xs,ys,deg,lam){
+  const n=xs.length,d=deg+1;
+  const V=xs.map(x=>Array.from({length:d},(_,j)=>Math.pow(x,j)));
+  const Vt=trans2(V),VtV=matMul2(Vt,V);
+  for(let i=0;i<d;i++) VtV[i][i]+=lam;
+  const Vty=matMul2(Vt,ys.map(y=>[y])).map(r=>r[0]);
+  // Gaussian elimination
+  const M=VtV.map((r,i)=>[...r,Vty[i]]);
+  for(let i=0;i<d;i++){let mx=i;for(let j=i+1;j<d;j++)if(Math.abs(M[j][i])>Math.abs(M[mx][i]))mx=j;[M[i],M[mx]]=[M[mx],M[i]];const piv=M[i][i];if(Math.abs(piv)<1e-12)continue;for(let j=i;j<=d;j++)M[i][j]/=piv;for(let k=0;k<d;k++)if(k!==i){const f=M[k][i];for(let j=i;j<=d;j++)M[k][j]-=f*M[i][j];}}
+  return M.map(r=>r[d]);
+}
+function evalPolyCoeffs(c,x){return c.reduce((s,a,i)=>s+a*Math.pow(x,i),0);}
+
+function initMapVsMLChart(){
+  mapVsMLChart=new Chart(document.getElementById('mapVsMLChart').getContext('2d'),{
+    type:'scatter',
+    data:{datasets:[
+      {label:'Données',data:data2.map(d=>({x:d.x,y:d.y})),backgroundColor:'rgba(30,58,95,.7)',pointRadius:7},
+      {label:'ML (λ=0)',data:[],type:'line',borderColor:'#0D9488',borderWidth:2,pointRadius:0,fill:false,borderDash:[5,3]},
+      {label:'MAP (Ridge)',data:[],type:'line',borderColor:'#F59E0B',borderWidth:3,pointRadius:0,fill:false},
+      {label:'Vraie fonction',data:[],type:'line',borderColor:'#94A3B8',borderWidth:1.5,pointRadius:0,fill:false,borderDash:[3,3]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},
+      scales:{x:{min:0,max:1,title:{display:true,text:'x'}},y:{min:-2.5,max:2.5,title:{display:true,text:'y'}}}}
+  });
+}
+function updateMapVsML(){
+  const lam=+document.getElementById('lambda').value;
+  const deg=+document.getElementById('mapDeg').value;
+  document.getElementById('lambdaVal').textContent=lam.toFixed(2);
+  document.getElementById('mapDegVal').textContent=deg;
+  const xs=data2.map(d=>d.x), ys=data2.map(d=>d.y);
+  const wML=solveRidge(xs,ys,deg,0);
+  const wMAP=solveRidge(xs,ys,deg,lam);
+  const pts=Array.from({length:60},(_,i)=>i/59);
+  mapVsMLChart.data.datasets[1].data=pts.map(x=>({x,y:Math.max(-3,Math.min(3,evalPolyCoeffs(wML,x)))}));
+  mapVsMLChart.data.datasets[2].data=pts.map(x=>({x,y:Math.max(-3,Math.min(3,evalPolyCoeffs(wMAP,x)))}));
+  mapVsMLChart.data.datasets[3].data=pts.map(x=>({x,y:trueF2(x)}));
+  mapVsMLChart.update('none');
+  const testXs=Array.from({length:50},_=>Math.random()), testYs=testXs.map(x=>trueF2(x)+(Math.random()-.5)*.8);
+  const mseMl=testXs.reduce((s,x,i)=>s+(testYs[i]-evalPolyCoeffs(wML,x))**2,0)/50;
+  const mseMap=testXs.reduce((s,x,i)=>s+(testYs[i]-evalPolyCoeffs(wMAP,x))**2,0)/50;
+  const normML=Math.sqrt(wML.reduce((s,w)=>s+w**2,0));
+  const normMAP=Math.sqrt(wMAP.reduce((s,w)=>s+w**2,0));
+  document.getElementById('mapMSE').textContent=mseMap.toFixed(3);
+  document.getElementById('mlMSE').textContent=mseMl.toFixed(3);
+  document.getElementById('mapNormW').textContent=normMAP.toFixed(2);
+  document.getElementById('mlNormW').textContent=normML.toFixed(2);
+}
+['lambda','mapDeg'].forEach(id=>document.getElementById(id).addEventListener('input',updateMapVsML));
+
+// ======================== COST-BASED DECISION ========================
+let costChart;
+function initCostChart(){
+  costChart=new Chart(document.getElementById('costChart').getContext('2d'),{
+    type:'line',
+    data:{datasets:[
+      {label:'Risque de décider +',data:[],borderColor:'#0D9488',borderWidth:2,pointRadius:0,fill:false},
+      {label:'Risque de décider -',data:[],borderColor:'#DC2626',borderWidth:2,pointRadius:0,fill:false},
+      {label:'Seuil optimal',data:[],backgroundColor:'#F59E0B',borderColor:'#F59E0B',pointRadius:12,type:'scatter'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{type:'linear',min:0,max:1,title:{display:true,text:'P(+|x) — Score du classifieur'}},y:{title:{display:true,text:'Risque attendu'},min:0}}}
+  });
+}
+function updateCost(){
+  const prior=+document.getElementById('priorPos').value;
+  const cFN=+document.getElementById('costFN').value;
+  const cFP=+document.getElementById('costFP').value;
+  document.getElementById('priorPosVal').textContent=(prior*100).toFixed(0)+'%';
+  document.getElementById('costFNVal').textContent=cFN;
+  document.getElementById('costFPVal').textContent=cFP;
+  // For P(+|x) = p:
+  // Risk(decide +) = C(+|-) * P(-|x) = cFP * (1-p)
+  // Risk(decide -) = C(-|+) * P(+|x) = cFN * p
+  // Optimal: decide + if cFN*p > cFP*(1-p) → p > cFP/(cFN+cFP)
+  const ps=Array.from({length:101},(_,i)=>i/100);
+  const riskPlus=ps.map(p=>cFP*(1-p));
+  const riskMinus=ps.map(p=>cFN*p);
+  const optThresh=cFP/(cFN+cFP);
+  costChart.data.datasets[0].data=ps.map((p,i)=>({x:p,y:riskPlus[i]}));
+  costChart.data.datasets[1].data=ps.map((p,i)=>({x:p,y:riskMinus[i]}));
+  const crossRisk=(cFP*cFN)/(cFN+cFP);
+  costChart.data.datasets[2].data=[{x:optThresh,y:crossRisk}];
+  costChart.update('none');
+  document.getElementById('optThreshCost').textContent=optThresh.toFixed(3);
+  document.getElementById('decisionRule').textContent=`Choisir + si P(+|x) > ${optThresh.toFixed(3)}`;
+  document.getElementById('costRatio').textContent=(cFN/cFP).toFixed(1);
+  document.getElementById('costNote').textContent=`Seuil optimal = C(+|-)/(C(-|+)+C(+|-)) = ${cFP}/(${cFN}+${cFP}) = ${optThresh.toFixed(3)}. Plus C(-|+) est grand (FN coûteux), plus le seuil baisse → on préfère sur-détecter les positifs.`;
+}
+['priorPos','costFN','costFP'].forEach(id=>document.getElementById(id).addEventListener('input',updateCost));
+
+initPosteriorChart(); updatePosterior();
+initMapVsMLChart(); updateMapVsML();
+initCostChart(); updateCost();
+</script>
+
+<script>
+(function waitForKatex(tries){
+  if(tries<=0) return;
+  if(typeof katex==='undefined'){setTimeout(()=>waitForKatex(tries-1),150);return;}
+  
+  function rk(latex,display){
+    try{return katex.renderToString(latex,{displayMode:!!display,throwOnError:false});}
+    catch(e){return '<code>'+latex+'</code>';}
+  }
+  
+  document.querySelectorAll('.pending-math').forEach(function(pm){
+    const phrase  = pm.dataset.phrase  || '';
+    const latex   = pm.dataset.latex   || '';
+    const latex2  = pm.dataset.latex2  || '';
+    const example = pm.dataset.example || '';
+    let vars = [];
+    try{ vars = JSON.parse(pm.dataset.vars || '[]'); } catch(e){}
+    
+    let varsRows = vars.map(v=>
+      '<tr><td>'+rk(v.sym)+'</td><td>'+v.desc+'</td></tr>'
+    ).join('');
+    
+    let html = '<div class="math-block">';
+    if(phrase) html += '<div class="math-phrase">📌 <em><strong>En une phrase :</strong> '+phrase+'</em></div>';
+    if(latex)  html += '<div class="math-eq">'+rk(latex,true)+'</div>';
+    if(latex2) html += '<div class="math-eq">'+rk(latex2,true)+'</div>';
+    if(vars.length){
+      html += '<div class="math-vars-wrap"><div class="math-vars-title">🔤 Décryptage des symboles :</div>';
+      html += '<table class="math-vars-table">'+varsRows+'</table></div>';
+    }
+    if(example) html += '<div class="math-example"><div class="ex-title">💡 Exemple concret :</div><p>'+example+'</p></div>';
+    html += '</div>';
+    
+    pm.outerHTML = html;
+  });
+  
+  // mark enhanced formula-boxes
+  document.querySelectorAll('.formula-box,.formula-display').forEach(function(fb){
+    if(fb.nextElementSibling && fb.nextElementSibling.classList && fb.nextElementSibling.classList.contains('math-block')){
+      fb.classList.add('enhanced');
+    }
+  });
+  
+})(30);
+</script>
+</body>
+</html>

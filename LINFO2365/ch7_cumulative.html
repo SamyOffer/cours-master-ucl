@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 7 — Ordonnancement Cumulatif</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:flex-start; }
+  .control-group { display:flex; flex-direction:column; gap:4px; min-width:120px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#d97706; }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+  canvas { max-width:100%; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 7 — Ordonnancement Cumulatif</h1>
+      <p>Contrainte Cumulative, filtrage TimeTable et LNS pour le scheduling</p>
+      <span class="chapter-badge">Chapitre 7 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- SCHEDULING INTRO -->
+<div class="section">
+  <h2>📅 Qu'est-ce que l'Ordonnancement ?</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi l'ordonnancement ?</span>
+    <p>L'ordonnancement (scheduling), c'est <strong>"allouer des ressources rares à des activités dans le temps"</strong>. Par exemple : un hôpital doit planifier des opérations chirurgicales (activités) avec un nombre limité de salles d'opération (ressources).</p>
+    <p><strong>Exemples concrets :</strong></p>
+    <p>• Téléchargement de données d'un satellite (ressource = canaux de téléchargement)</p>
+    <p>• Planification de la mission spatiale Philae sur la comète 67P (ressource = batteries)</p>
+    <p>• Horaires de trains dans une gare (ressource = voies ferrées)</p>
+    <p>• Production d'acier (ressource = convertisseur, dégasseur, coulée)</p>
+    <div class="retenir">💡 CP excelle en scheduling grâce à sa flexibilité de modélisation et ses algorithmes de filtrage puissants.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">⚙️</div><h4>Activités</h4><p>Tâches à ordonnancer avec un début s[i], durée d[i], fin e[i]=s[i]+d[i]</p></div>
+    <div class="icon-item"><div class="icon">🔧</div><h4>Ressources</h4><p>Capacité C = combien d'unités utilisables en même temps</p></div>
+    <div class="icon-item"><div class="icon">📊</div><h4>Besoin r[i]</h4><p>Combien de ressources l'activité i consomme simultanément</p></div>
+    <div class="icon-item"><div class="icon">🎯</div><h4>Objectif</h4><p>Souvent : minimiser le makespan (dernière date de fin)</p></div>
+  </div>
+</div>
+
+<!-- CUMULATIVE CONSTRAINT -->
+<div class="section">
+  <h2>📏 La Contrainte Cumulative</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi la contrainte Cumulative ?</span>
+    <p>La contrainte <strong>Cumulative</strong> garantit que la somme des ressources utilisées par les activités en cours d'exécution à n'importe quel instant t ne dépasse jamais la capacité C.</p>
+    <p><strong>Analogie :</strong> Imagine des voitures sur un pont — le pont a une capacité maximale (en tonnes). À chaque moment, le poids total des voitures sur le pont ne doit pas dépasser la limite. Certaines voitures entrent, d'autres sortent, et la contrainte surveille que ça ne dépasse jamais.</p>
+    <div class="retenir">💡 Cumulative(s, d, r, C) : à tout instant t, ∑ r[i] pour les activités i actives à t ≤ C.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Formule Cumulative</span>
+    <p class="phrase">📌 "À chaque instant t, la somme des besoins des activités en cours d'exécution ne dépasse pas la capacité C"</p>
+    <div class="pending-math" data-latex="\forall t: \left(\sum_{i: s_i \leq t < e_i} r_i\right) \leq C"></div>
+    <table>
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td>s[i]</td><td>Temps de début de l'activité i (variable !)</td></tr>
+      <tr><td>d[i]</td><td>Durée de l'activité i (constante)</td></tr>
+      <tr><td>e[i] = s[i]+d[i]</td><td>Temps de fin de l'activité i</td></tr>
+      <tr><td>r[i]</td><td>Besoin en ressource de l'activité i (constante)</td></tr>
+      <tr><td>C</td><td>Capacité maximale de la ressource</td></tr>
+    </table>
+    <p style="margin-top:10px;color:#065f46;"><strong>Exemple :</strong> C=3, activité A : s∈[0,4], d=3, r=2 ; activité B : s∈[1,5], d=2, r=2. Si A commence à t=2 et B à t=2 → besoin = 2+2=4 > 3 ❌ → violation !</p>
+  </div>
+
+  <!-- CUMULATIVE DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Contrainte Cumulative interactive</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px;">Ajuste les débuts des activités et vois si la capacité est respectée.</p>
+    <div class="controls">
+      <div class="control-group">
+        <label>Capacité C : <span class="val" id="capVal">4</span></label>
+        <input type="range" id="capSlider" min="1" max="6" value="4" oninput="updateCumul()">
+      </div>
+      <div class="control-group">
+        <label>Début A : <span class="val" id="sAVal">0</span></label>
+        <input type="range" id="sASlider" min="0" max="8" value="0" oninput="updateCumul()">
+      </div>
+      <div class="control-group">
+        <label>Début B : <span class="val" id="sBVal">2</span></label>
+        <input type="range" id="sBSlider" min="0" max="8" value="2" oninput="updateCumul()">
+      </div>
+      <div class="control-group">
+        <label>Début C : <span class="val" id="sCVal">4</span></label>
+        <input type="range" id="sCSlider" min="0" max="8" value="4" oninput="updateCumul()">
+      </div>
+    </div>
+    <canvas id="cumulCanvas" height="220"></canvas>
+    <div id="cumulResult" style="margin-top:10px;padding:12px;background:white;border-radius:8px;border:1.5px solid #e2e8f0;font-size:0.88rem;color:#334155;"></div>
+  </div>
+</div>
+
+<!-- TIMETABLE FILTERING -->
+<div class="section">
+  <h2>⚡ Filtrage TimeTable — O(n²)</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le profil obligatoire ?</span>
+    <p>Une activité i a une <strong>partie obligatoire</strong> : la période [max(s[i]), min(e[i])] = [s̄[i], e̲[i]] pendant laquelle elle s'exécute <em>quelle que soit</em> la valeur choisie pour s[i].</p>
+    <p><strong>Analogie :</strong> si tu dois être au bureau entre 9h et 18h (domaine de début = {8h, 9h}) et la durée est 6h, tu seras <em>forcément</em> là entre 14h et 15h (partie obligatoire) — peu importe si tu commences à 8h ou 9h.</p>
+    <p>Le <strong>profil obligatoire</strong> = la somme des besoins de toutes les parties obligatoires à chaque instant. Ce profil est "sûr" (il sera toujours chargé ainsi). On peut alors filtrer : repousser le début d'une activité si son ajout dépasserait C.</p>
+    <div class="retenir">💡 TimeTable : profil obligatoire → filtrage des bornes de s[i] en O(n²).</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Partie obligatoire et filtrage</span>
+    <p class="phrase">📌 "La partie obligatoire d'une activité i est l'intervalle pendant lequel elle s'exécute inévitablement"</p>
+    <div class="pending-math" data-latex="\text{Partie obligatoire} = [\bar{s}[i], \underline{e}[i]] = [\max(D(s[i])), \min(D(s[i])) + d[i]]"></div>
+    <p style="margin:8px 0;color:#065f46;"><strong>Filtrage :</strong></p>
+    <div class="pending-math" data-latex="\min(s[i]) \leftarrow \text{première position } t \text{ où } \text{profil}(t) + r[i] \leq C"></div>
+    <table>
+      <tr><th>Terme</th><th>Signification</th></tr>
+      <tr><td>s̄[i] = max(D(s[i]))</td><td>Début le plus tardif de l'activité i</td></tr>
+      <tr><td>ē[i] = min(D(s[i]))+d[i]</td><td>Fin la plus tôt de l'activité i</td></tr>
+      <tr><td>profil(t)</td><td>Somme des r[j] pour toutes les parties obligatoires à l'instant t</td></tr>
+      <tr><td>Filtrage</td><td>s[i] ne peut pas commencer là où profil(t)+r[i] > C</td></tr>
+    </table>
+  </div>
+
+  <!-- TIMETABLE DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Profil TimeTable & Filtrage</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Capacité C : <span class="val" id="ttCapVal">3</span></label>
+        <input type="range" id="ttCap" min="1" max="5" value="3" oninput="updateTT()">
+      </div>
+      <div class="control-group">
+        <label>min(s[A]) : <span class="val" id="sAminV">0</span></label>
+        <input type="range" id="sAmin" min="0" max="6" value="0" oninput="updateTT()">
+      </div>
+      <div class="control-group">
+        <label>max(s[A]) : <span class="val" id="sAmaxV">3</span></label>
+        <input type="range" id="sAmax" min="0" max="8" value="3" oninput="updateTT()">
+      </div>
+    </div>
+    <canvas id="ttCanvas" height="240"></canvas>
+    <div id="ttResult" style="margin-top:10px;padding:12px;background:white;border-radius:8px;border:1.5px solid #e2e8f0;font-size:0.88rem;color:#334155;"></div>
+  </div>
+</div>
+
+<!-- TIMETABLE COMPLEXITY -->
+<div class="section">
+  <h2>📊 Complexité et Comparaison des Approches</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 Pourquoi ne pas décomposer en contraintes réifiées ?</span>
+    <p>La décomposition naïve crée O(n×H) variables et contraintes (où H = horizon de temps). Pour H=10 heures et n=10 activités avec granularité à la seconde → 360 000 variables ! Totalement impraticable.</p>
+    <p><strong>TimeTable</strong> résout ce problème : il travaille directement sur les n activités, avec une complexité de O(n²) par propagation. C'est nettement plus scalable.</p>
+    <div class="retenir">💡 Décomposition = O(n×H) variables. TimeTable = O(n²) par propagation. Énorme différence !</div>
+  </div>
+
+  <div class="demo-box">
+    <h3>📈 Scalabilité — Décomposition vs TimeTable</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Activités n : <span class="val" id="nActV">10</span></label>
+        <input type="range" id="nActSlider" min="2" max="50" value="10" oninput="updateComplexity()">
+      </div>
+      <div class="control-group">
+        <label>Horizon H (heures) : <span class="val" id="horizV">10</span></label>
+        <input type="range" id="horizSlider" min="1" max="100" value="10" oninput="updateComplexity()">
+      </div>
+      <div class="control-group">
+        <label>Granularité (min) : <span class="val" id="granV">60</span></label>
+        <input type="range" id="granSlider" min="1" max="60" value="60" oninput="updateComplexity()">
+      </div>
+    </div>
+    <canvas id="complexChart" height="200"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Variables (décompo) : <span id="decompVars">—</span></div>
+      <div class="stat-chip">Complexité TimeTable : <span id="ttComp">—</span></div>
+      <div class="stat-chip">Rapport : <span id="ratio">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LNS FOR SCHEDULING -->
+<div class="section">
+  <h2>🔄 LNS pour l'Ordonnancement</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 Pourquoi LNS classique ne marche pas bien pour le scheduling ?</span>
+    <p>En scheduling, fixer aléatoirement 75% des temps de début est une <strong>mauvaise idée</strong> : avec presque zéro chance d'amélioration, on reconstruit souvent la même solution. Il faut être plus malin.</p>
+    <p><strong>Partial Order Schedule (POS) :</strong> au lieu de fixer des temps absolus, on conserve une partie de la <em>structure relative</em> de la solution courante. On garde certaines <strong>précédences</strong> (activité A se termine avant que B commence) mais pas toutes. Ainsi, on peut réordonner des activités tout en gardant une structure cohérente.</p>
+    <div class="retenir">💡 LNS pour scheduling = relaxer des précédences, pas des temps absolus. Plus flexible, meilleures solutions !</div>
+  </div>
+
+  <div class="demo-box">
+    <h3>📅 Démo — Ordonnancement interactif (Gantt)</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Nombre d'activités : <span class="val" id="nJobsV">5</span></label>
+        <input type="range" id="nJobsSlider" min="3" max="8" value="5" oninput="generateSchedule()">
+      </div>
+      <div class="control-group">
+        <label>Capacité : <span class="val" id="schedCapV">3</span></label>
+        <input type="range" id="schedCapSlider" min="2" max="5" value="3" oninput="generateSchedule()">
+      </div>
+      <button class="btn" onclick="generateSchedule()">🔀 Générer nouvel ordonnancement</button>
+      <button class="btn btn-amber" onclick="lnsImprove()">⚡ LNS — Améliorer</button>
+    </div>
+    <canvas id="ganttChart" height="220"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Makespan : <span id="makespanVal">—</span></div>
+      <div class="stat-chip">Violations de capacité : <span id="violationsVal">—</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer><strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 7 : Ordonnancement Cumulatif</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    if (el.dataset.latex) el.innerHTML = katex.renderToString(el.dataset.latex, {displayMode:true, throwOnError:false});
+  });
+  updateCumul();
+  updateTT();
+  updateComplexity();
+  generateSchedule();
+});
+
+// ===== CUMULATIVE DEMO =====
+// Activities: A (d=3, r=2), B (d=2, r=2), C (d=4, r=1)
+const acts = [
+  { name:'A', d:3, r:2, color:'#0D9488' },
+  { name:'B', d:2, r:2, color:'#F59E0B' },
+  { name:'C', d:4, r:1, color:'#6366f1' },
+];
+let cumulChartObj = null;
+function updateCumul() {
+  const C = parseInt(document.getElementById('capSlider').value);
+  const sA = parseInt(document.getElementById('sASlider').value);
+  const sB = parseInt(document.getElementById('sBSlider').value);
+  const sC = parseInt(document.getElementById('sCSlider').value);
+  document.getElementById('capVal').textContent = C;
+  document.getElementById('sAVal').textContent = sA;
+  document.getElementById('sBVal').textContent = sB;
+  document.getElementById('sCVal').textContent = sC;
+  const starts = [sA, sB, sC];
+  const H = 14;
+  const profile = new Array(H).fill(0);
+  acts.forEach((a,i) => {
+    for (let t = starts[i]; t < starts[i]+a.d && t < H; t++) profile[t] += a.r;
+  });
+  const violation = profile.some(v => v > C);
+  const labels = Array.from({length:H}, (_,i)=>i);
+  const ctx = document.getElementById('cumulCanvas').getContext('2d');
+  if (cumulChartObj) cumulChartObj.destroy();
+  cumulChartObj = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Utilisation ressource', data: profile, backgroundColor: profile.map(v => v>C?'#ef4444':v===C?'#F59E0B':'#0D9488'), borderRadius: 3 },
+        { label: 'Capacité C', data: new Array(H).fill(C), type: 'line', borderColor: '#1E3A5F', borderWidth: 2, pointRadius: 0, borderDash: [5,5], fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { title: { display: true, text: `Profil d'utilisation — Capacité C=${C}` }, legend: { display: true } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Ressource utilisée' } }, x: { title: { display: true, text: 'Temps t' } } }
+    }
+  });
+  document.getElementById('cumulResult').innerHTML = `
+    A : [${sA}, ${sA+acts[0].d}[, besoin=${acts[0].r} &nbsp;|&nbsp; B : [${sB}, ${sB+acts[1].d}[, besoin=${acts[1].r} &nbsp;|&nbsp; C : [${sC}, ${sC+acts[2].d}[, besoin=${acts[2].r}<br>
+    <strong style="color:${violation?'#ef4444':'#0D9488'}">${violation ? '❌ Violation ! La capacité C='+C+' est dépassée → backtrack nécessaire' : '✅ Contrainte Cumulative respectée'}</strong>
+  `;
+}
+
+// ===== TIMETABLE DEMO =====
+// Activity A: d=4, r=2; other fixed activities with mandatory parts
+let ttChartObj = null;
+function updateTT() {
+  const C = parseInt(document.getElementById('ttCap').value);
+  const sAmin = parseInt(document.getElementById('sAmin').value);
+  const sAmax = parseInt(document.getElementById('sAmax').value);
+  document.getElementById('ttCapVal').textContent = C;
+  document.getElementById('sAminV').textContent = sAmin;
+  document.getElementById('sAmaxV').textContent = sAmax;
+  const dA = 4, rA = 2;
+  // Mandatory part of A: [sAmax, sAmin + dA]
+  const mandStart = sAmax, mandEnd = sAmin + dA;
+  const H = 12;
+  // Other activities (fixed)
+  const others = [{s:1,d:3,r:1},{s:5,d:2,r:1}];
+  // Build profile (mandatory parts only)
+  const profile = new Array(H).fill(0);
+  others.forEach(a => { for(let t=a.s;t<a.s+a.d&&t<H;t++) profile[t]+=a.r; });
+  if (mandStart < mandEnd) { for(let t=mandStart;t<mandEnd&&t<H;t++) profile[t]+=rA; }
+  // Find filtered start for A
+  let filteredMin = sAmin;
+  for (let t = sAmin; t <= sAmax; t++) {
+    let ok = true;
+    for (let tt = t; tt < t+dA && tt < H; tt++) {
+      const contrib = (tt >= mandStart && tt < mandEnd) ? 0 : 0; // don't double-count
+      if (profile[tt] - ((tt>=mandStart&&tt<mandEnd)?rA:0) + rA > C) { ok = false; break; }
+    }
+    if (ok) { filteredMin = t; break; }
+  }
+  const ctx = document.getElementById('ttCanvas').getContext('2d');
+  if (ttChartObj) ttChartObj.destroy();
+  ttChartObj = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Array.from({length:H},(_,i)=>i),
+      datasets: [
+        { label: 'Profil obligatoire', data: profile, backgroundColor: profile.map(v=>v>C?'#ef4444':v>=C-rA+1?'#F59E0B':'rgba(13,148,136,0.7)'), borderRadius: 3 },
+        { label: 'Capacité C', data: new Array(H).fill(C), type:'line', borderColor:'#1E3A5F', borderWidth:2, pointRadius:0, borderDash:[5,5], fill:false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { title: { display: true, text: `Profil TimeTable (partie obligatoire de A = [${mandStart},${mandEnd}[)` } },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Ressource' } }, x: { title: { display: true, text: 'Temps' } } }
+    }
+  });
+  document.getElementById('ttResult').innerHTML = `
+    Activité A : d=4, r=2, D(s[A]) = [${sAmin}, ${sAmax}]<br>
+    Partie obligatoire de A : [${mandStart}, ${mandEnd}[ ${mandStart<mandEnd?'':'(aucune — domaine trop large)'}<br>
+    min(s[A]) filtré par TimeTable : <strong style="color:var(--teal)">${filteredMin}</strong> (était ${sAmin})
+    ${filteredMin>sAmin?` ← poussé en avant de ${filteredMin-sAmin} unité(s)`:'(pas de filtrage nécessaire)'}
+  `;
+}
+
+// ===== COMPLEXITY DEMO =====
+let complexChart = null;
+function updateComplexity() {
+  const n = parseInt(document.getElementById('nActSlider').value);
+  const H = parseInt(document.getElementById('horizSlider').value);
+  const gran = parseInt(document.getElementById('granSlider').value);
+  document.getElementById('nActV').textContent = n;
+  document.getElementById('horizV').textContent = H;
+  document.getElementById('granV').textContent = gran;
+  const slots = H * 60 / gran;
+  const decompVars = n * slots;
+  const ttOps = n * n;
+  const ratio = (decompVars/ttOps).toFixed(0);
+  document.getElementById('decompVars').textContent = decompVars.toLocaleString();
+  document.getElementById('ttComp').textContent = `O(n²) = ${ttOps}`;
+  document.getElementById('ratio').textContent = `${ratio}× plus`;
+  const ctx = document.getElementById('complexChart').getContext('2d');
+  if (complexChart) complexChart.destroy();
+  complexChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Décomposition réifiée', 'TimeTable'],
+      datasets: [{ data: [decompVars, ttOps], backgroundColor: ['#f43f5e', '#0D9488'], borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: `Variables/opérations — n=${n} activités, H=${H}h, granularité ${gran}min` } },
+      scales: { y: { type: 'logarithmic', title: { display: true, text: 'Complexité (échelle log)' } } }
+    }
+  });
+}
+
+// ===== GANTT DEMO =====
+let ganttChart = null;
+let currentSchedule = [];
+function generateSchedule() {
+  const n = parseInt(document.getElementById('nJobsSlider').value);
+  const C = parseInt(document.getElementById('schedCapSlider').value);
+  document.getElementById('nJobsV').textContent = n;
+  document.getElementById('schedCapV').textContent = C;
+  const colors = ['#0D9488','#F59E0B','#6366f1','#ec4899','#14b8a6','#f97316','#8b5cf6','#06b6d4'];
+  const durations = Array.from({length:n},()=>Math.floor(Math.random()*4)+2);
+  const requirements = Array.from({length:n},()=>Math.floor(Math.random()*(C-1))+1);
+  // Greedy scheduling respecting capacity
+  const starts = new Array(n).fill(0);
+  const H = 20;
+  const profile = new Array(H).fill(0);
+  for (let i = 0; i < n; i++) {
+    let t = 0;
+    while (t < H) {
+      let ok = true;
+      for (let tt = t; tt < t+durations[i] && tt < H; tt++) { if (profile[tt]+requirements[i]>C){ok=false;break;} }
+      if (ok) { starts[i]=t; for(let tt=t;tt<t+durations[i]&&tt<H;tt++) profile[tt]+=requirements[i]; break; }
+      t++;
+    }
+  }
+  const makespan = Math.max(...starts.map((s,i)=>s+durations[i]));
+  document.getElementById('makespanVal').textContent = makespan;
+  document.getElementById('violationsVal').textContent = '0';
+  currentSchedule = starts.map((s,i) => ({s, d:durations[i], r:requirements[i], color:colors[i%colors.length], name:`T${i+1}`}));
+  drawGantt(currentSchedule, C);
+}
+function lnsImprove() {
+  if (!currentSchedule.length) return;
+  const C = parseInt(document.getElementById('schedCapSlider').value);
+  // Simple LNS: reorder 2 random activities
+  const newSched = [...currentSchedule];
+  const i = Math.floor(Math.random()*newSched.length);
+  const j = Math.floor(Math.random()*newSched.length);
+  const tmpS = newSched[i].s; newSched[i].s = Math.max(0, newSched[i].s - 1); newSched[j].s = Math.max(0, newSched[j].s - 1);
+  const makespan = Math.max(...newSched.map(a=>a.s+a.d));
+  document.getElementById('makespanVal').textContent = makespan;
+  currentSchedule = newSched;
+  drawGantt(currentSchedule, C);
+}
+function drawGantt(schedule, C) {
+  const H = Math.max(...schedule.map(a=>a.s+a.d)) + 2;
+  const ctx = document.getElementById('ganttChart').getContext('2d');
+  if (ganttChart) ganttChart.destroy();
+  ganttChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: schedule.map(a=>a.name),
+      datasets: [{
+        label: 'Activités',
+        data: schedule.map(a=>[a.s, a.s+a.d]),
+        backgroundColor: schedule.map(a=>a.color),
+        borderSkipped: false,
+        borderRadius: 4,
+        barPercentage: 0.6,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: `Diagramme de Gantt — Makespan=${Math.max(...schedule.map(a=>a.s+a.d))}, Capacité=${C}` },
+        tooltip: { callbacks: { label: (ctx) => {
+          const a = schedule[ctx.dataIndex];
+          return `Début: ${a.s}, Fin: ${a.s+a.d}, Besoin: ${a.r}/${C}`;
+        }}}
+      },
+      scales: { x: { min: 0, max: H, title: { display: true, text: 'Temps' } } }
+    }
+  });
+}
+</script>
+</body>
+</html>

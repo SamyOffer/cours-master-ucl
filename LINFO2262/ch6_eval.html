@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.6 — Évaluation des Performances</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#fff;--gray:#64748B;--dark:#1E293B;--green:#059669;--red:#DC2626}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark)}
+  nav{background:var(--navy);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+  nav a{color:#94A3B8;text-decoration:none;font-size:.9rem} nav a:hover{color:#fff}
+  nav span{color:#fff;font-weight:700}
+  header{background:var(--navy);padding:2rem 2rem 1.5rem;border-left:8px solid var(--red)}
+  header h1{color:#fff;font-size:2rem;margin-bottom:.3rem}
+  header p{color:#94A3B8;font-size:.95rem}
+  main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+  .section{background:var(--white);border-radius:12px;padding:1.75rem;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+  .section h2{color:var(--navy);font-size:1.3rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+  .section p.intro{color:var(--gray);font-size:.9rem;margin-bottom:1.25rem;line-height:1.7}
+  .tag{background:var(--red);color:#fff;font-size:.7rem;padding:.15rem .5rem;border-radius:999px;font-weight:700}
+  .formula-box{background:#FFE4E6;border:1px solid #FCA5A5;border-radius:8px;padding:1rem 1.25rem;margin:.75rem 0;font-family:monospace;font-size:.93rem;color:var(--dark)}
+  .formula-box .label{font-size:.75rem;font-weight:700;color:var(--red);text-transform:uppercase;margin-bottom:.3rem;font-family:'Segoe UI',sans-serif}
+  .result-box{background:#CCFBF1;border:1px solid #5EEAD4;border-radius:8px;padding:.75rem 1rem;margin:.4rem 0;font-size:.95rem;font-weight:700;color:var(--dark)}
+  .result-box .rl{font-size:.75rem;font-weight:400;color:var(--teal);margin-bottom:.2rem}
+  .controls{display:flex;flex-wrap:wrap;gap:1.5rem;margin:1rem 0;align-items:flex-end}
+  .ctrl{display:flex;flex-direction:column;gap:.3rem;min-width:180px}
+  .ctrl label{font-size:.85rem;font-weight:600;color:var(--navy)}
+  .ctrl input[type=range]{width:100%;accent-color:var(--red);cursor:pointer}
+  .ctrl .val{font-size:.9rem;font-weight:700;color:var(--red)}
+  canvas{max-height:300px}
+  .note{background:#FEF3C7;border-left:4px solid var(--amber);padding:.75rem 1rem;border-radius:0 8px 8px 0;font-size:.88rem;color:var(--dark);margin:.75rem 0;line-height:1.6}
+  .conf-matrix{display:grid;grid-template-columns:auto 1fr 1fr;gap:3px;margin:1rem 0;max-width:340px}
+  .cm-cell{padding:.6rem .8rem;border-radius:4px;text-align:center;font-weight:700;font-size:.9rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+  .metric-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .75rem;border-radius:6px;margin:.2rem 0;background:var(--light)}
+  .metric-row .ml{font-size:.88rem;color:var(--dark);font-weight:600}
+  .metric-row .mv{font-size:.95rem;font-weight:800}
+  input[type=number]{width:70px;padding:.3rem .5rem;border-radius:6px;border:1px solid #CBD5E1;font-size:.9rem;text-align:center}
+
+  /* ===== MATH BLOCK PANELS (KaTeX enhanced) ===== */
+  .math-block{background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1.5px solid #6EE7B7;border-left:4px solid #0D9488;border-radius:12px;padding:1.25rem 1.4rem;margin:.5rem 0 1.25rem;}
+  .math-phrase{font-size:.87rem;color:#064E3B;font-style:italic;margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px dashed #A7F3D0;line-height:1.5;}
+  .math-phrase strong{color:#0D9488;font-style:normal;}
+  .math-eq{text-align:center;padding:.6rem .5rem;margin:.5rem 0;overflow-x:auto;background:rgba(255,255,255,.7);border-radius:8px;}
+  .math-eq .katex-display{margin:.3rem 0;}
+  .math-vars-wrap{margin:.75rem 0;}
+  .math-vars-title{font-size:.72rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.35rem;}
+  .math-vars-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .math-vars-table td{padding:.28rem .4rem;border-bottom:1px solid #D1FAE5;vertical-align:top;}
+  .math-vars-table td:first-child{white-space:nowrap;padding-right:.75rem;min-width:70px;font-weight:600;color:#065F46;}
+  .math-vars-table tr:last-child td{border-bottom:none;}
+  .math-vars-table .katex{font-size:.85em;}
+  .math-example{background:#FFFBEB;border-radius:7px;padding:.6rem .85rem;margin-top:.65rem;border-left:3px solid #F59E0B;}
+  .math-example .ex-title{font-size:.72rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;}
+  .math-example p{font-size:.82rem;color:#78350F;line-height:1.65;margin:0;}
+  /* hide original formula-box once math-block is present */
+  .formula-box.enhanced{display:none!important;}
+  .formula-display.enhanced{display:none!important;}
+  
+  /* ===== BEGINNER EXPLANATION BLOCKS ===== */
+  .explain-intro{background:linear-gradient(135deg,#FFFBEB 0%,#FFF7ED 100%);border:1.5px solid #FCD34D;border-left:5px solid #F59E0B;border-radius:0 14px 14px 0;padding:1.3rem 1.5rem;margin:0 0 1.5rem;}
+  .ei-badge{display:inline-flex;align-items:center;gap:.35rem;background:#F59E0B;color:white;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:.22rem .7rem;border-radius:999px;margin-bottom:.7rem;}
+  .explain-intro p{font-size:.91rem;color:#78350F;line-height:1.82;margin:.45rem 0;}
+  .explain-intro p strong{color:#92400E;font-weight:700;}
+  .explain-intro p em{color:#B45309;font-style:italic;}
+  .explain-analogy{background:white;border-radius:10px;padding:.9rem 1.15rem;margin:.9rem 0;font-size:.88rem;line-height:1.82;border:1.5px solid #FDE68A;color:#78350F;}
+  .explain-analogy .an-title{font-size:.72rem;font-weight:800;color:#D97706;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem;display:block;}
+  .explain-visual{display:flex;gap:.5rem;flex-wrap:wrap;margin:.85rem 0;}
+  .ev-item{background:white;border-radius:10px;padding:.6rem .85rem;font-size:.82rem;color:#78350F;border:1.5px solid #FDE68A;text-align:center;flex:1;min-width:110px;}
+  .ev-item .ev-emoji{font-size:1.5rem;display:block;margin-bottom:.25rem;}
+  .ev-item .ev-label{font-weight:700;color:#92400E;font-size:.8rem;display:block;margin-bottom:.15rem;}
+  .explain-steps{list-style:none;padding:0;margin:.7rem 0;}
+  .explain-steps li{padding:.35rem 0 .35rem 1.5rem;position:relative;font-size:.88rem;color:#78350F;line-height:1.7;border-bottom:1px dashed #FDE68A;}
+  .explain-steps li:last-child{border-bottom:none;}
+  .explain-steps li::before{content:"→";position:absolute;left:0;color:#F59E0B;font-weight:700;}
+  .explain-key{background:#FEF3C7;border-radius:8px;padding:.65rem .95rem;margin-top:.8rem;font-size:.86rem;color:#92400E;font-weight:600;line-height:1.65;border-left:3px solid #F59E0B;}
+  .explain-key::before{content:"💡 À retenir : ";}
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+</head>
+<body>
+<nav><a href="index.html">← Accueil</a><span>Chapitre 6 — Évaluation des Performances</span></nav>
+<header>
+  <h1>📈 Évaluation des Performances</h1>
+  <p>Matrice de confusion, métriques, ROC/AUC, intervalles de confiance, tests d'hypothèses</p>
+</header>
+<main>
+
+<!-- SECTION 1: CONFUSION MATRIX -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> Matrice de Confusion — Toutes les métriques</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Les 4 façons dont un classifieur peut se tromper (ou avoir raison)</div>
+  <p>Un classifieur prédit 'positif' ou 'négatif'. Il peut avoir tort de <strong>deux façons différentes</strong>, et raison de deux façons différentes. La matrice de confusion comptabilise tout ça.</p>
+  <p>Exemple médical : tu testes des patients pour une maladie. Tu peux :<br>• ✅ Dire 'malade' à quelqu'un qui est malade (TP — Vrai Positif)<br>• ✅ Dire 'sain' à quelqu'un qui est sain (TN — Vrai Négatif)<br>• ❌ Dire 'malade' à quelqu'un qui est sain (FP — Fausse Alarme)<br>• ❌ Dire 'sain' à quelqu'un qui est malade (FN — Très Dangereux !)</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Pourquoi ne pas juste utiliser l'accuracy (précision globale) ?</span>Imagine un test de cancer où seulement 1% des gens sont malades. Un classifieur qui dit TOUJOURS 'sain' aura <strong>99% d'accuracy</strong> — mais il rate 100% des cancers !<br><br>C'est pourquoi on utilise des métriques plus fines :<br>🎯 <strong>Précision</strong> = TP/(TP+FP) : parmi mes alarmes, combien sont vraies ?<br>🔍 <strong>Rappel (Sensibilité)</strong> = TP/(TP+FN) : parmi les vrais positifs, combien j'ai trouvé ?<br>⚖️ <strong>F1</strong> = 2×P×R/(P+R) : la moyenne harmonique — utile quand les classes sont déséquilibrées<br>📊 <strong>MCC</strong> = Matthews Correlation Coefficient : la métrique la plus robuste aux déséquilibres</div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">✅</span><span class="ev-label">TP</span>Vrai Positif. Malade → prédit malade. Parfait !</div>
+    <div class="ev-item"><span class="ev-emoji">✅</span><span class="ev-label">TN</span>Vrai Négatif. Sain → prédit sain. Parfait !</div>
+    <div class="ev-item"><span class="ev-emoji">⚠️</span><span class="ev-label">FP</span>Faux Positif. Sain → prédit malade. Fausse alarme.</div>
+    <div class="ev-item"><span class="ev-emoji">🚨</span><span class="ev-label">FN</span>Faux Négatif. Malade → prédit sain. Très dangereux !</div>
+  </div>
+  <div class="explain-key">Le choix de la métrique dépend du problème ! Pour la détection de maladies graves : maximiser le rappel (minimiser les FN). Pour les spams : maximiser la précision (minimiser les FP). Il n'y a pas de métrique universelle !</div>
+</div>
+
+  <p class="intro">La matrice de confusion est la base de l'évaluation d'un classifieur binaire. Modifie les valeurs TP, TN, FP, FN et vois toutes les métriques se recalculer en temps réel.</p>
+
+  <div class="grid2">
+    <div>
+      <div style="font-weight:700;color:var(--navy);margin-bottom:.75rem">Ajuste les valeurs :</div>
+      <div class="controls" style="flex-direction:column;gap:.75rem">
+        <div style="display:flex;gap:1rem;align-items:center">
+          <label style="width:240px;font-size:.88rem;font-weight:600">Vrais Positifs (TP) — prédit + et réel + :</label>
+          <input type="number" id="tp" min="0" max="500" value="90" oninput="updateConfMatrix()">
+        </div>
+        <div style="display:flex;gap:1rem;align-items:center">
+          <label style="width:240px;font-size:.88rem;font-weight:600">Faux Négatifs (FN) — prédit - et réel + :</label>
+          <input type="number" id="fn" min="0" max="500" value="10" oninput="updateConfMatrix()">
+        </div>
+        <div style="display:flex;gap:1rem;align-items:center">
+          <label style="width:240px;font-size:.88rem;font-weight:600">Faux Positifs (FP) — prédit + et réel - :</label>
+          <input type="number" id="fp" min="0" max="500" value="20" oninput="updateConfMatrix()">
+        </div>
+        <div style="display:flex;gap:1rem;align-items:center">
+          <label style="width:240px;font-size:.88rem;font-weight:600">Vrais Négatifs (TN) — prédit - et réel - :</label>
+          <input type="number" id="tn" min="0" max="500" value="180" oninput="updateConfMatrix()">
+        </div>
+      </div>
+      <div style="margin-top:1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem">Matrice de confusion :</div>
+      <div class="conf-matrix" id="confMatrix">
+        <div class="cm-cell" style="background:transparent"></div>
+        <div class="cm-cell" style="background:var(--navy);color:#fff;font-size:.8rem">Prédit +</div>
+        <div class="cm-cell" style="background:var(--navy);color:#fff;font-size:.8rem">Prédit -</div>
+        <div class="cm-cell" style="background:var(--navy);color:#fff;font-size:.8rem;writing-mode:horizontal-tb">Réel +</div>
+        <div class="cm-cell" id="cmTP" style="background:#DCFCE7;color:var(--green);font-size:1.2rem">90</div>
+        <div class="cm-cell" id="cmFN" style="background:#FFE4E6;color:var(--red);font-size:1.2rem">10</div>
+        <div class="cm-cell" style="background:var(--navy);color:#fff;font-size:.8rem">Réel -</div>
+        <div class="cm-cell" id="cmFP" style="background:#FFE4E6;color:var(--red);font-size:1.2rem">20</div>
+        <div class="cm-cell" id="cmTN" style="background:#DCFCE7;color:var(--green);font-size:1.2rem">180</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-weight:700;color:var(--navy);margin-bottom:.75rem">Métriques calculées :</div>
+      <div class="metric-row"><span class="ml">Précision (Accuracy)</span><span class="mv" id="mAccuracy" style="color:var(--navy)">—</span></div>
+      <div class="metric-row"><span class="ml">Sensibilité (Recall / TPR)</span><span class="mv" id="mRecall" style="color:var(--green)">—</span></div>
+      <div class="metric-row"><span class="ml">Précision (Precision)</span><span class="mv" id="mPrecision" style="color:var(--teal)">—</span></div>
+      <div class="metric-row"><span class="ml">Spécificité (TNR)</span><span class="mv" id="mSpecificity" style="color:var(--navy)">—</span></div>
+      <div class="metric-row"><span class="ml">FPR (Faux Positifs / Négatifs réels)</span><span class="mv" id="mFPR" style="color:var(--red)">—</span></div>
+      <div class="metric-row"><span class="ml">F1-Score (harmonie Prec./Rec.)</span><span class="mv" id="mF1" style="color:var(--amber)">—</span></div>
+      <div class="metric-row"><span class="ml">MCC (Matthews Corr. Coeff.)</span><span class="mv" id="mMCC" style="color:var(--navy)">—</span></div>
+      <div id="formulasDisplay" style="margin-top:.75rem;font-size:.82rem;color:var(--gray);background:var(--light);padding:.75rem;border-radius:8px;line-height:2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ROC CURVE -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> Courbe ROC & AUC — Effet du seuil</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Le compromis détection vs fausse alarme</div>
+  <p>Tout classifieur probabiliste prédit une <strong>probabilité</strong> (ex: 73% de chance que ce soit un spam). Pour décider 'spam ou non', on fixe un <em>seuil</em> : si probabilité > 50%, c'est spam. Mais ce seuil de 50% est-il le meilleur ?</p>
+  <p>La <strong>courbe ROC</strong> (Receiver Operating Characteristic) montre ce qui se passe pour <em>tous les seuils possibles</em> de 0% à 100%. Pour chaque seuil, on calcule le taux de vrais positifs (TPR) et le taux de faux positifs (FPR) et on trace le point correspondant.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 La détective et son enquête</span>🔍 <strong>Seuil bas (ex: 10%) :</strong> 'Je suspecte tout le monde'. Détecte presque tous les coupables (TPR élevé), mais arrête aussi beaucoup d'innocents (FPR élevé).<br><br>🔍 <strong>Seuil haut (ex: 90%) :</strong> 'Je n'accuse que si j'en suis sûr'. Peu de fausses accusations (FPR bas), mais rate beaucoup de coupables (TPR bas).<br><br>📊 <strong>L'AUC (Aire sous la courbe)</strong> résume la qualité globale :<br>• AUC = 1.0 → classifieur parfait (courbe qui monte à 90° puis horizontale)<br>• AUC = 0.5 → pas mieux que le hasard (diagonale)<br>• AUC = 0.8 → bon classifieur</div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">📈</span><span class="ev-label">AUC = 1.0</span>Parfait ! TPR=1, FPR=0 pour un seuil optimal.</div>
+    <div class="ev-item"><span class="ev-emoji">📊</span><span class="ev-label">AUC = 0.8</span>Bon classifieur. Utile en pratique.</div>
+    <div class="ev-item"><span class="ev-emoji">↗️</span><span class="ev-label">AUC = 0.5</span>Aussi bon que pile ou face. Inutile !</div>
+    <div class="ev-item"><span class="ev-emoji">🎯</span><span class="ev-label">Seuil optimal</span>Dépend des coûts FP vs FN (voir Ch.7 !).</div>
+  </div>
+  <div class="explain-key">Le choix du seuil optimal n'est pas toujours 0.5 ! Il dépend des coûts relatifs des erreurs. Pour détecter un cancer rare, on préfère un seuil bas (plus de rappel) quitte à avoir plus de fausses alarmes.</div>
+</div>
+
+  <p class="intro">La courbe ROC trace TPR vs FPR pour <strong>tous les seuils</strong> possibles. L'AUC mesure la qualité globale du classifieur. Déplace le seuil et vois comment TPR et FPR changent.</p>
+
+  <div class="formula-box">
+    <div class="label">ROC et AUC</div>
+    TPR = TP/(TP+FN)  |  FPR = FP/(FP+TN)  |  AUC = aire sous courbe ROC
+    <br>AUC = 0.5 → classifieur aléatoire  |  AUC = 1.0 → classifieur parfait
+  </div>
+  <div class="pending-math" data-phrase="La courbe ROC illustre le compromis entre taux de vrais positifs et taux de faux positifs quand on fait varier le seuil de décision ; l'AUC résume la qualité globale." data-latex="\text{TPR} = \frac{TP}{TP+FN}, \quad \text{FPR} = \frac{FP}{FP+TN}, \quad \text{AUC} = \int_0^1\!\mathrm{TPR}(t)\,dt" data-latex2="F_1 = \frac{2\cdot\text{Précision}\cdot\text{Rappel}}{\text{Précision}+\text{Rappel}}, \quad \text{MCC} = \frac{TP\cdot TN - FP\cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}" data-vars='[{"sym": "\\text{TPR}", "desc": "True Positive Rate (sensibilité / rappel) — proportion de positifs détectés"}, {"sym": "\\text{FPR}", "desc": "False Positive Rate — proportion de négatifs incorrectement classés positifs"}, {"sym": "TP,TN,FP,FN", "desc": "Vrais positifs, vrais négatifs, faux positifs, faux négatifs"}, {"sym": "\\text{AUC}", "desc": "Aire sous la courbe ROC (0.5 = aléatoire, 1.0 = parfait)"}, {"sym": "F_1", "desc": "Moyenne harmonique précision/rappel — utile si classes déséquilibrées"}, {"sym": "\\text{MCC}", "desc": "Matthews Correlation Coefficient — robuste aux classes déséquilibrées"}]' data-example="100 malades + 100 sains. Seuil 0.3 : TP=90, FN=10, FP=40, TN=60 → TPR=0.90, FPR=0.40. Seuil 0.7 : TP=50, FP=5 → TPR=0.50, FPR=0.05. La courbe ROC trace ces points pour tous les seuils."></div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Seuil de décision : <span class="val" id="threshVal">0.50</span></label>
+      <input type="range" id="thresh" min="0.01" max="0.99" step="0.01" value="0.5">
+    </div>
+    <div class="ctrl">
+      <label>Qualité du classifieur : <span class="val" id="qualVal">Bon</span></label>
+      <input type="range" id="quality" min="0.5" max="3" step="0.1" value="1.5">
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div><canvas id="rocChart" style="max-height:300px"></canvas></div>
+    <div><canvas id="scoreDistChart" style="max-height:300px"></canvas></div>
+  </div>
+
+  <div class="grid2" style="margin-top:1rem">
+    <div>
+      <div class="metric-row"><span class="ml">TPR (Sensibilité) @ seuil</span><span class="mv" id="rocTPR" style="color:var(--green)">—</span></div>
+      <div class="metric-row"><span class="ml">FPR @ seuil</span><span class="mv" id="rocFPR" style="color:var(--red)">—</span></div>
+      <div class="metric-row"><span class="ml">Précision @ seuil</span><span class="mv" id="rocPrec" style="color:var(--teal)">—</span></div>
+    </div>
+    <div>
+      <div class="metric-row"><span class="ml">AUC (estimée)</span><span class="mv" id="rocAUC" style="color:var(--amber)">—</span></div>
+      <div class="metric-row"><span class="ml">F1-Score @ seuil</span><span class="mv" id="rocF1" style="color:var(--navy)">—</span></div>
+      <div class="metric-row"><span class="ml">Seuil optimal (F1 max)</span><span class="mv" id="rocOptThresh" style="color:var(--green)">—</span></div>
+    </div>
+  </div>
+  <div class="note" id="rocNote">Déplace le seuil pour voir l'impact sur TPR et FPR !</div>
+</div>
+
+<!-- SECTION 3: CONFIDENCE INTERVAL -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> Intervalles de Confiance & Tests d'Hypothèses</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 À quel point peut-on faire confiance à un score d'accuracy ?</div>
+  <p>Ton modèle fait 20% d'erreur sur 100 exemples de test. Mais 100 exemples, c'est peu ! Si tu avais testé sur 100 autres exemples, tu aurais peut-être eu 15% ou 25% d'erreur. La vraie erreur du modèle est quelque part dans cette fourchette.</p>
+  <p>L'<strong>intervalle de confiance</strong> (IC) donne cette fourchette : 'Avec 95% de certitude, la vraie erreur est entre X% et Y%'. Plus tu as d'exemples de test, plus la fourchette est étroite, et plus tu peux faire confiance à ton évaluation.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Comparer deux modèles : est-ce vraiment significatif ?</span>Modèle A : 85% accuracy sur 100 exemples de test.<br>Modèle B : 82% accuracy sur 100 exemples de test.<br><br>Est-ce que A est VRAIMENT meilleur que B ? Peut-être pas...<br><br>IC de A à 95% : 85% ± 7% → [78%, 92%]<br>IC de B à 95% : 82% ± 7.5% → [74.5%, 89.5%]<br><br>Les intervalles se chevauchent ! La différence n'est <strong>pas statistiquement significative</strong>. Il faudrait plus de données de test pour conclure.<br><br>⚠️ En ML, on compare souvent des modèles avec des datasets de test petits — les IC montrent que beaucoup de 'améliorations' annoncées ne sont pas significatives !</div>
+  <ul class="explain-steps">
+    <li>Ajuste ε̂ (l'erreur observée) : l'IC se déplace.</li>
+    <li>Augmente n (taille du test set) : l'IC se rétrécit — plus de données = plus de certitude.</li>
+    <li>Change le niveau de confiance : 99% donne un IC plus large que 95%.</li>
+  </ul>
+  <div class="explain-key">Pour une évaluation fiable, il faut un dataset de test suffisamment grand (généralement 1000+ exemples). Avec 50 exemples de test, ton IC à 95% couvre presque ±14% — tu ne peux pas savoir si ton modèle est vraiment bon !</div>
+</div>
+
+  <p class="intro">Après avoir évalué un classifieur sur un ensemble de test, on ne connaît pas la vraie erreur — on ne dispose que d'une estimation. L'intervalle de confiance quantifie l'incertitude.</p>
+
+  <div class="formula-box">
+    <div class="label">IC à 95% sur l'erreur de test</div>
+    ε̂ ± z_{0.025} · √(ε̂(1-ε̂)/n)  avec z_{0.025} = 1.96
+    <br>Valide si n·ε̂ ≥ 5 et n·(1-ε̂) ≥ 5
+  </div>
+  <div class="pending-math" data-phrase="L'intervalle de confiance donne la plage dans laquelle se trouve la vraie erreur du modèle avec une certaine probabilité, selon la taille du dataset de test." data-latex="\hat{\varepsilon} \pm z_{\alpha/2}\sqrt{\frac{\hat{\varepsilon}(1-\hat{\varepsilon})}{n}}, \qquad z_{0.025}=1.96\text{ pour IC 95\%}" data-vars='[{"sym": "\\hat{\\varepsilon}", "desc": "Erreur observée sur l&apos;ensemble de test (ex : 0.20 = 20% d&apos;erreurs)"}, {"sym": "n", "desc": "Taille de l&apos;ensemble de test — plus n est grand, plus l&apos;IC est étroit"}, {"sym": "z_{\\alpha/2}", "desc": "Quantile de la loi normale (1.96 pour 95%, 2.576 pour 99%)"}, {"sym": "\\sqrt{\\hat{\\varepsilon}(1-\\hat{\\varepsilon})/n}", "desc": "Erreur standard de l&apos;estimation (écart-type de ε̂)"}]' data-example="ε̂=20%, n=100 : IC = 0.20 ± 1.96×√(0.20×0.80/100) = 0.20 ± 0.078 → [12.2%, 27.8%]. Avec n=1000 : IC = 0.20 ± 0.025 → [17.5%, 22.5%]. Plus le dataset de test est grand, plus l'évaluation est précise !"></div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Erreur observée ε̂ : <span class="val" id="errVal">20%</span></label>
+      <input type="range" id="errObs" min="0.01" max="0.49" step="0.01" value="0.2">
+    </div>
+    <div class="ctrl">
+      <label>Taille ensemble test n : <span class="val" id="nTestVal">100</span></label>
+      <input type="range" id="nTest" min="10" max="2000" step="10" value="100">
+    </div>
+    <div class="ctrl">
+      <label>Niveau de confiance : <span class="val" id="confLevelVal">95%</span></label>
+      <input type="range" id="confLevel" min="80" max="99" step="1" value="95">
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div id="icResult" style="padding:1.25rem;background:var(--light);border-radius:8px;line-height:2.2;font-size:.9rem"></div>
+    </div>
+    <div><canvas id="icChart" style="max-height:240px"></canvas></div>
+  </div>
+
+  <div class="note" style="margin-top:1rem">💡 Un test McNemar ou un t-test pairé sur des k-fold CV est utilisé pour comparer deux classifieurs de façon statistiquement rigoureuse.</div>
+</div>
+
+</main>
+<script>
+// ======================== CONFUSION MATRIX ========================
+function updateConfMatrix(){
+  const tp=+document.getElementById('tp').value||0, fn=+document.getElementById('fn').value||0;
+  const fp=+document.getElementById('fp').value||0, tn=+document.getElementById('tn').value||0;
+  const tot=tp+fn+fp+tn; if(tot===0) return;
+  document.getElementById('cmTP').textContent=tp;
+  document.getElementById('cmFN').textContent=fn;
+  document.getElementById('cmFP').textContent=fp;
+  document.getElementById('cmTN').textContent=tn;
+  const acc=(tp+tn)/tot, rec=tp/(tp+fn)||0, prec=tp/(tp+fp)||0;
+  const spec=tn/(tn+fp)||0, fpr=fp/(fp+tn)||0;
+  const f1=2*prec*rec/(prec+rec)||0;
+  const mcc_num=(tp*tn-fp*fn), mcc_den=Math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
+  const mcc=mcc_den>0?mcc_num/mcc_den:0;
+  const fmt=v=>(v*100).toFixed(1)+'%';
+  document.getElementById('mAccuracy').textContent=fmt(acc);
+  document.getElementById('mRecall').textContent=fmt(rec);
+  document.getElementById('mPrecision').textContent=fmt(prec);
+  document.getElementById('mSpecificity').textContent=fmt(spec);
+  document.getElementById('mFPR').textContent=fmt(fpr);
+  document.getElementById('mF1').textContent=f1.toFixed(3);
+  document.getElementById('mMCC').textContent=mcc.toFixed(3);
+  document.getElementById('formulasDisplay').innerHTML=
+    `Accuracy = (${tp}+${tn})/${tot} = <strong>${fmt(acc)}</strong><br>` +
+    `Recall = ${tp}/(${tp}+${fn}) = <strong>${fmt(rec)}</strong><br>` +
+    `Precision = ${tp}/(${tp}+${fp}) = <strong>${fmt(prec)}</strong><br>` +
+    `F1 = 2·${prec.toFixed(2)}·${rec.toFixed(2)}/(${prec.toFixed(2)}+${rec.toFixed(2)}) = <strong>${f1.toFixed(3)}</strong>`;
+}
+updateConfMatrix();
+
+// ======================== ROC CURVE ========================
+let rocChart, scoreDistChart;
+function normalPDF(x,m,s){return Math.exp(-.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));}
+function normalCDF(x){const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2),p=d*t*(0.3193815+t*(-0.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));return x>=0?1-p:p;}
+
+function initROCChart(){
+  rocChart=new Chart(document.getElementById('rocChart').getContext('2d'),{
+    type:'line',
+    data:{datasets:[
+      {label:'Courbe ROC',data:[],borderColor:'#1E3A5F',borderWidth:3,pointRadius:0,fill:false,tension:.4},
+      {label:'Aléatoire',data:[{x:0,y:0},{x:1,y:1}],borderColor:'#94A3B8',borderWidth:1.5,borderDash:[5,5],pointRadius:0,fill:false},
+      {label:'Seuil actuel',data:[],backgroundColor:'#F59E0B',borderColor:'#F59E0B',pointRadius:12,type:'scatter'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{min:0,max:1,title:{display:true,text:'FPR (1-Spécificité)'}},y:{min:0,max:1,title:{display:true,text:'TPR (Sensibilité)'}}}}
+  });
+  scoreDistChart=new Chart(document.getElementById('scoreDistChart').getContext('2d'),{
+    type:'line',
+    data:{datasets:[
+      {label:'Classe - (scores)',data:[],borderColor:'#DC2626',borderWidth:2,fill:true,backgroundColor:'rgba(220,38,38,.2)',pointRadius:0},
+      {label:'Classe + (scores)',data:[],borderColor:'#0D9488',borderWidth:2,fill:true,backgroundColor:'rgba(13,148,136,.2)',pointRadius:0},
+      {label:'Seuil',data:[],type:'line',borderColor:'#F59E0B',borderWidth:2.5,pointRadius:0,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},
+      scales:{x:{title:{display:true,text:'Score du classifieur'}},y:{title:{display:true,text:'Densité'}}}}
+  });
+}
+function updateROC(){
+  const thresh=+document.getElementById('thresh').value;
+  const q=+document.getElementById('quality').value;
+  document.getElementById('threshVal').textContent=thresh.toFixed(2);
+  document.getElementById('qualVal').textContent=q<0.8?'Mauvais':q<1.2?'Moyen':q<2?'Bon':'Excellent';
+  const mu_neg=0.35, mu_pos=0.35+0.3*q, sigma=0.15;
+  // ROC curve
+  const thresholds=Array.from({length:101},(_,i)=>i/100);
+  const roc=thresholds.map(t=>{
+    const tpr=1-normalCDF((t-mu_pos)/sigma);
+    const fpr=1-normalCDF((t-mu_neg)/sigma);
+    return{x:fpr,y:tpr};
+  }).sort((a,b)=>a.x-b.x);
+  // AUC trapezoidal
+  let auc=0;
+  for(let i=1;i<roc.length;i++) auc+=Math.abs(roc[i].x-roc[i-1].x)*(roc[i].y+roc[i-1].y)/2;
+  // Current threshold
+  const tpr=1-normalCDF((thresh-mu_pos)/sigma);
+  const fpr=1-normalCDF((thresh-mu_neg)/sigma);
+  const N_pos=200, N_neg=200;
+  const tp=Math.round(tpr*N_pos), fn=N_pos-tp, fp=Math.round(fpr*N_neg), tn=N_neg-fp;
+  const prec=tp/(tp+fp)||0, f1=2*prec*tpr/(prec+tpr)||0;
+  // Find optimal threshold by F1
+  let bestF1=0, bestT=0.5;
+  thresholds.forEach(t=>{
+    const tr1=1-normalCDF((t-mu_pos)/sigma), fr1=1-normalCDF((t-mu_neg)/sigma);
+    const tpp=Math.round(tr1*N_pos), fpp=Math.round(fr1*N_neg);
+    const pr=tpp/(tpp+fpp)||0, f=2*pr*tr1/(pr+tr1)||0;
+    if(f>bestF1){bestF1=f;bestT=t;}
+  });
+  rocChart.data.datasets[0].data=roc;
+  rocChart.data.datasets[2].data=[{x:fpr,y:tpr}];
+  rocChart.update('none');
+  // Score distributions
+  const xs=Array.from({length:100},(_,i)=>i/99);
+  scoreDistChart.data.datasets[0].data=xs.map(x=>({x,y:normalPDF(x,mu_neg,sigma)}));
+  scoreDistChart.data.datasets[1].data=xs.map(x=>({x,y:normalPDF(x,mu_pos,sigma)}));
+  scoreDistChart.data.datasets[2].data=[{x:thresh,y:0},{x:thresh,y:normalPDF(mu_pos,mu_pos,sigma)*1.2}];
+  scoreDistChart.update('none');
+  document.getElementById('rocTPR').textContent=(tpr*100).toFixed(1)+'%';
+  document.getElementById('rocFPR').textContent=(fpr*100).toFixed(1)+'%';
+  document.getElementById('rocPrec').textContent=(prec*100).toFixed(1)+'%';
+  document.getElementById('rocAUC').textContent=auc.toFixed(3);
+  document.getElementById('rocF1').textContent=f1.toFixed(3);
+  document.getElementById('rocOptThresh').textContent=bestT.toFixed(2)+' (F1='+bestF1.toFixed(3)+')';
+  document.getElementById('rocNote').textContent=`Seuil ${thresh.toFixed(2)} : TP=${tp}, FP=${fp}, TN=${tn}, FN=${fn}. AUC = ${auc.toFixed(3)}`;
+}
+['thresh','quality'].forEach(id=>document.getElementById(id).addEventListener('input',updateROC));
+
+// ======================== CONFIDENCE INTERVAL ========================
+let icChart;
+function initICChart(){
+  icChart=new Chart(document.getElementById('icChart').getContext('2d'),{
+    type:'bar',
+    data:{datasets:[{label:'Intervalle de confiance',data:[],backgroundColor:'rgba(13,148,136,.3)',borderColor:'#0D9488',borderWidth:2,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:true,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:p=>`IC: [${p.parsed.x.toFixed(3)}, IC+${p.parsed.y?.toFixed(3)}]`}}},
+      scales:{x:{min:0,max:0.6,title:{display:true,text:'Taux d\'erreur'}},y:{ticks:{display:true}}}}
+  });
+}
+function updateIC(){
+  const eps=+document.getElementById('errObs').value;
+  const n=+document.getElementById('nTest').value;
+  const conf=+document.getElementById('confLevel').value;
+  document.getElementById('errVal').textContent=(eps*100).toFixed(0)+'%';
+  document.getElementById('nTestVal').textContent=n;
+  document.getElementById('confLevelVal').textContent=conf+'%';
+  const zMap={80:1.282,85:1.440,90:1.645,95:1.960,99:2.576};
+  const z=zMap[conf]||1.96;
+  const se=Math.sqrt(eps*(1-eps)/n);
+  const lo=Math.max(0,eps-z*se), hi=Math.min(1,eps+z*se);
+  const valid=(n*eps>=5)&&(n*(1-eps)>=5);
+  document.getElementById('icResult').innerHTML=
+    `<strong>Erreur observée ε̂ = ${(eps*100).toFixed(1)}%</strong> sur n = ${n} exemples<br>` +
+    `Écart-type : √(ε̂(1-ε̂)/n) = ${se.toFixed(4)}<br>` +
+    `z_{α/2} = ${z} (pour niveau ${conf}%)<br>` +
+    `<strong>IC à ${conf}% = [${(lo*100).toFixed(1)}%, ${(hi*100).toFixed(1)}%]</strong><br>` +
+    `Largeur de l'IC : ${((hi-lo)*100).toFixed(1)}%<br>` +
+    `${valid?'✅ Approximation normale valide':'⚠️ Approximation approximative (n trop petit)'}`;
+  icChart.data.labels=['Erreur'];
+  icChart.data.datasets[0].data=[{x:lo,y:hi}];
+  icChart.options.scales.x.min=Math.max(0,eps-.25);
+  icChart.options.scales.x.max=Math.min(1,eps+.25);
+  // Simple bar representing the CI
+  icChart.data.datasets[0].data=[lo,hi];
+  icChart.data.labels=['IC bas','IC haut'];
+  icChart.update('none');
+}
+['errObs','nTest','confLevel'].forEach(id=>document.getElementById(id).addEventListener('input',updateIC));
+
+initROCChart(); updateROC();
+initICChart(); updateIC();
+</script>
+
+<script>
+(function waitForKatex(tries){
+  if(tries<=0) return;
+  if(typeof katex==='undefined'){setTimeout(()=>waitForKatex(tries-1),150);return;}
+  
+  function rk(latex,display){
+    try{return katex.renderToString(latex,{displayMode:!!display,throwOnError:false});}
+    catch(e){return '<code>'+latex+'</code>';}
+  }
+  
+  document.querySelectorAll('.pending-math').forEach(function(pm){
+    const phrase  = pm.dataset.phrase  || '';
+    const latex   = pm.dataset.latex   || '';
+    const latex2  = pm.dataset.latex2  || '';
+    const example = pm.dataset.example || '';
+    let vars = [];
+    try{ vars = JSON.parse(pm.dataset.vars || '[]'); } catch(e){}
+    
+    let varsRows = vars.map(v=>
+      '<tr><td>'+rk(v.sym)+'</td><td>'+v.desc+'</td></tr>'
+    ).join('');
+    
+    let html = '<div class="math-block">';
+    if(phrase) html += '<div class="math-phrase">📌 <em><strong>En une phrase :</strong> '+phrase+'</em></div>';
+    if(latex)  html += '<div class="math-eq">'+rk(latex,true)+'</div>';
+    if(latex2) html += '<div class="math-eq">'+rk(latex2,true)+'</div>';
+    if(vars.length){
+      html += '<div class="math-vars-wrap"><div class="math-vars-title">🔤 Décryptage des symboles :</div>';
+      html += '<table class="math-vars-table">'+varsRows+'</table></div>';
+    }
+    if(example) html += '<div class="math-example"><div class="ex-title">💡 Exemple concret :</div><p>'+example+'</p></div>';
+    html += '</div>';
+    
+    pm.outerHTML = html;
+  });
+  
+  // mark enhanced formula-boxes
+  document.querySelectorAll('.formula-box,.formula-display').forEach(function(fb){
+    if(fb.nextElementSibling && fb.nextElementSibling.classList && fb.nextElementSibling.classList.contains('math-block')){
+      fb.classList.add('enhanced');
+    }
+  });
+  
+})(30);
+</script>
+</body>
+</html>

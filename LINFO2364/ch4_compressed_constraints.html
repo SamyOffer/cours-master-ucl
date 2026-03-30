@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 4 — Patterns Compressés et Contraintes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #EFF6FF;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #1F2937;
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #1E3A5F;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        header > div {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .header-bar {
+            background: #F59E0B;
+            width: 6px;
+            flex-shrink: 0;
+        }
+
+        .header-bar-2 {
+            background: #0D9488;
+            width: 4px;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .header-content {
+            padding: 16px 20px;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            color: #F59E0B;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-subtitle {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .header-link {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .header-link:hover {
+            color: #F59E0B;
+        }
+
+        .breadcrumb {
+            color: #64748B;
+            font-size: 13px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+
+        .breadcrumb a {
+            color: #0D9488;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .section > h2 {
+            color: #1E3A5F;
+            font-size: 28px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #0D9488;
+        }
+
+        .section > h3 {
+            color: #1E3A5F;
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .explain-intro .badge {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .explain-intro p {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid #0D9488;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box {
+            background: #EFF6FF;
+            border-left: 4px solid #1E3A5F;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box h4 {
+            color: #1E3A5F;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .theory-box p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .emoji-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 20px;
+            background: #F5F5F5;
+            border-radius: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .emoji-item {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .emoji-item .emoji {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .emoji-item .label {
+            font-size: 13px;
+            color: #4B5563;
+            font-weight: 500;
+        }
+
+        .emoji-flow .arrow {
+            font-size: 24px;
+            color: #0D9488;
+            margin: 0 10px;
+        }
+
+        .constraint-example {
+            background: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #CBD5E1;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #1E3A5F;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+
+        .demo-container {
+            background: #F8FAFC;
+            border: 2px solid #0D9488;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demo-title {
+            color: #0D9488;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .demo-title .icon {
+            display: inline-block;
+            background: #0D9488;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .control-group {
+            margin: 15px 0;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #CBD5E1;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0D9488;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0D9488;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            min-width: 50px;
+            text-align: right;
+            color: #1E3A5F;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-item input {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .demo-output {
+            background: white;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            min-height: 50px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #0D9488 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        canvas {
+            margin: 15px 0;
+        }
+
+        .lattice-container {
+            background: white;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        #latticeCanvas {
+            display: block;
+            margin: 15px auto;
+            max-width: 100%;
+        }
+
+        .lattice-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .legend-color.frequent {
+            background: #10B981;
+        }
+
+        .legend-color.infrequent {
+            background: #EF4444;
+        }
+
+        .legend-color.maximal {
+            border: 3px solid #8B5CF6;
+        }
+
+        .itemset-list {
+            background: white;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .itemset-list h4 {
+            color: #1E3A5F;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .itemset {
+            background: #F8FAFC;
+            border-left: 3px solid #0D9488;
+            padding: 10px 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        footer {
+            background: #1E3A5F;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .footer-title {
+            color: #F59E0B;
+            font-weight: 700;
+        }
+
+        .footer-subtitle {
+            color: #94A3B8;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="header-bar"></div>
+            <div class="header-bar-2"></div>
+            <div class="header-content">
+                <div>
+                    <div class="header-title">LINFO2364</div>
+                    <div class="header-subtitle">Mining Patterns in Data</div>
+                </div>
+                <a href="index.html" class="header-link">← Accueil</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">🏠 Accueil → Chapitre 4 — Patterns Compressés et Contraintes</div>
+
+        <!-- Section 1: Le Problème de l'Explosion de Patterns -->
+        <div class="section">
+            <h2>Section 1: Le Problème de l'Explosion de Patterns</h2>
+
+            <div class="explain-intro">
+                <span class="badge">C'est quoi le problème ?</span>
+                <p><strong>Analogie du restaurant:</strong> Imagine un menu de restaurant avec 20 plats. Il y a 2^20 = plus d'un million de combinaisons possibles. Si tu veux trouver toutes les combinaisons que les gens commandent souvent, tu te retrouves submergé de résultats !</p>
+                <p style="margin-top: 15px;"><strong>En data mining:</strong> Avec 1000 items et un seuil de support minSupp = 0.1, on peut se retrouver avec <strong>des millions de patterns fréquents</strong> ! C'est impossible à exploiter manuellement.</p>
+                <p style="margin-top: 15px;"><strong>Le problème central:</strong> Trop de patterns = pas d'insight utile. On noie l'utilisateur dans un flot de résultats sans valeur.</p>
+            </div>
+
+            <div class="emoji-flow">
+                <div class="emoji-item">
+                    <span class="emoji">📊</span>
+                    <span class="label">Données</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="emoji-item">
+                    <span class="emoji">🌊</span>
+                    <span class="label">Flood de patterns</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="emoji-item">
+                    <span class="emoji">🎯</span>
+                    <span class="label">Contraintes</span>
+                </div>
+                <div class="arrow">→</div>
+                <div class="emoji-item">
+                    <span class="emoji">✅</span>
+                    <span class="label">Patterns utiles</span>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="label">Scénario</div>
+                    <div class="number">1M+</div>
+                    <div class="label">patterns fréquents possible</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Items dans la BD</div>
+                    <div class="number">1000</div>
+                    <div class="label">items typique</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Support minimal</div>
+                    <div class="number">0.1</div>
+                    <div class="label">10% des transactions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Types de Contraintes -->
+        <div class="section">
+            <h2>Section 2: Types de Contraintes</h2>
+
+            <p style="margin-bottom: 20px;">Il existe plusieurs catégories de contraintes pour canaliser la recherche de patterns :</p>
+
+            <div class="theory-box">
+                <h4>1. Contraintes de type de connaissance</h4>
+                <p>Quel type de pattern recherche-t-on ? Associations ? Clusters ? Classifications ? Règles ?</p>
+            </div>
+
+            <div class="theory-box">
+                <h4>2. Contraintes de données</h4>
+                <p>Quelles données analyser ? Transactions ? Séquences ? Graphes ? Images ?</p>
+            </div>
+
+            <div class="theory-box">
+                <h4>3. Contraintes de dimension/niveau</h4>
+                <p>Quel niveau d'abstraction ? Détail produit ou catégorie ? Jour ou semaine ? Client ou segment ?</p>
+            </div>
+
+            <div class="theory-box">
+                <h4>4. Contraintes d'intérêt (Interestingness)</h4>
+                <p>Seuils sur les métriques : support ≥ 0.3, confidence ≥ 0.8, lift > 1.2, etc.</p>
+            </div>
+
+            <div class="theory-box">
+                <h4>5. Contraintes de règle/pattern</h4>
+                <p>Forme des patterns : min/max nombre d'items, contient certains items, valeur totale ≥ seuil, etc.</p>
+            </div>
+
+            <h3>Exemple réel de contraintes combinées</h3>
+            <div class="constraint-example">
+Je veux des <strong>règles d'association</strong> avec :<br>
+• <strong>support</strong> ≥ 20%<br>
+• <strong>confidence</strong> ≥ 70%<br>
+• <strong>au moins 2 items</strong> côté gauche (antécédent)<br>
+• Entre <strong>produits alimentaires</strong> uniquement<br>
+• Excluant <strong>promotions saisonnières</strong>
+            </div>
+        </div>
+
+        <!-- Section 3: Propriétés des Contraintes -->
+        <div class="section">
+            <h2>Section 3: Propriétés des Contraintes</h2>
+
+            <p style="margin-bottom: 20px;">Les contraintes possèdent des propriétés mathématiques qui permettent de les exploiter efficacement :</p>
+
+            <h3>Anti-monotone (Pruning efficace)</h3>
+            <div class="math-block">
+                <div style="text-align: center; margin: 10px 0;">
+                    Si <code>I</code> viole <code>C</code>, alors tous les super-ensembles de <code>I</code> violent aussi <code>C</code>
+                </div>
+                <p><strong>Exemple :</strong> support ≥ minSupp est anti-monotone. Si {A,B} est infréquent, alors {A,B,C} l'est aussi. Permet l'élagage (pruning) en Apriori.</p>
+            </div>
+
+            <h3>Monotone (Extension garantie)</h3>
+            <div class="math-block">
+                <div style="text-align: center; margin: 10px 0;">
+                    Si <code>I</code> satisfait <code>C</code>, alors tous les super-ensembles de <code>I</code> satisfont aussi <code>C</code>
+                </div>
+                <p><strong>Exemple :</strong> "contient l'item 'bread'" est monotone. Si {bread, milk} satisfait, alors {bread, milk, butter} le satisfait aussi.</p>
+            </div>
+
+            <h3>Succincte (Calcul direct)</h3>
+            <div class="math-block">
+                <p>Une contrainte est succincte si on peut la vérifier exactement à partir de la contrainte seule, sans accès à la base de données.</p>
+                <p><strong>Exemple :</strong> "commence par l'item X" est succincte.</p>
+            </div>
+
+            <h3>Classification des contraintes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contrainte</th>
+                        <th>Propriété</th>
+                        <th>Application</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>support ≥ min_supp</td>
+                        <td>Anti-monotone</td>
+                        <td>Élagage Apriori</td>
+                    </tr>
+                    <tr>
+                        <td>min_profit ≥ δ</td>
+                        <td>Anti-monotone</td>
+                        <td>Profit mining</td>
+                    </tr>
+                    <tr>
+                        <td>contient 'bread'</td>
+                        <td>Monotone</td>
+                        <td>Filtrage après recherche</td>
+                    </tr>
+                    <tr>
+                        <td>sum(price) ≥ v</td>
+                        <td>Convertible</td>
+                        <td>Optimisation hybride</td>
+                    </tr>
+                    <tr>
+                        <td>max_items = 3</td>
+                        <td>Succincte</td>
+                        <td>Limitation de taille</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>DÉMO INTERACTIVE 1: Impact des Contraintes</h3>
+            <div class="demo-container">
+                <div class="demo-title">
+                    <span class="icon">1</span>
+                    Visualisation de l'impact des contraintes sur le nombre de patterns
+                </div>
+
+                <div class="control-group">
+                    <label>Support minimal</label>
+                    <div class="slider-container">
+                        <input type="range" id="minSupport" min="0" max="10" value="3" step="1">
+                        <span class="value-display"><span id="minSupportVal">3</span>/10 transactions</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Taille maximale d'itemset</label>
+                    <div class="slider-container">
+                        <input type="range" id="maxSize" min="1" max="5" value="5" step="1">
+                        <span class="value-display">Max: <span id="maxSizeVal">5</span> items</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Contraintes supplémentaires</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mustContainA" name="mustContainA">
+                            <label for="mustContainA">Doit contenir A</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mustNotE" name="mustNotE">
+                            <label for="mustNotE">Ne doit pas contenir E</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="minItems2" name="minItems2">
+                            <label for="minItems2">Min 2 items</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-output" id="demoOutput">
+                    <strong>Patterns fréquents totaux:</strong> <span id="totalPatterns">0</span><br>
+                    <strong>Patterns après contraintes:</strong> <span id="constrainedPatterns">0</span><br>
+                    <strong>Réduction:</strong> <span id="reductionPercent">0</span>%
+                </div>
+
+                <canvas id="constraintChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 4: Itemsets Maximaux Fréquents -->
+        <div class="section">
+            <h2>Section 4: Itemsets Maximaux Fréquents</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Itemsets Maximaux</span>
+                <p><strong>Analogie des boîtes emboîtées:</strong> Pense à des boîtes de différentes tailles emboîtées les unes dans les autres. Une boîte est 'maximale' si aucune boîte plus grande ne la contient ET si elle est fréquente. Ce sont les 'championnats' des patterns — les plus grands patterns fréquents qu'on puisse trouver !</p>
+            </div>
+
+            <h3>Définition mathématique</h3>
+            <div class="math-block">
+                <p style="text-align: center; font-style: italic;">
+                    Un itemset <code>I</code> est <strong>maximal fréquent</strong> si et seulement si :
+                </p>
+                <div style="text-align: center; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 14px;">
+                    support(I) ≥ minSupp   ET   ∀J ⊃ I, support(J) < minSupp
+                </div>
+                <p>En d'autres termes : <code>I</code> est fréquent ET tous ses sur-ensembles sont infréquents.</p>
+            </div>
+
+            <h3>Avantages et inconvénients</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Détail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>✅ Avantage</strong></td>
+                        <td>Représentation très compacte de tous les itemsets fréquents</td>
+                    </tr>
+                    <tr>
+                        <td><strong>✅ Avantage</strong></td>
+                        <td>Peut réduire de 99% le nombre de patterns à stocker</td>
+                    </tr>
+                    <tr>
+                        <td><strong>❌ Inconvénient</strong></td>
+                        <td>Impossible de retrouver le support exact d'un sous-itemset</td>
+                    </tr>
+                    <tr>
+                        <td><strong>❌ Inconvénient</strong></td>
+                        <td>Nécessite une étape supplémentaire pour récupérer tous les itemsets</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>DÉMO INTERACTIVE 2: Lattice des Itemsets Maximaux</h3>
+            <div class="demo-container">
+                <div class="demo-title">
+                    <span class="icon">2</span>
+                    Visualisation du lattice avec itemsets maximaux
+                </div>
+
+                <p style="margin-bottom: 15px; color: #4B5563; font-size: 14px;">
+                    Ajuste le support minimal pour voir quels itemsets deviennent fréquents/infréquents et lesquels sont maximaux.
+                </p>
+
+                <div class="control-group">
+                    <label>Support minimal</label>
+                    <div class="slider-container">
+                        <input type="range" id="maximalMinSupp" min="1" max="5" value="2" step="1">
+                        <span class="value-display"><span id="maximalMinSuppVal">2</span>/5 transactions</span>
+                    </div>
+                </div>
+
+                <div class="lattice-container">
+                    <canvas id="latticeCanvas" width="600" height="400"></canvas>
+                    <div class="lattice-legend">
+                        <div class="legend-item">
+                            <div class="legend-color frequent"></div>
+                            <span>Fréquent</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color infrequent"></div>
+                            <span>Infréquent</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color maximal"></div>
+                            <span>Maximal fréquent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="itemset-list">
+                    <h4>Itemsets fréquents:</h4>
+                    <div id="frequentItemsets"></div>
+                </div>
+
+                <div class="itemset-list">
+                    <h4>Itemsets maximaux fréquents:</h4>
+                    <div id="maximalItemsets"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Itemsets Fermés Fréquents -->
+        <div class="section">
+            <h2>Section 5: Itemsets Fermés Fréquents</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Itemsets Fermés</span>
+                <p><strong>Analogie du groupe d'amis:</strong> Un itemset fermé est l'itemset 'le plus grand' possible sans perdre de transactions. C'est comme chercher le groupe d'amis qui se retrouvent TOUJOURS ensemble — ajouter une autre personne casserait la règle. Si tu ajoutes quelqu'un d'autre, tu perds des amis du groupe original.</p>
+            </div>
+
+            <h3>Définition mathématique</h3>
+            <div class="math-block">
+                <p style="text-align: center; font-style: italic;">
+                    Un itemset <code>I</code> est <strong>fermé</strong> si et seulement si :
+                </p>
+                <div style="text-align: center; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 14px;">
+                    ∀J ⊃ I, support(J) < support(I)
+                </div>
+                <p>En d'autres termes : aucun sur-ensemble n'a le même support.</p>
+            </div>
+
+            <h3>Opérateur de clôture (Closure)</h3>
+            <div class="math-block">
+                <div style="text-align: center; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 14px;">
+                    closure(I) = {i ∈ Items | ∀τ ∈ cover(I), i ∈ τ}
+                </div>
+                <p>La clôture de <code>I</code> est l'ensemble des items qui apparaissent dans TOUTES les transactions contenant <code>I</code>.</p>
+            </div>
+
+            <h3>Exemple concret</h3>
+            <div class="constraint-example">
+Transactions (BD simple avec 4 transactions):<br>
+T1 = {A, B, C}<br>
+T2 = {A, B}<br>
+T3 = {A, B, C}<br>
+T4 = {A, B}<br><br>
+<strong>Analyse:</strong><br>
+• cover({A}) = {T1, T2, T3, T4}<br>
+• closure({A}) = {A, B} (car B apparaît dans TOUTES les transactions avec A)<br>
+• support({A}) = 4<br>
+• support({A,B}) = 4<br><br>
+<strong>Conclusion:</strong> {A} est NOT fermé (support({A}) = support({A,B}))<br>
+{A,B} EST fermé (support({A,B}) > support de ses sur-ensembles)
+            </div>
+
+            <h3>Hiérarchie des itemsets</h3>
+            <div class="constraint-example" style="text-align: center; font-family: Arial, sans-serif;">
+                <strong>Tous les itemsets fréquents ⊇ Itemsets fermés fréquents ⊇ Itemsets maximaux fréquents</strong><br><br>
+                <span style="font-size: 12px; color: #666;">
+                    (chaque niveau inférieur est un sous-ensemble du niveau supérieur)
+                </span>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 3: Calculateur de Clôture</h3>
+            <div class="demo-container">
+                <div class="demo-title">
+                    <span class="icon">3</span>
+                    Calcule la clôture et vérifie si un itemset est fermé
+                </div>
+
+                <p style="margin-bottom: 15px; color: #4B5563; font-size: 14px;">
+                    Sélectionne un itemset pour voir sa clôture et vérifier sa propriété.
+                </p>
+
+                <div class="control-group">
+                    <label>Sélectionne des items:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="closureA" name="closureItems" value="A">
+                            <label for="closureA">A</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="closureB" name="closureItems" value="B">
+                            <label for="closureB">B</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="closureC" name="closureItems" value="C">
+                            <label for="closureC">C</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="closureD" name="closureItems" value="D">
+                            <label for="closureD">D</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-output" id="closureOutput" style="min-height: 120px;">
+                    <p><strong>Itemset sélectionné:</strong> (aucun)</p>
+                    <p><strong>Transactions contenant cet itemset:</strong> -</p>
+                    <p><strong>Clôture:</strong> -</p>
+                    <p><strong>Support:</strong> -</p>
+                    <p><strong>Fermé ?</strong> -</p>
+                </div>
+            </div>
+
+            <h3>Récapitulatif: Tous vs Fermés vs Maximaux</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Tous les fréquents</th>
+                        <th>Fermés fréquents</th>
+                        <th>Maximaux fréquents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Nombre</strong></td>
+                        <td>Très grand (millions)</td>
+                        <td>Moyen (centaines)</td>
+                        <td>Petit (dizaines)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Info conservée</strong></td>
+                        <td>Support exact</td>
+                        <td>Support exact</td>
+                        <td>Pas d'info de support</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cas d'usage</strong></td>
+                        <td>Analyse détaillée</td>
+                        <td>Bonne compression</td>
+                        <td>Vue synthétique</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 6: Résumé -->
+        <div class="section">
+            <h2>Section 6: Résumé et Points-Clés</h2>
+
+            <div class="explain-intro">
+                <span class="badge">À retenir</span>
+                <p><strong>🎯 Objectif des contraintes:</strong> Transforme la masse de patterns en résultats exploitables par l'utilisateur.</p>
+                <p><strong>🔑 Trois niveaux de compression:</strong></p>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Tous les itemsets fréquents (complet mais énorme)</li>
+                    <li>Itemsets fermés fréquents (compression modérée, support conservé)</li>
+                    <li>Itemsets maximaux fréquents (compression extrême)</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>💡 Clé:</strong> Les propriétés des contraintes (anti-monotone, monotone, succincte) permettent d'optimiser les algorithmes de recherche.</p>
+            </div>
+
+            <h3>Algorithmes associés</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithme</th>
+                        <th>Objectif</th>
+                        <th>Specialité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Apriori</td>
+                        <td>Tous les itemsets fréquents</td>
+                        <td>Utilise anti-monotonie du support</td>
+                    </tr>
+                    <tr>
+                        <td>CLOSET</td>
+                        <td>Itemsets fermés fréquents</td>
+                        <td>Représentation compressée</td>
+                    </tr>
+                    <tr>
+                        <td>MaxMiner</td>
+                        <td>Itemsets maximaux fréquents</td>
+                        <td>Vue simplifiée</td>
+                    </tr>
+                    <tr>
+                        <td>ConApriori</td>
+                        <td>Patterns avec contraintes</td>
+                        <td>Élagage intelligent</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="footer-subtitle">Prof. Hélène Verhaeghe · UCLouvain · 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        // Demo 1: Impact des Contraintes
+        const txData = [
+            {id: 'T1', items: ['A', 'B', 'C']},
+            {id: 'T2', items: ['A', 'C']},
+            {id: 'T3', items: ['A', 'B', 'C', 'D']},
+            {id: 'T4', items: ['B', 'C', 'D']},
+            {id: 'T5', items: ['A', 'B', 'C']},
+            {id: 'T6', items: ['B', 'D', 'E']},
+            {id: 'T7', items: ['A', 'B']},
+            {id: 'T8', items: ['B', 'C']},
+            {id: 'T9', items: ['A', 'C', 'E']},
+            {id: 'T10', items: ['A', 'B', 'C', 'D']}
+        ];
+
+        function generateSubsets(items) {
+            const result = [];
+            for (let i = 1; i < (1 << items.length); i++) {
+                const subset = [];
+                for (let j = 0; j < items.length; j++) {
+                    if (i & (1 << j)) subset.push(items[j]);
+                }
+                result.push(subset);
+            }
+            return result;
+        }
+
+        function calculateSupport(itemset, txData) {
+            let count = 0;
+            txData.forEach(tx => {
+                if (itemset.every(item => tx.items.includes(item))) count++;
+            });
+            return count / txData.length;
+        }
+
+        function updateConstraintDemo() {
+            const minSupp = parseFloat(document.getElementById('minSupport').value) / 10;
+            const maxSize = parseInt(document.getElementById('maxSize').value);
+            const mustContainA = document.getElementById('mustContainA').checked;
+            const mustNotE = document.getElementById('mustNotE').checked;
+            const minItems2 = document.getElementById('minItems2').checked;
+
+            document.getElementById('minSupportVal').textContent = document.getElementById('minSupport').value;
+            document.getElementById('maxSizeVal').textContent = maxSize;
+
+            const allItems = ['A', 'B', 'C', 'D', 'E'];
+            const allSubsets = generateSubsets(allItems).filter(s => s.length <= maxSize);
+
+            let frequent = allSubsets.filter(s => calculateSupport(s, txData) >= minSupp);
+            let constrained = frequent.filter(s => {
+                if (mustContainA && !s.includes('A')) return false;
+                if (mustNotE && s.includes('E')) return false;
+                if (minItems2 && s.length < 2) return false;
+                return true;
+            });
+
+            const total = frequent.length;
+            const final = constrained.length;
+            const reduction = total > 0 ? Math.round(100 * (1 - final / total)) : 0;
+
+            document.getElementById('totalPatterns').textContent = total;
+            document.getElementById('constrainedPatterns').textContent = final;
+            document.getElementById('reductionPercent').textContent = reduction;
+
+            updateConstraintChart(frequent.length, constrained.length);
+        }
+
+        let constraintChart = null;
+        function updateConstraintChart(freq, cons) {
+            const ctx = document.getElementById('constraintChart').getContext('2d');
+            if (constraintChart) constraintChart.destroy();
+
+            constraintChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Patterns trouvés', 'Après contraintes'],
+                    datasets: [{
+                        label: 'Nombre de patterns',
+                        data: [freq, cons],
+                        backgroundColor: ['#F59E0B', '#0D9488'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+        }
+
+        document.getElementById('minSupport').addEventListener('input', updateConstraintDemo);
+        document.getElementById('maxSize').addEventListener('input', updateConstraintDemo);
+        document.getElementById('mustContainA').addEventListener('change', updateConstraintDemo);
+        document.getElementById('mustNotE').addEventListener('change', updateConstraintDemo);
+        document.getElementById('minItems2').addEventListener('change', updateConstraintDemo);
+
+        // Demo 2: Lattice des Itemsets Maximaux
+        const latticeData = {
+            1: { A: {support: 0.8}, B: {support: 0.7}, C: {support: 0.6}, D: {support: 0.5} },
+            2: { 'AB': {support: 0.7}, 'AC': {support: 0.5}, 'BC': {support: 0.5}, 'AD': {support: 0.4}, 'BD': {support: 0.4} },
+            3: { 'ABC': {support: 0.4}, 'ABD': {support: 0.3} },
+            4: { 'ABCD': {support: 0.2} }
+        };
+
+        function drawLattice(minSupp) {
+            const canvas = document.getElementById('latticeCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const items = ['∅', 'A', 'B', 'C', 'D', 'AB', 'AC', 'BC', 'AD', 'BD', 'ABC', 'ABD'];
+            const supports = [1, 0.8, 0.7, 0.6, 0.5, 0.7, 0.5, 0.5, 0.4, 0.4, 0.4, 0.3];
+
+            const positions = {
+                '∅': {x: 300, y: 30},
+                'A': {x: 100, y: 100}, 'B': {x: 200, y: 100}, 'C': {x: 300, y: 100}, 'D': {x: 400, y: 100},
+                'AB': {x: 80, y: 180}, 'AC': {x: 160, y: 180}, 'BC': {x: 240, y: 180}, 'AD': {x: 320, y: 180}, 'BD': {x: 400, y: 180},
+                'ABC': {x: 120, y: 260}, 'ABD': {x: 280, y: 260}
+            };
+
+            const threshold = minSupp / 5;
+            const frequent = new Set();
+            const maximal = new Set();
+
+            items.forEach((item, i) => {
+                if (supports[i] >= threshold) frequent.add(item);
+            });
+
+            frequent.forEach(item => {
+                let isMaximal = true;
+                items.forEach(other => {
+                    if (other !== item && frequent.has(other) && other.includes(item) && other.length > item.length) {
+                        isMaximal = false;
+                    }
+                });
+                if (isMaximal) maximal.add(item);
+            });
+
+            items.forEach(item => {
+                if (!positions[item]) return;
+                const pos = positions[item];
+                const isFreq = frequent.has(item);
+
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 20, 0, 2 * Math.PI);
+                if (maximal.has(item)) {
+                    ctx.strokeStyle = '#8B5CF6';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+                ctx.fillStyle = isFreq ? '#10B981' : '#EF4444';
+                ctx.fill();
+
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item, pos.x, pos.y);
+            });
+
+            updateFrequentItemsets(Array.from(frequent).sort(), supports, items);
+            updateMaximalItemsets(Array.from(maximal).sort());
+        }
+
+        function updateFrequentItemsets(items, supports, allItems) {
+            const div = document.getElementById('frequentItemsets');
+            div.innerHTML = items.map(item => {
+                const idx = allItems.indexOf(item);
+                return `<div class="itemset">{${item}} — support: ${(supports[idx] * 100).toFixed(0)}%</div>`;
+            }).join('');
+        }
+
+        function updateMaximalItemsets(items) {
+            const div = document.getElementById('maximalItemsets');
+            div.innerHTML = items.length > 0
+                ? items.map(item => `<div class="itemset">{${item}}</div>`).join('')
+                : '<div style="color: #999; padding: 10px;">Aucun itemset maximal pour ce seuil</div>';
+        }
+
+        document.getElementById('maximalMinSupp').addEventListener('input', (e) => {
+            document.getElementById('maximalMinSuppVal').textContent = e.target.value;
+            drawLattice(parseInt(e.target.value));
+        });
+
+        // Demo 3: Calculateur de Clôture
+        const closureData = {
+            T1: new Set(['A', 'B', 'C']),
+            T2: new Set(['A', 'B']),
+            T3: new Set(['A', 'B', 'C']),
+            T4: new Set(['A', 'B'])
+        };
+
+        function updateClosureDemo() {
+            const selected = Array.from(document.querySelectorAll('input[name="closureItems"]:checked')).map(x => x.value);
+
+            if (selected.length === 0) {
+                document.getElementById('closureOutput').innerHTML = `
+                    <p><strong>Itemset sélectionné:</strong> (aucun)</p>
+                    <p><strong>Transactions contenant cet itemset:</strong> -</p>
+                    <p><strong>Clôture:</strong> -</p>
+                    <p><strong>Support:</strong> -</p>
+                    <p><strong>Fermé ?</strong> -</p>
+                `;
+                return;
+            }
+
+            const selectedSet = new Set(selected);
+            const cover = Object.entries(closureData)
+                .filter(([_, items]) => selected.every(s => items.has(s)))
+                .map(x => x[0]);
+
+            const closure = new Set();
+            ['A', 'B', 'C', 'D'].forEach(item => {
+                if (cover.every(tx => closureData[tx].has(item))) {
+                    closure.add(item);
+                }
+            });
+
+            const support = cover.length / Object.keys(closureData).length;
+            const closureSupport = cover.length > 0
+                ? Object.values(closureData).filter(items => Array.from(closure).every(c => items.has(c))).length / Object.keys(closureData).length
+                : 0;
+
+            const isClosed = support === closureSupport || closure.size === selectedSet.size;
+
+            document.getElementById('closureOutput').innerHTML = `
+                <p><strong>Itemset sélectionné:</strong> {${selected.join(', ')}}</p>
+                <p><strong>Transactions contenant cet itemset:</strong> ${cover.join(', ') || 'aucune'}</p>
+                <p><strong>Clôture:</strong> {${Array.from(closure).sort().join(', ') || 'vide'}}</p>
+                <p><strong>Support itemset:</strong> ${(support * 100).toFixed(0)}% | <strong>Support clôture:</strong> ${(closureSupport * 100).toFixed(0)}%</p>
+                <p><strong>Fermé ?</strong> <strong style="color: ${isClosed ? '#10B981' : '#EF4444'}">${isClosed ? 'OUI ✓' : 'NON ✗'}</strong></p>
+            `;
+        }
+
+        document.querySelectorAll('input[name="closureItems"]').forEach(el => {
+            el.addEventListener('change', updateClosureDemo);
+        });
+
+        // Initialize
+        updateConstraintDemo();
+        drawLattice(2);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 1: Introduction - LINFO2364</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+            --white: #FFFFFF;
+            --gray: #64748B;
+            --text-dark: #1F2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--navy);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .header-stripe {
+            width: 6px;
+            background: var(--amber);
+            flex-shrink: 0;
+        }
+
+        .header-stripe-teal {
+            width: 4px;
+            background: var(--teal);
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .header-content {
+            padding: 16px 20px;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title div:first-child {
+            color: var(--amber);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-title div:last-child {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--amber);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb a {
+            color: var(--teal);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--navy);
+        }
+
+        .page-title {
+            color: var(--navy);
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: var(--gray);
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid var(--amber);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.7;
+        }
+
+        .explain-intro p {
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .explain-intro p:last-child {
+            margin-bottom: 0;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid var(--teal);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box {
+            background: var(--light);
+            border-left: 4px solid var(--navy);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .section {
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .section h2 {
+            color: var(--navy);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2::before {
+            content: '';
+            width: 4px;
+            height: 30px;
+            background: var(--teal);
+            border-radius: 2px;
+        }
+
+        .section h3 {
+            color: var(--navy);
+            font-size: 20px;
+            font-weight: 700;
+            margin: 25px 0 15px 0;
+        }
+
+        .section p {
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            font-size: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            background: #F8F9FA;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .icon-item:hover {
+            background: var(--light);
+            transform: translateY(-5px);
+        }
+
+        .icon-item .emoji {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .icon-item .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--navy);
+            line-height: 1.4;
+        }
+
+        .data-types-explorer {
+            margin: 25px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .data-type-button {
+            background: white;
+            border: 2px solid #E5E7EB;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--navy);
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .data-type-button:hover,
+        .data-type-button.active {
+            background: var(--teal);
+            color: white;
+            border-color: var(--teal);
+        }
+
+        .data-type-content {
+            background: #F8F9FA;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .data-type-content.active {
+            display: block;
+        }
+
+        .data-type-content h4 {
+            color: var(--navy);
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .data-type-content .example {
+            background: white;
+            padding: 15px;
+            border-left: 3px solid var(--amber);
+            border-radius: 5px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 14px;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .challenge-card {
+            background: linear-gradient(135deg, var(--white) 0%, #F3F4F6 100%);
+            border-radius: 14px;
+            padding: 25px;
+            border-left: 5px solid transparent;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .challenge-card:nth-child(1) {
+            border-left-color: var(--amber);
+        }
+
+        .challenge-card:nth-child(2) {
+            border-left-color: var(--teal);
+        }
+
+        .challenge-card:nth-child(3) {
+            border-left-color: var(--navy);
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .challenge-emoji {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .challenge-card h3 {
+            color: var(--navy);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .challenge-card p {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .formula-label {
+            font-weight: 700;
+            color: var(--navy);
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .math-formula {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        .symbol-table {
+            font-size: 13px;
+            margin: 15px 0;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .symbol-table-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .symbol-table-row:last-child {
+            border-bottom: none;
+        }
+
+        .symbol-table code {
+            font-family: 'Courier New', monospace;
+            background: #F9FAFB;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--teal);
+        }
+
+        .example-box {
+            background: #F0FDF4;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--teal);
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .example-box strong {
+            color: var(--navy);
+        }
+
+        .timeline-course {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .timeline-course::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), var(--amber));
+            z-index: -1;
+        }
+
+        .timeline-step {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .timeline-step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--teal);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto 10px;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
+        }
+
+        .timeline-step-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pending-math {
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+
+        footer .footer-title {
+            color: var(--amber);
+            font-weight: 700;
+        }
+
+        footer .footer-info {
+            color: #94A3B8;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 28px;
+            }
+
+            .icon-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .timeline-course::before {
+                display: none;
+            }
+
+            .data-types-explorer {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <div class="header-stripe"></div>
+            <div class="header-stripe-teal"></div>
+            <div class="header-content">
+                <div class="header-title">
+                    <div>LINFO2364</div>
+                    <div>Mining Patterns in Data</div>
+                </div>
+                <nav>
+                    <a href="index.html">← Accueil</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="breadcrumb">
+            <a href="index.html">🏠 Accueil</a>
+            <span>→</span>
+            <span>Introduction</span>
+        </div>
+
+        <h1 class="page-title">Chapitre 1: Introduction au Data Mining</h1>
+        <p class="page-subtitle">Fondamentaux, concepts et défis du mining de patterns</p>
+
+        <!-- Section 1: C'est quoi le Data Mining -->
+        <section class="section">
+            <h2>C'est quoi le Data Mining ?</h2>
+
+            <div class="explain-intro">
+                <p>
+                    <strong>Imaginez ceci :</strong> Vous travaillez dans un supermarché depuis 10 ans et vous avez accès à
+                    <strong>un million de tickets de caisse</strong>. Vous pouvez voir ce que chaque client a acheté, quand, et
+                    combien il a payé. Mais avec autant de données, comment découvrir des patterns utiles ? C'est là que le
+                    data mining intervient. Au lieu de regarder chaque ticket individuellement (ce qui prendrait une vie !),
+                    le data mining automatise la découverte de patterns cachés.
+                </p>
+                <p>
+                    Par exemple, vous pourriez découvrir que "89% des clients qui achètent du beurre achètent aussi du pain",
+                    ou que "les ventes de crème glacée augmentent les jours chauds". Ces insights ne sont pas évidents à première
+                    vue, mais une fois découverts, ils deviennent extrêmement précieux pour les décisions commerciales.
+                </p>
+            </div>
+
+            <h3>Le processus en un coup d'œil</h3>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <span class="emoji">📦</span>
+                    <div class="label">Données brutes</div>
+                </div>
+                <div class="icon-item">
+                    <span class="emoji">🔍</span>
+                    <div class="label">Analyse</div>
+                </div>
+                <div class="icon-item">
+                    <span class="emoji">💡</span>
+                    <div class="label">Patterns</div>
+                </div>
+                <div class="icon-item">
+                    <span class="emoji">🎯</span>
+                    <div class="label">Connaissance</div>
+                </div>
+            </div>
+
+            <h3>Définition formelle</h3>
+            <div class="theory-box">
+                <p>
+                    <strong>Data Mining</strong> est le processus de découverte de patterns intéressants, modèles et autres
+                    formes de connaissance dans de larges ensembles de données.
+                </p>
+                <p style="margin-top: 15px; font-size: 13px; color: var(--gray);">
+                    Synonymes : Knowledge Discovery in Databases (KDD), pattern discovery, knowledge extraction, data analytics
+                </p>
+            </div>
+
+            <h3>D'autres noms pour le même concept</h3>
+            <p>
+                Vous rencontrerez souvent ces termes utilisés de manière interchangeable :
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li><strong>KDD (Knowledge Discovery in Databases)</strong> - le processus complet incluant nettoyage et préparation</li>
+                <li><strong>Pattern Discovery</strong> - découverte spécifique de patterns</li>
+                <li><strong>Knowledge Extraction</strong> - extraction de connaissance</li>
+                <li><strong>Data Analytics</strong> - analyse statistique et patterns</li>
+                <li><strong>Business Intelligence</strong> - application pratique aux décisions</li>
+            </ul>
+        </section>
+
+        <!-- Section 2: Types de données -->
+        <section class="section">
+            <h2>Types de données</h2>
+
+            <div class="explain-intro">
+                <p>
+                    Le data mining s'applique à tous les types de données. Avant de pouvoir miner efficacement, il faut
+                    d'abord comprendre <strong>comment les données sont organisées</strong>. Les techniques que nous utilisons
+                    dépendent fortement du type de données avec lequel nous travaillons.
+                </p>
+            </div>
+
+            <h3>Explorateur interactif</h3>
+            <p>Cliquez sur un type de données pour voir des exemples concrets :</p>
+
+            <div class="data-types-explorer">
+                <button class="data-type-button active" onclick="showDataType(0)">📊 Structurées</button>
+                <button class="data-type-button" onclick="showDataType(1)">📁 Semi-structurées</button>
+                <button class="data-type-button" onclick="showDataType(2)">📄 Non-structurées</button>
+            </div>
+
+            <div id="structured" class="data-type-content active">
+                <h4>Données Structurées</h4>
+                <p>
+                    Les données structurées sont organisées dans un format prédéfini, généralement des bases de données
+                    relationnelles avec des lignes et des colonnes.
+                </p>
+                <p style="margin-top: 12px;"><strong>Caractéristiques :</strong></p>
+                <ul style="margin-left: 20px; font-size: 14px;">
+                    <li>Schéma fixe et défini</li>
+                    <li>Faciles à interroger et analyser</li>
+                    <li>Format: Tableau (lignes × colonnes)</li>
+                </ul>
+                <div class="example">
+ID | Client  | Article    | Quantité | Prix
+---|---------|------------|----------|------
+1  | Dupont  | Pain       | 2        | 2.50
+2  | Dupont  | Beurre     | 1        | 4.20
+3  | Martin  | Lait       | 2        | 1.80
+                </div>
+            </div>
+
+            <div id="semistructured" class="data-type-content">
+                <h4>Données Semi-Structurées</h4>
+                <p>
+                    Les données semi-structurées ont une structure partielle mais flexible. On y trouve :
+                </p>
+
+                <h4 style="margin-top: 20px; font-size: 16px;">🛒 Bases de données transactionnelles</h4>
+                <p>
+                    Chaque transaction = ensemble d'items. C'est la base du frequent itemset mining.
+                </p>
+                <div class="example">
+Transaction T1: {Lait, Pain, Beurre}
+Transaction T2: {Pain, Œufs}
+Transaction T3: {Beurre, Lait, Œufs, Crème}
+                </div>
+
+                <h4 style="margin-top: 20px; font-size: 16px;">⏱️ Bases de données de séquences</h4>
+                <p>
+                    Les transactions sont ordonnées dans le temps. Ordre = important.
+                </p>
+                <div class="example">
+Séquence S1: &lt;{Lait}, {Pain, Beurre}, {Œufs}&gt;
+Séquence S2: &lt;{Pain}, {Lait}, {Crème}&gt;
+Où chaque {} = items achetés au même moment
+                </div>
+
+                <h4 style="margin-top: 20px; font-size: 16px;">🌐 Graphes</h4>
+                <p>
+                    Nœuds (nodes) connectés par des arêtes (edges). Exemples : réseaux sociaux, molécules chimiques.
+                </p>
+                <div class="example">
+Alice --amie--> Bob --amie--> Charlie
+ |
+ amie
+ |
+David
+                </div>
+            </div>
+
+            <div id="unstructured" class="data-type-content">
+                <h4>Données Non-Structurées</h4>
+                <p>
+                    Les données non-structurées n'ont pas de format prédéfini. Elles nécessitent un traitement préalable
+                    pour les convertir en format analysable.
+                </p>
+                <p style="margin-top: 12px;"><strong>Types courants :</strong></p>
+                <ul style="margin-left: 20px; font-size: 14px;">
+                    <li><strong>Texte :</strong> Emails, articles, commentaires clients</li>
+                    <li><strong>Images :</strong> Photos, radiographies, images satellite</li>
+                    <li><strong>Vidéo :</strong> Films, streams, surveillance</li>
+                    <li><strong>Audio :</strong> Appels, musique, podcasts</li>
+                </ul>
+                <div class="example">
+"Je suis allé au supermarché aujourd'hui et j'ai trouvé
+une promotion incroyable sur le pain. Le beurre était
+aussi en solde. J'ai acheté deux pains et du beurre!"
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px;">Types de données et techniques de mining</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Type de données</th>
+                        <th>Format</th>
+                        <th>Techniques applicables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Structurées</strong></td>
+                        <td>Tableau (lignes × colonnes)</td>
+                        <td>Classification, clustering, association rules</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transactionnelles</strong></td>
+                        <td>Ensembles d'items par transaction</td>
+                        <td>Frequent itemset mining, association rules</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Séquentielles</strong></td>
+                        <td>Séquences ordonnées dans le temps</td>
+                        <td>Sequence mining, pattern temporal</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Graphes</strong></td>
+                        <td>Nœuds + arêtes</td>
+                        <td>Graph mining, sous-graphes fréquents</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Non-structurées</strong></td>
+                        <td>Texte, images, vidéo</td>
+                        <td>NLP, computer vision, clustering</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <script>
+                function showDataType(index) {
+                    const types = ['structured', 'semistructured', 'unstructured'];
+                    const buttons = document.querySelectorAll('.data-type-button');
+                    const contents = document.querySelectorAll('.data-type-content');
+
+                    buttons.forEach((btn, i) => {
+                        btn.classList.toggle('active', i === index);
+                    });
+
+                    contents.forEach((content, i) => {
+                        content.classList.toggle('active', i === index);
+                    });
+                }
+            </script>
+        </section>
+
+        <!-- Section 3: Types de Data Mining -->
+        <section class="section">
+            <h2>Types de Data Mining</h2>
+
+            <div class="explain-intro">
+                <p>
+                    Le data mining se divise en deux catégories principales selon l'objectif : <strong>descriptif</strong>
+                    (comprendre les données) et <strong>prédictif</strong> (prédire le futur).
+                </p>
+            </div>
+
+            <h3>Data Mining Descriptif vs Prédictif</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Objectif</th>
+                        <th>Data Mining Descriptif</th>
+                        <th>Data Mining Prédictif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>But</strong></td>
+                        <td>Décrire et comprendre les patterns existants</td>
+                        <td>Prédire des valeurs ou classes futures</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Question</strong></td>
+                        <td>"Quels sont les patterns dans ces données ?"</td>
+                        <td>"Que va-t-il se passer ensuite ?"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Techniques</strong></td>
+                        <td>
+                            • Frequent itemset mining<br>
+                            • Association rules<br>
+                            • Clustering<br>
+                            • Correlations<br>
+                            • Outlier detection
+                        </td>
+                        <td>
+                            • Classification<br>
+                            • Regression<br>
+                            • Time series forecasting<br>
+                            • Anomaly detection
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exemple</strong></td>
+                        <td>"Clients qui achètent pain → achètent beurre (89%)"</td>
+                        <td>"Ce client va probablement acheter du vin (classe: rouge)"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sortie</strong></td>
+                        <td>Patterns, rules, clusters, insights</td>
+                        <td>Prédictions, classes, scores</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 40px;">Exemples détaillés</h3>
+
+            <div class="theory-box">
+                <p>
+                    <strong>Descriptif :</strong> "Je découvre que 45% de mes clients achètent du café le lundi matin"
+                    → Insight sur le comportement existant
+                </p>
+            </div>
+
+            <div class="theory-box">
+                <p>
+                    <strong>Prédictif :</strong> "Ce client qui a regardé 5 films d'action va probablement aimer ce nouvel
+                    action movie" → Prédiction basée sur patterns appris
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: Défis du cours -->
+        <section class="section">
+            <h2>Les 3 Grands Défis du Data Mining</h2>
+
+            <p>
+                Tout le data mining se résume à répondre à trois questions fondamentales. Ce cours vous apprendra à résoudre
+                chacun de ces défis.
+            </p>
+
+            <div class="challenges-grid">
+                <div class="challenge-card">
+                    <span class="challenge-emoji">🎯</span>
+                    <h3>Définition</h3>
+                    <p>
+                        <strong>Qu'est-ce qu'un pattern pour ce type de données ?</strong>
+                    </p>
+                    <p style="margin-top: 10px; color: var(--text-dark); font-size: 13px;">
+                        Pour des transactions ? Des séquences ? Des graphes ? Comment mathématiquement définissons-nous ce qu'est
+                        un pattern "intéressant" ?
+                    </p>
+                </div>
+
+                <div class="challenge-card">
+                    <span class="challenge-emoji">⚡</span>
+                    <h3>Efficacité</h3>
+                    <p>
+                        <strong>Comment trouver les patterns efficacement ?</strong>
+                    </p>
+                    <p style="margin-top: 10px; color: var(--text-dark); font-size: 13px;">
+                        Avec un million de transactions, on ne peut pas tester tous les patterns possibles (2^n combos !).
+                        Quels algorithmes utiliser ?
+                    </p>
+                </div>
+
+                <div class="challenge-card">
+                    <span class="challenge-emoji">💎</span>
+                    <h3>Utilité</h3>
+                    <p>
+                        <strong>Comment trouver seulement les patterns UTILES ?</strong>
+                    </p>
+                    <p style="margin-top: 10px; color: var(--text-dark); font-size: 13px;">
+                        Des millions de patterns peuvent être fréquents. Comment identifier ceux qui sont vraiment
+                        intéressants pour la décision ?
+                    </p>
+                </div>
+            </div>
+
+            <div class="theory-box" style="margin-top: 30px;">
+                <p>
+                    Ces trois défis définissent la structure de ce cours. Chaque chapitre les aborde sous différents angles
+                    et pour différents types de données.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 5: Plan du cours -->
+        <section class="section">
+            <h2>Plan du cours (7 chapitres)</h2>
+
+            <p>
+                Voici comment ce cours est structuré pour vous apprendre à maîtriser le data mining progressivement :
+            </p>
+
+            <div class="timeline-course">
+                <div class="timeline-step">
+                    <div class="timeline-step-number">1</div>
+                    <div class="timeline-step-label">Intro & Types</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-step-number">2</div>
+                    <div class="timeline-step-label">FIM - Bases</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-step-number">3</div>
+                    <div class="timeline-step-label">Patterns Intéressants</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-step-number">4</div>
+                    <div class="timeline-step-label">Optimisation</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-step-number">5</div>
+                    <div class="timeline-step-label">Séquences</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-step-number">6</div>
+                    <div class="timeline-step-label">Graphes</div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-step-number">7</div>
+                    <div class="timeline-step-label">Classification</div>
+                </div>
+            </div>
+
+            <div class="theory-box" style="margin-top: 30px;">
+                <h3 style="margin-bottom: 15px;">Structure progression</h3>
+                <p>
+                    <strong>Chapitres 1-4 :</strong> Fondations. Nous apprenons à miner des itemsets fréquents à partir de données
+                    transactionnelles, puis comment optimiser avec des contraintes.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Chapitres 5-6 :</strong> Spécialisations. Nous appliquons les concepts à des données ordonnées (séquences)
+                    et aux graphes complexes.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Chapitre 7 :</strong> Prédiction. Nous utilisons les patterns pour faire de la classification.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 6: Formules clés -->
+        <section class="section">
+            <h2>Formules clés et notations</h2>
+
+            <p>
+                Voici les notations et formules que vous rencontrerez continuellement dans ce cours. Comprenez-les bien !
+            </p>
+
+            <h3>1. Support Absolu et Relatif</h3>
+
+            <div class="math-block">
+                <p class="formula-label">Définition en une phrase</p>
+                <p>
+                    Le <strong>support</strong> d'un itemset mesure combien de transactions le contiennent. C'est une mesure
+                    de la fréquence.
+                </p>
+
+                <p class="formula-label">Formule 1: Support Absolu</p>
+                <div class="math-formula">
+                    <div class="pending-math" data-latex="support\_count(I) = |cover_D(I)|"></div>
+                </div>
+
+                <p class="formula-label">Formule 2: Support Relatif (Pourcentage)</p>
+                <div class="math-formula">
+                    <div class="pending-math" data-latex="support(I) = \frac{support\_count(I)}{|D|} \times 100\%"></div>
+                </div>
+
+                <div class="symbol-table">
+                    <div class="symbol-table-row">
+                        <span><code>I</code></span>
+                        <span>Un itemset (ensemble d'items)</span>
+                    </div>
+                    <div class="symbol-table-row">
+                        <span><code>cover_D(I)</code></span>
+                        <span>Les transactions dans D qui contiennent I</span>
+                    </div>
+                    <div class="symbol-table-row">
+                        <span><code>|D|</code></span>
+                        <span>Nombre total de transactions</span>
+                    </div>
+                    <div class="symbol-table-row">
+                        <span><code>support_count(I)</code></span>
+                        <span>Nombre de transactions contenant I</span>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <strong>Exemple :</strong> Si dans un supermarché avec 1000 transactions, 890 contiennent à la fois
+                    "beurre" et "pain", alors :<br>
+                    • support_count({beurre, pain}) = 890<br>
+                    • support({beurre, pain}) = 890/1000 = 89%
+                </div>
+            </div>
+
+            <h3>2. Itemset Fréquent</h3>
+
+            <div class="math-block">
+                <p class="formula-label">Définition</p>
+                <div class="theory-box">
+                    <p>
+                        Un itemset <code>I</code> est <strong>fréquent</strong> si son support est ≥ à un seuil minimum
+                        <code>min_support</code> défini par l'utilisateur.
+                    </p>
+                </div>
+
+                <p class="formula-label">Condition formelle</p>
+                <div class="math-formula">
+                    <div class="pending-math" data-latex="I \text{ est fréquent } \iff support(I) \geq min\_support"></div>
+                </div>
+
+                <div class="symbol-table">
+                    <div class="symbol-table-row">
+                        <span><code>min_support</code></span>
+                        <span>Seuil défini par l'utilisateur (ex: 5%)</span>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <strong>Exemple :</strong> Si min_support = 20%, alors :<br>
+                    • {pain} avec support 85% → FRÉQUENT<br>
+                    • {beurre, pain} avec support 89% → FRÉQUENT<br>
+                    • {champagne, caviar} avec support 0.5% → PAS FRÉQUENT
+                </div>
+            </div>
+
+            <h3>3. Règles d'Association</h3>
+
+            <div class="math-block">
+                <p class="formula-label">Définition</p>
+                <p>
+                    Une règle d'association est de la forme <code>X → Y</code> où X et Y sont des itemsets.
+                    Elle signifie : "Si un client achète X, il achète probablement aussi Y".
+                </p>
+
+                <p class="formula-label">Formule: Confiance d'une règle</p>
+                <div class="math-formula">
+                    <div class="pending-math" data-latex="confidence(X \to Y) = \frac{support(X \cup Y)}{support(X)}"></div>
+                </div>
+
+                <div class="symbol-table">
+                    <div class="symbol-table-row">
+                        <span><code>X ∪ Y</code></span>
+                        <span>Union de X et Y (tous les items ensemble)</span>
+                    </div>
+                    <div class="symbol-table-row">
+                        <span><code>confidence</code></span>
+                        <span>Probabilité que Y soit acheté si X l'est</span>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <strong>Exemple :</strong> Règle: beurre → pain<br>
+                    • support(beurre ∪ pain) = 80%<br>
+                    • support(beurre) = 85%<br>
+                    • confidence = 80% / 85% = 94.1%<br><br>
+                    ✓ Signification: 94.1% des clients qui achètent du beurre achètent aussi du pain.
+                </div>
+            </div>
+        </section>
+
+        <!-- Recap section -->
+        <section class="section">
+            <h2>Résumé du chapitre</h2>
+
+            <div class="theory-box">
+                <h3 style="margin-top: 0;">Points clés à retenir</h3>
+                <ol style="margin-left: 20px; font-size: 15px; line-height: 2;">
+                    <li>
+                        <strong>Data Mining</strong> = découverte automatique de patterns intéressants dans de grandes données
+                    </li>
+                    <li>
+                        Les données peuvent être <strong>structurées</strong> (tables), <strong>semi-structurées</strong> (transactions,
+                        séquences, graphes) ou <strong>non-structurées</strong> (texte, images, vidéo)
+                    </li>
+                    <li>
+                        Deux types : <strong>Descriptif</strong> (comprendre) et <strong>Prédictif</strong> (prédire)
+                    </li>
+                    <li>
+                        Trois défis majeurs : <strong>Définition</strong> du pattern, <strong>Efficacité</strong> des algorithmes,
+                        <strong>Utilité</strong> des résultats
+                    </li>
+                    <li>
+                        Les notations clés : <strong>Support</strong> (fréquence), <strong>Itemset fréquent</strong>, <strong>Règles
+                        d'association</strong>
+                    </li>
+                </ol>
+            </div>
+
+            <p style="margin-top: 25px; color: var(--gray); font-style: italic;">
+                👉 Prêt pour le <a href="ch2_frequent_itemsets.html" style="color: var(--teal); text-decoration: none; font-weight: 600;">Chapitre 2 : Frequent Itemset Mining — Bases</a> ?
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="footer-info">Prof. Hélène Verhaeghe · UCLouvain · 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function() {
+            const mathElements = document.querySelectorAll('.pending-math');
+            mathElements.forEach(element => {
+                const latex = element.getAttribute('data-latex');
+                if (latex) {
+                    try {
+                        katex.render(latex, element, {
+                            displayMode: true,
+                            throwOnError: false
+                        });
+                    } catch (e) {
+                        console.error('KaTeX error:', e);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

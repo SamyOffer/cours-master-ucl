@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz – LINFO2146 Mobile & Embedded Computing</title>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--red:#EF4444;--green:#10B981}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Header */
+.header-stripe{background:var(--navy);height:6px}
+.header-content{background:var(--navy);padding:20px 32px;display:flex;align-items:center;gap:16px}
+.header-content h1{color:#fff;font-size:1.5rem;font-weight:700}
+.header-content .breadcrumb{color:#93c5fd;font-size:.9rem}
+.header-content .breadcrumb a{color:#93c5fd}
+
+/* Chapter nav */
+#chapter-nav{background:#fff;border-bottom:2px solid #e2e8f0;padding:12px 32px;display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:100}
+.ch-pill{padding:6px 14px;border-radius:20px;border:2px solid #cbd5e1;background:#fff;cursor:pointer;font-size:.82rem;font-weight:600;color:#475569;transition:all .2s}
+.ch-pill:hover{border-color:var(--teal);color:var(--teal)}
+.ch-pill.active{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* Main layout */
+#quiz-app{max-width:800px;margin:0 auto;padding:24px 16px}
+
+/* Progress */
+#progress-wrap{margin-bottom:16px}
+.progress-bar-bg{background:#e2e8f0;border-radius:99px;height:8px;overflow:hidden}
+.progress-bar-fill{background:var(--teal);height:8px;border-radius:99px;transition:width .3s}
+.progress-text{font-size:.82rem;color:#64748b;margin-top:4px;display:flex;justify-content:space-between}
+
+/* Score */
+#score-display{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.score-badge{padding:8px 16px;border-radius:8px;font-weight:700;font-size:.9rem}
+.score-correct{background:#d1fae5;color:#065f46}
+.score-wrong{background:#fee2e2;color:#991b1b}
+.score-skip{background:#fef3c7;color:#92400e}
+.score-total{background:#e0f2fe;color:#075985}
+
+/* Question card */
+#question-card{background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.08);padding:28px;margin-bottom:20px;min-height:200px}
+.q-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.q-type-badge{padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.type-MCQ{background:#e0f2fe;color:#0369a1}
+.type-Flashcard{background:#f0fdf4;color:#166534}
+.type-TrueOrFalse{background:#fef3c7;color:#92400e}
+.type-ShortAnswer{background:#ede9fe;color:#5b21b6}
+.type-Matching{background:#fce7f3;color:#9d174d}
+.type-Categorization{background:#f0fdf4;color:#14532d}
+.type-FillInTheBlanks{background:#fff7ed;color:#9a3412}
+.type-LabelOnImage{background:#e0e7ff;color:#3730a3}
+.type-GuessNumber{background:#fdf4ff;color:#6b21a8}
+.q-num{font-size:.82rem;color:#94a3b8}
+.q-text{font-size:1.05rem;font-weight:600;line-height:1.5;margin-bottom:20px;color:#1e293b}
+
+/* MCQ */
+.mcq-option{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;margin-bottom:8px;transition:all .2s;line-height:1.4}
+.mcq-option:hover{border-color:var(--teal);background:#f0fdfa}
+.mcq-option input{margin-top:2px;accent-color:var(--teal);flex-shrink:0}
+.mcq-option.correct{border-color:var(--green);background:#d1fae5}
+.mcq-option.wrong{border-color:var(--red);background:#fee2e2}
+.mcq-option.highlight{border-color:var(--green);background:#d1fae5}
+
+/* Flashcard */
+.flashcard-wrap{perspective:800px}
+.flashcard{width:100%;min-height:180px;position:relative;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;width:100%;backface-visibility:hidden;padding:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1rem;line-height:1.6}
+.fc-front{background:linear-gradient(135deg,#1e3a5f,#0d9488);color:#fff;min-height:180px}
+.fc-back{background:linear-gradient(135deg,#059669,#0d9488);color:#fff;transform:rotateY(180deg);min-height:180px;position:relative}
+.flashcard-hint{text-align:center;color:#64748b;font-size:.85rem;margin-top:12px}
+.fc-self-grade{display:none;gap:12px;justify-content:center;margin-top:14px}
+.fc-self-grade.visible{display:flex}
+.btn-knew{background:var(--green);color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:700}
+.btn-didnt{background:var(--red);color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:700}
+
+/* TrueOrFalse */
+.tf-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;margin-bottom:8px;flex-wrap:wrap}
+.tf-text{flex:1;line-height:1.4}
+.tf-btns{display:flex;gap:6px}
+.btn-tf{padding:6px 14px;border-radius:6px;border:2px solid #e2e8f0;cursor:pointer;font-weight:700;font-size:.82rem;transition:all .2s;background:#fff}
+.btn-tf:hover{opacity:.85}
+.btn-true{border-color:var(--green);color:var(--green)}
+.btn-true.selected-true{background:var(--green);color:#fff}
+.btn-false{border-color:var(--red);color:var(--red)}
+.btn-false.selected-false{background:var(--red);color:#fff}
+.tf-item.correct-item .btn-tf.selected-true,.tf-item.correct-item .btn-tf.selected-false{border-color:var(--green)!important}
+.tf-item.wrong-item .btn-tf.selected-true,.tf-item.wrong-item .btn-tf.selected-false{border-color:var(--red)!important}
+.tf-result{font-size:.8rem;font-weight:700;margin-left:4px}
+
+/* ShortAnswer */
+.short-input{width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:1rem;outline:none;transition:border-color .2s}
+.short-input:focus{border-color:var(--teal)}
+.short-answer-reveal{margin-top:14px;padding:14px;background:#d1fae5;border-radius:8px;display:none;line-height:1.6}
+.short-answer-reveal.visible{display:block}
+
+/* Matching */
+.matching-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.match-left{padding:12px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:8px;font-weight:600;font-size:.9rem;display:flex;align-items:center;min-height:60px}
+.match-right select{width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:8px;font-size:.85rem;background:#fff;outline:none;cursor:pointer}
+.match-right select:focus{border-color:var(--teal)}
+.match-item-correct select{border-color:var(--green)!important;background:#d1fae5!important}
+.match-item-wrong select{border-color:var(--red)!important;background:#fee2e2!important}
+.matching-key{margin-top:12px;display:none}
+.matching-key.visible{display:block}
+.matching-key .key-row{display:flex;gap:8px;margin-bottom:6px;padding:8px;background:#f0fdf4;border-radius:6px;font-size:.88rem}
+.key-left{font-weight:700;color:var(--navy);min-width:140px}
+.key-arrow{color:var(--teal);font-weight:700}
+.key-right{color:#475569}
+
+/* Categorization */
+.cat-items{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding:12px;background:#f8fafc;border-radius:8px}
+.cat-chip{padding:8px 14px;background:#fff;border:2px solid #cbd5e1;border-radius:20px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;user-select:none}
+.cat-chip:hover{border-color:var(--teal)}
+.cat-chip.selected{background:var(--teal);border-color:var(--teal);color:#fff}
+.cat-chip.placed{opacity:.4;cursor:default}
+.cat-buckets{display:grid;gap:12px}
+.cat-bucket{border:2px dashed #cbd5e1;border-radius:10px;padding:12px;min-height:70px;transition:border-color .2s}
+.cat-bucket.active{border-color:var(--teal);background:#f0fdfa}
+.cat-bucket-title{font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.cat-bucket-items{display:flex;flex-wrap:wrap;gap:6px}
+.cat-placed-chip{padding:6px 12px;background:var(--teal);color:#fff;border-radius:16px;font-size:.82rem;cursor:pointer;user-select:none}
+.cat-placed-chip:hover{background:#0f766e}
+.cat-answer-box{display:none;margin-top:12px;padding:12px;background:#f0fdf4;border-radius:8px}
+.cat-answer-box.visible{display:block}
+
+/* FillInBlanks */
+.fill-template{font-size:1rem;line-height:2.2;padding:16px;background:#f8fafc;border-radius:8px;margin-bottom:12px}
+.fill-input{border:none;border-bottom:2px solid var(--teal);background:transparent;font-size:.95rem;padding:2px 4px;outline:none;min-width:80px;max-width:160px;text-align:center;color:var(--navy);font-weight:700}
+.fill-input.correct-fill{border-bottom-color:var(--green);background:#d1fae5;border-radius:4px}
+.fill-input.wrong-fill{border-bottom-color:var(--red);background:#fee2e2;border-radius:4px}
+.fill-reveal{display:none;margin-top:12px;padding:12px;background:#fef3c7;border-radius:8px;font-size:.9rem}
+.fill-reveal.visible{display:block}
+
+/* LabelImage */
+.label-context{padding:14px;background:#eff6ff;border-radius:8px;border-left:4px solid var(--teal);margin-bottom:16px;font-size:.9rem;line-height:1.6}
+.label-list{list-style:none;padding:0}
+.label-list li{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.label-num{background:var(--navy);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.label-input{flex:1;padding:8px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:.9rem;outline:none}
+.label-input:focus{border-color:var(--teal)}
+.label-reveal{display:none;margin-top:12px;padding:12px;background:#d1fae5;border-radius:8px}
+.label-reveal.visible{display:block}
+.label-reveal li{margin-bottom:6px;font-size:.9rem}
+
+/* GuessNumber */
+.guess-input{width:180px;padding:12px;border:2px solid #e2e8f0;border-radius:8px;font-size:1.1rem;text-align:center;outline:none;font-weight:700}
+.guess-input:focus{border-color:var(--teal)}
+
+/* Controls */
+#quiz-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:32px}
+.btn{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:.9rem;transition:all .2s}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:#0f766e}
+.btn-secondary{background:#fff;color:var(--navy);border:2px solid #e2e8f0}
+.btn-secondary:hover{border-color:var(--navy)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-amber:hover{background:#d97706}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:#1e3456}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-group{display:flex;gap:8px}
+
+/* Feedback */
+.feedback{margin-top:16px;padding:12px 16px;border-radius:8px;font-weight:600;display:none;line-height:1.5}
+.feedback.show{display:block}
+.feedback-correct{background:#d1fae5;color:#065f46;border-left:4px solid var(--green)}
+.feedback-wrong{background:#fee2e2;color:#991b1b;border-left:4px solid var(--red)}
+
+/* Summary */
+#summary-panel{display:none;background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.08);padding:32px;text-align:center;margin-bottom:24px}
+#summary-panel.show{display:block}
+.summary-score-big{font-size:3rem;font-weight:900;color:var(--teal);margin:12px 0}
+.summary-grade{font-size:1.1rem;color:#475569;margin-bottom:20px}
+
+/* Footer */
+footer{background:var(--navy);color:#93c5fd;text-align:center;padding:20px;font-size:.85rem;margin-top:40px}
+
+@media(max-width:600px){
+  .matching-grid{grid-template-columns:1fr}
+  .header-content h1{font-size:1.1rem}
+  #quiz-app{padding:12px 8px}
+}
+</style>
+</head>
+<body>
+<div class="header-stripe"></div>
+<div class="header-content">
+  <div>
+    <div class="breadcrumb"><a href="index.html">LINFO2146</a> › Quiz</div>
+    <h1>🎯 Quiz interactif – Tous chapitres</h1>
+  </div>
+</div>
+
+<div id="chapter-nav"></div>
+
+<div id="quiz-app">
+  <div id="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-text"><span id="prog-text">Question 1</span><span id="prog-pct">0%</span></div>
+  </div>
+  <div id="score-display">
+    <div class="score-badge score-correct">✓ <span id="sc-correct">0</span></div>
+    <div class="score-badge score-wrong">✗ <span id="sc-wrong">0</span></div>
+    <div class="score-badge score-skip">⟳ <span id="sc-skip">0</span></div>
+    <div class="score-badge score-total">Total : <span id="sc-total">0</span></div>
+  </div>
+  <div id="question-card"></div>
+  <div id="quiz-controls">
+    <div class="btn-group">
+      <button class="btn btn-secondary" id="btn-prev" onclick="navigate(-1)">← Précédent</button>
+      <button class="btn btn-secondary" id="btn-next" onclick="navigate(1)">Suivant →</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-amber" id="btn-check" onclick="checkCurrent()">Vérifier</button>
+      <button class="btn btn-navy" onclick="shuffleQ()">🔀 Mélanger</button>
+    </div>
+  </div>
+  <div id="summary-panel">
+    <div style="font-size:2rem">🏆</div>
+    <div class="summary-score-big" id="sum-score">0/0</div>
+    <div class="summary-grade" id="sum-grade"></div>
+    <button class="btn btn-primary" onclick="restartQuiz()">Recommencer</button>
+  </div>
+</div>
+
+<footer>LINFO2146 – Mobile and Embedded Computing · UCLouvain · Prof. Ramin Sadre</footer>
+
+<script>
+// ===== QUESTION DATA =====
+// t: type (M=MCQ, F=Flashcard, S=ShortAnswer, T=TrueOrFalse, B=FillBlanks, G=Matching, C=Categorization, L=LabelImage, N=GuessNumber)
+// For MCQ: opts=options array, a=correct index(es, array or number)
+// For Flashcard/Short: ans=answer string
+// For Matching: pairs=[[left,right],...], shuffled on render
+// For Categorization: cats={catName:[items],...}
+// For TrueOrFalse: items=[{tx,ans},...] ans=true/false
+// For FillBlanks: tmpl=text with ___ marks, blanks=[answers]
+// For Label: ctx=context desc, labels=[answers]
+// For GuessNumber: ans=number(string)
+
+const RAW=[
+/* ===== CHAPTER 1 ===== */
+{ch:"1",t:"M",q:"What is an embedded system?",
+ opts:["A general-purpose computer","A portable device with wireless communication","A system used only for gaming","A computer system with a dedicated function within a larger system"],a:3},
+{ch:"1",t:"M",q:"Which component is typically integrated in a microcontroller?",
+ opts:["A dedicated graphics card and sound card","Only the CPU, with no memory or interfaces","External hard drive and monitor","CPU, memory, and interfaces"],a:3},
+{ch:"1",t:"M",q:"Why are embedded systems often not based on traditional computer architecture?",
+ opts:["They are designed only for gaming","They are incompatible with sensors","They are too big, expensive, sensitive, or power-consuming","They require too much external hardware"],a:2},
+{ch:"1",t:"M",q:"What is a major challenge in resource-constrained wireless sensor networks?",
+ opts:["High bandwidth data transfer","Wired connectivity issues","Unlimited power supply","Robust routing algorithms for dynamic and unknown networks"],a:3},
+{ch:"1",t:"M",q:"Which wireless technology is commonly used in modern low-power WSN hardware?",
+ opts:["WiFi 6","IEEE 802.15.4","LTE","Bluetooth Classic"],a:1},
+{ch:"1",t:"M",q:"What is a typical characteristic of wireless sensor networks (WSN)?",
+ opts:["High power consumption and large size","Wired connections for all sensors","Small devices with sensors that transmit data wirelessly","Exclusive use in military applications only"],a:2},
+{ch:"1",t:"M",q:"What does IoT stand for?",opts:["Internet of Things","Internet of Telecommunication","Internet of Transmission","Internet of Technology"],a:0},
+{ch:"1",t:"M",q:"Which of the following is NOT a typical feature of IoT devices?",
+ opts:["Limited processing capability","High power consumption","Addressability and discoverability","Sensors and network interfaces"],a:1},
+{ch:"1",t:"M",q:"What is a key enabler of IoT that involves addressing billions of devices?",
+ opts:["IPv6 and RFID","Wi-Fi only","Ethernet cables","Bluetooth only"],a:0},
+{ch:"1",t:"M",q:"What type of network is commonly used in smart homes for IoT device communication?",
+ opts:["Wide Area Network (WAN)","Cellular network","Personal Area Network (PAN)","Public Wi-Fi"],a:2},
+{ch:"1",t:"M",q:"What is a typical feature of autonomous systems in IoT?",
+ opts:["Limited to wired connections","Self-organization and agents","No data processing capabilities","Manual configuration only"],a:1},
+{ch:"1",t:"G",q:"IoT Data Processing Locations",
+ pairs:[["On the device (mote)","Processing directly on sensor node; lowest latency; most resource-constrained"],["Edge / Fog node","Intermediate gateway or router processes data locally; reduced latency; local decisions"],["Cloud / Back-end server","Centralized remote processing; highest compute power; requires internet connectivity"]]},
+{ch:"1",t:"G",q:"Networking for IoT Devices",
+ pairs:[["PAN (Personal Area Network)","IEEE 802.15.4, Bluetooth, ZigBee; ~10 m range; low power"],["LAN (Local Area Network)","WiFi (IEEE 802.11); ~100 m range; higher bandwidth"],["WAN (Wide Area Network)","LoRaWAN, LTE/NB-IoT, Sigfox; km-scale range; IoT backhaul"]]},
+
+/* ===== CHAPTER 2 ===== */
+{ch:"2",t:"S",q:"What does ISR stand for?",ans:"Interrupt Service Routine"},
+{ch:"2",t:"S",q:"What does IRQ stand for?",ans:"Interrupt Request"},
+{ch:"2",t:"S",q:"What does IVT stand for?",ans:"Interrupt Vector Table"},
+{ch:"2",t:"G",q:"Types of Input for Microcontrollers",
+ pairs:[["Polling","CPU continuously reads status registers in a loop to check if input is ready"],["Interrupt (IRQ)","Hardware signal stops the CPU; it executes the ISR; CPU can sleep between events"],["DMA (Direct Memory Access)","Data transferred directly to memory without CPU involvement"]]},
+{ch:"2",t:"C",q:"Classify each characteristic as Polling or Interrupts",
+ cats:{"Polling":["CPU always active / busy-waiting","Simple to program","Wastes energy with no idle","Predictable timing","No special hardware needed"],"Interrupts":["CPU can sleep between events","Event-driven execution","Requires ISR (Interrupt Service Routine)","Requires IVT (Interrupt Vector Table)","Energy efficient"]}},
+{ch:"2",t:"M",q:"What is the main advantage of using interrupts over polling?",
+ opts:["Interrupts are easier to implement than polling","Interrupts always execute faster than polling","Interrupts allow the CPU to sleep when there is nothing to do, saving energy","Interrupts do not require special registers or vector tables"],a:2},
+{ch:"2",t:"M",q:"What is the main purpose of the bootstrap loader (BSL)?",
+ opts:["To write to flash memory or RAM from a serial interface when the device is empty","To connect the device to the internet","To power the device during startup","To write code and data into flash memory or RAM without using communication interfaces"],a:0},
+{ch:"2",t:"M",q:"Do embedded systems typically require an operating system?",
+ opts:["Only if connected to the internet","Only for devices with more than 1 GB of RAM","No, they do not necessarily require an OS","Yes, they always require a full-featured OS"],a:2},
+{ch:"2",t:"T",q:"Are these affirmations about Real-Time OS true or false?",
+ items:[{tx:"Smaller than desktop/server OS",ans:true},{tx:"Bigger than desktop/server OS",ans:false},{tx:"Contains a lot of features",ans:false},{tx:"Contains a reduced set of features",ans:true},{tx:"Fast context switch",ans:true},{tx:"Guaranteed time-bounded response to interrupts",ans:true},{tx:"Tries to avoid code that cannot be preempted",ans:true}]},
+{ch:"2",t:"C",q:"Link these facts to the correct operating system",
+ cats:{"TinyOS":["NesC component-based language","Event + task model (no threads)","Single shared stack","Split-phase (non-blocking) operations","TinyOS is event-driven"],"Contiki":["Proto-threads (lightweight cooperative threads)","Cooperative scheduling","uIP TCP/IP stack with one single packet buffer","Only one TCP segment on the air at a time","Processes communicate via sync + async events"],"RIOT OS":["Preemptive priority-based scheduling","POSIX-like API","Full C/C++ support","Tasks with higher priority interrupt lower-priority tasks","Microkernel architecture"]}},
+{ch:"2",t:"M",q:"How do TinyOS applications handle events?",
+ opts:["They call specific event handler functions","They use threads with preemptive scheduling","They do not handle events at all","They run in separate processes with stacks"],a:0},
+{ch:"2",t:"M",q:"What scheduling method does Contiki use?",
+ opts:["Preemptive priority scheduling","Round-robin time-slice","Cooperative scheduling","FIFO with time quanta"],a:2},
+{ch:"2",t:"T",q:"Proto-threads (Contiki)",
+ items:[{tx:"More expensive than regular Linux/Windows threads",ans:false},{tx:"Use one stack per process",ans:false},{tx:"Local variables lose their value after a context switch",ans:true}]},
+{ch:"2",t:"M",q:"How do processes in Contiki communicate with each other?",
+ opts:["With synchronous events only","With asynchronous events only","With both synchronous and asynchronous events","Without any events"],a:2},
+{ch:"2",t:"M",q:"What scheduling method does RIOT OS use?",
+ opts:["Cooperative scheduling only","Round-robin time-slice","Time-sharing with fixed slices","Preemptive priority scheduling"],a:3},
+{ch:"2",t:"M",q:"How many packet buffers does the uIP library typically use?",
+ opts:["Multiple buffers for each protocol layer","Two buffers (incoming and outgoing)","One single packet buffer","No dedicated buffer"],a:2},
+
+/* ===== CHAPTER 3 ===== */
+{ch:"3",t:"M",q:"How can a signal s(t) be mathematically represented?",
+ opts:["As a sum of sine waves with different frequencies, phases, and amplitudes","As a multiplication of sine waves","As a single square wave","As a division of sine waves"],a:0},
+{ch:"3",t:"M",q:"If you want to send data fast, what frequency should you use?",
+ opts:["High frequency","Low frequency"],a:0},
+{ch:"3",t:"M",q:"What is interleaving in error control coding?",
+ opts:["Removing redundant bits from the data","Encoding data into a single large block without shuffling","Shuffling data to distribute burst errors over multiple codewords","Combining multiple signals into one for transmission"],a:2},
+{ch:"3",t:"G",q:"Modulation Parameters → Modulation Type",
+ pairs:[["Amplitude A(t)","ASK — Amplitude Shift Keying (varies signal power)"],["Frequency f(t)","FSK — Frequency Shift Keying (varies signal frequency)"],["Phase φ(t)","PSK — Phase Shift Keying (varies signal phase)"]]},
+{ch:"3",t:"G",q:"Baseband and Carrier Signals",
+ pairs:[["Baseband signal m(t)","Digital codeword to transmit; low frequency [0..fb]; the information"],["Carrier signal c(t)","Sinusoidal wave at frequency fc; high frequency; transports the information"]]},
+{ch:"3",t:"F",q:"What does ASK, FSK and PSK stand for?",ans:"ASK: Amplitude Shift Keying\nFSK: Frequency Shift Keying\nPSK: Phase Shift Keying"},
+{ch:"3",t:"F",q:"What is the frequency range of the signal resulting from combining a baseband signal [0..fb] with a carrier at fc?",ans:"[fc − fb , fc + fb]"},
+{ch:"3",t:"F",q:"What does QPSK and QAM stand for?",ans:"QPSK: Quadrature Phase Shift Keying\nQAM: Quadrature Amplitude Modulation"},
+{ch:"3",t:"M",q:"What is combined in Quadrature Amplitude Modulation (QAM)?",
+ opts:["Phase and amplitude modulation","Phase and wavelength modulation","Frequency and phase modulation","Amplitude and frequency modulation"],a:0},
+{ch:"3",t:"F",q:"Under perfect conditions, using a modulation with m different amplitude symbols, what is the maximum bit rate in terms of bandwidth?",ans:"Maximum bit rate = 2 × Bandwidth × log₂(m)\n(Nyquist theorem)"},
+{ch:"3",t:"M",q:"What are the challenges faced during demodulation at the receiver?",
+ opts:["Frame synchronization only","Only hardware failures","Bit synchronization, frame synchronization, noise, interference","Frequency mismatch only"],a:2},
+{ch:"3",t:"G",q:"Demodulation Challenges",
+ pairs:[["Bit synchronization","Finding exact boundaries of each bit in the received signal"],["Frame synchronization","Finding where a frame starts and ends in the bitstream"],["Noise","Random perturbations added to the signal during propagation"],["Interference","Signals from other transmitters overlapping with the desired signal"]]},
+{ch:"3",t:"L",q:"Legend the transmission chain schema",
+ ctx:"The schema shows the complete signal processing pipeline from source to destination.",
+ labels:["Source encoder","Channel encoder","Modulator","Channel (wireless medium)","Demodulator","Channel decoder","Source decoder"]},
+{ch:"3",t:"L",q:"What shift keying type is used in each row? (Row 1 = baseband reference signal)",
+ ctx:"The schema shows one baseband digital signal and three modulated versions of it. The first row is the original baseband signal.",
+ labels:["Row 2: ASK (Amplitude Shift Keying) — amplitude changes with bit value","Row 3: FSK (Frequency Shift Keying) — frequency changes with bit value","Row 4: PSK (Phase Shift Keying) — phase shifts at each bit change"]},
+{ch:"3",t:"C",q:"Modes of propagation — classify each phenomenon",
+ cats:{"Line of Sight (LoS)":["Direct path signal","No obstacles between sender and receiver","Friis free-space equation applies"],"Non-Line of Sight (NLoS)":["Reflection off buildings or ground","Diffraction around corners of obstacles","Scattering by trees or rough surfaces","Multipath fading (destructive interference)"]}},
+{ch:"3",t:"C",q:"Link these path-loss causes with their description",
+ cats:{"Free space propagation loss":["Signal spreads over sphere (4πR²)","Power ∝ 1/R² — attenuates with distance","Friis formula: Pr/Pt = GtGr(λ/4πR)²"],"Shadowing (slow fading)":["Large obstacles (buildings, hills)","Log-normal distribution around mean","Deterministic + random component"],"Fast fading (multipath)":["Multiple signal copies with different delays","Constructive and destructive interference","Rayleigh or Rician fading model"]}},
+{ch:"3",t:"M",q:"Can a path-loss-free signal (no obstacles) get weaker with distance?",
+ opts:["Yes, it gets weaker with distance","No, if there are no obstacles the signal remains constant"],a:0},
+{ch:"3",t:"F",q:"What does LoS and NLoS stand for?",ans:"LoS: Line of Sight — direct path with no obstacles\nNLoS: Non-Line of Sight — indirect path with obstacles or reflections"},
+{ch:"3",t:"F",q:"What does SNR stand for and what is its formula?",ans:"SNR = Signal-to-Noise Ratio\nSNR[dB] = 10 log₁₀(Pr / PN)\nwhere Pr = received signal power, PN = noise floor"},
+{ch:"3",t:"F",q:"What does RSSI stand for?",ans:"RSSI: Received Signal Strength Indicator — measures the received signal power level"},
+{ch:"3",t:"F",q:"Explain the hidden station problem with three equidistant stations A, B and C (in this order)",
+ ans:"Station arrangement: A ——— B ——— C (equidistant, B is in the middle)\n\n• A and C are OUT of range of each other (too far apart)\n• B is in range of BOTH A and C\n\nProblem:\n1. A starts transmitting to B\n2. C cannot hear A's signal (out of range) → C thinks the channel is FREE\n3. C also starts transmitting to B simultaneously\n4. COLLISION occurs at B\n5. Neither A nor C detects the collision (they can't hear each other)\n\nConsequence: CSMA/CD fails in wireless — you cannot always sense whether another node is transmitting.\nSolution: RTS/CTS mechanism (Request to Send / Clear to Send)"},
+{ch:"3",t:"M",q:"In wireless networks compared to wired networks:",
+ opts:["Lower error rate and higher transmission rate","Higher error rate and lower transmission rate","Same error rate and lower transmission rate","Lower error rate and same transmission rate"],a:1},
+
+/* ===== CHAPTER 4 ===== */
+{ch:"4",t:"F",q:"What does SDMA, FDMA and TDMA stand for?",ans:"SDMA = Space Division Multiple Access\nFDMA = Frequency Division Multiple Access\nTDMA = Time Division Multiple Access"},
+{ch:"4",t:"G",q:"Types of Multiple Access Methods",
+ pairs:[["SDMA","Space Division — separates stations by physical location/antenna direction"],["FDMA","Frequency Division — each node gets a dedicated sub-band"],["TDMA","Time Division — nodes share a channel in dedicated time slots"],["CDMA","Code Division — all nodes share frequency and time; orthogonal codes differentiate senders"]]},
+{ch:"4",t:"G",q:"Guard Intervals in multiple access",
+ pairs:[["FDMA guard band","Frequency gap between adjacent channels to avoid inter-channel interference"],["TDMA guard time","Small time gap between consecutive slots to absorb propagation delay"]]},
+{ch:"4",t:"M",q:"What is the main challenge of using pure Space Division Multiple Access (SDMA)?",
+ opts:["Cannot be combined with other multiplexing methods","Only suitable for wired networks","Needs complex frequency filtering","Requires a huge secure distance between stations"],a:3},
+{ch:"4",t:"M",q:"What is the main disadvantage of FDMA?",
+ opts:["Cannot support multiple users simultaneously","Needs synchronization between stations","Only suitable for narrowband signals","Requires exact frequency filtering with guard bands"],a:3},
+{ch:"4",t:"M",q:"What is a key requirement for implementing TDMA?",
+ opts:["Multiple frequency bands","Orthogonal codes for each station","Synchronization between stations","High bandwidth channels"],a:2},
+{ch:"4",t:"F",q:"What does CDMA stand for and what does it allow?",ans:"CDMA = Code Division Multiple Access\nIt allows all stations to send at the SAME TIME on the SAME frequency band, differentiated by orthogonal codes"},
+{ch:"4",t:"M",q:"In CDMA, what is used to differentiate signals from different senders?",
+ opts:["Different time slots","Different physical locations","Different codes applied to the data stream","Different frequency bands"],a:2},
+{ch:"4",t:"F",q:"What are 'chips' in the context of CDMA?",ans:"The −1 and +1 signals used in spreading the data, which are sent to the modulator. One data bit is spread into multiple chips."},
+{ch:"4",t:"F",q:"What is the spreading factor in CDMA?",ans:"The number of chips used to spread one data bit. A higher spreading factor = more redundancy = more robust against interference."},
+{ch:"4",t:"F",q:"What is the main requirement for codes used in CDMA?",ans:"The codes must be pairwise orthogonal — their dot product must be zero. This allows receivers to separate simultaneous transmissions."},
+{ch:"4",t:"M",q:"What is a key practical challenge in implementing CDMA?",
+ opts:["Keeping the codes secret","Ensuring all stations transmit at the same power","Using only fixed frequency bands","Assigning and managing codes for all stations"],a:3},
+{ch:"4",t:"M",q:"What is polling in network communication?",
+ opts:["A token circulates among nodes to grant transmission rights","Nodes transmit only when they detect the channel is free","A server asks a node whether it has something to transmit","A node randomly transmits data without coordination"],a:2},
+{ch:"4",t:"M",q:"What is a challenge associated with token-passing networks?",
+ opts:["Requires centralized control","Token can get lost; nodes need to know next node; nodes might hold token too long","Nodes need different frequency bands","It eliminates the need for synchronization"],a:1},
+{ch:"4",t:"M",q:"In a random access network, when can a node transmit data?",
+ opts:["Only when the server grants permission","Only during assigned time slots","Whenever it wants to transmit","Only when it receives a token"],a:2},
+{ch:"4",t:"M",q:"How does ALOHA handle collisions?",
+ opts:["Collisions are ignored","Receiver requests retransmission","Sender waits a random backoff time and tries again","Sender immediately retransmits without delay"],a:2},
+{ch:"4",t:"F",q:"Explain the 5 steps of how ALOHA handles collisions",
+ ans:"1. Sender sends a packet\n2. Collision happens — receiver receives a garbled packet\n3. Receiver does NOT send ACK → sender knows packet was lost\n4. Sender waits a RANDOM backoff time in range [0, …, B]\n5. Sender tries again (→ Step 1)"},
+{ch:"4",t:"M",q:"What is the main improvement of Slotted ALOHA over pure ALOHA?",
+ opts:["Allowing multiple nodes to transmit simultaneously","Elimination of synchronization need","Removing random backoff","Use of time slots to limit collisions"],a:3},
+{ch:"4",t:"S",q:"What does Slotted ALOHA require on all nodes?",ans:"Synchronization between all nodes — all nodes must share the same clock to know when time slots begin"},
+{ch:"4",t:"M",q:"What is the main limitation of ALOHA in network communication?",
+ opts:["Requires full duplex hardware","Collisions are only detected by the receiver","Uses too much bandwidth","Cannot handle multiple nodes"],a:1},
+{ch:"4",t:"F",q:"What does CSMA stand for? and CD/CA?",ans:"CSMA = Carrier-Sense Multiple Access\nCD = Collision Detection (stop immediately when collision detected)\nCA = Collision Avoidance (try to avoid collision before it happens)"},
+{ch:"4",t:"M",q:"How does CSMA improve upon ALOHA?",
+ opts:["Nodes listen to the channel before transmitting","Nodes transmit without sensing the channel","It eliminates collisions entirely","It uses a different frequency band"],a:0},
+{ch:"4",t:"F",q:"Why can collisions still occur in CSMA even though nodes listen before transmitting?",ans:"Because of propagation delay: signals from other nodes may not yet have arrived when a node senses the channel as free — so it starts transmitting, leading to a collision."},
+{ch:"4",t:"M",q:"What is the primary goal of CSMA/CA in wireless networks?",
+ opts:["Guarantee collision-free transmission","Detect collisions after they happen","Increase transmission power","Avoid collisions without full-duplex hardware"],a:3},
+{ch:"4",t:"F",q:"Procedure of CSMA/CA (two cases)",
+ ans:"a) If channel is FREE:\n  1. Node waits for channel to stay free for IFS time\n  2. Node sends\n\nb) If channel is IN USE:\n  1. Node waits until current transmission is over\n  2. Node waits for channel to stay free for IFS time\n  3. Node waits additional RANDOM backoff time\n  4. Node sends"},
+{ch:"4",t:"M",q:"How does CSMA/CA with ACK prioritize frames?",
+ opts:["ACK frames are given higher priority and sent after a shorter IFS","ACK frames are sent before data frames","Data frames are prioritized over ACKs","All frames have equal priority"],a:0},
+{ch:"4",t:"F",q:"Why are CSMA/CA and CSMA/CD unreliable in wireless networks?",ans:"Because of the Hidden Station problem: nodes cannot always sense each other's transmissions, leading to undetected collisions."},
+{ch:"4",t:"F",q:"What is the purpose of RTS/CTS in CSMA/CA?",ans:"To RESERVE the medium for data transmission and reduce collisions, especially in hidden station scenarios."},
+{ch:"4",t:"F",q:"Give the protocol of CSMA/CA with RTS/CTS (4 steps)",
+ ans:"1. Node A sends RTS (Request to Send) to node B after medium was free for IFS time\n2. Node B sends CTS (Clear to Send) to node A after SIFS time\n3. Node C (hidden station) also hears the CTS → node C waits\n4. Node A can now send its data safely"},
+
+/* ===== CHAPTER 5 ===== */
+{ch:"5",t:"M",q:"What is the typical range of IEEE 802.15.4 wireless communication?",
+ opts:["Several kilometers","A few 10 meters","Several hundred meters"],a:1},
+{ch:"5",t:"M",q:"What is the maximum frame size in IEEE 802.15.4?",
+ opts:["255 bytes","127 bytes","512 bytes"],a:1},
+{ch:"5",t:"M",q:"How many channels are available in the 2.4 GHz band for IEEE 802.15.4?",
+ opts:["10 channels","20 channels","16 channels"],a:2},
+{ch:"5",t:"F",q:"What are the two types of nodes in IEEE 802.15.4 networks?",ans:"FFD: Full Functional Device — can be a coordinator or router\nRFD: Reduced Functional Device — end device only, simpler"},
+{ch:"5",t:"L",q:"Name the three IEEE 802.15.4 network topologies",
+ ctx:"IEEE 802.15.4 supports three network topologies. Identify them based on their structure.",
+ labels:["Star topology — all nodes connect directly to a single coordinator (PAN coordinator at center)","Cluster-tree topology — hierarchical tree of FFD coordinators with RFD leaves","Peer-to-peer (mesh) topology — any node can communicate with any other node in range"]},
+{ch:"5",t:"M",q:"What is used exclusively in unslotted mode for medium access control?",
+ opts:["FDMA","CSMA/CA","CSMA/CD"],a:1},
+{ch:"5",t:"M",q:"What does the receiver do if the CRC check fails in unslotted CSMA/CA?",
+ opts:["Discards the frame","Sends an ACK regardless","Requests retransmission immediately"],a:0},
+{ch:"5",t:"F",q:"What are the two types of Inter Frame Spaces (IFS) in unslotted CSMA/CA?",ans:"SIFS: Short Inter Frame Space\nLIFS: Long Inter Frame Space"},
+{ch:"5",t:"F",q:"What are the three main components of a superframe in slotted mode?",ans:"1. Beacon frame — announces the superframe structure\n2. CAP (Contention Access Period) — uses Slotted CSMA/CA (11 slots)\n3. CFP (Contention Free Period) — uses TDMA GTS slots (5 slots)"},
+{ch:"5",t:"F",q:"How many time slots are in a superframe, and how are they allocated?",ans:"16 time slots total:\n• 11 for Slotted CSMA/CA (CAP)\n• 5 for TDMA (CFP — Guaranteed Time Slots)"},
+{ch:"5",t:"F",q:"What is a major drawback of unslotted mode in terms of power consumption?",ans:"The receiver must listen continuously (~60 mW) and CANNOT sleep, which greatly increases power consumption."},
+{ch:"5",t:"M",q:"How many channels does TSCH use in each cycle?",opts:["32 channels","16 channels","1 channel"],a:1},
+{ch:"5",t:"M",q:"What is the typical length of a timeslot in TSCH?",opts:["100ms","1ms","10ms"],a:2},
+{ch:"5",t:"M",q:"What is a key advantage of channel hopping in TSCH?",
+ opts:["Reduces impact of external interference","Simplifies scheduling","Increases power consumption"],a:0},
+
+/* ===== CHAPTER 6 ===== */
+{ch:"6",t:"M",q:"Why is IPv6's minimum MTU a challenge for IEEE 802.15.4 networks?",
+ opts:["IPv6 does not support fragmentation","IPv6 uses a different protocol","IPv6 requires at least 1280 bytes, which exceeds the frame size"],a:2},
+{ch:"6",t:"M",q:"What does the header compression in 6LoWPAN aim to achieve?",
+ opts:["Compress TCP headers only","Add extra headers for security","Leave out unnecessary IPv6 header fields to reduce packet size"],a:2},
+{ch:"6",t:"F",q:"What is 6LoWPAN and what layer does it adapt?",ans:"6LoWPAN is an adaptation layer on top of IEEE 802.15.4, designed to carry IPv6 packets over constrained networks."},
+{ch:"6",t:"F",q:"What are the main features provided by 6LoWPAN?",ans:"1. Header compression (IPv6+UDP: 40 B → 7 B best case)\n2. Fragmentation (splits IPv6 min 1280 B into 127 B frames)\n3. Link-layer forwarding in mesh networks (Mesh Addressing Header)"},
+{ch:"6",t:"G",q:"Dispatch Byte Meanings in 6LoWPAN stacked headers",
+ pairs:[["00 xxxxxx","Not a LoWPAN frame (e.g., IPv4 or other protocol)"],["01 000001","Uncompressed IPv6 header"],["01 000010","LOWPAN_HC1 compressed header"],["10 xxxxxx","Mesh Addressing Header"],["11 000xxx","First fragment (FRAG1)"],["11 100xxx","Subsequent fragments (FRAGN)"]]},
+{ch:"6",t:"G",q:"IPv6 Compression Header Types",
+ pairs:[["HC1","Original header compression; only works well for link-local addresses"],["HC2","Extension for UDP header compression (used together with HC1)"],["LOWPAN_IPHC","Improved compression replacing HC1/HC2; supports globally routable addresses; uses contexts"]]},
+{ch:"6",t:"G",q:"Addressing in HC1 Header (what gets compressed)",
+ pairs:[["Source prefix (64 bits)","Compressed to 0 bits if link-local prefix (fe80::/64)"],["Source IID (64 bits)","Derived from EUI-64 MAC address; compressed to 0 bits if derivable"],["Destination prefix (64 bits)","Compressed to 0 bits if link-local"],["Destination IID (64 bits)","Derived from EUI-64 MAC address of destination"]]},
+{ch:"6",t:"M",q:"What does LOWPAN_IPHC replace in IPv6 header compression?",
+ opts:["HC3 compression","HC1 compression","HC2 compression"],a:1},
+{ch:"6",t:"M",q:"What is the purpose of contexts in stateful LOWPAN_IPHC compression?",
+ opts:["Identify the type of address (multicast/unicast)","Encrypt the addresses","Compress frequently used address prefixes"],a:2},
+{ch:"6",t:"F",q:"What are the two main routing methods used in 6LoWPAN networks?",ans:"Route-over: routing at IP layer (each hop = IP hop), uses RPL\nMesh-Under: routing at 6LoWPAN layer (Layer-2 forwarding, MAC addresses), single IP hop end-to-end"},
+{ch:"6",t:"C",q:"Classify these properties as Route-over or Mesh-Under",
+ cats:{"Route-over":["Each hop is an IP-level hop","Uses IP routing protocols (e.g., RPL)","Each intermediate node has a full IPv6 address","Fragment and reassemble at each IP hop"],"Mesh-Under":["Routing at 6LoWPAN adaptation layer (Layer 2)","Uses MAC addresses for routing","Single IP hop from source to destination","Mesh Addressing Header carries original+final addresses","Transparent to IP — looks like one link"]}},
+
+/* ===== CHAPTER 7 ===== */
+{ch:"7",t:"F",q:"What does LLN stand for?",ans:"Low-Power and Lossy Networks"},
+{ch:"7",t:"F",q:"What are the characteristics of LLN (4)?",ans:"1. Lossy, slow and unstable links\n2. Traffic mostly flows from devices to server/sink (or reverse)\n3. Large number of nodes\n4. Constrained devices with small memory"},
+{ch:"7",t:"F",q:"What is RPL?",ans:"RPL = Routing Protocol for Low-Power and Lossy Networks (RFC 6550)"},
+{ch:"7",t:"F",q:"What does DODAG stand for?",ans:"Destination Oriented Directed Acyclic Graph"},
+{ch:"7",t:"F",q:"What is a DODAG in the context of RPL?",ans:"A directed acyclic graph with a single root node at the top. Nodes form routing paths toward the root. NOT a tree — alternative paths are possible."},
+{ch:"7",t:"M",q:"In RPL, the route is established…",opts:["Toward the DODAG root","From the DODAG root"],a:0},
+{ch:"7",t:"F",q:"What does DIO stand for and what information does it carry?",ans:"DIO = DAG Information Object (sent by router nodes)\nCarries: DODAG ID, RPL-Instance ID, DODAG version number, rank of sending node, optionally: network prefix, objective function, metric container"},
+{ch:"7",t:"F",q:"What is the purpose of the rank in RPL?",ans:"A 16-bit node property, proportional to path cost to root. Must be GREATER than parent's rank. Used to maintain the DAG structure and avoid loops."},
+{ch:"7",t:"F",q:"What does ETX represent in RPL?",ans:"ETX = Expected Transmission Count — number of transmissions (including retransmissions) needed to successfully deliver a packet. Lower ETX = better link."},
+{ch:"7",t:"F",q:"What does MRHOF stand for?",ans:"Minimum Rank with Hysteresis Objective Function\nSelects the best parent based on path cost metrics (ETX, latency, hop count). Hysteresis prevents frequent parent changes."},
+{ch:"7",t:"F",q:"What is the purpose of DAO messages in RPL?",ans:"DAO = Destination Advertisement Object\nPropagates information about a node's children UP to the DODAG root, allowing parents to build downward routing tables."},
+{ch:"7",t:"F",q:"What triggers a node to send a DIS message in RPL?",ans:"DIS = DAG Information Solicitation\nTriggered when:\n1. A new node joins the network\n2. A sleeping node wakes up\n3. A node cannot reach its current parent"},
+{ch:"7",t:"C",q:"Classify properties as Storing Mode or Non-Storing Mode",
+ cats:{"Storing Mode":["Each node stores routing table entries","DAO messages propagate child info upward","Nodes know next hop for downward routes","More memory required per node"],"Non-Storing Mode":["Only the root stores all routing information","Source routing header used (root adds full path)","All packets pass through the root node","Less memory needed on devices","Used by RPL Lite (default in Contiki-NG)"]}},
+{ch:"7",t:"L",q:"Labels on the Trickle Timer diagram",
+ ctx:"The Trickle timer controls DIO message frequency. It has an interval that doubles over time when the network is stable.",
+ labels:["Imin: minimum interval size (starting value)","Imax: maximum interval = Imin × 2^DIOIntervalDoublings","I: current interval size (doubles after each stable period)","t: random transmission time chosen in [I/2, I]","c: counter of consistent DIO messages heard in current interval","k: redundancy constant (if c ≥ k, suppress own DIO transmission)"]},
+{ch:"7",t:"F",q:"What constitutes a 'good' message in the Trickle algorithm?",ans:"A DIO message that does NOT announce any change in parents, ranks, or DODAG version. Good messages cause the counter c to increment."},
+{ch:"7",t:"F",q:"What is the purpose of the Trickle timer?",ans:"To avoid unnecessary DIO messages. In a stable network, DIO frequency decreases over time (interval doubles up to Imax). A 'bad' message (change detected) resets the interval to Imin."},
+{ch:"7",t:"F",q:"What is the typical message complexity with Trickle?",ans:"O(k · log n), where k is the redundancy threshold and n is the number of nodes"},
+{ch:"7",t:"F",q:"What is a sinkhole attack in mesh networks?",ans:"A malicious node advertises a very good routing path to attract traffic, creating a 'sinkhole'. Packets are then dropped or manipulated."},
+{ch:"7",t:"F",q:"Describe a wormhole attack in mesh networks.",ans:"An attacker creates a fast link between two distant points, eavesdropping, modifying, or dropping packets routed through this tunnel."},
+
+/* ===== CHAPTER 8 ===== */
+{ch:"8",t:"F",q:"Why can't we use HTTP to access an API in the context of IoT devices and WSN?",ans:"HTTP headers are often 700 bytes or more — far too large for constrained IoT devices with 127-byte IEEE 802.15.4 frames."},
+{ch:"8",t:"F",q:"What does CoAP stand for?",ans:"Constrained Application Protocol"},
+{ch:"8",t:"F",q:"What are the four message types in CoAP?",ans:"0: CON (Confirmable) — requires ACK, retransmitted until acknowledged\n1: NON (Non-confirmable) — fire and forget\n2: ACK (Acknowledgment)\n3: RST (Reset)"},
+{ch:"8",t:"F",q:"What are the main components of a CoAP message header?",ans:"Version (Ver), Type (T), Token Length (TKL), Code, Message ID\nFixed 4-byte header!"},
+{ch:"8",t:"F",q:"Name the CoAP request methods",ans:"GET, POST, PUT, DELETE (same as HTTP)"},
+{ch:"8",t:"F",q:"How does CoAP achieve reliable messaging over UDP?",ans:"CON (Confirmable) messages require an ACK. If no ACK received within timeout, retransmit with exponential back-off, up to MAX_RETRANSMIT times."},
+{ch:"8",t:"F",q:"What is the difference between synchronous and asynchronous CoAP exchange?",ans:"Synchronous: Request sent as CON; response piggybacked in the ACK.\nAsynchronous: Request sent as CON; recipient sends empty ACK immediately; later sends actual response in a separate CON message."},
+{ch:"8",t:"F",q:"What is the purpose of the Observe option in CoAP?",ans:"Allows a client to register as an observer for a resource. The server sends updates whenever the resource changes — avoiding repeated polling."},
+{ch:"8",t:"F",q:"What security protocol can be used with CoAP?",ans:"DTLS (Datagram Transport Layer Security), indicated by 'coaps://' URI scheme"},
+{ch:"8",t:"F",q:"What is the purpose of block-wise transfer in CoAP?",ans:"For large resources that don't fit in a single frame. Client sends multiple GET requests for different byte ranges of the resource."},
+
+/* ===== CHAPTER 9 ===== */
+{ch:"9",t:"F",q:"What does MQTT stand for?",ans:"Message Queue Telemetry Transport"},
+{ch:"9",t:"F",q:"What does MQTT run on top of?",ans:"TCP/IP\n• Port 1883: MQTT\n• Port 8883: Secure MQTT (MQTT over SSL/TLS)"},
+{ch:"9",t:"F",q:"What is the difference between CoAP/HTTP and MQTT architectures?",ans:"CoAP/HTTP: Client-Server PULL architecture (client requests data)\nMQTT: Publisher-Subscriber PUSH architecture (broker distributes data to subscribers)"},
+{ch:"9",t:"L",q:"Find the name of the three categories in the MQTT architecture schema",
+ ctx:"The MQTT architecture schema shows data flow between three types of entities: those who produce data, those who receive and forward data, and those who consume data.",
+ labels:["Publisher(s) — send data to the broker with a topic label","Broker — receives messages from publishers and forwards them to matching subscribers","Subscriber(s) — register at the broker for specific topics; receive matching messages"]},
+{ch:"9",t:"F",q:"Explain the MQTT topic wildcards '+' and '#'",
+ ans:"'+' (plus — single-level wildcard):\n• Matches exactly ONE topic level\n• Example: 'home/+/temperature' matches 'home/room1/temperature' and 'home/kitchen/temperature'\n• Does NOT match 'home/floor1/room1/temperature' (two levels)\n\n'#' (hash — multi-level wildcard):\n• Matches ANY number of topic levels; MUST be the last character\n• Example: 'home/#' matches 'home/temp', 'home/room1/temp', 'home/room1/floor2/anything'\n• Example: '#' alone matches ALL topics"},
+{ch:"9",t:"F",q:"What is a Retained message in MQTT?",ans:"A retained message is stored by the broker. New subscribers immediately receive the last retained message for a topic, even if the original publish happened before they subscribed."},
+{ch:"9",t:"F",q:"Explain QoS level 0 in MQTT",ans:"'At most once' — fire and forget.\nSender sends PUBLISH. No retransmission. Message may be lost."},
+{ch:"9",t:"F",q:"Explain QoS level 1 in MQTT",ans:"'At least once'\nSender sends PUBLISH with packet ID.\nReceiver replies with PUBACK.\nSender retransmits if no PUBACK received.\nNo loss, but duplicates possible."},
+{ch:"9",t:"F",q:"Explain QoS level 2 in MQTT",ans:"'Exactly once'\n1. Sender → PUBLISH (packet ID)\n2. Receiver → PUBREC\n3. Sender → PUBREL\n4. Receiver → PUBCOMP\nNo loss, no duplicates. High overhead."},
+{ch:"9",t:"F",q:"What is a 'last will' message in MQTT?",ans:"A message automatically sent by the broker to subscribers if the connection with the publisher is lost unexpectedly.\nTriggered if: broker doesn't see a message from publisher within 1.5 × keep-alive duration.\nNOT sent if publisher disconnects gracefully with DISCONNECT message."},
+{ch:"9",t:"F",q:"What is MQTT-SN?",ans:"MQTT for Sensor Networks\n• Runs over UDP (not TCP)\n• Adds QoS level −1: publisher can publish without connecting\n• Requires a gateway to translate between MQTT-SN and normal MQTT\n• Gateway stores messages for sleeping devices"},
+
+/* ===== CHAPTER 10 ===== */
+{ch:"10",t:"F",q:"What does LoRa stand for?",ans:"Long Range"},
+{ch:"10",t:"F",q:"What are the two main components of LoRa technology?",ans:"LoRa PHY: the physical layer (proprietary Chirp Spread Spectrum modulation)\nLoRaWAN: the MAC layer protocol on top of LoRa PHY"},
+{ch:"10",t:"F",q:"What is a chirp in LoRa?",ans:"A short signal with a linearly increasing ('up-chirp') or decreasing ('down-chirp') frequency. LoRa uses Chirp Spread Spectrum (CSS) modulation."},
+{ch:"10",t:"F",q:"What does the spreading factor (SF) indicate in LoRa?",ans:"SF defines the length of each symbol. A symbol of SF n encodes n bits by starting the chirp at one of 2ⁿ possible frequencies.\nHigher SF → longer symbols → lower bit rate → longer range."},
+{ch:"10",t:"F",q:"How is the data rate calculated in LoRa?",ans:"Data rate = Spreading factor × Coding rate × Symbol rate\n• Symbol rate = Bandwidth / 2^SF\n• Coding rate = data bits / total bits (e.g., 4/5 = 0.8)"},
+{ch:"10",t:"N",q:"What is the symbol rate if we have a 125 kHz bandwidth and SF7?",ans:"976"},
+{ch:"10",t:"N",q:"What is the coding rate if we have 5 bits for 4 data bits?",ans:"0.8"},
+{ch:"10",t:"N",q:"What is the data rate if we have SF7, 125 kHz bandwidth, 4:5 coding rate?",ans:"5465"},
+{ch:"10",t:"F",q:"How many LoRaWAN device classes are there? Name them.",ans:"Three classes: A, B, and C"},
+{ch:"10",t:"F",q:"Describe Class A LoRaWAN devices",ans:"• Can send at any time\n• After sending, opens TWO receive windows (1 s and 2 s after TX)\n• Server can only respond in these windows\n• Lowest power consumption — most common class\n• ALL devices must support Class A"},
+{ch:"10",t:"F",q:"Describe Class B LoRaWAN devices",ans:"• Send and receive at specific times\n• Gateway sends beacon every 128 s to synchronize\n• Device opens 'ping slots' for downlink\n• Server always knows device is reachable during ping slot\n• Higher energy than Class A"},
+{ch:"10",t:"F",q:"Describe Class C LoRaWAN devices",ans:"• Can send at any time\n• Receive CONTINUOUSLY (except while sending)\n• Lowest latency, always reachable\n• Highest power consumption — usually on mains power"},
+{ch:"10",t:"F",q:"What is the purpose of the Network Session Key (NwSKey)?",ans:"Used to sign messages in the MIC (Message Integrity Code) header. Shared between the device and the network server. Ensures message authenticity."},
+{ch:"10",t:"F",q:"What is the difference between OTAA and ABP activation?",ans:"OTAA (Over-The-Air Activation): Device joins network dynamically. AppKey on a separate Join Server (more secure).\nABP (Activation By Personalization): Session keys manually configured on device (less secure, no join procedure)."}
+];
+
+
+// ===== EXTRA QUESTIONS (added to complete full question set) =====
+const EXTRA=[
+/* Ch1 missing */
+{ch:"1",t:"M",q:"What is a typical power profile strategy for a Shockfish TinyNode in a WSN?",
+ opts:["Keep the radio on constantly","Use high power transmission at all times","Disable sensors to save power","Reduce listening time when no nodes are found and optimize sleep mode"],a:3},
+{ch:"1",t:"M",q:"Which technological advancement has contributed to the growth of IoT?",
+ opts:["Manual data entry","Traditional landline phones","Wireless communication protocols","Analog television"],a:2},
+{ch:"1",t:"M",q:"What is a common use case of IoT in the consumer market?",
+ opts:["Social media platforms","Video streaming services","Online banking","Smart Home"],a:3},
+
+/* Ch2 missing */
+{ch:"2",t:"M",q:"What is the main purpose of the JTAG interface in microcontrollers?",
+ opts:["To increase processing speed","To write to flash memory or RAM from a serial interface when the device is empty","To write code without using communication interfaces","To connect the microcontroller to external sensors"],a:1},
+{ch:"2",t:"M",q:"What is a key characteristic of RIOT OS task preemption?",
+ opts:["Tasks run only when explicitly scheduled","Tasks are non-preemptible once started","Tasks with same priority cannot cooperate","Tasks with higher priority can interrupt lower priority tasks"],a:3},
+{ch:"2",t:"M",q:"What programming API does Contiki use for networking in uIP?",
+ opts:["Synchronous API","Procedural API only","Object-oriented API","Event-based API"],a:3},
+{ch:"2",t:"M",q:"What is a notable limitation of uIP's TCP implementation?",
+ opts:["It supports full congestion control and sliding window","Only one TCP segment can be on the air at a time","It requires large amounts of RAM","It cannot handle IP fragmentation"],a:1},
+{ch:"2",t:"F",q:"What are the two main mechanisms for loading code onto a microcontroller?",
+ ans:"1. JTAG — writes code/data to flash or RAM without using built-in communication interfaces\n2. BSL (Bootstrap Loader) — writes to flash/RAM via a serial interface when the device is empty (no firmware yet)"},
+
+/* Ch3 missing — FillInBlanks converted to flashcard */
+{ch:"3",t:"F",q:"Source encoder (role & example)",
+ ans:"• NOT part of the physical layer\n• Encodes information into a source codeword\n• Example: PCM (Pulse Code Modulation) encodes analog voice as digital codewords"},
+{ch:"3",t:"F",q:"Channel encoder (role & goals)",
+ ans:"• Encodes the source codeword as a channel codeword\n• Adapted to the properties of the channel\n• Goals: allow receiver to IDENTIFY bit errors and CORRECT a limited number of bit errors"},
+{ch:"3",t:"F",q:"How does modulation work? Define baseband and carrier signal.",
+ ans:"Modulation = combining a BASEBAND signal m(t) with a CARRIER signal c(t) by manipulating A(t), f(t), φ(t) of the carrier in function of the baseband.\n• Baseband signal = a DIGITAL signal (the codeword to transmit)\n• Carrier signal = a SINUS wave at carrier frequency fc"},
+
+/* Ch4 missing */
+{ch:"4",t:"M",q:"What is a key advantage of token-passing over demand-based assignment?",
+ opts:["No central coordinator is needed","It eliminates the need for a token","It prevents token loss","Allows nodes to transmit without holding the token"],a:0},
+{ch:"4",t:"M",q:"In a token-passing network, what must a node do before transmitting data?",
+ opts:["Send a request to the server","Wait for a collision","Hold the token","Detect if the channel is free"],a:2},
+{ch:"4",t:"M",q:"What is a disadvantage of polling in network communication?",
+ opts:["It guarantees fairness","It is the most efficient method","It requires no central coordination","Overhead and lack of scalability to large numbers of nodes"],a:3},
+{ch:"4",t:"M",q:"What is a disadvantage of random access methods?",
+ opts:["They do not allow for low latency","They are not fully distributed","The number of collisions increases with more nodes and traffic","They require synchronized clocks"],a:2},
+{ch:"4",t:"F",q:"What is an example of a random access network?",ans:"WiFi (IEEE 802.11) — nodes transmit whenever they want, using CSMA/CA to reduce collisions."},
+{ch:"4",t:"M",q:"What is the purpose of collision detection in CSMA/CD?",
+ opts:["To stop transmitting immediately when a collision occurs","To increase transmission speed","To detect collisions after transmission ends","To prevent collisions from happening"],a:0},
+{ch:"4",t:"M",q:"What is the main advantage of CSMA/CD over plain CSMA?",
+ opts:["Does not require hardware to listen while sending","Does not waste time transmitting when a collision occurs","Uses less bandwidth","Prevents all collisions"],a:1},
+{ch:"4",t:"M",q:"Why does CSMA/CD require full duplex hardware?",
+ opts:["To detect collisions after they happen","Because nodes need to send and listen at the same time","Because it only works on half duplex hardware","To avoid the need for collision detection"],a:1},
+
+/* Ch5 missing */
+{ch:"5",t:"M",q:"What is a key feature of IEEE 802.15.4 that makes it suitable for low-power devices?",
+ opts:["High power consumption for better range","Low data rate and complex protocol stack","Low data rate and simple protocol stack","High data rate and low power"],a:2},
+{ch:"5",t:"F",q:"What is the purpose of the 16-bit short address in IEEE 802.15.4?",
+ ans:"Assigns a unique address to nodes within a PAN for efficient communication. Valid only INSIDE the PAN (not routable globally)."},
+{ch:"5",t:"F",q:"What is the process of requesting a timeslot in the CFP (Contention Free Period)?",
+ ans:"1. Node sends a GTS (Guaranteed Time Slot) request during CAP\n2. Coordinator assigns a timeslot in the NEXT beacon frame"},
+{ch:"5",t:"M",q:"The channels in TSCH can be:",
+ opts:["Shared only","Dedicated to a single node only","Both shared or dedicated to a single node"],a:2},
+{ch:"5",t:"M",q:"How does TSCH ensure synchronization among devices?",
+ opts:["Using a central clock in each device","Through GPS signals","By sending beacons periodically"],a:2},
+{ch:"5",t:"M",q:"What are the possible scheduling approaches in TSCH?",
+ opts:["Static scheduling only","Centralized scheduling only","Static, centralized or decentralized scheduling"],a:2},
+
+/* Ch6 LoWPAN missing */
+{ch:"6",t:"M",q:"What is the maximum frame size of IEEE 802.15.4?",
+ opts:["255 bytes","1024 bytes","127 bytes"],a:2},
+{ch:"6",t:"M",q:"In 6LoWPAN, what does the first byte of the stacked header (dispatch byte) indicate?",
+ opts:["The packet's priority level","The header type","The source address"],a:1},
+{ch:"6",t:"F",q:"Can 6LoWPAN be used with network layers other than 802.15.4?",
+ ans:"Yes — 6LoWPAN can also be used with other physical and MAC layers, such as power-line communication."},
+{ch:"6",t:"F",q:"What is the purpose of the HC2 byte in 6LoWPAN?",
+ ans:"It indicates whether the UDP length and ports are compressed or uncompressed (used alongside HC1 for UDP header compression)."},
+{ch:"6",t:"F",q:"What is a drawback of HC1/HC2 compression?",
+ ans:"Reduces IPv6+UDP headers to 7 bytes in the best case, but FULL ROUTABLE addresses are needed outside the network — communication with external servers requires 128-bit addresses."},
+{ch:"6",t:"F",q:"What is the typical network topology used by 802.15.4 networks in 6LoWPAN?",
+ ans:"They typically run in unslotted mode (CSMA/CA) with a mesh topology."},
+{ch:"6",t:"M",q:"What is the minimum IPv6 MTU size that requires fragmentation in 6LoWPAN?",
+ opts:["1024 bytes","1500 bytes","1280 bytes"],a:2},
+{ch:"6",t:"F",q:"How many bits does LOWPAN_IPHC use in the dispatch byte?",
+ ans:"It uses the remaining 5 bits of the dispatch byte plus 8 extra bits (total ~13 bits for compression control)."},
+{ch:"6",t:"F",q:"In LOWPAN_IPHC, what does setting the Next-Header bit to 1 signify?",
+ ans:"The Next-Header field is COMPRESSED using LOWPAN_NHC compression."},
+{ch:"6",t:"F",q:"What are the three options for Hop Limit in LOWPAN_IPHC compression?",
+ ans:"Uncompressed, or set to 1, 64, or 255 (common values, compressed to 2 bits)."},
+{ch:"6",t:"F",q:"How many contexts can be used in LOWPAN_IPHC stateful compression?",
+ ans:"Up to 16 contexts — 4 bits for source, 4 bits for destination (specified by CID field)."},
+{ch:"6",t:"F",q:"How does the sender forward packets in Route-over routing?",
+ ans:"The sender sends an IP packet to the next hop, which forwards it to the destination using an IP routing protocol (like RPL)."},
+{ch:"6",t:"F",q:"What is the limitation of IEEE 802.15.4 frames regarding multi-hop delivery?",
+ ans:"802.15.4 frames can only be sent as single-hop frames — they cannot natively carry multi-hop routing information."},
+{ch:"6",t:"F",q:"In the Mesh Addressing Header, what addresses are specified?",
+ ans:"The link-layer address of the next hop AND the original source and final destination addresses."},
+{ch:"6",t:"F",q:"What are the possible sizes of source/destination addresses in the Mesh Addressing Header?",
+ ans:"16-bit or 64-bit addresses."},
+{ch:"6",t:"F",q:"What is the purpose of reassembling and fragmenting packets at each hop in 6LoWPAN routing?",
+ ans:"To enable multi-hop communication and proper delivery across the network."},
+
+/* Ch7 RPL missing */
+{ch:"7",t:"F",q:"What does a 'grounded' DODAG mean in RPL?",
+ ans:"A 'grounded' DODAG means the goal has been fulfilled — a stable, fully established routing structure.\nA 'floating' DODAG is not yet fully established."},
+{ch:"7",t:"F",q:"What does an RPL instance consist of?",ans:"Multiple disjoint DODAGs (all optimizing for the same objective)."},
+{ch:"7",t:"F",q:"Can multiple RPL instances operate on the same physical network?",
+ ans:"Yes — multiple RPL instances can run on the same network, each optimized for a different objective (energy, delay, etc.)"},
+{ch:"7",t:"F",q:"How does a node select a parent in an RPL network?",
+ ans:"Based on path quality metrics (signal quality, delay, throughput) and the objective function's criteria — aiming to minimize its rank."},
+{ch:"7",t:"F",q:"What is the role of Objective Function Zero (OF0) in RPL?",
+ ans:"OF0 defines how nodes calculate their rank based on parent's rank and link quality, with the goal of selecting the parent that results in the lowest rank.\nFormula: Rank(child) = Rank(parent) + (Rf × Sp + Sr) × Mi"},
+{ch:"7",t:"F",q:"Why are hysteresis and threshold mechanisms important in RPL parent selection?",
+ ans:"They stabilize the network by preventing frequent parent changes due to minor variations in path cost."},
+{ch:"7",t:"F",q:"How does a node calculate its own path cost in MRHOF?",
+ ans:"Path cost = (path cost in DIO from parent Y) + metric(X, Y)\nThe node adds the link cost to the parent's advertised path cost."},
+{ch:"7",t:"F",q:"How are DAO messages typically transmitted in RPL?",
+ ans:"Unicast to the parent OR link-local multicast. They are then forwarded up toward the root."},
+{ch:"7",t:"F",q:"What describes packet forwarding in Storing Mode?",
+ ans:"Up: packets sent toward lower rank or sibling nodes.\nDown: nodes use DAO messages to know the route to destination — only the NEXT HOP is stored (not the complete route)."},
+{ch:"7",t:"F",q:"Why do nodes in RPL only store the next hop rather than the complete route?",
+ ans:"To reduce memory usage and complexity — nodes only keep track of the next hop to forward packets efficiently."},
+{ch:"7",t:"F",q:"What is RPL Lite and what packet forwarding mode does it use?",
+ ans:"RPL Lite is the default RPL implementation in Contiki-NG. It only supports NON-STORING mode."},
+{ch:"7",t:"F",q:"How does source routing work in IPv6 (RFC 6554)?",
+ ans:"The root adds a source routing header with the IP addresses of nodes along the path. Each node forwards the packet based on the next address in the header."},
+{ch:"7",t:"F",q:"What is a disadvantage of source routing headers?",
+ ans:"They can become LARGE if the path is long, increasing packet size and overhead."},
+{ch:"7",t:"F",q:"What does the 'Segments Left' field indicate in the source routing header?",
+ ans:"How many segments (hops) remain in the route — decreased by 1 at each hop."},
+{ch:"7",t:"F",q:"What is the purpose of local repair in a DODAG?",
+ ans:"To fix routing problems locally when a node detects an issue (loses its parent, receives wrong direction flag). Node detaches, advertises infinite rank, broadcasts DIS to find new parent."},
+{ch:"7",t:"F",q:"What happens during a global repair of a DODAG?",
+ ans:"The root INCREASES the version number. Nodes update to the new version, performing route poisoning and selecting new parents and ranks."},
+{ch:"7",t:"F",q:"Why is loop avoidance important in lossy wireless networks?",
+ ans:"Message loss can cause rank inconsistencies and routing loops, which disrupt network stability."},
+{ch:"7",t:"F",q:"What does the direction flag (O flag) indicate in RPL header options?",
+ ans:"The expected direction of a data packet: 0 = upward (toward root), 1 = downward (away from root)."},
+{ch:"7",t:"F",q:"What general purpose do routing attacks serve in mesh networks?",
+ ans:"They aim to disturb the network by manipulating the routing of traffic."},
+{ch:"7",t:"F",q:"What is a selective-forwarding attack?",
+ ans:"A malicious node does NOT forward all packets, potentially disrupting communication without being obviously detected."},
+{ch:"7",t:"F",q:"What is a DODAG version attack?",
+ ans:"A malicious node sends fake DIO messages with a new version number, causing nodes to join it and potentially creating routing loops."},
+
+/* Ch8 CoAP missing */
+{ch:"8",t:"F",q:"What type of protocol is CoAP inspired by?",ans:"HTTP (Hypertext Transfer Protocol)"},
+{ch:"8",t:"F",q:"What is a key advantage of CoAP?",ans:"Low overhead (4-byte fixed header) and easy to implement on constrained devices."},
+{ch:"8",t:"F",q:"What is a disadvantage of CoAP?",ans:"Wastes bandwidth if data is needed periodically or by multiple clients (polling-based)."},
+{ch:"8",t:"F",q:"What layer does CoAP operate on?",ans:"Application layer (runs over UDP, not TCP)"},
+{ch:"8",t:"F",q:"What does the 'Ver' field in a CoAP message header represent?",ans:"The version of the CoAP protocol being used."},
+{ch:"8",t:"F",q:"How are options stored in a CoAP message?",
+ ans:"As a sequence of (option delta, option length, option value) triplets, with extended fields if needed."},
+{ch:"8",t:"F",q:"What does the 'Code' field in a CoAP message specify?",
+ ans:"The request method (GET=0.01, POST=0.02, PUT=0.03, DELETE=0.04) or the response code (2.xx success, 4.xx client error, 5.xx server error)."},
+{ch:"8",t:"F",q:"How does CoAP simplify URI parsing?",
+ ans:"By storing URI components in SEPARATE OPTIONS: Uri-Host, Uri-Port, Uri-Path, Uri-Query — rather than as a single string."},
+{ch:"8",t:"F",q:"What is the 'TKL' field in a CoAP message?",ans:"Token Length — specifies the length of the token in bytes (0–8 bytes)."},
+{ch:"8",t:"F",q:"Why should clients use long randomized token values?",
+ ans:"To prevent response-spoofing attacks — attackers cannot predict the token value."},
+{ch:"8",t:"F",q:"What is the significance of the Message ID in CoAP?",
+ ans:"Used for: de-duplication of messages, matching requests with responses, and managing retransmissions."},
+{ch:"8",t:"F",q:"What is the purpose of the 'Empty CON' message in CoAP?",
+ ans:"Can be used as a 'ping' to check if a server is reachable — the recipient replies with a RST message."},
+{ch:"8",t:"F",q:"What is the purpose of multicasting in CoAP?",
+ ans:"Useful for automatic service discovery in M2M (machine-to-machine) scenarios."},
+{ch:"8",t:"F",q:"What is the role of the ETag in CoAP caching?",
+ ans:"A string included in responses to indicate the resource version. Clients can send it in later requests; if unchanged, server replies '2.03 Valid' without resending content."},
+{ch:"8",t:"F",q:"What security concerns are associated with CoAP over UDP?",
+ ans:"UDP has no handshake/sequence numbers — third parties can spoof responses or disrupt communication.\nMitigation: DTLS + randomized long tokens."},
+
+/* Ch9 MQTT missing */
+{ch:"9",t:"F",q:"MQTT-SN — 3 key facts",
+ ans:"1. MQTT for Sensor Networks — runs over UDP (not TCP)\n2. QoS level -1: publisher can publish WITHOUT first connecting to broker\n3. Requires a GATEWAY to translate between MQTT-SN and standard MQTT (gateway also stores messages for sleeping devices)"},
+{ch:"9",t:"F",q:"Why does MQTT-SN need a gateway?",
+ ans:"To translate between MQTT-SN (UDP) and normal MQTT (TCP/IP). The gateway also stores messages if the client is sleeping and delivers them when the client wakes up."},
+{ch:"9",t:"F",q:"What is a SUBSCRIBE message and what does it contain?",
+ ans:"Used by subscribers to register for topics.\nContains: topic names (wildcards allowed) + desired maximum QoS level."},
+{ch:"9",t:"F",q:"What is a PUBLISH message and what does it contain?",
+ ans:"Used by publisher or broker to send data.\nContains: QoS level, Retain flag, Topic name, Payload, Packet ID (for QoS 1 and 2)."},
+{ch:"9",t:"F",q:"How does the broker choose the QoS level when publisher and subscriber have different QoS?",
+ ans:"The broker uses the MINIMUM QoS between the publisher's and subscriber's levels.\nExample: publisher QoS=1, subscriber QoS=2 → broker uses QoS 1."},
+{ch:"9",t:"F",q:"How does a client connect to a broker in MQTT? What messages are exchanged?",
+ ans:"Client sends CONNECT message to broker.\nBroker replies with CONNACK (connection acknowledgment) which can contain: unique client ID, username/password, keep-alive duration, last will topic and message."},
+
+/* Ch10 LoRa missing */
+{ch:"10",t:"F",q:"What are the components of a LoRa physical packet?",
+ ans:"8 preamble chirps + 2 sync chirps + header (19 bits) + payload (up to 255 bytes) + optional CRC (2 bytes)"},
+{ch:"10",t:"F",q:"How does SF(n+1) compare to SF(n) in LoRa?",
+ ans:"SF(n+1) symbols are TWO TIMES LONGER than SF(n) symbols."},
+{ch:"10",t:"F",q:"What is the effect of increasing the spreading factor on communication?",
+ ans:"Higher SF → longer symbols → lower bit rate → better error correction → longer communication distance."},
+{ch:"10",t:"F",q:"What is the relationship between spreading factor and bits per symbol?",
+ ans:"A symbol of SF(n) encodes n bits by starting the chirp at one of 2ⁿ possible frequencies."},
+{ch:"10",t:"F",q:"What layers does LoRaWAN define?",
+ ans:"LoRaWAN defines the MAC layer (LoRaMAC) on top of the LoRa physical layer."},
+{ch:"10",t:"F",q:"What is the supported spreading factor range in LoRaWAN?",ans:"SF7 to SF12"},
+{ch:"10",t:"F",q:"What is the purpose of the 32-bit device address in LoRaMAC?",
+ ans:"It is assigned by the network server to the device for identification within the network."},
+{ch:"10",t:"F",q:"Why do devices perform channel hopping in LoRaWAN?",
+ ans:"To increase allowed time on air and avoid external interference losses."},
+{ch:"10",t:"F",q:"What factors does LoRaWAN performance depend on?",
+ ans:"Number of devices, payload size vs header size, distance to gateway, background noise level, number of channels a device can use."},
+{ch:"10",t:"F",q:"What is an advantage of Class B LoRaWAN devices?",
+ ans:"The server can be SURE the device is reachable during the 'ping slot' — predictable downlink timing."},
+{ch:"10",t:"F",q:"What is the primary function of a LoRaWAN gateway?",
+ ans:"Listens on ALL channels simultaneously and forwards messages from devices to the network server."},
+{ch:"10",t:"F",q:"How does the network server handle duplicate messages from multiple gateways?",
+ ans:"It filters out duplicates using the FRAME COUNTER embedded in each message."},
+{ch:"10",t:"F",q:"What does NwSKey stand for and what is its purpose?",
+ ans:"NwSKey = Network Session Key\nUsed to sign messages in the MIC (Message Integrity Code) header. Shared by all devices and the network server."},
+{ch:"10",t:"F",q:"Between which components are messages encrypted using the AppSKey?",
+ ans:"Between the DEVICE and the APPLICATION SERVER (end-to-end encryption, the network server cannot read the payload)."},
+{ch:"10",t:"F",q:"What are the three requirements for device activation in LoRaWAN (before v1.0.4)?",
+ ans:"1. 64-bit device ID (DevEUI)\n2. 64-bit application ID (AppEUI)\n3. AES 128-bit AppKey (shared with Network Server — used to sign join-request and authenticate during activation)"},
+{ch:"10",t:"F",q:"How does OTAA (Over-The-Air Activation) change with LoRaWAN 1.0.4?",
+ ans:"The AppKey is stored on a SEPARATE JOIN SERVER instead of the network server, improving security."},
+{ch:"10",t:"F",q:"What is the main security difference between OTAA and ABP (Activation By Personalization)?",
+ ans:"OTAA: AppKey on separate server (more secure, dynamic session keys).\nABP: Session keys manually configured on device (less secure, no join procedure)."}
+];
+
+// Merge all questions
+const ALL_Q = [...RAW, ...EXTRA];
+
+// ===== DYNAMIC NAV BUILDER =====
+const CH_NAMES = {
+  '1':'Ch.1 – Intro IoT',
+  '2':'Ch.2 – OS embarqué',
+  '3':'Ch.3 – Physique & Propagation',
+  '4':'Ch.4 – Accès au médium',
+  '5':'Ch.5 – IEEE 802.15.4',
+  '6':'Ch.6 – 6LoWPAN',
+  '7':'Ch.7 – RPL',
+  '8':'Ch.8 – CoAP',
+  '9':'Ch.9 – MQTT',
+  '10':'Ch.10 – LoRa'
+};
+
+function buildNav(){
+  const nav = document.getElementById('chapter-nav');
+  const total = ALL_Q.length;
+  let html = `<button class="ch-pill active" onclick="filterChapter('all',this)">Tous (${total})</button>`;
+  Object.entries(CH_NAMES).forEach(([k,v])=>{
+    const cnt = ALL_Q.filter(q=>q.ch===k).length;
+    html += `<button class="ch-pill" onclick="filterChapter('${k}',this)">${v} (${cnt})</button>`;
+  });
+  nav.innerHTML = html;
+}
+
+
+// ===== STATE =====
+let filtered = [...ALL_Q];
+let idx = 0;
+let answered = {}; // idx -> {correct: bool, skipped: bool}
+let currentCh = 'all';
+let selectedItem = null; // for categorization
+
+function filterChapter(ch, el){
+  currentCh = ch;
+  document.querySelectorAll('.ch-pill').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  filtered = ch==='all' ? [...ALL_Q] : ALL_Q.filter(q=>q.ch===ch);
+  answered = {};
+  idx = 0;
+  selectedItem = null;
+  render();
+}
+
+function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function shuffleQ(){
+  shuffleArray(filtered);
+  answered = {};
+  idx = 0;
+  selectedItem = null;
+  render();
+}
+
+function navigate(dir){
+  idx = Math.max(0, Math.min(filtered.length-1, idx+dir));
+  selectedItem = null;
+  render();
+}
+
+function getScore(){
+  let correct=0,wrong=0,skip=0;
+  for(const k in answered){
+    if(answered[k].skipped) skip++;
+    else if(answered[k].correct) correct++;
+    else wrong++;
+  }
+  return {correct,wrong,skip};
+}
+
+function render(){
+  if(filtered.length===0){
+    document.getElementById('question-card').innerHTML='<p style="text-align:center;color:#94a3b8;padding:40px">Aucune question dans ce chapitre.</p>';
+    return;
+  }
+  const q = filtered[idx];
+  const total = filtered.length;
+  const pct = Math.round((idx/(total-1||1))*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-text').textContent=`Question ${idx+1} / ${total}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  const sc = getScore();
+  document.getElementById('sc-correct').textContent=sc.correct;
+  document.getElementById('sc-wrong').textContent=sc.wrong;
+  document.getElementById('sc-skip').textContent=sc.skip;
+  document.getElementById('sc-total').textContent=filtered.length;
+  document.getElementById('btn-prev').disabled=(idx===0);
+  document.getElementById('btn-next').disabled=(idx===filtered.length-1);
+  const chNames={"1":"Ch.1","2":"Ch.2","3":"Ch.3","4":"Ch.4","5":"Ch.5","6":"Ch.6","7":"Ch.7","8":"Ch.8","9":"Ch.9","10":"Ch.10"};
+  const typeNames={M:'MCQ',F:'Flashcard',S:'ShortAnswer',T:'TrueOrFalse',B:'FillInBlanks',G:'Matching',C:'Categorization',L:'LabelOnImage',N:'GuessNumber'};
+  const typeClass={M:'MCQ',F:'Flashcard',S:'ShortAnswer',T:'TrueOrFalse',B:'FillInTheBlanks',G:'Matching',C:'Categorization',L:'LabelOnImage',N:'GuessNumber'};
+  let html=`<div class="q-header">
+    <span class="q-type-badge type-${typeClass[q.t]||'MCQ'}">${typeNames[q.t]||q.t}</span>
+    <span class="q-num">${chNames[q.ch]||''} · #${idx+1}</span>
+  </div>
+  <div class="q-text">${q.q}</div>`;
+  switch(q.t){
+    case'M': html+=renderMCQ(q); break;
+    case'F': html+=renderFlashcard(q); break;
+    case'S': html+=renderShortAnswer(q); break;
+    case'T': html+=renderTrueOrFalse(q); break;
+    case'G': html+=renderMatching(q); break;
+    case'C': html+=renderCategorization(q); break;
+    case'L': html+=renderLabel(q); break;
+    case'N': html+=renderGuess(q); break;
+    default: html+=renderFlashcard(q);
+  }
+  document.getElementById('question-card').innerHTML=html;
+  // Re-attach cat events
+  if(q.t==='C') initCat(q);
+}
+
+function renderMCQ(q){
+  const prev = answered[idx];
+  let html='';
+  const opts = Array.isArray(q.opts)?q.opts:[];
+  opts.forEach((o,i)=>{
+    let cls='mcq-option';
+    if(prev && !prev.skipped){
+      const isCorrect = Array.isArray(q.a)?q.a.includes(i):(q.a===i);
+      if(isCorrect) cls+=' highlight';
+      if(prev.chosen!==undefined){
+        if(prev.chosen===i && !isCorrect) cls+=' wrong';
+      }
+    }
+    html+=`<label class="${cls}"><input type="radio" name="mcq" value="${i}" ${prev&&!prev.skipped?'disabled':''}> ${o}</label>`;
+  });
+  const fb = prev&&!prev.skipped ? `<div class="feedback show ${prev.correct?'feedback-correct':'feedback-wrong'}">${prev.correct?'✓ Correct !':'✗ Pas tout à fait.'} La bonne réponse : <b>${Array.isArray(q.a)?q.a.map(i=>opts[i]).join(' / '):opts[q.a]}</b></div>` : '';
+  return html+fb;
+}
+
+function renderFlashcard(q){
+  return `<div class="flashcard-wrap">
+    <div class="flashcard" id="fc-card" onclick="flipCard()">
+      <div class="fc-face fc-front"><div>${q.q}</div></div>
+      <div class="fc-face fc-back"><div style="white-space:pre-line">${(q.ans||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>
+    </div>
+  </div>
+  <p class="flashcard-hint">Cliquer pour retourner la carte</p>
+  <div class="fc-self-grade" id="fc-grade">
+    <button class="btn-knew" onclick="gradeFC(true)">✓ Je savais</button>
+    <button class="btn-didnt" onclick="gradeFC(false)">✗ Je ne savais pas</button>
+  </div>`;
+}
+
+function flipCard(){
+  const card=document.getElementById('fc-card');
+  if(!card) return;
+  card.classList.toggle('flipped');
+  if(card.classList.contains('flipped')){
+    document.getElementById('fc-grade').classList.add('visible');
+  }
+}
+
+function gradeFC(knew){
+  answered[idx]={correct:knew,skipped:false};
+  const sc=getScore();
+  document.getElementById('sc-correct').textContent=sc.correct;
+  document.getElementById('sc-wrong').textContent=sc.wrong;
+}
+
+function renderShortAnswer(q){
+  const prev=answered[idx];
+  return `<input type="text" class="short-input" placeholder="Votre réponse…" id="sa-input" onkeydown="if(event.key==='Enter')checkCurrent()">
+  <div class="short-answer-reveal ${prev?'visible':''}" id="sa-reveal">
+    <b>Réponse :</b><br><span style="white-space:pre-line">${(q.ans||'').replace(/</g,'&lt;')}</span>
+  </div>`;
+}
+
+function renderTrueOrFalse(q){
+  const prev=answered[idx];
+  let html='';
+  (q.items||[]).forEach((it,i)=>{
+    let cls='tf-item';
+    let trueState='',falseState='';
+    if(prev&&prev.choices){
+      const ch=prev.choices[i];
+      if(ch==='true') trueState='selected-true';
+      if(ch==='false') falseState='selected-false';
+    }
+    html+=`<div class="${cls}" id="tf-item-${i}">
+      <span class="tf-text">${it.tx}</span>
+      <div class="tf-btns">
+        <button class="btn-tf btn-true ${trueState}" onclick="tfClick(${i},true)">V</button>
+        <button class="btn-tf btn-false ${falseState}" onclick="tfClick(${i},false)">F</button>
+      </div>
+      <span class="tf-result" id="tfr-${i}"></span>
+    </div>`;
+  });
+  return html;
+}
+
+function tfClick(itemIdx, val){
+  const q=filtered[idx];
+  if(!answered[idx]) answered[idx]={choices:{},correct:true,skipped:false};
+  answered[idx].choices[itemIdx]=(val?'true':'false');
+  const correct=(val===q.items[itemIdx].ans);
+  const item=document.getElementById('tf-item-'+itemIdx);
+  const res=document.getElementById('tfr-'+itemIdx);
+  item.classList.remove('correct-item','wrong-item');
+  item.classList.add(correct?'correct-item':'wrong-item');
+  res.textContent=correct?'✓':'✗ ('+( q.items[itemIdx].ans?'V':'F')+')';
+  res.style.color=correct?'var(--green)':'var(--red)';
+  if(!correct) answered[idx].correct=false;
+  const sc=getScore();
+  document.getElementById('sc-correct').textContent=sc.correct;
+  document.getElementById('sc-wrong').textContent=sc.wrong;
+}
+
+function renderMatching(q){
+  // Shuffle right side
+  const pairs=q.pairs||[];
+  const rights=shuffleArray([...pairs.map(p=>p[1])]);
+  let html=`<div class="matching-grid">`;
+  pairs.forEach((p,i)=>{
+    html+=`<div class="match-left">${p[0]}</div>
+    <div class="match-right" id="mr-${i}">
+      <select id="ms-${i}">
+        <option value="">— Choisir —</option>
+        ${rights.map((r,j)=>`<option value="${j}">${r}</option>`).join('')}
+      </select>
+    </div>`;
+  });
+  html+=`</div>
+  <div class="matching-key" id="mk-key">
+    <b>Corrections :</b>
+    ${pairs.map(p=>`<div class="key-row"><span class="key-left">${p[0]}</span><span class="key-arrow">→</span><span class="key-right">${p[1]}</span></div>`).join('')}
+  </div>`;
+  // Store rights for checking
+  q._matchRights = rights;
+  return html;
+}
+
+function checkMatching(q){
+  const pairs=q.pairs||[];
+  const rights=q._matchRights||pairs.map(p=>p[1]);
+  let allCorrect=true;
+  pairs.forEach((p,i)=>{
+    const sel=document.getElementById('ms-'+i);
+    if(!sel) return;
+    const chosen=parseInt(sel.value);
+    const correct=rights[chosen]===p[1];
+    const wrap=document.getElementById('mr-'+i);
+    wrap.classList.remove('match-item-correct','match-item-wrong');
+    wrap.classList.add(correct?'match-item-correct':'match-item-wrong');
+    if(!correct) allCorrect=false;
+  });
+  document.getElementById('mk-key').classList.add('visible');
+  answered[idx]={correct:allCorrect,skipped:false};
+  return allCorrect;
+}
+
+function renderCategorization(q){
+  const cats=q.cats||{};
+  const allItems=Object.values(cats).flat();
+  shuffleArray(allItems);
+  let html=`<div class="cat-items" id="cat-items">`;
+  allItems.forEach((it,i)=>{
+    html+=`<div class="cat-chip" id="chip-${i}" data-text="${it.replace(/"/g,'&quot;')}">${it}</div>`;
+  });
+  html+=`</div><div class="cat-buckets">`;
+  Object.keys(cats).forEach(cat=>{
+    html+=`<div class="cat-bucket" id="bucket-${cat.replace(/\s/g,'_')}" data-cat="${cat}">
+      <div class="cat-bucket-title">${cat} <span id="cnt-${cat.replace(/\s/g,'_')}" style="font-weight:400;color:#94a3b8;font-size:.78rem"></span></div>
+      <div class="cat-bucket-items" id="bi-${cat.replace(/\s/g,'_')}"></div>
+    </div>`;
+  });
+  html+=`</div>
+  <div class="cat-answer-box" id="cat-ans">
+    <b>Réponse correcte :</b><br>
+    ${Object.entries(cats).map(([k,v])=>`<b>${k}</b>: ${v.join(', ')}`).join('<br><br>')}
+  </div>`;
+  q._allItems=allItems;
+  return html;
+}
+
+function initCat(q){
+  const chips=document.querySelectorAll('.cat-chip');
+  chips.forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      if(chip.classList.contains('placed')) return;
+      if(selectedItem===chip){
+        chip.classList.remove('selected');
+        selectedItem=null;
+      } else {
+        if(selectedItem) selectedItem.classList.remove('selected');
+        selectedItem=chip;
+        chip.classList.add('selected');
+      }
+    });
+  });
+  const buckets=document.querySelectorAll('.cat-bucket');
+  buckets.forEach(bucket=>{
+    bucket.addEventListener('click',()=>{
+      if(!selectedItem) return;
+      const cat=bucket.getAttribute('data-cat');
+      const text=selectedItem.getAttribute('data-text');
+      const catKey=cat.replace(/\s/g,'_');
+      const bi=document.getElementById('bi-'+catKey);
+      const placed=document.createElement('div');
+      placed.className='cat-placed-chip';
+      placed.textContent=text;
+      placed.setAttribute('data-text',text);
+      placed.setAttribute('data-cat',cat);
+      placed.addEventListener('click',()=>{
+        // Return to pool
+        const origChip=[...document.querySelectorAll('.cat-chip')].find(c=>c.getAttribute('data-text')===text);
+        if(origChip){origChip.classList.remove('placed','selected');}
+        placed.remove();
+      });
+      bi.appendChild(placed);
+      selectedItem.classList.add('placed');
+      selectedItem.classList.remove('selected');
+      selectedItem=null;
+      bucket.classList.remove('active');
+    });
+    bucket.addEventListener('mouseenter',()=>{if(selectedItem) bucket.classList.add('active');});
+    bucket.addEventListener('mouseleave',()=>bucket.classList.remove('active'));
+  });
+}
+
+function checkCategorization(q){
+  const cats=q.cats||{};
+  let correct=0,total=0;
+  Object.entries(cats).forEach(([cat,items])=>{
+    const catKey=cat.replace(/\s/g,'_');
+    const bi=document.getElementById('bi-'+catKey);
+    if(!bi) return;
+    const placed=[...bi.querySelectorAll('.cat-placed-chip')].map(c=>c.getAttribute('data-text'));
+    items.forEach(it=>{
+      total++;
+      if(placed.includes(it)) correct++;
+    });
+  });
+  const allCorrect=(correct===total);
+  answered[idx]={correct:allCorrect,skipped:false};
+  document.getElementById('cat-ans').classList.add('visible');
+  return allCorrect;
+}
+
+function renderLabel(q){
+  let html=`<div class="label-context">${q.ctx||''}</div>
+  <ul class="label-list" id="label-list">`;
+  (q.labels||[]).forEach((lbl,i)=>{
+    html+=`<li><div class="label-num">${i+1}</div><input class="label-input" placeholder="Label ${i+1}…" id="li-${i}"></li>`;
+  });
+  html+=`</ul>
+  <div class="label-reveal" id="lr-reveal">
+    <b>Réponses :</b>
+    <ol style="margin-top:8px;padding-left:20px">
+      ${(q.labels||[]).map(l=>`<li style="margin-bottom:4px">${l}</li>`).join('')}
+    </ol>
+  </div>`;
+  return html;
+}
+
+function checkLabel(q){
+  document.getElementById('lr-reveal').classList.add('visible');
+  answered[idx]={correct:true,skipped:false};
+}
+
+function renderGuess(q){
+  const prev=answered[idx];
+  return `<input type="number" class="guess-input" id="guess-in" placeholder="?" onkeydown="if(event.key==='Enter')checkCurrent()">
+  <div class="feedback ${prev?'show':'feedback-correct'}" id="guess-fb" style="${prev?'':'display:none'}">
+    Réponse correcte : <b>${q.ans}</b>
+  </div>`;
+}
+
+function checkCurrent(){
+  const q=filtered[idx];
+  if(q.t==='M'){
+    const sel=document.querySelector('input[name="mcq"]:checked');
+    if(!sel){ alert('Sélectionnez une réponse !'); return; }
+    const chosen=parseInt(sel.value);
+    const correct=Array.isArray(q.a)?q.a.includes(chosen):(q.a===chosen);
+    answered[idx]={correct,chosen,skipped:false};
+    render();
+  } else if(q.t==='S'){
+    document.getElementById('sa-reveal').classList.add('visible');
+    answered[idx]={correct:true,skipped:false};
+  } else if(q.t==='F'){
+    flipCard();
+  } else if(q.t==='G'){
+    const correct=checkMatching(q);
+    const sc=getScore();
+    document.getElementById('sc-correct').textContent=sc.correct;
+    document.getElementById('sc-wrong').textContent=sc.wrong;
+  } else if(q.t==='C'){
+    const correct=checkCategorization(q);
+    const sc=getScore();
+    document.getElementById('sc-correct').textContent=sc.correct;
+    document.getElementById('sc-wrong').textContent=sc.wrong;
+  } else if(q.t==='L'){
+    checkLabel(q);
+  } else if(q.t==='N'){
+    const val=document.getElementById('guess-in').value;
+    const correct=parseFloat(val)===parseFloat(q.ans);
+    answered[idx]={correct,skipped:false};
+    const fb=document.getElementById('guess-fb');
+    if(fb){fb.style.display='block';fb.className='feedback show '+(correct?'feedback-correct':'feedback-wrong');fb.innerHTML=correct?'✓ Correct !':'✗ La réponse correcte est <b>'+q.ans+'</b>';}
+  }
+  const sc=getScore();
+  document.getElementById('sc-correct').textContent=sc.correct;
+  document.getElementById('sc-wrong').textContent=sc.wrong;
+}
+
+function restartQuiz(){
+  answered={};
+  idx=0;
+  document.getElementById('summary-panel').classList.remove('show');
+  render();
+}
+
+// Init
+buildNav();
+filtered = [...ALL_Q];
+render();
+</script>
+</body>
+</html>

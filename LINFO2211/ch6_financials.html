@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.6 – Financials | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:white;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom,var(--amber),var(--teal));}
+.header-inner{padding:32px 48px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:.82rem;color:#94a3b8;margin-bottom:10px;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+.chapter-badge{display:inline-block;background:linear-gradient(135deg,var(--amber),#d97706);color:white;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+header h1{font-size:1.9rem;font-weight:800;margin-bottom:6px;}
+header p.subtitle{color:#94a3b8;font-size:.95rem;}
+.header-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.1);color:#e2e8f0;font-size:.8rem;padding:4px 12px;border-radius:20px;}
+nav{background:white;border-bottom:1px solid #e2e8f0;padding:12px 48px;}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;}
+.nav-link{padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--gray);transition:all .2s;}
+.nav-link:hover,.nav-link.active{background:var(--teal);color:white;}
+main{max-width:1100px;margin:0 auto;padding:36px 48px;}
+.section{background:white;border-radius:14px;box-shadow:0 2px 16px rgba(30,58,95,.07);padding:32px;margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.section-icon{font-size:1.6rem;}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--navy);}
+.section-subtitle{font-size:.85rem;color:var(--gray);margin-top:2px;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.explain-intro .badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.explain-intro p{font-size:.9rem;line-height:1.7;color:#451a03;}
+.analogy{background:#fef3c7;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88rem;color:#78350f;border-left:3px solid #f59e0b;}
+.retenir{background:#fffbeb;border:1.5px solid var(--amber);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:.88rem;font-weight:600;color:#92400e;}
+.math-block{background:#f0fdf4;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.math-block .badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.math-block .phrase{font-size:.9rem;color:#065f46;margin-bottom:12px;font-style:italic;}
+.formula-display{background:white;border-radius:10px;padding:18px;text-align:center;margin:14px 0;border:1.5px solid #d1fae5;overflow-x:auto;}
+.vars-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem;}
+.vars-table th{background:#d1fae5;color:#065f46;padding:8px 12px;text-align:left;}
+.vars-table td{padding:8px 12px;border-bottom:1px solid #e7fdf1;}
+.theory-box{background:#eff6ff;border-radius:10px;padding:18px 22px;margin:14px 0;border:1px solid #bfdbfe;}
+.theory-box h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.theory-box p{font-size:.88rem;line-height:1.65;color:#1e40af;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:16px 0;}
+.icon-item{background:#f8fafc;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0;}
+.icon-item .emoji{font-size:1.8rem;margin-bottom:8px;}
+.icon-item .label{font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.icon-item .desc{font-size:.72rem;color:var(--gray);line-height:1.4;}
+.demo-box{background:#f8fafc;border-radius:12px;padding:24px;border:2px dashed #cbd5e1;margin-top:20px;}
+.demo-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.demo-controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.control-group label{display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:6px;}
+.control-group input[type=range]{width:100%;accent-color:var(--teal);}
+.control-value{font-size:1.1rem;font-weight:700;color:var(--teal);}
+.demo-result{background:white;border-radius:10px;padding:16px;border:1px solid #e2e8f0;}
+.result-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:.88rem;}
+.result-row:last-child{border-bottom:none;}
+.result-label{color:var(--gray);}
+.result-value{font-weight:700;color:var(--navy);}
+.result-highlight{color:var(--teal);font-size:1.05rem;}
+.btn{background:var(--teal);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;margin:4px;}
+.btn:hover{background:#0f766e;}
+.btn-secondary{background:#f1f5f9;color:var(--navy);}
+canvas{max-width:100%;}
+.nice-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.88rem;}
+.nice-table th{background:var(--navy);color:white;padding:10px 14px;text-align:left;}
+.nice-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0;}
+.nice-table tr:hover td{background:#f8fafc;}
+.quote{background:var(--navy);color:white;border-radius:12px;padding:20px 24px;margin:16px 0;font-style:italic;}
+.quote p{font-size:.95rem;line-height:1.6;margin-bottom:8px;}
+.quote cite{font-size:.8rem;color:var(--amber);font-style:normal;font-weight:600;}
+.funding-stages{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:16px 0;}
+.stage-card{border-radius:10px;padding:14px;text-align:center;border:1.5px solid;}
+.stage-card .amount{font-size:1rem;font-weight:800;margin-bottom:4px;}
+.stage-card .label{font-size:.72rem;font-weight:700;text-transform:uppercase;margin-bottom:6px;}
+.stage-card .desc{font-size:.72rem;line-height:1.4;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:24px;font-size:.82rem;margin-top:40px;}
+footer span{color:var(--amber);}
+@media(max-width:700px){.header-inner,nav,main{padding-left:20px;padding-right:20px;} header h1{font-size:1.4rem;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 6</div>
+    <div class="chapter-badge">Chapitre 6</div>
+    <h1>Financials</h1>
+    <p class="subtitle">Métriques financières clés, profit vs cash-flow, valorisation et financement</p>
+    <div class="header-chips">
+      <span class="chip">💹 Profit vs Cash</span>
+      <span class="chip">📊 Métriques clés</span>
+      <span class="chip">🦁 Business Angels</span>
+      <span class="chip">💰 Venture Capital</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#profit-cash" class="nav-link active">Profit vs Cash</a>
+    <a href="#metriques" class="nav-link">Métriques clés</a>
+    <a href="#valorisation" class="nav-link">Valorisation</a>
+    <a href="#financement" class="nav-link">Financement</a>
+    <a href="#ba-vs-vc" class="nav-link">BA vs VC</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : PROFIT VS CASH ========== -->
+<div class="section" id="profit-cash">
+  <div class="section-header">
+    <span class="section-icon">⚖️</span>
+    <div>
+      <div class="section-title">Profit ≠ Cash — Une Confusion Fatale</div>
+      <div class="section-subtitle">Une entreprise profitable peut quand même faire faillite !</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la différence entre profit et cash ?</div>
+    <p>Le profit (ou résultat comptable) mesure la différence entre les revenus et les charges d'une période. Le cash (trésorerie) mesure l'argent réellement disponible sur le compte bancaire. Ces deux concepts peuvent être très différents à cause du timing des paiements et des règles comptables. C'est une des sources d'erreur les plus courantes chez les entrepreneurs débutants.</p>
+    <div class="analogy">
+      🏠 <strong>Analogie : le promoteur immobilier.</strong> Un promoteur signe un contrat pour construire 10 maisons à 300k€ chacune = 3M€ de chiffre d'affaires prévu. Il paie ses ouvriers (200k€/mois), les matériaux (100k€ d'avance). Comptablement, le projet sera TRÈS profitable (+500k€ de profit). Mais les acheteurs ne paient qu'à la livraison dans 18 mois. S'il n'a pas de trésorerie pour financer les 18 mois de travaux, il fait FAILLITE malgré un projet profitable !
+    </div>
+    <div class="retenir">💡 À retenir : "Cash is King" dans une start-up. Un entrepreneur peut être profitable sur le papier et faire faillite si son cash-flow est négatif. La gestion de trésorerie est aussi importante que la gestion de la profitabilité.</div>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Différences clés</div>
+    <p class="phrase">3 raisons principales pour lesquelles Profit ≠ Cash :</p>
+    <div class="formula-display">
+      <p style="font-size:.95rem;color:var(--navy);">Cash-flow ≠ Profit car :</p>
+      <p style="margin-top:8px;font-size:.88rem;color:#065f46;">
+        1. <strong>Amortissements</strong> : charge non-cash (ex: machine à 100k€ amortie sur 5 ans = 20k€/an de charge comptable, mais cash payé en une fois au début)<br><br>
+        2. <strong>Créances clients</strong> : ventes facturées mais non encore encaissées (ex: client paie à 90 jours)<br><br>
+        3. <strong>Stock et dettes</strong> : achat de stock = sortie de cash sans charge (jusqu'à vente), dette = entrée de cash sans revenu
+      </p>
+    </div>
+    <table class="vars-table">
+      <tr><th>Concept</th><th>Définition</th><th>Impact</th></tr>
+      <tr><td><strong>EBIT</strong></td><td>Earnings Before Interest and Taxes — profit opérationnel</td><td>Mesure la performance opérationnelle hors financement</td></tr>
+      <tr><td><strong>EBITDA</strong></td><td>EBIT + Depreciation & Amortization</td><td>Proxy du cash-flow opérationnel — très utilisé par les VCs</td></tr>
+      <tr><td><strong>FCF</strong></td><td>Free Cash Flow — cash réellement disponible après investissements</td><td>La vraie mesure de la valeur créée pour les actionnaires</td></tr>
+      <tr><td><strong>Burn rate</strong></td><td>Vitesse à laquelle une start-up dépense son cash de démarrage</td><td>Ex: 50k€/mois → 300k€ en banque = 6 mois de "runway"</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : MÉTRIQUES ========== -->
+<div class="section" id="metriques">
+  <div class="section-header">
+    <span class="section-icon">📊</span>
+    <div>
+      <div class="section-title">Les Métriques Financières Clés</div>
+      <div class="section-subtitle">Les indicateurs que tout entrepreneur doit maîtriser</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi les métriques financières ?</div>
+    <p>Les métriques financières sont des indicateurs qui résument la santé et la performance d'une entreprise. Comme un tableau de bord de voiture : vitesse (chiffre d'affaires), niveau d'essence (cash), température moteur (marges)... si tu ne regardes pas le tableau de bord, tu risques de tomber en panne au mauvais moment.</p>
+    <div class="retenir">💡 À retenir : Les investisseurs (Business Angels et VCs) regardent 3 choses en priorité : <strong>1)</strong> La croissance des revenus (MoM ou YoY), <strong>2)</strong> La marge brute (unit economics), <strong>3)</strong> Le burn rate et le runway. Sans ces métriques, pas de funding sérieux.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="emoji">📈</div><div class="label">MRR / ARR</div><div class="desc">Monthly/Annual Recurring Revenue — revenus récurrents prévisibles</div></div>
+    <div class="icon-item"><div class="emoji">💸</div><div class="label">CAC</div><div class="desc">Customer Acquisition Cost — coût pour acquérir 1 client</div></div>
+    <div class="icon-item"><div class="emoji">💰</div><div class="label">LTV</div><div class="desc">Lifetime Value — valeur totale générée par 1 client sur sa durée de vie</div></div>
+    <div class="icon-item"><div class="emoji">🔄</div><div class="label">Churn Rate</div><div class="desc">% de clients qui arrêtent le service par période</div></div>
+    <div class="icon-item"><div class="emoji">🏃</div><div class="label">Burn Rate</div><div class="desc">Cash dépensé par mois — détermine le "runway" (survie)</div></div>
+    <div class="icon-item"><div class="emoji">📉</div><div class="label">Gross Margin</div><div class="desc">% de revenus restant après les coûts directs de production</div></div>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Formule clé : LTV / CAC Ratio</div>
+    <p class="phrase">En une phrase : ce ratio mesure si ton business est scalable — si tu gagnes plus en retenant un client que ce qu'il t'a coûté à acquérir.</p>
+    <div class="formula-display">
+      <div id="ltvcac_formula"></div>
+    </div>
+    <table class="vars-table">
+      <tr><th>Variable</th><th>Signification</th><th>Exemple</th></tr>
+      <tr><td><strong>LTV</strong></td><td>Lifetime Value = revenu moyen / client × durée moyenne de rétention</td><td>Spotify : 10€/mois × 24 mois = 240€ LTV</td></tr>
+      <tr><td><strong>CAC</strong></td><td>Customer Acquisition Cost = Total coûts marketing & ventes / Nouveaux clients</td><td>Spotify : 30M€ marketing / 5M clients = 6€ CAC</td></tr>
+      <tr><td><strong>Ratio idéal</strong></td><td>LTV/CAC > 3 = business sain. LTV/CAC < 1 = business insoutenable</td><td>240/6 = 40 → 🚀 Excellent !</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : VALORISATION ========== -->
+<div class="section" id="valorisation">
+  <div class="section-header">
+    <span class="section-icon">💎</span>
+    <div>
+      <div class="section-title">Méthodes de Valorisation</div>
+      <div class="section-subtitle">Comment estimer la valeur d'une start-up — l'art de "quantifier l'inquantifiable"</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la valorisation d'une start-up ?</div>
+    <p>Valoriser une start-up, c'est estimer combien elle "vaut" aujourd'hui. C'est difficile car une start-up n'a souvent pas de revenus ou de profits significatifs. Comme estimer le prix d'une maison qui n'est pas encore construite — tu dois projeter sa valeur future et l'actualiser. La valorisation est autant un art qu'une science, surtout pour les early-stage startups.</p>
+    <div class="analogy">
+      🦄 <strong>L'illusion des "Unicorns" :</strong> Une "licorne" est une start-up valorisée à plus d'1 milliard $. En 2021, Klarna était valorisée à 45 milliards $. En 2022, sa valorisation a chuté à 6,7 milliards — une perte de 85% de valeur. Pourquoi ? Les taux d'intérêt ont augmenté → le coût du capital a augmenté → les valorisations basées sur des projections lointaines ont chuté. La valorisation n'est pas une vérité absolue, c'est une fonction du contexte macro-financier.
+    </div>
+    <div class="retenir">💡 À retenir : Faustien deal — les start-ups acceptent des valorisations élevées (bonne pour eux) en échange d'une pression à croître rapidement (risquée). Le "hockey stick" (croissance exponentielle) est la promesse implicite dans toute valorisation VC élevée.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="emoji">📊</div><div class="label">Multiples</div><div class="desc">Valeur = X × Revenus ou X × EBITDA. Ex: SaaS = 5-15× ARR selon la croissance</div></div>
+    <div class="icon-item"><div class="emoji">💹</div><div class="label">DCF</div><div class="desc">Discounted Cash Flows : actualise les cash-flows futurs au coût du capital</div></div>
+    <div class="icon-item"><div class="emoji">🔄</div><div class="label">Comparable</div><div class="desc">Comparer avec des start-ups similaires récemment levées ou vendues</div></div>
+    <div class="icon-item"><div class="emoji">👼</div><div class="label">Scorecard</div><div class="desc">Méthode Business Angel : score sur team, marché, traction, concurrence</div></div>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Méthode DCF (Discounted Cash Flows)</div>
+    <p class="phrase">En une phrase : 1€ aujourd'hui vaut plus qu'1€ dans 5 ans, car on peut l'investir entre-temps. La méthode DCF prend en compte ce "coût du temps" pour valoriser les flux futurs.</p>
+    <div class="formula-display">
+      <div id="dcf_formula"></div>
+    </div>
+    <table class="vars-table">
+      <tr><th>Variable</th><th>Signification</th><th>Exemple</th></tr>
+      <tr><td><strong>NPV</strong></td><td>Net Present Value — valeur actuelle nette</td><td>Si NPV > 0, le projet crée de la valeur</td></tr>
+      <tr><td><strong>CF_t</strong></td><td>Cash-flow à la période t</td><td>Année 1 : 100k€, Année 2 : 200k€, ...</td></tr>
+      <tr><td><strong>r</strong></td><td>Taux d'actualisation (coût du capital)</td><td>Start-up VC : 25-40% selon le risque</td></tr>
+      <tr><td><strong>t</strong></td><td>Période de temps</td><td>t=1 (an 1), t=2 (an 2), etc.</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-box" style="margin-top:18px; background:#fef2f2; border-color:#fca5a5;">
+    <h4>⚠️ Les limites du DCF / NPV pour l'innovation (Gailly, 2018)</h4>
+    <p style="color:#991b1b;">La méthode DCF est puissante mais <strong>profondément problématique pour évaluer les projets d'innovation</strong>. Gailly identifie plusieurs biais systématiques :</p>
+    <p style="color:#991b1b; margin-top:8px;"><strong>1. Le taux d'actualisation amplifie les erreurs :</strong> Une légère variation du taux d'actualisation peut changer radicalement la NPV. Pour une start-up, le vrai taux de risque est souvent inconnu — l'utiliser comme si c'était une entreprise mature est une erreur fréquente.</p>
+    <p style="color:#991b1b; margin-top:8px;"><strong>2. La "tyrannie" des projections :</strong> Le DCF est aussi bon que les projections de cash-flows. Pour un projet innovant, ces projections sont largement spéculatives sur 3-5 ans. Garbage in, garbage out.</p>
+    <p style="color:#991b1b; margin-top:8px;"><strong>3. Ignore les options réelles :</strong> Le DCF ne capture pas la valeur de la <em>flexibilité</em> — la possibilité de pivoter, d'accélérer si ça marche, ou d'arrêter si ça échoue. La méthode des "Real Options" est plus appropriée pour les projets d'innovation mais plus complexe à mettre en œuvre.</p>
+    <p style="color:#991b1b; margin-top:8px;"><strong>4. Biais cognitifs :</strong> Les managers surestiment systématiquement les flux futurs (planning fallacy) et utilisent le DCF pour justifier des décisions déjà prises intuitivement — ce qu'on appelle le "GIGO modelling".</p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px;">
+    <h4>🎂 La métaphore du gâteau (Gailly, 2018) — "Taille, Prix, Temps de cuisson"</h4>
+    <p>Pour comprendre intuitivement les fondamentaux financiers d'un projet d'innovation, Gailly propose la métaphore du gâteau :</p>
+    <p style="margin-top:8px;">🎂 <strong>Taille du gâteau</strong> = le marché potentiel (volume × prix) — "Quelle est la taille totale de la valeur que ce marché peut générer ?"</p>
+    <p style="margin-top:8px;">💰 <strong>Prix du gâteau</strong> = la part de marché + les marges capturables — "Quelle portion puis-je espérer capturer, et à quel prix de revient ?"</p>
+    <p style="margin-top:8px;">⏱️ <strong>Temps de cuisson</strong> = le temps jusqu'au premier cash-flow positif, et le total d'investissement requis avant la rentabilité — "Combien de temps et d'argent faut-il brûler avant de récupérer sa mise ?"</p>
+    <p style="margin-top:8px;">Ces trois dimensions doivent être alignées pour qu'un projet soit financièrement viable. Un grand gâteau (grand marché) ne suffit pas si le temps de cuisson est trop long ou si le prix capturé est trop faible.</p>
+  </div>
+
+  <h3 style="color:var(--navy);margin:20px 0 12px;font-size:1.05rem;">🎯 Taux d'actualisation : VC vs Industrie</h3>
+  <table class="nice-table">
+    <tr><th>Contexte</th><th>Taux d'actualisation typique</th><th>Justification</th></tr>
+    <tr>
+      <td>🏭 Projet industriel (grande entreprise mature)</td>
+      <td>8–15% selon le profil de risque du projet</td>
+      <td>Risque modéré, actifs tangibles, flux prévisibles, marché connu</td>
+    </tr>
+    <tr>
+      <td>🌱 Start-up / projet innovation radicale (VC)</td>
+      <td>25–40% (taux "venture")</td>
+      <td>Risque très élevé, cashflows très incertains, taux d'échec élevé dans le portefeuille VC</td>
+    </tr>
+    <tr>
+      <td>💡 Innovation incrémentale en grande entreprise</td>
+      <td>15–25%</td>
+      <td>Risque intermédiaire — connu en partie, marché partiellement validé</td>
+    </tr>
+  </table>
+  <p style="font-size:.85rem;color:var(--gray);margin-top:8px;">Note de Gailly (2018) : les VCs appliquent des taux élevés non pas parce qu'ils sont avides, mais parce que sur 10 projets financés, 6-7 échouent complètement. Les 2-3 succès doivent compenser toutes les pertes ET générer un rendement attractif pour les limited partners du fonds.</p>
+</div>
+
+<!-- ========== SECTION 4 : FINANCEMENT ========== -->
+<div class="section" id="financement">
+  <div class="section-header">
+    <span class="section-icon">💰</span>
+    <div>
+      <div class="section-title">Sources de Financement — Le "Pecking Order"</div>
+      <div class="section-subtitle">De l'argent personnel aux marchés financiers : le chemin de financement d'une start-up</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le Pecking Order du financement ?</div>
+    <p>Le "pecking order" (ordre de priorité), c'est la séquence naturelle dans laquelle une start-up lève de l'argent selon son stade de développement. Les sources les plus accessibles mais les plus chères en dilution (FFF, bootstrapping) viennent en premier. Les sources les plus complexes mais les meilleures en termes de valeur ajoutée (VC, IPO) viennent plus tard.</p>
+    <div class="analogy">
+      🏗️ <strong>Analogie :</strong> C'est comme construire une maison. D'abord tes propres économies (fondations), puis ta famille (premiers murs), puis une banque hypothécaire (toiture), puis des investisseurs immobiliers (extension). À chaque étape, tu prouveras davantage et obtiendras davantage.
+    </div>
+    <div class="retenir">💡 À retenir : L'asymétrie d'information est le problème central du financement des start-ups. Le fondateur sait des choses que l'investisseur ne sait pas → l'investisseur exige une prime de risque (dilution élevée). Plus tu peux réduire l'incertitude (traction, revenus, brevets), plus tu lèves à de bonnes conditions.</div>
+  </div>
+
+  <div class="funding-stages">
+    <div class="stage-card" style="background:#f8fafc;border-color:#e2e8f0;">
+      <div class="amount" style="color:#475569;">5-50k€</div>
+      <div class="label" style="color:#475569;">Bootstrapping</div>
+      <div class="desc" style="color:#64748B;">Fonds propres du fondateur, épargne personnelle</div>
+    </div>
+    <div class="stage-card" style="background:#fef2f2;border-color:#fca5a5;">
+      <div class="amount" style="color:#991b1b;">10-100k€</div>
+      <div class="label" style="color:#991b1b;">FFF</div>
+      <div class="desc" style="color:#991b1b;">Friends, Family, Fools — premiers soutiens inconditionnels</div>
+    </div>
+    <div class="stage-card" style="background:#fff7ed;border-color:#fdba74;">
+      <div class="amount" style="color:#9a3412;">50k-500k€</div>
+      <div class="label" style="color:#9a3412;">Business Angels</div>
+      <div class="desc" style="color:#9a3412;">Investisseurs individuels expérimentés + "smart money"</div>
+    </div>
+    <div class="stage-card" style="background:#fefce8;border-color:#fde047;">
+      <div class="amount" style="color:#713f12;">500k-5M€</div>
+      <div class="label" style="color:#713f12;">Seed / VC Series A</div>
+      <div class="desc" style="color:#713f12;">Fonds de capital risque — croissance accélérée</div>
+    </div>
+    <div class="stage-card" style="background:#f0fdf4;border-color:#86efac;">
+      <div class="amount" style="color:#14532d;">5-50M€+</div>
+      <div class="label" style="color:#14532d;">Series B/C/D</div>
+      <div class="desc" style="color:#14532d;">Scale et internationalisation</div>
+    </div>
+    <div class="stage-card" style="background:#eff6ff;border-color:#93c5fd;">
+      <div class="amount" style="color:#1e3a8a;">50M€+</div>
+      <div class="label" style="color:#1e3a8a;">IPO / Exit</div>
+      <div class="desc" style="color:#1e3a8a;">Introduction en bourse ou acquisition</div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>🔍 Pourquoi le cash est-il "coûteux" pour les start-ups ?</h4>
+    <p>5 raisons pour lesquelles lever de l'argent est difficile et cher pour les start-ups :
+    <strong>1) Information asymétry</strong> — le fondateur en sait toujours plus que l'investisseur.
+    <strong>2) Pas d'historique financier</strong> — pas de bilan passé pour évaluer le risque.
+    <strong>3) Actifs intangibles</strong> — les brevets et le code ne servent pas de garantie.
+    <strong>4) Moral hazard</strong> — après avoir levé, le fondateur peut changer de stratégie.
+    <strong>5) Marché illiquide</strong> — difficile de revendre sa participation si l'investisseur veut sortir.</p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px; background:#fffbeb; border-color:#f59e0b;">
+    <h4>💀 La "Vallée de la Mort" — le trou de financement critique (Gailly, 2018)</h4>
+    <p style="color:#78350f;">La "Valley of Death" est la période entre <strong>le moment où une start-up commence à brûler de l'argent sérieusement</strong> (recrutements, R&D, développement produit) <strong>et le moment où ses revenus couvrent ses coûts</strong>. C'est dans cette vallée que la majorité des start-ups meurent — pas par manque d'idée, mais par manque de cash. Gailly souligne que cette vallée est structurellement sous-financée : trop tard pour les FFF (Friends, Family, Fools), trop tôt et trop risqué pour les VCs traditionnels. C'est précisément pour cela que le rôle des Business Angels et des programmes publics de soutien à l'innovation (subventions, prêts d'honneur, aides à l'innovation) est crucial — ils comblent ce "missing middle" du financement de l'innovation.</p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px;">
+    <h4>📊 Analyse de sensibilité et planification par scénarios (Gailly, 2018)</h4>
+    <p>Face aux limitations du DCF traditionnel, Gailly recommande systématiquement de compléter toute valorisation ou évaluation financière par :</p>
+    <p style="margin-top:8px;"><strong>Analyse de sensibilité :</strong> Faire varier les hypothèses clés (taux de croissance, marges, taux d'actualisation) une à une pour identifier les paramètres qui influencent le plus la NPV. Cela permet d'identifier les "risques prioritaires" à monitorer et à mitiger.</p>
+    <p style="margin-top:8px;"><strong>Planification par scénarios :</strong> Construire 3 scénarios complets — <em>pessimiste</em> (tout va mal : adoption lente, concurrence forte, coûts dérapants), <em>central</em> (hypothèses de base), <em>optimiste</em> (adoption rapide, marges élevées, synergies). Cette approche force l'entrepreneur à penser aux risques de façon systématique et donne aux investisseurs une vision honnête de la gamme de résultats possibles. La règle empirique : <em>le résultat réel se situe presque toujours entre le scénario pessimiste et le scénario central — rarement au-delà du scénario optimiste</em>. <em>(Gailly, 2018)</em></p>
+  </div>
+</div>
+
+<!-- ========== SECTION 5 : BA VS VC ========== -->
+<div class="section" id="ba-vs-vc">
+  <div class="section-header">
+    <span class="section-icon">🤝</span>
+    <div>
+      <div class="section-title">Business Angels vs Venture Capitalists</div>
+      <div class="section-subtitle">Deux types d'investisseurs très différents — connaître la différence est critique</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un Business Angel ?</div>
+    <p>Un Business Angel, c'est un entrepreneur ou manager expérimenté qui investit son propre argent dans de jeunes start-ups. Il apporte aussi son réseau, son expertise et son temps (d'où "smart money" vs "dumb money"). La différence avec un VC : le BA joue avec son propre argent, le VC avec celui de ses limited partners (institutions, family offices).</p>
+    <div class="analogy">
+      🎸 <strong>Analogie :</strong> Un BA c'est comme un coach de tennis amateur qui donne des cours gratuitement parce qu'il aime le tennis et croit en un jeune joueur. Un VC c'est comme l'Académie Roland-Garros : investissement professionnel, exigences élevées, contrats en béton, exit obligatoire dans X années.
+    </div>
+    <div class="retenir">💡 À retenir : Les BA et les VCs sont complémentaires, pas concurrents. Les BAs couvrent les stades "trop tôt et trop petits" pour les VCs. Une fois qu'un BA investit et que la start-up gagne en crédibilité, les VCs peuvent entrer à leur tour. Les BAs cherchent un retour de 30-35% p.a. sur leur investissement.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th></th><th>🌟 Business Angels</th><th>💹 Venture Capitalists</th></tr>
+    <tr><td>Approche</td><td>Entrepreneurs expérimentés, ex-managers</td><td>Investisseurs professionnels</td></tr>
+    <tr><td>Taille investment</td><td>10k€ – 500k€ (propres fonds)</td><td>500k€ – 50M€+ (fonds de tiers)</td></tr>
+    <tr><td>Stage</td><td>Early stage, pre-seed, seed</td><td>Series A, B, C...</td></tr>
+    <tr><td>Due diligence</td><td>Légère (basée sur l'instinct et le réseau)</td><td>Approfondie (équipes dédiées, 3-6 mois)</td></tr>
+    <tr><td>Contrats</td><td>Simples (convertible notes, SAFEs)</td><td>Complexes (term sheets, board seats, staging)</td></tr>
+    <tr><td>Suivi</td><td>Hands-on (coaching, introductions)</td><td>Formel (board meetings, KPIs, reporting)</td></tr>
+    <tr><td>Exit</td><td>Moins important, peut rester longtemps</td><td>Critique — exit dans 5-10 ans obligatoire</td></tr>
+    <tr><td>Géographie</td><td>Locale (important pour les BAs)</td><td>Nationale/internationale</td></tr>
+  </table>
+
+  <div class="theory-box">
+    <h4>📊 Critères d'évaluation d'un VC ("Deep Pockets, Short Arms")</h4>
+    <p><strong>1) Venture Potential :</strong> Qualité du management (expérience, passion), potentiel de marché (TAM > 500M$), avantage compétitif unique, projections financières réalistes.<br>
+    <strong>2) Good Business :</strong> Economics saines (marges, CAC/LTV), scalabilité démontrée, protection IP.<br>
+    <strong>3) Fit with Fund :</strong> Le deal correspond au stage, secteur et géographie du fonds. Budget restant, timing de l'investissement, syndication possible.</p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px;">
+    <h4>💡 "Smart Money" vs "Dumb Money" — la valeur ajoutée au-delà du capital (Gailly, 2018)</h4>
+    <p>Gailly insiste sur la distinction entre le <strong>"smart money"</strong> (investisseurs qui apportent du capital ET de la valeur non-financière) et le <strong>"dumb money"</strong> (pur capital sans expertise ni réseau). Pour une start-up innovante, le smart money est de loin préférable :</p>
+    <p style="margin-top:8px;">Le smart money d'un <strong>Business Angel expérimenté</strong> peut apporter : accès à son carnet d'adresses (clients potentiels, partenaires, futurs investisseurs), expertise sectorielle pour éviter les erreurs communes, crédibilité auprès des prochains investisseurs, et coaching stratégique et opérationnel. La valeur de ces ressources non-financières dépasse souvent celle du chèque lui-même.</p>
+    <p style="margin-top:8px;">Un <strong>VC top-tier</strong> (Sequoia, Andreessen Horowitz, etc.) apporte en plus : accès au talent (réseau de recrutement), introductions aux grandes entreprises comme clients ou partenaires, expérience de scale international, et un signal de qualité qui facilite les prochaines levées. Choisir le bon investisseur est donc aussi important que le montant levé. <em>(Gailly, 2018)</em></p>
+  </div>
+</div>
+
+<!-- ========== SECTION 6 : DÉMO ========== -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <span class="section-icon">🎮</span>
+    <div>
+      <div class="section-title">Démo Interactive — Simulateur de Trésorerie Start-up</div>
+      <div class="section-subtitle">Visualise le "valley of death" et gère ton runway pour survivre</div>
+    </div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">💸 Cash Flow Simulator — Valley of Death</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:16px;">Configure ta start-up et vois si tu survis au "valley of death" — la période critique avant d'atteindre le cash-flow positif.</p>
+
+    <div class="demo-controls">
+      <div class="control-group">
+        <label>💰 Cash initial (levée) : <span class="control-value" id="v_seed">500</span>k€</label>
+        <input type="range" min="50" max="5000" step="50" value="500" id="seed" oninput="updateCashSim()">
+      </div>
+      <div class="control-group">
+        <label>🔥 Burn rate mensuel : <span class="control-value" id="v_burn">40</span>k€/m</label>
+        <input type="range" min="5" max="200" step="5" value="40" id="burn" oninput="updateCashSim()">
+      </div>
+      <div class="control-group">
+        <label>📈 Croissance revenus (%/mois) : <span class="control-value" id="v_growth">15</span>%</label>
+        <input type="range" min="0" max="50" step="1" value="15" id="growth" oninput="updateCashSim()">
+      </div>
+      <div class="control-group">
+        <label>💵 Revenus initiaux (k€/m) : <span class="control-value" id="v_rev0">5</span>k€</label>
+        <input type="range" min="0" max="100" step="1" value="5" id="rev0" oninput="updateCashSim()">
+      </div>
+    </div>
+
+    <canvas id="cashChart" style="max-height:300px;"></canvas>
+
+    <div class="demo-result" style="margin-top:16px;">
+      <div class="result-row"><span class="result-label">Runway initial</span><span class="result-value" id="r_runway">—</span></div>
+      <div class="result-row"><span class="result-label">Mois avant cash positif</span><span class="result-value" id="r_cashpositive">—</span></div>
+      <div class="result-row"><span class="result-label">Cash minimum atteint</span><span class="result-value" id="r_cashmin">—</span></div>
+      <div class="result-row"><span class="result-label">Survie sans nouvelle levée ?</span><span class="result-value result-highlight" id="r_survival">—</span></div>
+    </div>
+    <button class="btn btn-secondary" onclick="resetCashSim()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="ch5_organisations.html" style="color:var(--amber);">← Ch.5 Organisations</a> &nbsp;|&nbsp; <a href="exam_questions.html" style="color:var(--amber);">📝 Questions d'examen →</a></p>
+</footer>
+
+<script>
+// ============ KaTeX ============
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof katex !== 'undefined') {
+    document.getElementById('ltvcac_formula').innerHTML = katex.renderToString(
+      '\\frac{LTV}{CAC} > 3 \\Rightarrow \\text{Business sain}',
+      { displayMode: true, throwOnError: false }
+    );
+    document.getElementById('dcf_formula').innerHTML = katex.renderToString(
+      'NPV = \\sum_{t=1}^{n} \\frac{CF_t}{(1+r)^t} - \\text{Investissement}_0',
+      { displayMode: true, throwOnError: false }
+    );
+  }
+});
+
+// ============ CASH SIMULATOR ============
+let cashChart = null;
+function updateCashSim() {
+  const seed = +document.getElementById('seed').value * 1000;
+  const burn = +document.getElementById('burn').value * 1000;
+  const growth = +document.getElementById('growth').value / 100;
+  const rev0 = +document.getElementById('rev0').value * 1000;
+
+  document.getElementById('v_seed').textContent = (seed/1000).toFixed(0);
+  document.getElementById('v_burn').textContent = (burn/1000).toFixed(0);
+  document.getElementById('v_growth').textContent = (growth*100).toFixed(0);
+  document.getElementById('v_rev0').textContent = (rev0/1000).toFixed(0);
+
+  const months = 48;
+  const labels = Array.from({length: months}, (_,i) => 'M'+(i+1));
+  const cashVals = [], revVals = [], netVals = [];
+
+  let cash = seed;
+  let rev = rev0;
+  let cashMin = seed;
+  let cashPosMonth = null;
+  let survived = true;
+  const runway = Math.floor(seed / burn);
+
+  for (let m = 0; m < months; m++) {
+    const net = rev - burn;
+    cash += net;
+    if (cash < 0 && survived) { survived = false; }
+    if (cashPosMonth === null && net > 0) cashPosMonth = m + 1;
+    cashMin = Math.min(cashMin, cash);
+    cashVals.push(Math.max(cash / 1000, 0));
+    revVals.push(rev / 1000);
+    netVals.push(net / 1000);
+    rev *= (1 + growth);
+  }
+
+  document.getElementById('r_runway').textContent = runway + ' mois';
+  document.getElementById('r_cashpositive').textContent = cashPosMonth ? cashPosMonth + ' mois' : '⚠️ Non atteint dans 48 mois';
+  document.getElementById('r_cashmin').textContent = (cashMin/1000).toFixed(0) + 'k€';
+  const survEl = document.getElementById('r_survival');
+  survEl.textContent = survived ? '✅ Oui — survit sans nouvelle levée' : '❌ Non — nouvelle levée nécessaire';
+  survEl.style.color = survived ? '#059669' : '#dc2626';
+
+  const ctx = document.getElementById('cashChart').getContext('2d');
+  if (cashChart) cashChart.destroy();
+  cashChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Cash en banque (k€)', data: cashVals, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', fill: true, tension: 0.2 },
+        { label: 'Revenus mensuels (k€)', data: revVals, borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.2 },
+        { label: 'Net cash-flow mensuel (k€)', data: netVals, borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.2, borderDash: [4,4] }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'Simulation de trésorerie sur 48 mois — Valley of Death' },
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: { title: { display: true, text: 'k€' } },
+        x: { title: { display: true, text: 'Mois depuis levée' } }
+      }
+    }
+  });
+}
+
+function resetCashSim() {
+  document.getElementById('seed').value = 500;
+  document.getElementById('burn').value = 40;
+  document.getElementById('growth').value = 15;
+  document.getElementById('rev0').value = 5;
+  updateCashSim();
+}
+
+window.addEventListener('load', updateCashSim);
+</script>
+</body>
+</html>

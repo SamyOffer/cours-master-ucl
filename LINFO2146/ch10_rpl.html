@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 10 : Routage RPL | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .math-block h3 {
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: block;
+            margin: 1rem 0;
+        }
+
+        .controls {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .control-group {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--navy);
+            min-width: 150px;
+        }
+
+        .control-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d5db;
+            outline: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--teal);
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 0.7rem 1.5rem;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #0f766e;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 10 : Routage RPL</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 10 : Routage RPL (IPv6 Routing Protocol for Low-power)</h1>
+
+        <p>RPL est le protocole de routage standard pour les réseaux IoT bas débit. C'est un protocole de distance-vecteur optimisé pour les réseaux maillés à faible puissance. RPL construit un DODAG (Directed Acyclic Graph) avec une racine commune et des routes vers elle.</p>
+
+        <!-- LLN et besoins -->
+        <h2>1. LLN (Low-power Lossy Network) et défis</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Environnement difficile</div>
+            <p>Les réseaux IoT (LLN) ont des caractéristiques uniques qui rendent le routage difficile.</p>
+            <div class="analogy">
+                📡 <strong>Challenges :</strong> Les liens radio perdent des paquets (de 10% à 50%), les capteurs meurent et redémarrent, la topologie change constamment. Imagine un GPS où 20% des satellites disparaissent chaque jour !
+            </div>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Caractéristique</th>
+                    <th>Impact</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Perte de paquets (10-50%)</td>
+                    <td>Les routes doivent être fiables même avec des liens faibles</td>
+                </tr>
+                <tr>
+                    <td>Batterie limitée</td>
+                    <td>Routage doit être efficient en énergie, peu de messages de contrôle</td>
+                </tr>
+                <tr>
+                    <td>Nœuds arrivent/partent continuellement</td>
+                    <td>Adaptation rapide de la topologie, récupération des pannes</td>
+                </tr>
+                <tr>
+                    <td>Débit faible (250 kbps)</td>
+                    <td>En-têtes compacts, peu de flooding</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- DODAG -->
+        <h2>2. DODAG (Directed Acyclic Graph)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Structure d'arbre orientée</div>
+            <p>Au lieu d'utiliser des routes point-à-point, RPL crée un DODAG : un arbre orienté vers une racine (server ou border router). Tous les chemins montent vers la racine.</p>
+            <div class="analogy">
+                🌳 <strong>Visualisation :</strong> Imaginez un arbre généalogique inversé où tous les enfants remontent vers leurs parents et grands-parents jusqu'à l'ancêtre commun (la racine). Chaque nœud sait comment remonter grâce à son parent dans l'arbre.
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <h3>Concepts clés du DODAG</h3>
+            <p><strong>Racine :</strong> Le nœud commun (server, border router, coordinateur).</p>
+            <p style="margin-top: 0.5rem;"><strong>Rang :</strong> Numéro entier (16-bit) croissant depuis la racine. Racine = rang 0, premiers voisins = rang X, etc. Plus on s'éloigne, plus le rang augmente.</p>
+            <p style="margin-top: 0.5rem;"><strong>Parent :</strong> Un nœud avec un rang plus petit que soi. On envoie les données vers un parent.</p>
+            <p style="margin-top: 0.5rem;"><strong>Enfants :</strong> Nœuds qui nous ont choisi comme parent.</p>
+        </div>
+
+        <div class="demo-box">
+            <h3>🖼️ Démo : Construction d'un DODAG</h3>
+            <canvas id="dodagCanvas" width="900" height="400"></canvas>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 4px;">
+                <button id="dodagPlayBtn">▶ Construire le DODAG</button>
+                <button id="dodagResetBtn">🔄 Réinitialiser</button>
+            </div>
+        </div>
+
+        <!-- Messages RPL -->
+        <h2>3. Messages RPL : DIO, DAO, DIS</h2>
+
+        <div class="theory-box">
+            <h3>Les trois types de messages</h3>
+            <p><strong>DIO (DODAG Information Object) :</strong> Broadcast descendant (de la racine vers les feuilles). Annonce la présence du DODAG, indique le rang du nœud, invite les autres à le rejoindre.</p>
+            <p style="margin-top: 0.8rem;"><strong>DAO (Destination Advertisement Object) :</strong> Unicast ascendant (vers la racine). Les nœuds envoient un DAO pour informer la racine de leur présence. Utilisé pour le routage point-à-point (si la racine a besoin d'envoyer des données à un nœud spécifique).</p>
+            <p style="margin-top: 0.8rem;"><strong>DIS (DODAG Information Solicitation) :</strong> Broadcast, demande un DIO. Un nouveau nœud qui arrive envoie un DIS : "Y a-t-il un DODAG ici ?" → les voisins répondent par un DIO.</p>
+        </div>
+
+        <!-- Fonction objective -->
+        <h2>4. Fonctions objectif : OF0 et MRHOF</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Choisir le meilleur parent</div>
+            <p>Comment choisir lequel des voisins est le meilleur parent ? On utilise une fonction objectif qui calcule une métrique de chemin.</p>
+        </div>
+
+        <div class="math-block">
+            <h3>Fonction objective MRHOF (Minimum Rank with Hysteresis Objective Function)</h3>
+            <div class="formula">
+                Le coût d'un chemin est :
+                <div class="pending-math" data-latex="\text{Path\_cost}(node) = \text{Path\_cost}(parent) + \text{metric}(node, parent)"></div>
+                où la métrique typique est l'<strong>ETX</strong> (Expected Transmission Count) : nombre de transmissions attendues pour envoyer avec succès.
+            </div>
+
+            <div class="formula">
+                <strong>ETX lissé avec facteur α :</strong>
+                <div class="pending-math" data-latex="\text{NewETX} = \text{OldETX} \times (1 - \alpha) + \text{PacketETX} \times \alpha"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                        <th>Valeur typique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Path_cost</td>
+                        <td>Coût total du chemin vers la racine</td>
+                        <td>Initialisé à une grande valeur (65535)</td>
+                    </tr>
+                    <tr>
+                        <td>ETX</td>
+                        <td>Expected Transmission Count = 1 / (P_fwd × P_bwd)</td>
+                        <td>1.0 à 3.0 (1.0 = parfait, 3.0 = mauvais lien)</td>
+                    </tr>
+                    <tr>
+                        <td>P_fwd, P_bwd</td>
+                        <td>Probabilités de succès avant/arrière</td>
+                        <td>0.5 à 1.0</td>
+                    </tr>
+                    <tr>
+                        <td>α</td>
+                        <td>Facteur de lissage exponentiell (EMA)</td>
+                        <td>0.1 à 0.5</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background: white; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                <strong>Exemple chiffré :</strong> ETX lissé avec α = 0.5
+                <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+                    <li>OldETX = 1.5 (lien de moyenne qualité)</li>
+                    <li>PacketETX = 2.0 (dernier paquet a nécessité 2 tentatives)</li>
+                    <li>NewETX = 1.5 × (1 - 0.5) + 2.0 × 0.5 = 1.5 × 0.5 + 2.0 × 0.5 = 0.75 + 1.0 = <strong>1.75</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>📊 Démo interactive : Convergence ETX</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Facteur α (EMA) :</label>
+                    <input type="range" id="alphaSlider" min="0.1" max="0.9" step="0.1" value="0.5">
+                    <span class="value-display" id="alphaVal">0.50</span>
+                </div>
+            </div>
+            <canvas id="etxChart" width="900" height="300"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                Plus α est grand, plus l'ETX converge vite vers les valeurs récentes (réactif). Plus α est petit, plus l'ETX lisse (stable).
+            </p>
+        </div>
+
+        <!-- Trickle Timer -->
+        <h2>5. Trickle Timer : adapter la fréquence des messages</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Économie d'énergie</div>
+            <p>Au début, quand la topologie change beaucoup, les nœuds envoient des DIO souvent. Avec le temps, quand tout s'est stabilisé, les DIO deviennent rares.</p>
+            <div class="analogy">
+                🔔 <strong>Analogie :</strong> Une cloche d'église sonne souvent quand il y a une fête (topologie instable). Mais pendant les jours calmes, elle ne sonne qu'une fois par jour (topologie stable). Si quelque chose change (urgence), la cloche recommence à sonner souvent.
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <h3>Fonctionnement du Trickle Timer</h3>
+            <p><strong>Intervalle I :</strong> Commence à I_min, double chaque fois que rien ne change (I_min → 2×I_min → 4×I_min → ... → I_max).</p>
+            <p style="margin-top: 0.5rem;"><strong>Fenêtre K :</strong> Au maximum K messages par intervalle (contrôle la fréquence).</p>
+            <p style="margin-top: 0.5rem;"><strong>Réinitialisation :</strong> Si une incohérence est détectée (ex: un nouveau nœud avec un rang meilleur), le timer est réinitialisé à I_min.</p>
+            <p style="margin-top: 0.5rem;"><strong>Résultat :</strong> Peu de messages en condition stable, beaucoup en cas de changement.</p>
+        </div>
+
+        <div class="demo-box">
+            <h3>⏱️ Démo : Évolution du Trickle Timer</h3>
+            <canvas id="trickleChart" width="900" height="300"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                L'intervalle des DIO augmente exponentiellement avec le temps si pas d'incohérence. Passant de quelques secondes à plusieurs minutes/heures en condition stable.
+            </p>
+        </div>
+
+        <!-- Réparation -->
+        <h2>6. Réparation DODAG</h2>
+
+        <div class="theory-box">
+            <h3>Deux types de réparation</h3>
+            <p><strong>Réparation locale :</strong> Un nœud détecte que sa route vers la racine est coupée. Il envoie un DIS localement. Un voisin (nouveau parent) répond par un DIO. Le nœud se reconecte rapidement au DODAG.</p>
+            <p style="margin-top: 0.8rem;"><strong>Route poisoning :</strong> Si aucun parent n'est disponible, le nœud augmente son rang à (MAX_RANK) pour indiquer "ne me choisissez pas comme parent". Puis il attend un DIO d'un autre parent.</p>
+            <p style="margin-top: 0.8rem;"><strong>Réparation globale :</strong> La racine incrémente son "DODAG Version Number". Cela force tous les nœuds à mettre à jour leurs routes. Utilisé après une longue partition du réseau.</p>
+        </div>
+
+        <div class="retenir">
+            ✅ RPL est le protocole de routage standard pour 6LoWPAN et les réseaux IoT. Efficace en énergie, adaptatif aux changements de topologie, et optimisé pour les réseaux maillés à faible puissance.
+        </div>
+
+        <!-- Détection de problèmes de routage -->
+        <h2>7. Détection des problèmes de routage (RFC 6553)</h2>
+
+        <div class="theory-box">
+            <h3>Option IPv6 pour RPL : le flag de direction (O flag)</h3>
+            <p>La RFC 6553 définit une option d'en-tête IPv6 spécifique à RPL, qui contient des informations supplémentaires pour détecter les problèmes de routage en cours de route :</p>
+            <ul style="margin-top:0.7rem; padding-left:1.4rem;">
+                <li><strong>Direction flag (O flag) :</strong> indique la direction attendue du paquet — <em>vers le haut (O=0)</em> pour aller vers la racine, ou <em>vers le bas (O=1)</em> pour aller vers un nœud feuille.</li>
+                <li>L'émetteur positionne le flag en fonction du sens de transmission.</li>
+                <li>Si un paquet "montant" est transféré d'un nœud A vers un nœud B de rang supérieur, le nœud B détecte une incohérence et déclenche une réparation locale.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Réparation locale — étapes détaillées</h3>
+            <p>Un nœud déclenche une réparation locale lorsqu'il :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem;">
+                <li>A perdu son parent (plus de DIO reçus)</li>
+                <li>Reçoit un paquet avec un flag de direction incorrect</li>
+            </ul>
+            <p style="margin-top:0.7rem;"><strong>Procédure :</strong></p>
+            <ol style="padding-left:1.4rem; margin-top:0.3rem; line-height:1.9;">
+                <li>Le nœud se détache du DODAG en annonçant un rang <code>INFINITE_RANK (255)</code> — c'est le <em>route poisoning</em> — pour que ses enfants le retirent de leur liste de parents.</li>
+                <li>Il diffuse des messages <strong>DIS</strong> pour trouver un nouveau parent.</li>
+                <li>Il sélectionne un nouveau parent grâce aux réponses DIO reçues, puis envoie ses DAO pour reconstituer ses routes descendantes.</li>
+            </ol>
+        </div>
+
+        <div class="theory-box">
+            <h3>Réparation globale — numéros de version</h3>
+            <p>La racine peut déclencher une réparation globale en incrémentant le <strong>DODAG Version Number</strong> dans ses messages DIO.</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.8;">
+                <li>Pendant la transition, deux versions du DODAG coexistent temporairement.</li>
+                <li>Un nœud rejoignant la version <em>N+1</em> ignore les messages de version inférieure à <em>N+1</em>.</li>
+                <li>Quand un nœud reçoit un message de version plus récente, il effectue un <em>route poisoning</em> et choisit un nouveau parent dans la nouvelle version.</li>
+            </ul>
+        </div>
+
+        <!-- Attaques de routage -->
+        <h2>8. Attaques de routage dans les réseaux maillés</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Sécurité RPL</div>
+            <p>Les réseaux IoT maillés sont vulnérables à diverses attaques exploitant le protocole RPL. Comprendre ces attaques permet de mieux concevoir des systèmes sécurisés.</p>
+        </div>
+
+        <table class="info-table">
+            <thead>
+                <tr>
+                    <th>Attaque</th>
+                    <th>Mécanisme</th>
+                    <th>Conséquence</th>
+                    <th>Défense</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Selective Forwarding</strong></td>
+                    <td>Nœud malveillant ne transfère pas tous les paquets (uniquement les messages RPL, par exemple)</td>
+                    <td>RPL croit que tout va bien, mais le trafic applicatif est bloqué ou retardé</td>
+                    <td>Chiffrement, mesure de qualité au niveau applicatif</td>
+                </tr>
+                <tr>
+                    <td><strong>Sinkhole Attack</strong></td>
+                    <td>Annonce un rang artificiellement très bas → attire le trafic des voisins</td>
+                    <td>Crée un "puits" concentrant tout le trafic ; peut espionner ou supprimer des paquets</td>
+                    <td>Chiffrement dans le PAN</td>
+                </tr>
+                <tr>
+                    <td><strong>HELLO Flooding</strong></td>
+                    <td>Émet un DIO à forte puissance → les nœuds croient qu'il est voisin, mais il est hors portée pour le trafic</td>
+                    <td>Nœuds configurent des routes vers un parent injoignable, perturbant le réseau</td>
+                    <td>Chiffrement dans le PAN</td>
+                </tr>
+                <tr>
+                    <td><strong>Wormhole Attack</strong></td>
+                    <td>Crée un tunnel rapide (ex. WiFi) entre deux points éloignés du réseau 802.15.4</td>
+                    <td>Devient chemin préféré → peut espionner, modifier ou supprimer des paquets</td>
+                    <td>Difficile ; nécessite des mécanismes de détection de distance</td>
+                </tr>
+                <tr>
+                    <td><strong>DODAG Version Attack</strong></td>
+                    <td>Envoie des DIO avec un numéro de version faux et plus élevé</td>
+                    <td>Les nœuds rejoignent le faux DODAG → boucles possibles car il ne part pas de la racine</td>
+                    <td>Authentification des messages RPL</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Selective Forwarding — variantes intéressantes</h3>
+            <p>L'attaque de forwarding sélectif peut prendre des formes subtiles :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li><strong>Ne pas transmettre les ACK :</strong> provoque des retransmissions — très coûteux dans les réseaux 802.15.4 à ressources limitées.</li>
+                <li><strong>Retarder le transfert ou utiliser un mauvais chemin :</strong> crée des informations de routage confuses.</li>
+                <li><strong>Transmettre uniquement les messages RPL, supprimer le reste :</strong> RPL croit que la liaison est parfaite — attaque difficile à détecter.</li>
+            </ul>
+            <p style="margin-top:0.7rem;">La défense principale : chiffrer les paquets (l'attaquant ne peut plus filtrer par contenu) et surveiller la qualité du réseau au niveau applicatif.</p>
+        </div>
+
+        <div class="retenir">
+            🔒 La plupart des attaques peuvent être contrecarrées par le chiffrement ou en sécurisant les nœuds contre le piratage. Certaines (ex. Wormhole avec suppression de paquets) restent difficiles à défendre même avec chiffrement.
+        </div>
+
+        <!-- RPL Lite -->
+        <h2>9. RPL Lite et mode non-stockant</h2>
+
+        <div class="theory-box">
+            <h3>RPL Lite — implémentation allégée (Contiki-NG)</h3>
+            <p>RPL Lite est l'implémentation par défaut de RPL dans Contiki-NG. Elle impose plusieurs contraintes pour rester légère :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li>Une seule instance RPL</li>
+                <li>Un seul DODAG</li>
+                <li>Uniquement le <strong>mode non-stockant</strong> (<em>non-storing mode</em>)</li>
+                <li>Support de OF0 et MRHOF</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Mode non-stockant vs mode stockant</h3>
+            <table class="info-table" style="margin-top:0.5rem;">
+                <thead>
+                    <tr>
+                        <th>Critère</th>
+                        <th>Mode stockant (Storing)</th>
+                        <th>Mode non-stockant (Non-Storing)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Qui stocke les routes ?</td>
+                        <td>Chaque nœud stocke les routes vers ses descendants</td>
+                        <td>Seulement la racine stocke toutes les routes</td>
+                    </tr>
+                    <tr>
+                        <td>Chemin des paquets</td>
+                        <td>Routage hop-by-hop autonome</td>
+                        <td>Tous les paquets (même nœud→nœud) passent par la racine</td>
+                    </tr>
+                    <tr>
+                        <td>Mémoire requise</td>
+                        <td>Plus élevée (tables de routage réparties)</td>
+                        <td>Moindre (seulement la racine stocke)</td>
+                    </tr>
+                    <tr>
+                        <td>Latence</td>
+                        <td>Plus faible (chemin direct)</td>
+                        <td>Plus élevée (passage obligatoire par la racine)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top:0.8rem;">En mode non-stockant, la racine utilise le <strong>source routing</strong> pour indiquer aux nœuds le chemin complet à suivre jusqu'à la destination.</p>
+        </div>
+
+        <!-- Source Routing -->
+        <h2>10. Source Routing (RFC 6554)</h2>
+
+        <div class="theory-box">
+            <h3>Principe du source routing</h3>
+            <p>Quand la racine veut envoyer un paquet vers un nœud du DODAG (mode non-stockant), elle insère dans le paquet un en-tête de routage source contenant la liste complète des nœuds intermédiaires :</p>
+            <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:1rem; margin:0.8rem 0; font-family:monospace; font-size:0.9rem;">
+                <div style="display:grid; grid-template-columns:1fr; gap:4px;">
+                    <div style="background:#0D9488; color:white; padding:6px 12px; border-radius:4px; text-align:center;">En-tête IPv6</div>
+                    <div style="background:#F59E0B; color:white; padding:6px 12px; border-radius:4px; text-align:center;">En-tête de routage source (Source Routing Header)</div>
+                    <div style="background:#6366f1; color:white; padding:6px 12px; border-radius:4px; text-align:center;">Payload du paquet</div>
+                </div>
+            </div>
+            <p>L'en-tête contient la liste des adresses IPv6 des nœuds sur le chemin de la racine jusqu'à la destination. Chaque nœud intermédiaire consulte cet en-tête pour déterminer le prochain saut.</p>
+            <p style="margin-top:0.7rem;"><strong>Inconvénient :</strong> L'en-tête peut devenir très grand si le chemin est long.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Champ Segments Left et compression CmprI/CmprE</h3>
+            <p>L'en-tête de routage source (RFC 6554) contient plusieurs champs clés :</p>
+            <ul style="padding-left:1.4rem; margin-top:0.5rem; line-height:1.9;">
+                <li><strong>Segments Left :</strong> initialisé à <em>n</em> (nombre de nœuds intermédiaires). Décrémenté de 1 à chaque saut. Quand il atteint 0, le paquet est livré à la destination.</li>
+                <li><strong>CmprI :</strong> nombre d'octets du préfixe commun omis pour les adresses 1 à n−1. <code>CmprI=0</code> → adresses complètes 128 bits. <code>CmprI=x</code> → on ne stocke que les 16−x derniers octets.</li>
+                <li><strong>CmprE :</strong> même principe pour la dernière adresse (destination). Permet de compresser les adresses qui partagent un préfixe commun avec la destination.</li>
+            </ul>
+            <div style="background:#fef3c7; border-left:4px solid #F59E0B; padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin-top:0.8rem;">
+                <strong>Exemple :</strong> Si tous les nœuds partagent le préfixe <code>fd00::/112</code>, on peut ne stocker que les 2 derniers octets par adresse → gain significatif pour les longs chemins.
+            </div>
+        </div>
+
+        <div class="retenir">
+            ✅ RPL Lite simplifie l'implémentation en mode non-stockant : seule la racine stocke les routes et utilise le source routing (RFC 6554) pour guider chaque paquet. Cela réduit la mémoire nécessaire sur les nœuds contraints, au prix d'un passage obligatoire par la racine.
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch9_6lowpan.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="ch11_mqtt_coap.html">Chapitre suivant →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // DODAG Canvas
+        const dodagCanvas = document.getElementById('dodagCanvas');
+        const dodagCtx = dodagCanvas.getContext('2d');
+        const dodagPlayBtn = document.getElementById('dodagPlayBtn');
+        const dodagResetBtn = document.getElementById('dodagResetBtn');
+
+        let dodagFrame = 0;
+        let dodagAnimating = false;
+
+        const nodes = [
+            { x: 450, y: 50, id: 'Root', rank: 0, color: '#0D9488' },
+            { x: 350, y: 150, id: '1', rank: 256, color: '#d1d5db' },
+            { x: 550, y: 150, id: '2', rank: 256, color: '#d1d5db' },
+            { x: 250, y: 250, id: '3', rank: 512, color: '#d1d5db' },
+            { x: 450, y: 250, id: '4', rank: 512, color: '#d1d5db' },
+            { x: 650, y: 250, id: '5', rank: 512, color: '#d1d5db' },
+            { x: 150, y: 350, id: '6', rank: 768, color: '#d1d5db' },
+            { x: 700, y: 350, id: '7', rank: 768, color: '#d1d5db' }
+        ];
+
+        const edges = [
+            { from: 0, to: 1 },
+            { from: 0, to: 2 },
+            { from: 1, to: 3 },
+            { from: 1, to: 4 },
+            { from: 2, to: 5 },
+            { from: 3, to: 6 },
+            { from: 5, to: 7 }
+        ];
+
+        function drawDODAG(frame) {
+            dodagCanvas.width = dodagCanvas.offsetWidth;
+            const width = dodagCanvas.width;
+            const height = dodagCanvas.height;
+
+            dodagCtx.fillStyle = '#f9fafb';
+            dodagCtx.fillRect(0, 0, width, height);
+
+            // Title
+            dodagCtx.fillStyle = '#333';
+            dodagCtx.font = 'bold 14px Arial';
+            dodagCtx.fillText('Construction du DODAG (Directed Acyclic Graph)', 60, 25);
+
+            const animationPhases = Math.ceil(nodes.length / 2);
+            const currentPhase = Math.min(Math.floor(frame / 30), animationPhases);
+
+            // Draw edges first
+            edges.forEach(edge => {
+                if (edge.to <= currentPhase) {
+                    dodagCtx.strokeStyle = '#0D9488';
+                    dodagCtx.lineWidth = 2;
+                    dodagCtx.beginPath();
+                    dodagCtx.moveTo(nodes[edge.from].x, nodes[edge.from].y);
+                    dodagCtx.lineTo(nodes[edge.to].x, nodes[edge.to].y);
+                    dodagCtx.stroke();
+
+                    // Arrow
+                    const dx = nodes[edge.to].x - nodes[edge.from].x;
+                    const dy = nodes[edge.to].y - nodes[edge.from].y;
+                    const angle = Math.atan2(dy, dx);
+                    const arrowSize = 8;
+                    const fromX = nodes[edge.from].x + dx * 0.8;
+                    const fromY = nodes[edge.from].y + dy * 0.8;
+
+                    dodagCtx.fillStyle = '#0D9488';
+                    dodagCtx.beginPath();
+                    dodagCtx.moveTo(fromX, fromY);
+                    dodagCtx.lineTo(fromX - arrowSize * Math.cos(angle - Math.PI / 6), fromY - arrowSize * Math.sin(angle - Math.PI / 6));
+                    dodagCtx.lineTo(fromX - arrowSize * Math.cos(angle + Math.PI / 6), fromY - arrowSize * Math.sin(angle + Math.PI / 6));
+                    dodagCtx.closePath();
+                    dodagCtx.fill();
+                }
+            });
+
+            // Draw nodes
+            nodes.forEach((node, idx) => {
+                if (idx <= currentPhase || node.id === 'Root') {
+                    const color = node.id === 'Root' ? '#0D9488' : '#F59E0B';
+                    dodagCtx.fillStyle = color;
+                    dodagCtx.beginPath();
+                    dodagCtx.arc(node.x, node.y, 25, 0, Math.PI * 2);
+                    dodagCtx.fill();
+
+                    dodagCtx.fillStyle = 'white';
+                    dodagCtx.font = 'bold 12px Arial';
+                    dodagCtx.textAlign = 'center';
+                    dodagCtx.textBaseline = 'middle';
+                    dodagCtx.fillText(node.id, node.x, node.y - 5);
+
+                    dodagCtx.font = '9px Arial';
+                    dodagCtx.fillText('R=' + (node.rank / 256), node.x, node.y + 8);
+                }
+            });
+
+            // Status text
+            dodagCtx.fillStyle = '#333';
+            dodagCtx.font = '11px Arial';
+            dodagCtx.textAlign = 'left';
+            dodagCtx.fillText('Nœuds actifs: ' + Math.min(currentPhase + 1, nodes.length), 60, height - 30);
+            dodagCtx.fillText('Phase: ' + (currentPhase + 1) + '/' + animationPhases, 60, height - 10);
+        }
+
+        dodagPlayBtn.addEventListener('click', () => {
+            if (dodagAnimating) return;
+            dodagAnimating = true;
+            dodagPlayBtn.disabled = true;
+            dodagResetBtn.disabled = false;
+
+            dodagFrame = 0;
+            const interval = setInterval(() => {
+                drawDODAG(dodagFrame);
+                dodagFrame++;
+                if (dodagFrame >= 300) {
+                    clearInterval(interval);
+                    dodagAnimating = false;
+                    dodagPlayBtn.disabled = false;
+                }
+            }, 30);
+        });
+
+        dodagResetBtn.addEventListener('click', () => {
+            dodagFrame = 0;
+            dodagAnimating = false;
+            dodagPlayBtn.disabled = false;
+            drawDODAG(0);
+        });
+
+        drawDODAG(0);
+
+        // ETX Chart
+        const alphaSlider = document.getElementById('alphaSlider');
+        const alphaVal = document.getElementById('alphaVal');
+        const etxCanvas = document.getElementById('etxChart');
+        let etxChart = null;
+
+        function updateETXChart() {
+            const alpha = parseFloat(alphaSlider.value);
+            alphaVal.textContent = alpha.toFixed(2);
+
+            const iterations = 30;
+            const etxValues = [];
+            const timeLabels = [];
+
+            let etx = 1.5;
+            const newMeasurements = [2.0, 1.8, 2.2, 1.6, 1.9, 1.7, 1.5, 1.8, 1.6, 1.5];
+
+            for (let i = 0; i < iterations; i++) {
+                etxValues.push(etx.toFixed(2));
+                timeLabels.push(i.toString());
+
+                if (i < newMeasurements.length) {
+                    etx = etx * (1 - alpha) + newMeasurements[i] * alpha;
+                }
+            }
+
+            const ctx = etxCanvas.getContext('2d');
+            if (etxChart) etxChart.destroy();
+
+            etxChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [{
+                        label: 'ETX lissé (α = ' + alpha.toFixed(2) + ')',
+                        data: etxValues,
+                        borderColor: '#0D9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 3,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true, labels: { font: { size: 12, weight: 'bold' } } }
+                    },
+                    scales: {
+                        y: {
+                            min: 1.4,
+                            max: 2.3,
+                            title: { display: true, text: 'Valeur ETX', font: { size: 12, weight: 'bold' } },
+                            grid: { color: '#e5e7eb' }
+                        }
+                    }
+                }
+            });
+        }
+
+        alphaSlider.addEventListener('input', updateETXChart);
+        updateETXChart();
+
+        // Trickle Chart
+        const trickleCanvas = document.getElementById('trickleChart');
+
+        const trickleChart = new Chart(trickleCanvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: 20 }, (_, i) => i.toString()),
+                datasets: [{
+                    label: 'Intervalle Trickle (en unités de temps)',
+                    data: Array.from({ length: 20 }, (_, i) => Math.min(Math.pow(2, i), 1024)),
+                    borderColor: '#F59E0B',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0,
+                    fill: true,
+                    pointRadius: 4,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: true, labels: { font: { size: 12, weight: 'bold' } } }
+                },
+                scales: {
+                    y: {
+                        type: 'logarithmic',
+                        title: { display: true, text: 'Intervalle (unités)', font: { size: 12, weight: 'bold' } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Itérations sans incohérence', font: { size: 12, weight: 'bold' } }
+                    }
+                }
+            }
+        });
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            drawDODAG(dodagFrame);
+            updateETXChart();
+        });
+    </script>
+</body>
+</html>

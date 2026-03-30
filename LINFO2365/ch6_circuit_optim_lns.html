@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 6 — Circuit, Optimisation & LNS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:center; }
+  .control-group { display:flex; flex-direction:column; gap:4px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#d97706; }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+  canvas { max-width:100%; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 6 — Circuit, Optimisation & LNS</h1>
+      <p>Voyageur de commerce, Branch-and-Bound et Large Neighborhood Search</p>
+      <span class="chapter-badge">Chapitre 6 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- CIRCUIT CONSTRAINT -->
+<div class="section">
+  <h2>🗺️ La Contrainte Circuit</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi une contrainte Circuit ?</span>
+    <p>Imagine un livreur qui doit visiter N villes et revenir à son point de départ, en passant par chaque ville exactement une fois — c'est le célèbre <strong>Problème du Voyageur de Commerce (TSP)</strong>. La contrainte <strong>Circuit</strong> encode exactement ça.</p>
+    <p>On modélise : <code>succ[i]</code> = le successeur de la ville i dans le circuit. Un circuit valide = chaque nœud a exactement un successeur, et il n'y a <strong>pas de sous-cycles</strong>.</p>
+    <p><strong>Pourquoi pas juste AllDifferent(succ) ?</strong> AllDifferent garantit que les successeurs sont tous différents, mais pas l'absence de sous-cycles ! Par exemple, succ = [1,0,3,2] crée deux cycles (0→1→0 et 2→3→2), ce qui est invalide.</p>
+    <div class="retenir">💡 Circuit = AllDifferent + interdiction des sous-cycles. Le filtrage est NP-difficile → on utilise des heuristiques (chemin partiel).</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">🏙️</div><h4>succ[i]</h4><p>Successeur de la ville i dans le circuit</p></div>
+    <div class="icon-item"><div class="icon">🚫</div><h4>Sous-cycles</h4><p>Interdit ! Le circuit doit passer par tous les nœuds</p></div>
+    <div class="icon-item"><div class="icon">✂️</div><h4>Filtrage chemin partiel</h4><p>Prévenir la fermeture prématurée d'un chemin partiel</p></div>
+    <div class="icon-item"><div class="icon">🔵</div><h4>SCC Check</h4><p>Si > 1 SCC dans le graphe courant → échec</p></div>
+  </div>
+
+  <!-- CIRCUIT DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Circuit & Chemins Partiels (TSP)</h3>
+    <canvas id="circuitCanvas" width="560" height="320" style="max-width:100%;display:block;margin:0 auto;background:white;border-radius:8px;"></canvas>
+    <div class="controls" style="margin-top:12px;">
+      <button class="btn" onclick="nextCircuitStep()">▶ Étape suivante</button>
+      <button class="btn btn-amber" onclick="resetCircuit()">↺ Réinitialiser</button>
+    </div>
+    <div id="circuitLog" style="margin-top:10px;padding:12px;background:white;border-radius:8px;border:1.5px solid #e2e8f0;font-size:0.85rem;color:#334155;"></div>
+  </div>
+</div>
+
+<!-- OPTIMIZATION COP -->
+<div class="section">
+  <h2>📈 Optimisation — du CSP au COP</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi un COP ?</span>
+    <p>Un <strong>CSP</strong> (Constraint Satisfaction Problem) cherche n'importe quelle solution. Un <strong>COP</strong> (Constrained Optimization Problem) cherche la <em>meilleure</em> solution selon une fonction objectif f à minimiser (ex: la distance totale du TSP).</p>
+    <p><strong>Branch and Bound :</strong> on explore l'arbre de recherche, mais chaque fois qu'on trouve une solution de valeur f(σ), on ajoute la contrainte "la prochaine solution doit avoir f < f(σ)". Ainsi, on ne s'intéresse qu'aux solutions meilleures que la meilleure connue.</p>
+    <div class="retenir">💡 Branch-and-Bound = DFS + contrainte de bornement qui se resserre à chaque solution trouvée.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Branch-and-Bound</span>
+    <p class="phrase">📌 "À chaque solution σᵢ trouvée, on ajoute f(σ) &lt; f(σᵢ) pour forcer la prochaine à être meilleure"</p>
+    <div class="pending-math" data-latex="\text{COP} = \langle X, D, C, f \rangle \quad \text{trouver } \sigma^* = \arg\min_{\sigma \in \mathcal{S}(\langle X,D,C\rangle)} f(\sigma)"></div>
+    <table>
+      <tr><th>Terme</th><th>Signification</th></tr>
+      <tr><td>f</td><td>Fonction objectif à minimiser (ex: distance totale)</td></tr>
+      <tr><td>σᵢ</td><td>La i-ème solution feasible trouvée</td></tr>
+      <tr><td>bound</td><td>La meilleure valeur connue = f(σᵢ). La borne est tightened après chaque solution.</td></tr>
+      <tr><td>tighten()</td><td>Ajouter f(σ) ≤ bound−1 après avoir trouvé σᵢ</td></tr>
+    </table>
+  </div>
+
+  <!-- B&B DEMO -->
+  <div class="demo-box">
+    <h3>📊 Démo — Branch-and-Bound : évolution de la borne</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Vitesse : <span class="val" id="bbSpeed">500</span>ms/étape</label>
+        <input type="range" id="bbSpeedSlider" min="100" max="1000" value="500" step="100" oninput="document.getElementById('bbSpeed').textContent=this.value">
+      </div>
+      <button class="btn" onclick="runBnB()">▶ Lancer B&B</button>
+      <button class="btn btn-amber" onclick="resetBnB()">↺ Reset</button>
+    </div>
+    <canvas id="bnbChart" height="200"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Solutions trouvées : <span id="bnbSols">0</span></div>
+      <div class="stat-chip">Meilleure valeur : <span id="bnbBest">∞</span></div>
+      <div class="stat-chip">Étape : <span id="bnbStep">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LNS -->
+<div class="section">
+  <h2>🔄 Large Neighborhood Search (LNS)</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi LNS ?</span>
+    <p>Pour les gros problèmes d'optimisation, explorer tout l'arbre de recherche est impossible. <strong>LNS</strong> (Large Neighborhood Search) est une heuristique qui combine les avantages de CP et de la recherche locale.</p>
+    <p><strong>Idée :</strong> on a une solution courante S*. On en "détruit" une partie (on <em>relaxe</em> certaines variables — on remet leurs domaines à leur valeur initiale) et on <em>reconstruit</em> en résolvant avec une limite de temps ou d'échecs. Si on trouve mieux → S* est mis à jour.</p>
+    <p><strong>Analogie :</strong> tu as un puzzle presque résolu. Au lieu de tout recommencer, tu défais seulement une zone et tu la ré-assembles — en gardant le reste qui était bien.</p>
+    <div class="retenir">💡 LNS = Fix + Relax + Restart. 75% des variables fixées → ne chercher que dans 25% de l'espace.</div>
+  </div>
+
+  <ul class="steps">
+    <li><p><strong>Trouver</strong> une première solution feasible S* (par DFS standard)</p></li>
+    <li><p><strong>Relaxer</strong> : choisir aléatoirement ~25% des variables et remettre leurs domaines initiaux (les 75% autres sont fixées à leur valeur dans S*)</p></li>
+    <li><p><strong>Re-optimiser</strong> avec une limite d'échecs (ex: 100 backtracks max)</p></li>
+    <li><p>Si une meilleure solution S' est trouvée → S* ← S'</p></li>
+    <li><p>Répéter les étapes 2-4 pour 1000 restarts</p></li>
+  </ul>
+
+  <div class="theory-box">
+    <p><strong>Avantages de LNS sur Branch-and-Bound classique :</strong></p>
+    <p>• <strong>Voisinage large</strong> : pas besoin de métaheuristique pour éviter les optima locaux</p>
+    <p>• <strong>Modélisation CP</strong> : pas besoin de définir un voisinage complexe manuellement</p>
+    <p>• <strong>Comportement anytime</strong> : à chaque restart, on a une solution valide (parfois meilleure)</p>
+    <p>• <strong>Scalabilité</strong> : fonctionne bien sur les gros problèmes où B&B pur est trop lent</p>
+  </div>
+
+  <!-- LNS DEMO -->
+  <div class="demo-box">
+    <h3>📊 Démo — LNS vs B&B Pur : qualité de solution au fil du temps</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>% variables relaxées : <span class="val" id="relaxPct">25</span>%</label>
+        <input type="range" id="relaxSlider" min="10" max="60" value="25" oninput="document.getElementById('relaxPct').textContent=this.value;updateLNS()">
+      </div>
+      <div class="control-group">
+        <label>Limite d'échecs : <span class="val" id="failLim">100</span></label>
+        <input type="range" id="failSlider" min="10" max="500" step="10" value="100" oninput="document.getElementById('failLim').textContent=this.value;updateLNS()">
+      </div>
+      <button class="btn" onclick="runLNS()">▶ Simuler LNS</button>
+      <button class="btn btn-amber" onclick="resetLNS()">↺ Reset</button>
+    </div>
+    <canvas id="lnsChart" height="220"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">LNS — Meilleure valeur : <span id="lnsBest">—</span></div>
+      <div class="stat-chip">B&B — Meilleure valeur : <span id="bnbBestComp">—</span></div>
+      <div class="stat-chip">Restarts LNS : <span id="lnsRestarts">0</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer><strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 6 : Circuit, Optimisation & LNS</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    if (el.dataset.latex) el.innerHTML = katex.renderToString(el.dataset.latex, {displayMode:true, throwOnError:false});
+  });
+  resetCircuit();
+  resetBnB();
+  resetLNS();
+});
+
+// ===== CIRCUIT DEMO =====
+const cities = [[100,80],[200,40],[380,60],[460,140],[400,260],[260,280],[130,230],[60,160]];
+const nCities = cities.length;
+let circuitState = { edges:[], step:0, partialPaths:[] };
+const circuitSteps = [
+  { edges:[], msg:"État initial : 8 villes, tous les successeurs possibles" },
+  { edges:[[0,1]], msg:"succ[0]=1 fixé → chemin partiel : 0→1" },
+  { edges:[[0,1],[1,2]], msg:"succ[1]=2 fixé → chemin : 0→1→2" },
+  { edges:[[0,1],[1,2],[4,5]], msg:"succ[4]=5 fixé → nouveau chemin : 4→5 (séparé)" },
+  { edges:[[0,1],[1,2],[2,3],[4,5]], msg:"succ[2]=3 → chemin 0→1→2→3. Filtrage : succ[3]≠0 (créerait sous-cycle de longueur 4 < 7)" },
+  { edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0]], msg:"✅ Circuit complet : 0→1→2→3→4→5→6→7→0 !" },
+];
+function resetCircuit() {
+  circuitState.step = 0;
+  drawCircuit(circuitSteps[0]);
+  document.getElementById('circuitLog').textContent = circuitSteps[0].msg;
+}
+function nextCircuitStep() {
+  if (circuitState.step < circuitSteps.length - 1) circuitState.step++;
+  drawCircuit(circuitSteps[circuitState.step]);
+  document.getElementById('circuitLog').textContent = circuitSteps[circuitState.step].msg;
+}
+function drawCircuit(state) {
+  const canvas = document.getElementById('circuitCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const complete = state.edges.length === nCities;
+  // Draw edges
+  state.edges.forEach(([a,b]) => {
+    ctx.strokeStyle = complete ? '#F59E0B' : '#0D9488';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(cities[a][0], cities[a][1]); ctx.lineTo(cities[b][0], cities[b][1]); ctx.stroke();
+    // Arrow
+    const dx = cities[b][0]-cities[a][0], dy = cities[b][1]-cities[a][1];
+    const len = Math.sqrt(dx*dx+dy*dy);
+    const mx = cities[a][0]+dx*0.6, my = cities[a][1]+dy*0.6;
+    const ax = -dy/len*8, ay = dx/len*8;
+    ctx.fillStyle = complete ? '#F59E0B' : '#0D9488';
+    ctx.beginPath(); ctx.moveTo(mx+dx/len*10,my+dy/len*10); ctx.lineTo(mx+ax,my+ay); ctx.lineTo(mx-ax,my-ay); ctx.fill();
+  });
+  // Draw cities
+  cities.forEach((c,i) => {
+    ctx.beginPath(); ctx.arc(c[0],c[1],18,0,Math.PI*2);
+    ctx.fillStyle = complete ? '#F59E0B' : '#1E3A5F'; ctx.fill();
+    ctx.fillStyle = complete ? '#1E3A5F' : 'white'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(i, c[0], c[1]);
+  });
+}
+
+// ===== B&B DEMO =====
+let bnbChart = null, bnbTimer = null;
+const bnbSolutions = [120, 95, 82, 78, 71, 68, 66, 63];
+function resetBnB() {
+  if (bnbTimer) clearInterval(bnbTimer);
+  document.getElementById('bnbSols').textContent = '0';
+  document.getElementById('bnbBest').textContent = '∞';
+  document.getElementById('bnbStep').textContent = '0';
+  drawBnBChart([], []);
+}
+function drawBnBChart(steps, bests) {
+  const ctx = document.getElementById('bnbChart').getContext('2d');
+  if (bnbChart) bnbChart.destroy();
+  bnbChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: steps,
+      datasets: [{
+        label: 'Meilleure solution trouvée',
+        data: bests,
+        borderColor: '#0D9488',
+        backgroundColor: 'rgba(13,148,136,0.1)',
+        tension: 0,
+        fill: true,
+        pointBackgroundColor: '#F59E0B',
+        pointRadius: 6,
+        stepped: 'after',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { title: { display: true, text: 'Valeur objectif au fil des solutions trouvées (B&B)' } },
+      scales: {
+        y: { title: { display: true, text: 'Valeur objectif f(σ)' }, beginAtZero: false },
+        x: { title: { display: true, text: 'Solutions trouvées' } }
+      }
+    }
+  });
+}
+function runBnB() {
+  if (bnbTimer) clearInterval(bnbTimer);
+  let s = 0;
+  const speed = parseInt(document.getElementById('bbSpeedSlider').value);
+  const steps = [], bests = [];
+  bnbTimer = setInterval(() => {
+    if (s >= bnbSolutions.length) { clearInterval(bnbTimer); return; }
+    steps.push(`Sol.${s+1}`);
+    bests.push(bnbSolutions[s]);
+    s++;
+    document.getElementById('bnbSols').textContent = s;
+    document.getElementById('bnbBest').textContent = bnbSolutions[s-1];
+    document.getElementById('bnbStep').textContent = s;
+    drawBnBChart(steps, bests);
+  }, speed);
+}
+
+// ===== LNS DEMO =====
+let lnsChart = null, lnsTimer = null;
+let lnsData = { lns:[], bnb:[], steps:[] };
+function resetLNS() {
+  if (lnsTimer) clearInterval(lnsTimer);
+  lnsData = { lns:[], bnb:[], steps:[] };
+  document.getElementById('lnsBest').textContent = '—';
+  document.getElementById('bnbBestComp').textContent = '—';
+  document.getElementById('lnsRestarts').textContent = '0';
+  drawLNSChart([],[],[]);
+}
+function drawLNSChart(steps, lns, bnb) {
+  const ctx = document.getElementById('lnsChart').getContext('2d');
+  if (lnsChart) lnsChart.destroy();
+  lnsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: steps,
+      datasets: [
+        { label: 'LNS', data: lns, borderColor: '#0D9488', backgroundColor: 'rgba(13,148,136,0.1)', tension: 0.3, fill: false, stepped: 'after' },
+        { label: 'B&B pur', data: bnb, borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.05)', tension: 0.3, fill: false, stepped: 'after' }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true }, title: { display: true, text: 'Qualité de solution au fil du temps' } },
+      scales: { y: { title: { display: true, text: 'Valeur objectif (moins = mieux)' } }, x: { title: { display: true, text: 'Restarts / temps' } } }
+    }
+  });
+}
+function updateLNS() {}
+function runLNS() {
+  if (lnsTimer) clearInterval(lnsTimer);
+  resetLNS();
+  const relaxPct = parseInt(document.getElementById('relaxSlider').value);
+  let bestLNS = 200, bestBnB = 200;
+  let restart = 0;
+  lnsTimer = setInterval(() => {
+    restart++;
+    if (restart > 30) { clearInterval(lnsTimer); return; }
+    // LNS improves faster with more relaxation
+    const lnsImprove = Math.random() < (relaxPct/100 * 0.8) ? Math.floor(Math.random()*8)+1 : 0;
+    bestLNS = Math.max(50, bestLNS - lnsImprove);
+    // B&B improves slowly
+    if (restart <= 8) bestBnB = Math.max(100, bestBnB - (Math.random() < 0.4 ? Math.floor(Math.random()*10)+1 : 0));
+    lnsData.steps.push(`R${restart}`);
+    lnsData.lns.push(bestLNS);
+    lnsData.bnb.push(bestBnB);
+    document.getElementById('lnsBest').textContent = bestLNS;
+    document.getElementById('bnbBestComp').textContent = bestBnB;
+    document.getElementById('lnsRestarts').textContent = restart;
+    drawLNSChart(lnsData.steps, lnsData.lns, lnsData.bnb);
+  }, 250);
+}
+</script>
+</body>
+</html>

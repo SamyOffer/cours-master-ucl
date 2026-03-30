@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINFO2262 — Machine Learning Interactif</title>
+<style>
+  :root {
+    --navy: #1E3A5F; --teal: #0D9488; --amber: #F59E0B;
+    --light: #EFF6FF; --white: #FFFFFF; --gray: #64748B;
+    --dark: #1E293B;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--dark); }
+
+  header {
+    background: var(--navy); padding: 2.5rem 2rem 2rem;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; left: 0; top: 0; width: 8px; height: 100%;
+    background: var(--teal);
+  }
+  header::after {
+    content: ''; position: absolute; left: 8px; top: 0; width: 3px; height: 100%;
+    background: var(--amber);
+  }
+  header h1 { color: #fff; font-size: 2.4rem; margin-left: 1rem; margin-bottom: .4rem; }
+  header p { color: #94A3B8; font-size: 1.05rem; margin-left: 1rem; }
+  .badge { display: inline-block; background: var(--teal); color: #fff; padding: .25rem .75rem; border-radius: 999px; font-size: .8rem; margin-left: 1rem; margin-top: .6rem; }
+
+  .hero-stats { display: flex; gap: 2rem; margin: 1.5rem 1rem 0; }
+  .stat { text-align: center; }
+  .stat .n { font-size: 2rem; font-weight: 800; color: var(--amber); }
+  .stat .l { font-size: .8rem; color: #94A3B8; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+  .section-title {
+    font-size: 1.5rem; font-weight: 700; color: var(--navy);
+    margin-bottom: 1.5rem; padding-bottom: .5rem;
+    border-bottom: 3px solid var(--teal);
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+
+  .card {
+    background: var(--white); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .2s, box-shadow .2s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+
+  .card-header {
+    padding: 1.25rem 1.25rem .75rem;
+    display: flex; align-items: center; gap: .75rem;
+  }
+  .card-icon {
+    width: 52px; height: 52px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; flex-shrink: 0;
+  }
+  .card-ch { font-size: .75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .05em; }
+  .card-title { font-size: 1.05rem; font-weight: 700; color: var(--navy); line-height: 1.3; }
+
+  .card-body { padding: .5rem 1.25rem 1rem; flex: 1; }
+  .card-desc { font-size: .88rem; color: var(--gray); line-height: 1.6; }
+
+  .card-features { padding: .75rem 1.25rem; background: #f8faff; border-top: 1px solid #e2e8f0; }
+  .feature { font-size: .78rem; color: var(--teal); font-weight: 600; margin-bottom: .2rem; }
+  .feature::before { content: '▶ '; }
+
+  .card-footer {
+    padding: .75rem 1.25rem; background: var(--navy);
+    text-align: center; color: #fff; font-weight: 700; font-size: .9rem;
+  }
+  .card:hover .card-footer { background: var(--teal); }
+
+  .info-box {
+    background: var(--white); border-radius: 12px; padding: 1.5rem;
+    border-left: 4px solid var(--amber); box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    margin-bottom: 2rem;
+  }
+  .info-box h3 { color: var(--navy); margin-bottom: .5rem; font-size: 1rem; }
+  .info-box p { color: var(--gray); font-size: .88rem; line-height: 1.7; }
+
+  footer { text-align: center; padding: 2rem; color: var(--gray); font-size: .85rem; background: var(--navy); color: #94A3B8; margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Machine Learning Interactif</h1>
+  <p>LINFO2262 — Prof. Pierre Dupont — UCLouvain</p>
+  <span class="badge">Guide d'apprentissage visuel</span>
+  <div class="hero-stats">
+    <div class="stat"><div class="n">8</div><div class="l">Chapitres</div></div>
+    <div class="stat"><div class="n">30+</div><div class="l">Démos interactives</div></div>
+    <div class="stat"><div class="n">100%</div><div class="l">Formules expliquées</div></div>
+  </div>
+</header>
+
+<main>
+  <div class="info-box">
+    <h3>💡 Comment utiliser ce site ?</h3>
+    <p>Chaque page est un chapitre complet avec des <strong>démonstrations interactives</strong> : utilise les sliders pour modifier les paramètres et vois l'impact en temps réel sur les graphiques. Les formules s'affichent avec les valeurs actuelles à chaque changement. Commence par le Chapitre 1 si tu pars de zéro.</p>
+  </div>
+
+  <div class="section-title">Les 8 Chapitres du cours</div>
+
+  <div class="grid">
+
+    <a href="ch1_intro.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#DBEAFE; color:#1E3A5F">📊</div>
+        <div><div class="card-ch">Chapitre 1</div><div class="card-title">Introduction au Machine Learning</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">Formalisme de l'apprentissage, types de ML, overfitting vs underfitting, compromis biais-variance.</p></div>
+      <div class="card-features">
+        <div class="feature">Régression polynomiale interactive (overfitting)</div>
+        <div class="feature">Courbe Biais² + Variance vs complexité</div>
+        <div class="feature">Simulateur d'inductive bias</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch2_proba.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#CCFBF1; color:#0D9488">🎲</div>
+        <div><div class="card-ch">Chapitre 2</div><div class="card-title">Probabilités & Statistiques</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">Règle de Bayes, distributions, espérance, variance, loi normale, Théorème Central Limite.</p></div>
+      <div class="card-features">
+        <div class="feature">Calculateur Bayes avec arbre de proba</div>
+        <div class="feature">Explorateur loi normale (μ, σ)</div>
+        <div class="feature">Démo Théorème Central Limite</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch3_arbres.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#DCFCE7; color:#059669">🌳</div>
+        <div><div class="card-ch">Chapitre 3</div><div class="card-title">Arbres de Décision & Random Forests</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">ID3, entropie, gain d'information, C4.5, CART, Gini, Bagging et Random Forests.</p></div>
+      <div class="card-features">
+        <div class="feature">Entropie et Gini en temps réel</div>
+        <div class="feature">Gain d'information sur PlayTennis</div>
+        <div class="feature">Visualisation de l'arbre ID3</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch4_lineaire.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#F3E8FF; color:#7C3AED">📐</div>
+        <div><div class="card-ch">Chapitre 4</div><div class="card-title">Discriminants Linéaires</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">Perceptron, descente de gradient, règle LMS/Widrow-Hoff, frontière de décision linéaire.</p></div>
+      <div class="card-features">
+        <div class="feature">Algorithme Perceptron animé pas à pas</div>
+        <div class="feature">Descente de gradient sur surface 3D</div>
+        <div class="feature">Comparaison Perceptron vs LMS</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch5_svm.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FEF3C7; color:#F59E0B">⚡</div>
+        <div><div class="card-ch">Chapitre 5</div><div class="card-title">Support Vector Machines</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">Marge maximale, formulation duale, noyaux (kernel trick), marge souple, paramètre C.</p></div>
+      <div class="card-features">
+        <div class="feature">SVM 2D avec support vectors visibles</div>
+        <div class="feature">Kernel trick : données non-linéaires</div>
+        <div class="feature">Effet du paramètre C (soft margin)</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch6_eval.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FFE4E6; color:#DC2626">📈</div>
+        <div><div class="card-ch">Chapitre 6</div><div class="card-title">Évaluation des Performances</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">Intervalles de confiance, tests d'hypothèses, cross-validation, courbe ROC et AUC.</p></div>
+      <div class="card-features">
+        <div class="feature">Matrice de confusion interactive</div>
+        <div class="feature">Courbe ROC avec seuil ajustable</div>
+        <div class="feature">Calculateur d'intervalles de confiance</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch7_bayes.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#DBEAFE; color:#2563EB">🔬</div>
+        <div><div class="card-ch">Chapitre 7</div><div class="card-title">Apprentissage Bayésien</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">MAP, maximum de vraisemblance, MDL, optimalité du classifieur de Bayes, coûts de classification.</p></div>
+      <div class="card-features">
+        <div class="feature">Mise à jour bayésienne (coin flip)</div>
+        <div class="feature">MAP vs ML selon les données</div>
+        <div class="feature">Règle de décision avec coûts</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+    <a href="ch8_naivebayes.html" class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#FEF3C7; color:#D97706">🧩</div>
+        <div><div class="card-ch">Chapitre 8</div><div class="card-title">Classificateur Naive Bayes</div></div>
+      </div>
+      <div class="card-body"><p class="card-desc">Hypothèse d'indépendance conditionnelle, estimation des paramètres, lissage de Laplace, classification de texte.</p></div>
+      <div class="card-features">
+        <div class="feature">Classificateur PlayTennis en temps réel</div>
+        <div class="feature">Explorateur lissage Laplace</div>
+        <div class="feature">Classification de texte bag-of-words</div>
+      </div>
+      <div class="card-footer">Ouvrir le chapitre →</div>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>LINFO2262 Machine Learning — UCLouvain — Prof. Pierre Dupont — Guide interactif créé pour l'apprentissage</footer>
+
+</body>
+</html>

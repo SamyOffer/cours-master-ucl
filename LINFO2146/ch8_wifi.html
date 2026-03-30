@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 8 : WiFi | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .math-block h3 {
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: block;
+            margin: 1rem 0;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .icon-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 4px;
+            border: 2px solid var(--light);
+            text-align: center;
+        }
+
+        .icon-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .icon-item p {
+            color: var(--navy);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .controls {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .control-group {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--navy);
+            min-width: 200px;
+        }
+
+        .control-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d5db;
+            outline: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--teal);
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 8 : WiFi</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 8 : WiFi (802.11)</h1>
+
+        <p>WiFi a révolutionné les communications sans fil. De 11 Mbps en 1999 à 9.6 Gbps en 2019. Grâce à l'OFDM et au MIMO, WiFi offre des débits gigantesques pour les courtes distances. C'est LE standard pour les réseaux locaux sans fil.</p>
+
+        <!-- Introduction -->
+        <h2>1. Introduction à WiFi</h2>
+
+        <div class="explain-intro">
+            <div class="badge">802.11 = WiFi</div>
+            <p>WiFi est le nom commercial pour IEEE 802.11. C'est un standard pour les réseaux sans fil locaux (WLAN = Wireless Local Area Network).</p>
+            <div class="analogy">
+                📶 <strong>Analogie :</strong> Si Ethernet était une autoroute à 4 voies câblées, WiFi est une autoroute sans fils à 8+ voies (MIMO) avec des vitesses records. Mais plus proche, moins de portée que les réseaux cellulaires lointains.
+            </div>
+        </div>
+
+        <div class="icon-grid">
+            <div class="icon-item">
+                <div class="icon">🏢</div>
+                <p>Infrastructure BSS</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">🔗</div>
+                <p>Ad-hoc IBSS</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">📛</div>
+                <p>SSID</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">🎯</div>
+                <p>BSSID (MAC)</p>
+            </div>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Génération</th>
+                    <th>Standard</th>
+                    <th>Année</th>
+                    <th>Fréquence</th>
+                    <th>Débit théorique</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>WiFi 1 (Legacy)</td>
+                    <td>802.11b</td>
+                    <td>1999</td>
+                    <td>2.4 GHz</td>
+                    <td>11 Mbps</td>
+                </tr>
+                <tr>
+                    <td>WiFi 1 (Legacy)</td>
+                    <td>802.11a</td>
+                    <td>1999</td>
+                    <td>5 GHz</td>
+                    <td>54 Mbps</td>
+                </tr>
+                <tr>
+                    <td>WiFi 2 (Legacy)</td>
+                    <td>802.11g</td>
+                    <td>2003</td>
+                    <td>2.4 GHz</td>
+                    <td>54 Mbps</td>
+                </tr>
+                <tr>
+                    <td>WiFi 4</td>
+                    <td>802.11n</td>
+                    <td>2009</td>
+                    <td>2.4/5 GHz</td>
+                    <td>600 Mbps</td>
+                </tr>
+                <tr>
+                    <td style="background: #d1fae5;">WiFi 5</td>
+                    <td style="background: #d1fae5;">802.11ac</td>
+                    <td style="background: #d1fae5;">2013</td>
+                    <td style="background: #d1fae5;">5 GHz</td>
+                    <td style="background: #d1fae5;">7 Gbps</td>
+                </tr>
+                <tr>
+                    <td style="background: #d1fae5;">WiFi 6</td>
+                    <td style="background: #d1fae5;">802.11ax</td>
+                    <td style="background: #d1fae5;">2019</td>
+                    <td style="background: #d1fae5;">2.4/5/6 GHz</td>
+                    <td style="background: #d1fae5;">9.6 Gbps</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="retenir">
+            ✅ 802.11n (WiFi 4, 2009) a changé le jeu avec MIMO et l'utilisation complète du spectre 5 GHz (80/160 MHz de largeur). Avant ça, 54 Mbps était la limite.
+        </div>
+
+        <!-- OFDM -->
+        <h2>2. OFDM (Orthogonal Frequency Division Multiplexing)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">La clé du débit élevé</div>
+            <p>OFDM divise le spectre en plusieurs sous-porteuses orthogonales. Au lieu d'une large bande, on utilise plein de petites bandes parallèles.</p>
+            <div class="analogy">
+                🛣️ <strong>Analogie :</strong> Une autoroute à 4 voies : au lieu d'une super-large voie qui transmet vite mais facilement perturbée, on crée 4 petites voies parallèles (sous-porteuses). Chacune transmet indépendamment. Perturbation sur une voie ? Les autres continuent. Total : 4x plus efficace.
+            </div>
+        </div>
+
+        <div class="math-block">
+            <h3>Débit avec OFDM</h3>
+            <div class="formula">
+                <div class="pending-math" data-latex="\text{Débit} = N_{subcarriers} \times \text{bits\_par\_symbole} \times \frac{1}{T_{symbole}}"></div>
+            </div>
+
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Signification</th>
+                        <th>Valeur typique (802.11n)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>N<sub>subcarriers</sub></td>
+                        <td>Nombre de sous-porteuses utilisées</td>
+                        <td>108 (dans 40 MHz), 48 (dans 20 MHz)</td>
+                    </tr>
+                    <tr>
+                        <td>bits_par_symbole</td>
+                        <td>Modulation (BPSK=1, QPSK=2, ..., 256-QAM=8)</td>
+                        <td>1 à 8</td>
+                    </tr>
+                    <tr>
+                        <td>T<sub>symbole</sub></td>
+                        <td>Durée d'un symbole OFDM</td>
+                        <td>3.6 µs (802.11n, short GI)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background: white; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                <strong>Exemple :</strong> 802.11n avec 1 flux MIMO
+                <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+                    <li>108 sous-porteuses × 6 bits/symbole × (1/3.6µs) = 180 Mbps</li>
+                    <li>Avec 4 flux MIMO parallèles → 180 × 4 = 720 Mbps (proche des 600 Mbps théoriques avec framing overhead)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>📊 Démo animée : Visualisation des sous-porteuses OFDM</h3>
+            <canvas id="ofdmCanvas" width="900" height="300"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                Chaque colonne représente une sous-porteuse. Toutes les sous-porteuses peuvent transmettre simultanément sans interférence (orthogonales).
+            </p>
+        </div>
+
+        <!-- Calcul de débit -->
+        <h2>3. Calcul de débit 802.11n (MIMO OFDM)</h2>
+
+        <div class="demo-box">
+            <h3>🧮 Démo interactive : Calculateur de débit WiFi</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Nombre de sous-porteuses :</label>
+                    <select id="numSubcarriers" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <option value="48">48 (20 MHz)</option>
+                        <option value="108" selected>108 (40 MHz)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Modulation (bits/symbole) :</label>
+                    <input type="range" id="bitsPerSymbol" min="1" max="8" value="6">
+                    <span class="value-display" id="bpsVal">6 bits</span>
+                </div>
+
+                <div class="control-group">
+                    <label>Nombre de flux MIMO :</label>
+                    <input type="range" id="mimoStreams" min="1" max="4" value="1">
+                    <span class="value-display" id="mimoVal">1 flux</span>
+                </div>
+
+                <div class="control-group">
+                    <label>Intervalle de garde (GI) :</label>
+                    <select id="giLength" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                        <option value="800">800 ns (Long GI, robustesse)</option>
+                        <option value="400" selected>400 ns (Short GI, vitesse)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="background: #ecfdf5; padding: 1.5rem; border-radius: 4px; margin: 1.5rem 0; border: 2px solid var(--teal);">
+                <h4 style="color: var(--teal); margin-bottom: 0.5rem;">Débit calculé :</h4>
+                <div style="font-size: 2em; font-weight: bold; color: var(--teal); margin-top: 0.5rem;">
+                    <span id="debitResult">180</span> Mbps
+                </div>
+                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                    (Formule: (sous-porteuses × bits/symbole × nombre de flux) / (durée symbole incluant GI))
+                </p>
+            </div>
+        </div>
+
+        <!-- CSMA/CA WiFi -->
+        <h2>4. CSMA/CA WiFi (DCF - Distributed Coordination Function)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">MAC Layer</div>
+            <p>WiFi utilise CSMA/CA avec des paramètres de timing précis (DIFS, SIFS) pour arbitrer l'accès au canal.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Chronologie d'une transmission WiFi réussie</h3>
+            <p><strong>1. Écoute :</strong> La station écoute le canal avec CCA (Clear Channel Assessment).</p>
+            <p style="margin-top: 0.5rem;"><strong>2. DIFS :</strong> Si libre, attend DIFS (Distributed Inter-Frame Space) = 34 µs.</p>
+            <p style="margin-top: 0.5rem;"><strong>3. Backoff :</strong> Attend une durée aléatoire [0, CW] × 20 µs, où CW ∈ [31, 1023].</p>
+            <p style="margin-top: 0.5rem;"><strong>4. Transmission :</strong> Envoie le data frame.</p>
+            <p style="margin-top: 0.5rem;"><strong>5. SIFS :</strong> Le destinataire attend SIFS = 10 µs (plus court que DIFS → ACK a priorité).</p>
+            <p style="margin-top: 0.5rem;"><strong>6. ACK :</strong> Le destinataire envoie un ACK court.</p>
+            <p style="margin-top: 0.5rem;"><strong>7. RTS/CTS (optionnel) :</strong> Pour éviter le hidden terminal problem.</p>
+        </div>
+
+        <div class="demo-box">
+            <h3>⏱️ Démo animée : Timing CSMA/CA WiFi avec RTS/CTS</h3>
+            <canvas id="wifiTimingCanvas" width="900" height="350"></canvas>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 4px; font-size: 0.9rem;">
+                <p><strong>Légende :</strong></p>
+                <ul style="margin-left: 2rem;">
+                    <li>DIFS: Attendre avant d'accéder (34 µs)</li>
+                    <li>Backoff: Attendre aléatoire (0 à CW × 20µs)</li>
+                    <li>RTS: Request To Send (optionnel)</li>
+                    <li>CTS: Clear To Send (réponse du destinataire)</li>
+                    <li>DATA: Payload</li>
+                    <li>SIFS: Espace court (10 µs) avant ACK</li>
+                    <li>ACK: Acquittement</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MIMO -->
+        <h2>5. MIMO (Multiple Input Multiple Output)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Antennes multiples</div>
+            <p>MIMO utilise plusieurs antennes à l'émetteur et plusieurs à la réception pour multiplier le débit.</p>
+            <div class="analogy">
+                🎙️ <strong>Analogie :</strong> Au lieu d'un seul micro qui parle (SISO), imaginez 4 personnes qui parlent en même temps sur le même canal : la première raconte l'histoire A, la deuxième raconte l'histoire B, etc. À la réception, 4 micros écoutent et démêlent les 4 histoires. Résultat : 4x plus d'information transmise ! C'est MIMO.
+            </div>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Configuration MIMO</th>
+                    <th>Antennes (TX × RX)</th>
+                    <th>Flux indépendants</th>
+                    <th>Gain de débit</th>
+                    <th>Exemple</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SISO</td>
+                    <td>1 × 1</td>
+                    <td>1</td>
+                    <td>1×</td>
+                    <td>802.11a/b/g</td>
+                </tr>
+                <tr>
+                    <td>MISO</td>
+                    <td>2 × 1</td>
+                    <td>1 (mais meilleure réception)</td>
+                    <td>~1.5×</td>
+                    <td>Beamforming</td>
+                </tr>
+                <tr>
+                    <td style="background: #d1fae5;">MIMO 2×2</td>
+                    <td style="background: #d1fae5;">2 × 2</td>
+                    <td style="background: #d1fae5;">2</td>
+                    <td style="background: #d1fae5;">~2×</td>
+                    <td style="background: #d1fae5;">802.11n courant</td>
+                </tr>
+                <tr>
+                    <td style="background: #d1fae5;">MIMO 4×4</td>
+                    <td style="background: #d1fae5;">4 × 4</td>
+                    <td style="background: #d1fae5;">4</td>
+                    <td style="background: #d1fae5;">~4×</td>
+                    <td style="background: #d1fae5;">802.11ac/ax</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="demo-box">
+            <h3>📡 Démo : Multiplicateur MIMO de débit</h3>
+            <canvas id="mimoChart" width="900" height="300"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                Chaque flux MIMO ajoute indépendamment au débit. Plus d'antennes = plus de flux = débit plus élevé.
+            </p>
+        </div>
+
+        <div class="retenir">
+            ✅ OFDM + MIMO = les deux innovations majeures qui ont permis à WiFi de passer de 54 Mbps (802.11a/g) à 600 Mbps (802.11n) puis 7 Gbps (802.11ac) et 9.6 Gbps (802.11ax).
+        </div>
+    </div>
+
+    <!-- ===== SECTION : PCF / INFRASTRUCTURE ===== -->
+    <div class="section">
+        <h2>🏛️ 6. PCF — Point Coordination Function (Mode Infrastructure)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">🧒 WiFi peut aussi fonctionner sans collision !</div>
+            <p>On a vu que DCF est aléatoire (CSMA/CA). En mode infrastructure, il existe un mode alternatif où c'est l'<strong>Access Point qui orchestre tout</strong> : le PCF.</p>
+        </div>
+
+        <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#3b82f6;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Fonctionnement du PCF</div>
+            <p>L'AP (Point Coordinator) gère l'accès au médium en utilisant des <strong>Superframes</strong> :</p>
+            <ol style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+                <li>L'AP diffuse une <strong>trame Beacon</strong> après avoir attendu PIFS (plus court que DIFS → priorité sur les données normales)</li>
+                <li>Si l'AP a des données pour une station, il les envoie</li>
+                <li>La station répond avec ACK et peut envoyer ses données à l'AP</li>
+                <li>L'AP répond avec ACK et passe à la station suivante (polling)</li>
+                <li>Fin du polling signalée par une trame CF_End, suivie d'une période DCF (contention)</li>
+            </ol>
+            <p style="margin-top:.6rem;">PIFS &lt; DIFS : l'AP peut toujours reprendre le contrôle du canal avant que les stations normales ne tentent d'envoyer.</p>
+        </div>
+
+        <table class="symbols-table" style="width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0;">
+            <tr style="background:#1E3A5F;color:#fff;"><th style="padding:.5rem">Critère</th><th style="padding:.5rem">DCF</th><th style="padding:.5rem">PCF</th></tr>
+            <tr><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;"><strong>Coordination</strong></td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Distribuée (pas de central)</td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Centralisée (via AP)</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;"><strong>Réseau</strong></td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Ad-hoc ou Infrastructure</td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Infrastructure seulement</td></tr>
+            <tr><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;"><strong>Collisions</strong></td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Possibles (backoff)</td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Aucune (polling)</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:.45rem;"><strong>Déterminisme</strong></td><td style="padding:.45rem;">Non (latence variable)</td><td style="padding:.45rem;">Oui (latence bornée)</td></tr>
+        </table>
+    </div>
+
+    <!-- ===== SECTION : BEACON ET TIM ===== -->
+    <div class="section">
+        <h2>📡 7. Trames Beacon et économie d'énergie — TIM</h2>
+
+        <div style="background:#f0fdf4;border-left:4px solid #0D9488;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#0D9488;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 La trame Beacon</div>
+            <p>La trame Beacon est envoyée périodiquement par l'AP (en mode infrastructure) ou par l'une des stations (en mode ad-hoc). Par défaut : <strong>toutes les 102 ms</strong> (= Target Beacon Transmission Time, TBTT).</p>
+            <p style="margin-top:.6rem;">La trame Beacon contient :</p>
+            <ul style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+                <li>BSSID (identifiant du réseau), débits supportés, configuration</li>
+                <li>Informations pour la <strong>synchronisation des horloges</strong> entre stations</li>
+                <li>Le <strong>Traffic Indication Map (TIM)</strong> pour l'économie d'énergie</li>
+            </ul>
+        </div>
+
+        <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#3b82f6;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Traffic Indication Map (TIM)</div>
+            <p>Mécanisme d'économie d'énergie pour les stations WiFi :</p>
+            <ol style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+                <li>Quand une station rejoint l'AP, elle reçoit un <strong>Association Identifier (AID)</strong></li>
+                <li>La station peut signaler à l'AP qu'elle passe en mode veille (power saving) → l'AP <strong>met en attente les données</strong> destinées à cette station</li>
+                <li>Dans chaque Beacon, l'AP inclut le TIM : la liste des AID des stations pour lesquelles des données sont en attente</li>
+                <li>La station se réveille uniquement pour recevoir le Beacon → si son AID n'est pas dans le TIM, elle se rendort immédiatement</li>
+                <li>Si son AID est dans le TIM, elle reste éveillée pour récupérer ses données</li>
+            </ol>
+            <p style="margin-top:.6rem;">Le trafic broadcast est annoncé dans un Delivery TIM (DTIM). Un mécanisme similaire existe en mode ad-hoc (ATIM).</p>
+            <div style="background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;">💡 À retenir : TIM = réveil sélectif des stations. Économie d'énergie sans perdre de paquets. La station décide de la fréquence à laquelle elle se réveille pour lire le Beacon.</div>
+        </div>
+    </div>
+
+    <!-- ===== SECTION : REJOINDRE UN BSS ===== -->
+    <div class="section">
+        <h2>🔗 8. Rejoindre un réseau WiFi — Association &amp; Scanning</h2>
+
+        <div style="background:#fffbeb;border-left:4px solid #F59E0B;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#F59E0B;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Processus d'association</div>
+            <p>Pour rejoindre un BSS (Basic Service Set = réseau WiFi avec un AP), une station doit d'abord trouver l'AP, puis s'y associer :</p>
+            <p style="margin-top:.6rem;"><strong>1. Découverte de l'AP :</strong></p>
+            <ul style="padding-left:1.2rem;line-height:1.8;">
+                <li><strong>Scanning passif</strong> : la station écoute les trames Beacon envoyées périodiquement par l'AP sur chaque canal</li>
+                <li><strong>Scanning actif</strong> : la station envoie une trame <em>Probe Request</em> et tous les APs répondent avec <em>Probe Response</em>. La station itère sur tous les canaux.</li>
+            </ul>
+            <p style="margin-top:.6rem;"><strong>2. Association :</strong></p>
+            <ul style="padding-left:1.2rem;line-height:1.8;">
+                <li>La station envoie une <em>Association Request</em> à l'AP choisi</li>
+                <li>L'AP répond avec une <em>Association Response</em> (confirmation)</li>
+                <li>Handshake pour le chiffrement (WPA2/WPA3) si configuré</li>
+            </ul>
+            <p style="margin-top:.6rem;"><strong>Note :</strong> Le standard WiFi ne spécifie <em>pas</em> comment la station doit choisir entre plusieurs APs disponibles (signal le plus fort ? charge la plus faible ?). C'est laissé à l'implémentation des pilotes.</p>
+        </div>
+
+        <table class="symbols-table" style="width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0;">
+            <tr style="background:#1E3A5F;color:#fff;"><th style="padding:.5rem">Critère</th><th style="padding:.5rem">Scanning passif</th><th style="padding:.5rem">Scanning actif</th></tr>
+            <tr><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;"><strong>Mécanisme</strong></td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Écoute des Beacons</td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Envoi Probe Request</td></tr>
+            <tr style="background:#f8fafc;"><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;"><strong>Vitesse</strong></td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Lente (attend le Beacon)</td><td style="padding:.45rem;border-bottom:1px solid #e2e8f0;">Plus rapide</td></tr>
+            <tr><td style="padding:.45rem;"><strong>Énergie</strong></td><td style="padding:.45rem;">Faible (écoute passive)</td><td style="padding:.45rem;">Plus élevée (émission)</td></tr>
+        </table>
+        <div style="background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;">💡 À retenir : Le scanning actif est plus rapide mais consomme plus d'énergie. Le scanning passif est économe mais dépend de l'intervalle des Beacons (102 ms par défaut).</div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch7_802154.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="ch9_6lowpan.html">Chapitre suivant →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // OFDM Canvas
+        const ofdmCanvas = document.getElementById('ofdmCanvas');
+        const ofdmCtx = ofdmCanvas.getContext('2d');
+
+        function drawOFDM() {
+            ofdmCanvas.width = ofdmCanvas.offsetWidth;
+            const width = ofdmCanvas.width;
+            const height = ofdmCanvas.height;
+
+            ofdmCtx.fillStyle = '#f9fafb';
+            ofdmCtx.fillRect(0, 0, width, height);
+
+            const numSubcarriers = 64;
+            const subcarrierWidth = (width - 100) / numSubcarriers;
+
+            ofdmCtx.fillStyle = '#333';
+            ofdmCtx.font = 'bold 14px Arial';
+            ofdmCtx.fillText('64 sous-porteuses OFDM (orthogonales)', 60, 30);
+
+            // Draw subcarriers with sine waves
+            for (let i = 0; i < numSubcarriers; i++) {
+                const x = 60 + i * subcarrierWidth;
+                const freq = i - numSubcarriers / 2;
+
+                // Draw carrier
+                const color = Math.abs(freq) < 28 ? '#0D9488' : '#d1d5db';
+                ofdmCtx.fillStyle = color;
+                ofdmCtx.globalAlpha = 0.7;
+                ofdmCtx.fillRect(x, 80, subcarrierWidth - 1, height - 150);
+                ofdmCtx.globalAlpha = 1;
+
+                // Draw small sine wave
+                ofdmCtx.strokeStyle = color;
+                ofdmCtx.lineWidth = 2;
+                ofdmCtx.beginPath();
+                for (let t = 0; t <= subcarrierWidth; t += 2) {
+                    const y = 100 + 15 * Math.sin((t / subcarrierWidth) * Math.PI * 2);
+                    if (t === 0) ofdmCtx.moveTo(x + t, y);
+                    else ofdmCtx.lineTo(x + t, y);
+                }
+                ofdmCtx.stroke();
+
+                // Center carrier indicator
+                if (i === numSubcarriers / 2) {
+                    ofdmCtx.fillStyle = '#EF4444';
+                    ofdmCtx.fillRect(x, 60, subcarrierWidth - 1, 15);
+                    ofdmCtx.fillStyle = 'white';
+                    ofdmCtx.font = '9px Arial';
+                    ofdmCtx.textAlign = 'center';
+                    ofdmCtx.fillText('DC', x + subcarrierWidth / 2, 71);
+                }
+            }
+
+            // Info box
+            ofdmCtx.fillStyle = '#333';
+            ofdmCtx.font = '11px Arial';
+            ofdmCtx.textAlign = 'left';
+            ofdmCtx.fillText('Vert: Porteuses utilisées | Gris: Porteuses de garde (inactives)', 60, height - 20);
+        }
+
+        drawOFDM();
+
+        // Débit calculator
+        const numSubcarriersSelect = document.getElementById('numSubcarriers');
+        const bitsPerSymbolSlider = document.getElementById('bitsPerSymbol');
+        const mimoStreamsSlider = document.getElementById('mimoStreams');
+        const giLengthSelect = document.getElementById('giLength');
+        const debitResult = document.getElementById('debitResult');
+        const bpsVal = document.getElementById('bpsVal');
+        const mimoVal = document.getElementById('mimoVal');
+
+        function calculateDebit() {
+            const subcarriers = parseInt(numSubcarriersSelect.value);
+            const bitsPerSym = parseInt(bitsPerSymbolSlider.value);
+            const mimoFlows = parseInt(mimoStreamsSlider.value);
+            const gi = parseInt(giLengthSelect.value);
+
+            // Symbol duration: (64 + 16) × 50ns (subcarrier spacing) = 4µs for 800ns GI, 3.6µs for 400ns GI
+            const symbolDuration = gi === 800 ? 4.0 : 3.6; // µs
+            const symbolsPerSecond = 1000 / symbolDuration;
+
+            // Debit = subcarriers × bits × symbols/sec × mimo_streams
+            const debit = subcarriers * bitsPerSym * symbolsPerSecond * mimoFlows;
+
+            bpsVal.textContent = bitsPerSym + ' bits';
+            mimoVal.textContent = mimoFlows + ' flux';
+            debitResult.textContent = Math.round(debit / 10) * 10; // Round to nearest 10
+        }
+
+        numSubcarriersSelect.addEventListener('change', calculateDebit);
+        bitsPerSymbolSlider.addEventListener('input', calculateDebit);
+        mimoStreamsSlider.addEventListener('input', calculateDebit);
+        giLengthSelect.addEventListener('change', calculateDebit);
+        calculateDebit();
+
+        // WiFi Timing Canvas
+        const wifiTimingCanvas = document.getElementById('wifiTimingCanvas');
+        const wifiTimingCtx = wifiTimingCanvas.getContext('2d');
+
+        function drawWiFiTiming() {
+            wifiTimingCanvas.width = wifiTimingCanvas.offsetWidth;
+            const width = wifiTimingCanvas.width;
+            const height = wifiTimingCanvas.height;
+
+            wifiTimingCtx.fillStyle = '#f9fafb';
+            wifiTimingCtx.fillRect(0, 0, width, height);
+
+            const timelineY = 80;
+            const timelineHeight = 200;
+            const xStart = 80;
+            const xEnd = width - 40;
+            const timelineWidth = xEnd - xStart;
+
+            // Timeline
+            wifiTimingCtx.strokeStyle = '#333';
+            wifiTimingCtx.lineWidth = 2;
+            wifiTimingCtx.beginPath();
+            wifiTimingCtx.moveTo(xStart, timelineY + timelineHeight);
+            wifiTimingCtx.lineTo(xEnd, timelineY + timelineHeight);
+            wifiTimingCtx.stroke();
+
+            // Time labels
+            wifiTimingCtx.fillStyle = '#333';
+            wifiTimingCtx.font = 'bold 12px Arial';
+            wifiTimingCtx.fillText('Temps (µs)', 10, 40);
+
+            // Phases with timing
+            const phases = [
+                { label: 'DIFS\n34µs', width: 0.08, color: '#3B82F6' },
+                { label: 'Backoff\n~100µs', width: 0.25, color: '#F59E0B' },
+                { label: 'RTS\n26µs', width: 0.06, color: '#10B981' },
+                { label: 'SIFS\n10µs', width: 0.02, color: '#6366F1' },
+                { label: 'CTS\n26µs', width: 0.06, color: '#10B981' },
+                { label: 'SIFS\n10µs', width: 0.02, color: '#6366F1' },
+                { label: 'DATA\n~800µs', width: 0.32, color: '#3B82F6' },
+                { label: 'SIFS\n10µs', width: 0.02, color: '#6366F1' },
+                { label: 'ACK\n26µs', width: 0.08, color: '#10B981' }
+            ];
+
+            let currentX = xStart;
+            phases.forEach((phase, idx) => {
+                const phaseWidth = phase.width * timelineWidth;
+
+                // Phase box
+                wifiTimingCtx.fillStyle = phase.color;
+                wifiTimingCtx.fillRect(currentX, timelineY, phaseWidth, timelineHeight);
+
+                // Border
+                wifiTimingCtx.strokeStyle = '#333';
+                wifiTimingCtx.lineWidth = 1;
+                wifiTimingCtx.strokeRect(currentX, timelineY, phaseWidth, timelineHeight);
+
+                // Label
+                wifiTimingCtx.fillStyle = phase.color === '#6366F1' || phase.color === '#3B82F6' ? 'white' : '#333';
+                wifiTimingCtx.font = 'bold 9px Arial';
+                wifiTimingCtx.textAlign = 'center';
+                wifiTimingCtx.textBaseline = 'middle';
+                const lines = phase.label.split('\n');
+                lines.forEach((line, lineIdx) => {
+                    wifiTimingCtx.fillText(line, currentX + phaseWidth / 2, timelineY + 40 + lineIdx * 25);
+                });
+
+                currentX += phaseWidth;
+            });
+
+            // Total time calculation
+            const totalTime = 34 + 100 + 26 + 10 + 26 + 10 + 800 + 10 + 26;
+            wifiTimingCtx.fillStyle = '#333';
+            wifiTimingCtx.font = '12px Arial';
+            wifiTimingCtx.textAlign = 'left';
+            wifiTimingCtx.fillText('Temps total (overhead + transmission): ~' + totalTime + ' µs', xStart, height - 30);
+            wifiTimingCtx.fillText('(Pour 1500 bytes de données)', xStart, height - 10);
+        }
+
+        drawWiFiTiming();
+
+        // MIMO Chart
+        const mimoCanvas = document.getElementById('mimoChart');
+
+        const mimoChart = new Chart(mimoCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['SISO (1×1)', 'MIMO 2×2', 'MIMO 3×3', 'MIMO 4×4'],
+                datasets: [
+                    {
+                        label: 'Débit relatif (802.11n, 40 MHz)',
+                        data: [150, 300, 450, 600],
+                        backgroundColor: ['#10B981', '#0D9488', '#0D7B6F', '#0A5C56'],
+                        borderColor: '#333',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'x',
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: { font: { size: 12, weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Débit (Mbps)' },
+                        beginAtZero: true,
+                        max: 700,
+                        grid: { color: '#e5e7eb' }
+                    }
+                }
+            }
+        });
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            drawOFDM();
+            drawWiFiTiming();
+        });
+    </script>
+</body>
+</html>

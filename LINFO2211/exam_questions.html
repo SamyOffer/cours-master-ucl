@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questions d'Examen – EPL 2211</title>
+<style>
+  :root {
+    --navy: #1E3A5F;
+    --teal: #0D9488;
+    --amber: #F59E0B;
+    --light: #EFF6FF;
+    --white: #FFFFFF;
+    --gray: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #1e293b; }
+
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 8px;
+    background: linear-gradient(to bottom, var(--amber), var(--teal));
+  }
+  .header-inner { padding: 36px 60px; max-width: 1200px; margin: 0 auto; }
+  .header-tag {
+    display: inline-block;
+    background: var(--amber);
+    color: var(--navy);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
+  header p.subtitle { font-size: 1rem; color: #94a3b8; }
+  .header-meta { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: #cbd5e1; }
+
+  nav.breadcrumb {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 60px;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+  nav.breadcrumb a { color: var(--teal); text-decoration: none; }
+  nav.breadcrumb a:hover { text-decoration: underline; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 40px; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(30,58,95,0.08);
+    border-top: 4px solid var(--teal);
+  }
+  .stat-card.amber { border-top-color: var(--amber); }
+  .stat-card.navy { border-top-color: var(--navy); }
+  .stat-number { font-size: 2rem; font-weight: 800; color: var(--navy); }
+  .stat-label { font-size: 0.8rem; color: var(--gray); margin-top: 4px; }
+
+  /* Controls */
+  .controls {
+    background: white;
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(30,58,95,0.07);
+  }
+  .controls label { font-size: 0.9rem; font-weight: 600; color: var(--navy); }
+  .controls button {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-expand { background: var(--teal); color: white; }
+  .btn-expand:hover { background: #0f766e; }
+  .btn-collapse { background: #e2e8f0; color: #475569; }
+  .btn-collapse:hover { background: #cbd5e1; }
+  .btn-filter {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--gray);
+    transition: all 0.2s;
+  }
+  .btn-filter.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  /* Progress tracker */
+  .progress-tracker {
+    background: white;
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 8px rgba(30,58,95,0.07);
+  }
+  .progress-tracker h3 { font-size: 0.9rem; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+  .progress-row { display: flex; align-items: center; gap: 12px; }
+  .progress-bar-bg { flex: 1; background: #e2e8f0; border-radius: 20px; height: 10px; }
+  .progress-fill { height: 10px; background: linear-gradient(to right, var(--teal), var(--amber)); border-radius: 20px; transition: width 0.4s; }
+  .progress-count { font-size: 0.85rem; font-weight: 700; color: var(--navy); min-width: 80px; text-align: right; }
+
+  /* Chapter sections */
+  .chapter-section { margin-bottom: 32px; }
+  .chapter-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .chapter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .chapter-heading h2 { font-size: 1.15rem; font-weight: 700; color: var(--navy); }
+  .chapter-heading .q-count { font-size: 0.8rem; color: var(--gray); background: #f1f5f9; padding: 3px 10px; border-radius: 20px; }
+
+  /* Question cards */
+  .question-card {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(30,58,95,0.07);
+    overflow: hidden;
+    border-left: 4px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .question-card.done { border-left-color: var(--teal); }
+  .question-card.flagged { border-left-color: var(--amber); }
+
+  .question-header {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    cursor: pointer;
+    gap: 14px;
+    user-select: none;
+  }
+  .question-header:hover { background: #f8fafc; }
+  .q-number {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--light);
+    color: var(--navy);
+    font-size: 0.85rem;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid #dbeafe;
+  }
+  .q-text { flex: 1; font-size: 0.95rem; font-weight: 600; color: #1e293b; line-height: 1.4; }
+  .q-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .q-check, .q-flag {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .q-check:hover { border-color: var(--teal); background: #f0fdf4; }
+  .q-flag:hover { border-color: var(--amber); background: #fffbeb; }
+  .q-check.active { background: var(--teal); border-color: var(--teal); color: white; }
+  .q-flag.active { background: var(--amber); border-color: var(--amber); color: white; }
+  .q-toggle {
+    color: var(--gray);
+    font-size: 1rem;
+    transition: transform 0.3s;
+  }
+  .q-toggle.open { transform: rotate(180deg); }
+
+  /* Answer panel */
+  .answer-panel {
+    display: none;
+    border-top: 1px solid #f1f5f9;
+    padding: 20px 24px;
+    background: #fafafa;
+  }
+  .answer-panel.open { display: block; }
+  .answer-panel h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .key-concepts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .concept-tag {
+    background: var(--light);
+    color: var(--navy);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid #dbeafe;
+  }
+
+  .answer-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .answer-points li {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #334155;
+    line-height: 1.5;
+  }
+  .answer-points li::before {
+    content: '→';
+    color: var(--teal);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .chapter-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .chapter-link:hover { text-decoration: underline; }
+
+  /* Tip box */
+  .exam-tip {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 1px solid #fde68a;
+    border-left: 4px solid var(--amber);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+  }
+  .exam-tip strong { color: #92400e; }
+  .exam-tip p { font-size: 0.9rem; color: #78350f; line-height: 1.6; }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--gray);
+    font-size: 0.85rem;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 40px;
+    background: white;
+  }
+  footer a { color: var(--teal); text-decoration: none; }
+
+  @media (max-width: 700px) {
+    .header-inner { padding: 24px 20px; }
+    nav.breadcrumb { padding: 10px 20px; }
+    main { padding: 20px 16px; }
+    header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">📝 Révision Examen</div>
+    <h1>Questions d'Examen</h1>
+    <p class="subtitle">EPL 2211 – Introduction to New Venture Management · UCLouvain</p>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-icon">❓</span> 39 questions officielles</div>
+      <div class="meta-item"><span class="meta-icon">📚</span> 6 chapitres</div>
+      <div class="meta-item"><span class="meta-icon">💡</span> Points-clés inclus</div>
+    </div>
+  </div>
+</header>
+
+<nav class="breadcrumb">
+  <a href="index.html">🏠 Accueil</a> › <span>Questions d'Examen</span>
+</nav>
+
+<main>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-number">39</div>
+      <div class="stat-label">Questions totales</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-number" id="doneCount">0</div>
+      <div class="stat-label">Révisées ✓</div>
+    </div>
+    <div class="stat-card navy">
+      <div class="stat-number" id="flagCount">0</div>
+      <div class="stat-label">À revoir 🚩</div>
+    </div>
+  </div>
+
+  <div class="progress-tracker">
+    <h3>🎯 Progression de révision</h3>
+    <div class="progress-row">
+      <div class="progress-bar-bg">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="progress-count" id="progressText">0 / 39</div>
+    </div>
+  </div>
+
+  <div class="exam-tip">
+    <p><strong>💡 Consigne de l'examen :</strong> Pour chaque question, soyez prêt·e à <em>introduire, discuter et illustrer</em> les concepts-clés, en mobilisant les exemples vus en cours et les travaux de groupe. Cliquez sur chaque question pour voir les points essentiels à couvrir. Cochez ✓ quand vous la maîtrisez, 🚩 pour marquer celles à retravailler.</p>
+  </div>
+
+  <div class="controls">
+    <label>Affichage :</label>
+    <button class="btn-expand" onclick="expandAll()">📖 Tout déplier</button>
+    <button class="btn-collapse" onclick="collapseAll()">📕 Tout replier</button>
+    <span style="width:1px;height:24px;background:#e2e8f0;display:inline-block;margin:0 4px;"></span>
+    <label>Filtrer :</label>
+    <button class="btn-filter active" id="filter-all" onclick="filterCards('all')">Toutes</button>
+    <button class="btn-filter" id="filter-done" onclick="filterCards('done')">✓ Révisées</button>
+    <button class="btn-filter" id="filter-flagged" onclick="filterCards('flagged')">🚩 À revoir</button>
+    <button class="btn-filter" id="filter-pending" onclick="filterCards('pending')">⬜ Non vues</button>
+  </div>
+
+  <!-- INTRODUCTION -->
+  <div class="chapter-section" data-chapter="intro">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#dbeafe;color:#1e3a8a;">0</div>
+      <h2>Introduction</h2>
+      <span class="q-count">2 questions</span>
+    </div>
+
+    <div class="question-card" data-q="1">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">1</div>
+        <div class="q-text">What are the key elements of an organization in general and of a business in particular, and the resulting challenges? What are the resulting ethical dilemmas?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)" title="Marquer comme révisée">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)" title="Marquer à revoir">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Organisation</span>
+          <span class="concept-tag">Ressources (R, K, T, E)</span>
+          <span class="concept-tag">Shareholders vs Stakeholders</span>
+          <span class="concept-tag">Triple Bottom Line</span>
+          <span class="concept-tag">Éthique des affaires</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Organisation</strong> = groupe de personnes avec un objectif commun, des ressources partagées et une structure de gouvernance.</li>
+          <li><strong>Éléments d'une entreprise</strong> : ressources (R = ressources naturelles, K = capital, T = technologie, E = entrepreneuriat), activités de transformation, création de valeur.</li>
+          <li><strong>Défis</strong> : coordination, allocation des ressources, survie à long terme, innovation continue.</li>
+          <li><strong>Dilemme éthique</strong> : perspective <em>shareholders</em> (maximiser profit pour actionnaires) vs <em>stakeholders</em> (créer de la valeur pour toutes les parties prenantes : employés, société, environnement).</li>
+          <li><strong>Triple Bottom Line</strong> : People, Planet, Profit – équilibrer performance économique, sociale et environnementale.</li>
+          <li>Exemple : Tesla (shareholder value) vs Patagonia (stakeholder/B-Corp model).</li>
+        </ul>
+        <a href="ch0_introduction.html" class="chapter-link">📖 Voir Chapitre 0 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="2">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">2</div>
+        <div class="q-text">What are the key elements of a "typical business" (including resources and purpose), and how can they vary across firms?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)" title="Marquer comme révisée">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)" title="Marquer à revoir">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Inputs → Transformation → Outputs</span>
+          <span class="concept-tag">Ressources RKTE</span>
+          <span class="concept-tag">Purpose / Mission</span>
+          <span class="concept-tag">Variabilité inter-firmes</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Structure typique</strong> : inputs (ressources) → processus de transformation → outputs (biens/services) → création de valeur → revenus → profit.</li>
+          <li><strong>Ressources</strong> : naturelles (R), capital financier (K), technologie (T), entrepreneuriat humain (E).</li>
+          <li><strong>Purpose</strong> : varie selon le type d'entreprise (startup tech, PME familiale, multinationale, coopérative, ONG).</li>
+          <li><strong>Variations</strong> : taille, secteur, structure de propriété, horizon temporel, culture, modèle de gouvernance.</li>
+          <li>Exemple : Apple (technologie, design, écosystème) vs ZARA (supply chain, fast fashion) vs Airbnb (plateforme, actifs légers).</li>
+        </ul>
+        <a href="ch0_introduction.html" class="chapter-link">📖 Voir Chapitre 0 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUSINESS PLANNING -->
+  <div class="chapter-section" data-chapter="bp">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#dcfce7;color:#14532d;">1</div>
+      <h2>Business Planning</h2>
+      <span class="q-count">2 questions</span>
+    </div>
+
+    <div class="question-card" data-q="3">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">3</div>
+        <div class="q-text">What are the key objectives of business planning? Which are the key questions involved?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)" title="Marquer comme révisée">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)" title="Marquer à revoir">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Cycle Why/What/Who/$</span>
+          <span class="concept-tag">R-W-W Screen</span>
+          <span class="concept-tag">Story Selling</span>
+          <span class="concept-tag">Objectifs du BP</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Objectifs du BP</strong> : clarifier la vision, convaincre des investisseurs, aligner l'équipe, identifier les risques, fixer des jalons.</li>
+          <li><strong>Questions-clés</strong> : <em>Why</em> (pourquoi ce projet ?), <em>What</em> (quoi offrir ?), <em>Who</em> (pour qui ?), <em>$</em> (comment gagner de l'argent ?).</li>
+          <li><strong>R-W-W Screen</strong> : Is it Real? Can we Win? Is it Worth it? → filtre de viabilité avant d'investir.</li>
+          <li><strong>Story Selling</strong> : narration convaincante pour investisseurs et partenaires (problème → solution → traction → vision).</li>
+          <li>Un bon BP est vivant et itératif, pas un document figé.</li>
+        </ul>
+        <a href="ch1_business_planning.html" class="chapter-link">📖 Voir Chapitre 1 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="4">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">4</div>
+        <div class="q-text">What are the key success and failure factors to consider when planning a business?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)" title="Marquer comme révisée">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)" title="Marquer à revoir">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">10 raisons d'échec</span>
+          <span class="concept-tag">Facteurs de succès</span>
+          <span class="concept-tag">Product-Market Fit</span>
+          <span class="concept-tag">Team</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Principales raisons d'échec</strong> : pas de besoin marché, manque de cash, mauvaise équipe, forte concurrence, mauvais pricing, mauvais produit, pas de modèle scalable, mauvais timing, perte de focus, conflit entre fondateurs.</li>
+          <li><strong>Facteurs de succès</strong> : product-market fit fort, équipe complémentaire et résiliente, timing optimal, business model scalable, financement adéquat.</li>
+          <li><strong>Team &gt; Idea</strong> : les investisseurs misent d'abord sur l'équipe.</li>
+          <li>Exemple : Quibi (échec malgré $1.75B), Airbnb (succès malgré scepticisme initial).</li>
+        </ul>
+        <a href="ch1_business_planning.html" class="chapter-link">📖 Voir Chapitre 1 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUSINESS OPPORTUNITIES -->
+  <div class="chapter-section" data-chapter="opp">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#fef9c3;color:#713f12;">2</div>
+      <h2>Opportunités Commerciales</h2>
+      <span class="q-count">8 questions</span>
+    </div>
+
+    <div class="question-card" data-q="5">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">5</div>
+        <div class="q-text">What is R&D and what do we mean by "technology platforms"?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">R&D Fondamentale</span>
+          <span class="concept-tag">R&D Appliquée</span>
+          <span class="concept-tag">R&D Expérimentale</span>
+          <span class="concept-tag">Technology Platform</span>
+          <span class="concept-tag">TRL Scale</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>R&D fondamentale</strong> : recherche de connaissances sans application immédiate (ex : CERN).</li>
+          <li><strong>R&D appliquée</strong> : recherche orientée vers une application pratique spécifique.</li>
+          <li><strong>R&D expérimentale / développement</strong> : création de prototypes et mise au point de produits.</li>
+          <li><strong>Technology Platform</strong> = ensemble de technologies/capacités qui peuvent générer de multiples applications commerciales différentes à partir d'une même base technologique.</li>
+          <li>Exemple : panneau solaire à hydrogène → 6 modèles d'affaires possibles (revente H2, station-service, vente électricité, stockage réseau…).</li>
+          <li><strong>TRL (Technology Readiness Level)</strong> : échelle 1-9 mesurant la maturité technologique.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="6">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">6</div>
+        <div class="q-text">Why is R&D "not enough" and what are the key steps involved when trying to turn research into business?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Valley of Death</span>
+          <span class="concept-tag">Tech Transfer</span>
+          <span class="concept-tag">Commercialisation</span>
+          <span class="concept-tag">Spin-off</span>
+        </div>
+        <ul class="answer-points">
+          <li>La R&D produit de la connaissance, mais pas automatiquement de la valeur commerciale → <strong>fossé entre invention et innovation</strong>.</li>
+          <li><strong>Étapes clés</strong> : invention → prototype → validation marché → business model → financement → lancement → scale-up.</li>
+          <li><strong>Valley of Death</strong> : période critique entre R&D et commercialisation où les besoins de financement dépassent les revenus.</li>
+          <li><strong>Tech Transfer</strong> : mécanismes de transfert université-industrie (licences, spin-offs, joint ventures).</li>
+          <li>Besoins complémentaires à la technologie : compréhension du marché, compétences commerciales, financement, réseaux.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="7">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">7</div>
+        <div class="q-text">Which are the main internal and external sources of innovation opportunities ("triggers of innovation")?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Sources internes</span>
+          <span class="concept-tag">Sources externes</span>
+          <span class="concept-tag">VUCA World</span>
+          <span class="concept-tag">Mégatendances</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Sources internes</strong> : R&D interne, processus défaillants, suggestions des employés, analyse des capacités sous-utilisées.</li>
+          <li><strong>Sources externes</strong> : retours clients, évolutions réglementaires, changements démographiques, nouvelles technologies, concurrents, partenaires.</li>
+          <li><strong>VUCA</strong> : Volatile, Uncertain, Complex, Ambiguous → environnement qui crée à la fois des menaces et des opportunités.</li>
+          <li><strong>Mégatendances</strong> : digitalisation, vieillissement, urbanisation, changement climatique, mondialisation → créent des besoins nouveaux à large échelle.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="8">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">8</div>
+        <div class="q-text">Why do we need to "think in new boxes" in order to be creative?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Schémas mentaux</span>
+          <span class="concept-tag">Innovation de rupture</span>
+          <span class="concept-tag">Analogies créatives</span>
+          <span class="concept-tag">Design Thinking</span>
+        </div>
+        <ul class="answer-points">
+          <li>Les <strong>schémas mentaux existants</strong> (les "boîtes") limitent la créativité en ancrant notre pensée dans des solutions connues.</li>
+          <li>"Think outside the box" ne suffit pas → il faut créer de <strong>nouvelles boîtes conceptuelles</strong> (nouveaux cadres de référence).</li>
+          <li>Techniques : analogies inter-sectorielles, questionnement radical (et si…?), reverse engineering, combinaison d'industries différentes.</li>
+          <li>Exemple : Uber n'a pas amélioré les taxis, il a créé un nouveau cadre (plateforme de mobilité).</li>
+          <li>Lien avec le <strong>Design Thinking</strong> : empathie → définition → idéation → prototypage → test.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="9">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">9</div>
+        <div class="q-text">How can firms combine "technology" and "needs" when trying to identify innovation opportunities? What are the pros and cons of those approaches?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Technology Push</span>
+          <span class="concept-tag">Market Pull</span>
+          <span class="concept-tag">Matrice Tech × Besoins</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Technology Push</strong> : partir d'une technologie disponible → chercher des applications. (+) innovation radicale potentielle. (−) risque de marché inexistant.</li>
+          <li><strong>Market Pull</strong> : partir d'un besoin identifié → chercher la technologie. (+) adéquation marché forte. (−) innovation incrémentale souvent.</li>
+          <li><strong>Approche combinée</strong> : matrice croisée technologie × besoins → identifier les intersections à fort potentiel.</li>
+          <li>Idéal = alignement entre capacité technologique et besoin marché réel → maximise les chances de succès commercial.</li>
+          <li>Exemple : GPS existait (push) + besoin de navigation (pull) → Waze, Google Maps.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="10">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">10</div>
+        <div class="q-text">How can you use "value gaps" to identify innovation opportunities? What are the pros and cons of those approaches?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Value Gap</span>
+          <span class="concept-tag">Push vs Pull</span>
+          <span class="concept-tag">Jobs-to-be-Done</span>
+          <span class="concept-tag">Niche non-servie</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Value Gap</strong> = écart entre la valeur que les clients souhaiteraient obtenir et ce que l'offre existante leur apporte.</li>
+          <li><strong>Types</strong> : gap de performance (mieux faire), gap d'accessibilité (atteindre plus de clients), gap d'usage (simplifier), gap émotionnel (sens, identité).</li>
+          <li><strong>Pros</strong> : ancré sur des besoins réels, réduit le risque commercial, facilite le messaging.</li>
+          <li><strong>Cons</strong> : risque de rester incrémental, difficile à identifier pour des besoins latents (non exprimés).</li>
+          <li>Lien avec <strong>Jobs-to-be-Done</strong> : comprendre ce que le client veut vraiment accomplir (ex : "les gens n'achètent pas une perceuse, ils achètent un trou dans le mur").</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="11">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">11</div>
+        <div class="q-text">Which are the main "sources of technology intelligence" a firm can leverage?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Veille technologique</span>
+          <span class="concept-tag">Brevets</span>
+          <span class="concept-tag">Publications scientifiques</span>
+          <span class="concept-tag">Open Innovation</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Sources internes</strong> : R&D, ingénieurs, retours terrain, bases de données internes.</li>
+          <li><strong>Sources externes</strong> : bases de brevets (EPO, USPTO), publications académiques, conférences, salons, startups, concurrents, fournisseurs, clients.</li>
+          <li><strong>Open Innovation</strong> : collaboration externe (universités, startups, concurrents) pour accélérer l'accès aux technologies.</li>
+          <li><strong>Veille concurrentielle</strong> : analyse brevets déposés par concurrents → anticiper leurs mouvements stratégiques.</li>
+          <li>Outils : Google Scholar, Espacenet, CB Insights, Gartner Hype Cycle.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="12">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">12</div>
+        <div class="q-text">What is a patent? What are the alternatives to patents?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Brevet / Patent</span>
+          <span class="concept-tag">Propriété Intellectuelle</span>
+          <span class="concept-tag">Secret industriel</span>
+          <span class="concept-tag">Marque / Copyright</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Brevet</strong> = droit exclusif d'exploitation d'une invention pendant ~20 ans en échange de sa divulgation publique.</li>
+          <li><strong>Conditions</strong> : nouveauté, inventivité (non-obvious), application industrielle.</li>
+          <li><strong>Avantages brevets</strong> : protection légale, actif valorisable, dissuasion concurrents, revenus de licensing.</li>
+          <li><strong>Inconvénients</strong> : coûteux, divulgation publique, long à obtenir, difficile à défendre.</li>
+          <li><strong>Alternatives</strong> : secret industriel (ex: recette Coca-Cola), marque déposée, copyright (œuvres créatives), design enregistré, first-mover advantage, courbe d'expérience.</li>
+        </ul>
+        <a href="ch2_opportunites.html" class="chapter-link">📖 Voir Chapitre 2 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRATEGIC POSITIONING -->
+  <div class="chapter-section" data-chapter="strat">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#fce7f3;color:#831843;">3</div>
+      <h2>Stratégies de Positionnement</h2>
+      <span class="q-count">9 questions</span>
+    </div>
+
+    <div class="question-card" data-q="13">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">13</div>
+        <div class="q-text">What are the key drivers of strategy (and why do firms need a strategy)?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Positionnement</span>
+          <span class="concept-tag">Avantage concurrentiel</span>
+          <span class="concept-tag">Mission / Vision</span>
+          <span class="concept-tag">Analyse interne/externe</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Pourquoi une stratégie ?</strong> : allouer des ressources limitées, différencier des concurrents, créer un avantage durable, guider les décisions.</li>
+          <li><strong>Drivers</strong> : environnement externe (opportunités/menaces), capacités internes (forces/faiblesses), vision des dirigeants, attentes des stakeholders.</li>
+          <li>Stratégie = choix de <em>où jouer</em> (marchés, segments) + <em>comment gagner</em> (avantage compétitif) + <em>quelles capacités</em> développer.</li>
+          <li>Sans stratégie → réactif, éparpillé, vulnérable à la concurrence.</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="14">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">14</div>
+        <div class="q-text">What is the difference between "shareholders" and "stakeholders' perspectives regarding corporate purposes?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Shareholder Theory (Friedman)</span>
+          <span class="concept-tag">Stakeholder Theory (Freeman)</span>
+          <span class="concept-tag">ESG</span>
+          <span class="concept-tag">B-Corp</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Shareholder view</strong> (Friedman) : la seule responsabilité d'une entreprise est de maximiser le profit pour ses actionnaires.</li>
+          <li><strong>Stakeholder view</strong> (Freeman) : l'entreprise a des responsabilités envers toutes les parties prenantes (employés, clients, fournisseurs, société, environnement).</li>
+          <li><strong>Tension</strong> : profit à court terme vs valeur long terme ; intérêts privés vs bien commun.</li>
+          <li><strong>Évolutions récentes</strong> : ESG investing, Business Roundtable (2019), certifications B-Corp, raison d'être en droit français.</li>
+          <li>Exemple : Johnson & Johnson Credo (stakeholders) vs Enron (shareholders extrême → scandale).</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="15">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">15</div>
+        <div class="q-text">What are the key strategic resources a firm can leverage, and how ("internal analysis" and "extending the core")?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">VRIN Resources</span>
+          <span class="concept-tag">Core Competencies</span>
+          <span class="concept-tag">Resource-Based View</span>
+          <span class="concept-tag">Extending the Core</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Ressources stratégiques</strong> (VRIN) : Valuable, Rare, Inimitable, Non-substitutable → sources d'avantage concurrentiel durable.</li>
+          <li><strong>Types</strong> : physiques (usines), financières (cash), humaines (talents), technologiques (brevets), organisationnelles (culture), relationnelles (marque, réseau).</li>
+          <li><strong>Core competencies</strong> : capacités distinctives qui créent de la valeur et sont difficiles à imiter (ex: logistique Amazon, design Apple).</li>
+          <li><strong>Extending the core</strong> : s'appuyer sur les forces existantes pour entrer sur de nouveaux marchés (ex: Amazon → AWS, Prime, Alexa).</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="16">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">16</div>
+        <div class="q-text">What are the key elements of the industry environment of a firm (Porter)?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">5 Forces de Porter</span>
+          <span class="concept-tag">Rivalité</span>
+          <span class="concept-tag">Entrants</span>
+          <span class="concept-tag">Substituts</span>
+          <span class="concept-tag">Fournisseurs / Clients</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>5 Forces de Porter</strong> : cadre d'analyse de l'attractivité d'un secteur.</li>
+          <li><strong>1. Rivalité</strong> : intensité de la concurrence directe (nb acteurs, croissance, différenciation).</li>
+          <li><strong>2. Nouveaux entrants</strong> : barrières à l'entrée (économies d'échelle, capital, réglementations, marques).</li>
+          <li><strong>3. Substituts</strong> : alternatives qui répondent au même besoin (ex: Netflix vs cinéma).</li>
+          <li><strong>4. Pouvoir fournisseurs</strong> : concentration, coûts de changement, différenciation des inputs.</li>
+          <li><strong>5. Pouvoir clients</strong> : concentration, sensibilité au prix, information disponible.</li>
+          <li>Plus les forces sont fortes → secteur moins attractif.</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="17">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">17</div>
+        <div class="q-text">What are the key elements of the macro-economic environment of a firm (Pestel)?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Politique</span>
+          <span class="concept-tag">Économique</span>
+          <span class="concept-tag">Social</span>
+          <span class="concept-tag">Technologique</span>
+          <span class="concept-tag">Environnemental</span>
+          <span class="concept-tag">Légal</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>PESTEL</strong> : outil d'analyse macro-environnementale en 6 dimensions.</li>
+          <li><strong>P</strong>olitique : stabilité gouvernementale, politique commerciale, fiscalité, subventions.</li>
+          <li><strong>É</strong>conomique : taux croissance, inflation, taux d'intérêt, chômage, pouvoir d'achat.</li>
+          <li><strong>S</strong>ocial : démographie, culture, modes de vie, attentes consommateurs, inégalités.</li>
+          <li><strong>T</strong>echnologique : innovation, digitalisation, automatisation, IA, cybersécurité.</li>
+          <li><strong>E</strong>nvironnemental : changement climatique, réglementations éco, ressources naturelles.</li>
+          <li><strong>L</strong>égal : droit du travail, PI, RGPD, normes sectorielles.</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="18">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">18</div>
+        <div class="q-text">What are the key "megatrends" affecting the environment of firms? How does it affect their strengths, weaknesses, opportunities and threats?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Mégatendances</span>
+          <span class="concept-tag">SWOT</span>
+          <span class="concept-tag">Digitalisation</span>
+          <span class="concept-tag">Transition écologique</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Mégatendances clés</strong> : digitalisation/IA, transition écologique, vieillissement démographique, urbanisation, mondialisation/dé-mondialisation, inégalités croissantes.</li>
+          <li><strong>Impact SWOT</strong> : une mégatendance peut être à la fois une opportunité (pour qui s'adapte) et une menace (pour qui ne change pas).</li>
+          <li>Ex: IA → opportunité pour les tech companies, menace pour les emplois de routine.</li>
+          <li>Ex: transition verte → opportunité pour les énergies renouvelables, menace pour l'industrie fossile.</li>
+          <li>Importance de l'<strong>anticipation stratégique</strong> pour transformer les menaces en opportunités.</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="19">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">19</div>
+        <div class="q-text">How and why should a firm identify the "needs" it meets, as well as the resulting market size?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">TAM / SAM / SOM</span>
+          <span class="concept-tag">Jobs-to-be-Done</span>
+          <span class="concept-tag">Segmentation</span>
+          <span class="concept-tag">Market Sizing</span>
+        </div>
+        <ul class="answer-points">
+          <li>Identifier les besoins → éviter de développer des solutions sans marché (cause #1 d'échec startup).</li>
+          <li><strong>TAM</strong> (Total Addressable Market) : taille totale du marché si 100% de pénétration.</li>
+          <li><strong>SAM</strong> (Serviceable Addressable Market) : portion du TAM accessible avec son modèle.</li>
+          <li><strong>SOM</strong> (Serviceable Obtainable Market) : part réaliste à capturer à court/moyen terme.</li>
+          <li><strong>Méthodes de sizing</strong> : top-down (stats macros) et bottom-up (nb clients × prix moyen).</li>
+          <li>Lier les besoins au <strong>willingness-to-pay</strong> : un besoin sans disposition à payer n'est pas un marché.</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="20">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">20</div>
+        <div class="q-text">What do we mean by segmentation and why is it important?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Segmentation</span>
+          <span class="concept-tag">Ciblage</span>
+          <span class="concept-tag">Positionnement</span>
+          <span class="concept-tag">Critères de segmentation</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Segmentation</strong> = diviser un marché hétérogène en groupes homogènes de clients ayant des besoins similaires.</li>
+          <li><strong>Critères</strong> : géographiques, démographiques, psychographiques (style de vie), comportementaux (usage, fidélité), B2B (secteur, taille).</li>
+          <li><strong>Importance</strong> : permettre de cibler les segments les plus attractifs, adapter l'offre et le marketing, allouer les ressources efficacement.</li>
+          <li>Processus STP : Segmentation → Targeting → Positioning.</li>
+          <li>Un segment attractif = grand, accessible, rentable, distinct, stable dans le temps.</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="21">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">21</div>
+        <div class="q-text">What are the main sources of competitive advantages for a firm?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Leadership coût</span>
+          <span class="concept-tag">Différenciation</span>
+          <span class="concept-tag">Focus / Niche</span>
+          <span class="concept-tag">Porter Generic Strategies</span>
+          <span class="concept-tag">Moats</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Porter : 3 stratégies génériques</strong> : Leadership par les coûts, Différenciation, Focus (niche coût ou différenciation).</li>
+          <li><strong>Sources d'avantage</strong> : économies d'échelle, effets réseau, marque forte, propriété intellectuelle, coûts de changement élevés, accès privilégié aux ressources, data propriétaire.</li>
+          <li><strong>Moats</strong> (fossés défensifs) : barrières durables qui protègent la position concurrentielle (ex: effets réseau Facebook, switching costs Microsoft Office).</li>
+          <li>Avantage compétitif = créer plus de valeur que les concurrents ET pouvoir la capturer.</li>
+          <li>Exemple : IKEA (coût + expérience), Apple (différenciation), Hermès (niche premium).</li>
+        </ul>
+        <a href="ch3_positionnement.html" class="chapter-link">📖 Voir Chapitre 3 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUSINESS MODELS -->
+  <div class="chapter-section" data-chapter="bm">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#ede9fe;color:#4c1d95;">4</div>
+      <h2>Modèles d'Affaires</h2>
+      <span class="q-count">5 questions</span>
+    </div>
+
+    <div class="question-card" data-q="22">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">22</div>
+        <div class="q-text">Define the key elements of a business model, and how they can evolve over time.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Business Model Canvas</span>
+          <span class="concept-tag">Why/What/Who/$</span>
+          <span class="concept-tag">BM Innovation</span>
+          <span class="concept-tag">Évolution BM</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>BM = comment une entreprise crée, délivre et capture de la valeur</strong>.</li>
+          <li><strong>Éléments clés (Why/What/Who/$)</strong> : pourquoi exister (mission), quoi offrir (proposition de valeur), pour qui (segments), comment gagner de l'argent (revenus - coûts).</li>
+          <li><strong>Business Model Canvas</strong> : 9 blocs (segments, value prop, canaux, relations clients, revenus, activités clés, ressources clés, partenaires, structure de coûts).</li>
+          <li><strong>Évolution</strong> : BM pivot (Slack était un jeu vidéo), extension (Amazon e-commerce → cloud → streaming), disruption par nouveaux entrants.</li>
+          <li>Un bon BM = cohérent, difficile à imiter, scalable.</li>
+        </ul>
+        <a href="ch4_modeles_affaires.html" class="chapter-link">📖 Voir Chapitre 4 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="23">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">23</div>
+        <div class="q-text">Describe the main characteristics of a market, a product and a service.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Bien tangible vs intangible</span>
+          <span class="concept-tag">IHIP</span>
+          <span class="concept-tag">Servitisation</span>
+          <span class="concept-tag">4P</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Marché</strong> : lieu d'échange entre offreurs et demandeurs, défini par un besoin commun, une géographie, un segment.</li>
+          <li><strong>Produit</strong> : bien tangible, stockable, transférable, qualité vérifiable avant achat.</li>
+          <li><strong>Service</strong> : caractéristiques IHIP → Intangible, Hétérogène, Inséparable (production/consommation simultanées), Périssable (non stockable).</li>
+          <li><strong>Tendance</strong> : <em>servitisation</em> = ajouter des services à des produits (Rolls-Royce vend des heures de vol, pas des moteurs).</li>
+          <li>Hybridation croissante : Spotify (service d'accès à musique), Netflix (service de streaming).</li>
+        </ul>
+        <a href="ch4_modeles_affaires.html" class="chapter-link">📖 Voir Chapitre 4 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="24">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">24</div>
+        <div class="q-text">Describe the key features of a value proposition.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Value Proposition</span>
+          <span class="concept-tag">4P (Product/Price/Place/Promo)</span>
+          <span class="concept-tag">Customer Gains/Pains</span>
+          <span class="concept-tag">Unique Selling Point</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Value Proposition</strong> = promesse de valeur délivrée au client : pourquoi acheter chez nous et pas ailleurs ?</li>
+          <li>Éléments : performance, prix, commodité, design, marque/statut, réduction de risque, accessibilité, personnalisation.</li>
+          <li><strong>Value Proposition Canvas</strong> : Customer Jobs (ce que le client veut faire) + Pains (frustrations) + Gains (bénéfices attendus) → Produit/Service + Pain Relievers + Gain Creators.</li>
+          <li><strong>4P</strong> : Product (quoi), Price (combien), Place (où/comment), Promotion (communication).</li>
+          <li>Une bonne VP est claire, mesurable, différenciante et centrée client.</li>
+        </ul>
+        <a href="ch4_modeles_affaires.html" class="chapter-link">📖 Voir Chapitre 4 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="25">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">25</div>
+        <div class="q-text">Describe the key features of a value chain, at industry and business levels. How can a value chain be innovative?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Value Chain (Porter)</span>
+          <span class="concept-tag">Activités primaires</span>
+          <span class="concept-tag">Activités support</span>
+          <span class="concept-tag">Intégration verticale</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Chaîne de valeur Porter</strong> : ensemble d'activités créant de la valeur pour le client.</li>
+          <li><strong>Activités primaires</strong> : logistique amont, opérations, logistique aval, marketing/ventes, services après-vente.</li>
+          <li><strong>Activités support</strong> : infrastructure, RH, R&D, achats.</li>
+          <li><strong>Niveau industrie</strong> : chaîne de valeur étendue entre fournisseurs, producteurs, distributeurs, clients finaux.</li>
+          <li><strong>Innovation de la VC</strong> : désintermédiation (vente directe), externalisation d'activités non-core, ajout de nouvelles étapes créatrices de valeur (ex: Apple Stores).</li>
+          <li>Exemple : Zara (intégration verticale) vs Nike (externalisation production, focus marque).</li>
+        </ul>
+        <a href="ch4_modeles_affaires.html" class="chapter-link">📖 Voir Chapitre 4 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="26">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">26</div>
+        <div class="q-text">Discuss the key design, operations and client management activities of a typical firm.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Design (R&D, Innovation)</span>
+          <span class="concept-tag">Opérations (production)</span>
+          <span class="concept-tag">CRM</span>
+          <span class="concept-tag">Customer Journey</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Design</strong> : activités de conception, R&D, développement produit, innovation → créer des offres alignées sur les besoins.</li>
+          <li><strong>Opérations</strong> : production, logistique, gestion des stocks, qualité, supply chain → livrer la promesse efficacement.</li>
+          <li><strong>Gestion clients</strong> : acquisition (marketing/ventes), rétention (service client, fidélisation), expansion (upsell/cross-sell).</li>
+          <li><strong>Customer Journey</strong> : cartographier chaque point de contact client pour optimiser l'expérience.</li>
+          <li>L'alignement entre ces 3 dimensions est essentiel : une belle promesse mal opérée = insatisfaction.</li>
+        </ul>
+        <a href="ch4_modeles_affaires.html" class="chapter-link">📖 Voir Chapitre 4 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORGANIZATIONS -->
+  <div class="chapter-section" data-chapter="org">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#d1fae5;color:#064e3b;">5</div>
+      <h2>Organisations</h2>
+      <span class="q-count">9 questions</span>
+    </div>
+
+    <div class="question-card" data-q="27">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">27</div>
+        <div class="q-text">Discuss the key myths related to entrepreneurship.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">6 mythes de l'entrepreneuriat</span>
+          <span class="concept-tag">Réalité vs Mythe</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Mythe 1</strong> : "L'entrepreneur naît, il ne se fait pas" → Réalité : les compétences entrepreneuriales s'apprennent et se développent.</li>
+          <li><strong>Mythe 2</strong> : "Il faut avoir une idée révolutionnaire" → Réalité : la plupart des succès viennent d'améliorations de l'existant.</li>
+          <li><strong>Mythe 3</strong> : "Il faut être jeune" → Réalité : l'âge médian des fondateurs de startups à succès est ~45 ans.</li>
+          <li><strong>Mythe 4</strong> : "Il faut prendre de gros risques" → Réalité : les bons entrepreneurs gèrent et réduisent les risques.</li>
+          <li><strong>Mythe 5</strong> : "L'entrepreneur travaille seul" → Réalité : les équipes réussissent mieux que les solos.</li>
+          <li><strong>Mythe 6</strong> : "Le capital est la principale contrainte" → Réalité : le talent, le réseau et l'exécution comptent plus.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="28">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">28</div>
+        <div class="q-text">Discuss the key characteristics of a (corporate) entrepreneur.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Intrapreneur</span>
+          <span class="concept-tag">Profil entrepreneur</span>
+          <span class="concept-tag">Mindset entrepreneurial</span>
+          <span class="concept-tag">Tolérance à l'ambiguïté</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Entrepreneur corporatif (intrapreneur)</strong> : individu qui adopte un comportement entrepreneurial au sein d'une organisation existante.</li>
+          <li><strong>Caractéristiques clés</strong> : vision, passion, tolérance à l'incertitude, orientation résultats, résilience, créativité, sens du réseau.</li>
+          <li><strong>Différence entrepreneur / manager</strong> : l'entrepreneur crée et innove, le manager optimise l'existant.</li>
+          <li>Importance de la <strong>diversité des profils</strong> dans les équipes entrepreneuriales.</li>
+          <li>Exemple : Steve Jobs (vision + design), Elon Musk (technologie + ambition), Reed Hastings (pivot stratégique Netflix).</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="29">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">29</div>
+        <div class="q-text">Discuss the key activities of a (corporate) entrepreneur.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Opportunité → Ressources</span>
+          <span class="concept-tag">Bricolage (Effectuation)</span>
+          <span class="concept-tag">Networking</span>
+          <span class="concept-tag">Pivoting</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Activités clés</strong> : identification et évaluation d'opportunités, mobilisation de ressources, constitution d'équipes, développement du réseau, pitching, itération.</li>
+          <li><strong>Effectuation</strong> (Sarasvathy) : partir de ses ressources disponibles → imaginer des opportunités (vs causal : partir d'un objectif → chercher les ressources).</li>
+          <li><strong>Bricolage</strong> : combiner les ressources à disposition de façon créative pour résoudre des problèmes.</li>
+          <li><strong>Pivot</strong> : changer de direction stratégique en gardant les apprentissages (ex: Instagram était Burbn, un check-in app).</li>
+          <li>L'entrepreneur est aussi un <strong>story teller</strong> : convaincre investisseurs, clients, talents.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="30">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">30</div>
+        <div class="q-text">Discuss the key skills of a (corporate) entrepreneur.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Vision</span>
+          <span class="concept-tag">Réseau</span>
+          <span class="concept-tag">Tech</span>
+          <span class="concept-tag">Vente</span>
+          <span class="concept-tag">Finance</span>
+          <span class="concept-tag">Résilience</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>6 compétences clés</strong> : vision stratégique, networking (réseau), maîtrise technologique, vente et persuasion, littératie financière, résilience émotionnelle.</li>
+          <li>Rare qu'un seul individu maîtrise tout → importance des <strong>équipes complémentaires</strong>.</li>
+          <li><strong>T-shaped skills</strong> : large culture générale + expertise profonde dans un domaine.</li>
+          <li>Compétences <strong>soft</strong> (leadership, communication, empathie) aussi importantes que les hard skills.</li>
+          <li>Développement continu : mentors, expériences diversifiées, feedback, apprentissage par l'échec.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="31">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">31</div>
+        <div class="q-text">Discuss the key characteristics of entrepreneurial teams, including diversity.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Complémentarité</span>
+          <span class="concept-tag">Diversité cognitive</span>
+          <span class="concept-tag">Confiance</span>
+          <span class="concept-tag">Conflits fondateurs</span>
+          <span class="concept-tag">Gouvernance</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Équipes entrepreneuriales réussissent mieux</strong> que les solopreneurs (accès plus large aux compétences, réseau, résilience).</li>
+          <li><strong>Complémentarité</strong> : idéalement couvrir tech, biz/marketing, finances/ops.</li>
+          <li><strong>Diversité</strong> : cognitive (perspectives différentes), fonctionnelle (compétences), démographique (genre, culture) → meilleure créativité et décision.</li>
+          <li><strong>Confiance et alignement</strong> : partager la vision, les valeurs, les attentes (vesting, rôles, equity split).</li>
+          <li><strong>Risques</strong> : conflits entre fondateurs (cause fréquente d'échec), free-riding, divergence de vision → importance des accords fondateurs explicites.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="32">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">32</div>
+        <div class="q-text">Discuss the key elements of a corporate structure and governance.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Conseil d'administration</span>
+          <span class="concept-tag">Structures juridiques</span>
+          <span class="concept-tag">Gouvernance</span>
+          <span class="concept-tag">Principal-Agent</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Structures juridiques</strong> : SRL, SA, SNC, coopérative → différences en termes de responsabilité, fiscalité, financement.</li>
+          <li><strong>Gouvernance</strong> : ensemble de règles et mécanismes pour diriger et contrôler une organisation.</li>
+          <li><strong>Conseil d'administration</strong> : rôle de supervision, validation stratégique, protection des actionnaires, recrutement du CEO.</li>
+          <li><strong>Problème Principal-Agent</strong> : divergence d'intérêts entre propriétaires (principal) et gestionnaires (agent) → mécanismes d'alignement (stock-options, audit, transparence).</li>
+          <li>Structures formelles vs informelles → importance de la culture organisationnelle.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="33">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">33</div>
+        <div class="q-text">Discuss the benefits and drawbacks of size for a firm.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Économies d'échelle</span>
+          <span class="concept-tag">Bureaucratie</span>
+          <span class="concept-tag">PME vs Multinationale</span>
+          <span class="concept-tag">Agilité</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Avantages de la taille</strong> : économies d'échelle, pouvoir de négociation, accès au capital, notoriété, capacité R&D, résilience aux chocs.</li>
+          <li><strong>Inconvénients</strong> : bureaucratie, lenteur décisionnelle, rigidité, culture d'entreprise difficile à maintenir, innovation freinée.</li>
+          <li><strong>PME / Startups</strong> : agilité, réactivité, culture forte, closer to customer. Mais : ressources limitées, vulnérabilité.</li>
+          <li><strong>Grandes firmes</strong> : structures, processus, gouvernance → efficacité mais parfois au détriment de l'innovation.</li>
+          <li>Solutions : corporate venture, spin-offs, innovation labs pour combiner agilité et ressources.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="34">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">34</div>
+        <div class="q-text">What is "open innovation"? What are the resulting benefits and drawbacks?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Open Innovation (Chesbrough)</span>
+          <span class="concept-tag">Inside-out / Outside-in</span>
+          <span class="concept-tag">Co-création</span>
+          <span class="concept-tag">IP Management</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Open Innovation</strong> (Chesbrough) : utiliser des flux de connaissances internes ET externes pour accélérer l'innovation interne et ouvrir des marchés externes pour les innovations internes.</li>
+          <li><strong>Outside-in</strong> : intégrer des idées/technologies externes (partenariats, startups, universités, clients).</li>
+          <li><strong>Inside-out</strong> : licencier ou vendre des technologies internes non utilisées.</li>
+          <li><strong>Avantages</strong> : accès plus rapide à l'innovation, réduction des coûts R&D, co-création de valeur.</li>
+          <li><strong>Inconvénients</strong> : risque de fuite PI, coordination complexe, gestion des partenariats, dilution de l'avantage concurrentiel.</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="35">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">35</div>
+        <div class="q-text">Discuss the main types of innovation support mechanisms available for firms.</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Incubateurs</span>
+          <span class="concept-tag">Accélérateurs</span>
+          <span class="concept-tag">Corporate Ventures</span>
+          <span class="concept-tag">Living Labs</span>
+          <span class="concept-tag">Clusters</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Incubateurs</strong> : accompagnement early-stage (espace, mentoring, réseau) pour startups en phase d'idéation/validation.</li>
+          <li><strong>Accélérateurs</strong> : programme intensif de 3-6 mois avec financement seed + coaching (Y Combinator, Techstars).</li>
+          <li><strong>Corporate Ventures / Labs</strong> : structures internes d'innovation (ex: Google X, Amazon Lab126).</li>
+          <li><strong>Living Labs</strong> : environnements d'expérimentation en conditions réelles avec utilisateurs.</li>
+          <li><strong>Clusters / Pôles</strong> : concentration géographique d'entreprises et d'institutions dans un secteur (Silicon Valley, Station F Paris).</li>
+          <li><strong>Soutien public</strong> : subsides R&D, tax shelter, fonds européens (Horizon Europe).</li>
+        </ul>
+        <a href="ch5_organisations.html" class="chapter-link">📖 Voir Chapitre 5 →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="chapter-section" data-chapter="fin">
+    <div class="chapter-heading">
+      <div class="chapter-badge" style="background:#fee2e2;color:#7f1d1d;">6</div>
+      <h2>Financials</h2>
+      <span class="q-count">4 questions</span>
+    </div>
+
+    <div class="question-card" data-q="36">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">36</div>
+        <div class="q-text">What are the key drivers ("fundamentals") of profitability for a firm? How do they relate to the other dimensions of business planning?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Revenus – Coûts = Profit</span>
+          <span class="concept-tag">Break-even</span>
+          <span class="concept-tag">Marge brute</span>
+          <span class="concept-tag">Scalabilité</span>
+          <span class="concept-tag">Unit Economics</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Profit = Revenus − Coûts</strong> (variables + fixes).</li>
+          <li><strong>Drivers revenus</strong> : prix × volume (quantité vendue × clients × fréquence × prix unitaire).</li>
+          <li><strong>Drivers coûts</strong> : coûts variables (proportionnels au volume), coûts fixes (indépendants du volume).</li>
+          <li><strong>Break-even</strong> : point où revenus = coûts totaux → Q* = Coûts fixes / (Prix − Coût variable unitaire).</li>
+          <li><strong>Unit economics</strong> : LTV (Lifetime Value) vs CAC (Customer Acquisition Cost) → LTV/CAC > 3 = bon signe.</li>
+          <li>Lien BP : la profitabilité découle directement du BM, du positionnement prix, et de la structure de coûts.</li>
+        </ul>
+        <a href="ch6_financials.html" class="chapter-link">📖 Voir Chapitre 6 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="37">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">37</div>
+        <div class="q-text">What are the key metrics of the financials of a firm? What is the link with cash-flows?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">EBIT / EBITDA</span>
+          <span class="concept-tag">FCF</span>
+          <span class="concept-tag">Burn Rate</span>
+          <span class="concept-tag">Profit ≠ Cash</span>
+          <span class="concept-tag">Runway</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>EBIT</strong> : Earnings Before Interest & Taxes → résultat opérationnel.</li>
+          <li><strong>EBITDA</strong> : + Depreciation & Amortization → proxy du cash opérationnel généré.</li>
+          <li><strong>FCF</strong> (Free Cash Flow) : cash disponible après investissements = EBITDA − CapEx − variation BFR.</li>
+          <li><strong>Profit ≠ Cash</strong> : une entreprise profitable peut manquer de liquidités (timing encaissements/décaissements, BFR).</li>
+          <li><strong>Burn Rate</strong> : cash consommé par mois. <strong>Runway</strong> = Cash disponible / Burn Rate → survie en mois.</li>
+          <li><strong>Valley of Death</strong> : période où les dépenses dépassent les revenus → besoin de financement externe.</li>
+        </ul>
+        <a href="ch6_financials.html" class="chapter-link">📖 Voir Chapitre 6 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="38">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">38</div>
+        <div class="q-text">What are the main sources of financing for a firm? Why is cash "costly"?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Pecking Order</span>
+          <span class="concept-tag">Bootstrapping</span>
+          <span class="concept-tag">Business Angels</span>
+          <span class="concept-tag">VC</span>
+          <span class="concept-tag">Coût du capital</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Pecking Order</strong> : les entreprises préfèrent financer par autofinancement, puis dette, puis equity (dilution).</li>
+          <li><strong>Étapes</strong> : bootstrapping → 3F (friends/family/fools) → business angels → VC → IPO / obligations.</li>
+          <li><strong>Pourquoi le cash est coûteux ?</strong> : coût d'opportunité (cash immobilisé pourrait être investi), coût de la dette (intérêts), coût de l'equity (dilution + attentes rendement).</li>
+          <li><strong>WACC</strong> (Weighted Average Cost of Capital) : coût moyen pondéré du capital = benchmark pour décisions d'investissement.</li>
+          <li>Chaque source de financement implique des compromis : contrôle, risque, coût, obligations.</li>
+        </ul>
+        <a href="ch6_financials.html" class="chapter-link">📖 Voir Chapitre 6 →</a>
+      </div>
+    </div>
+
+    <div class="question-card" data-q="39">
+      <div class="question-header" onclick="toggleQ(this)">
+        <div class="q-number">39</div>
+        <div class="q-text">What are the main differences between business angels and venture capitalists?</div>
+        <div class="q-actions">
+          <div class="q-check" onclick="toggleDone(event,this)">✓</div>
+          <div class="q-flag" onclick="toggleFlag(event,this)">🚩</div>
+          <div class="q-toggle">▼</div>
+        </div>
+      </div>
+      <div class="answer-panel">
+        <h4>Concepts-clés à mobiliser</h4>
+        <div class="key-concepts">
+          <span class="concept-tag">Business Angel (BA)</span>
+          <span class="concept-tag">Venture Capital (VC)</span>
+          <span class="concept-tag">Ticket d'investissement</span>
+          <span class="concept-tag">Due diligence</span>
+          <span class="concept-tag">Exit</span>
+        </div>
+        <ul class="answer-points">
+          <li><strong>Business Angels</strong> : investisseurs individuels fortunés, investissent leur propre argent, tickets 10K–500K€, early-stage, apportent aussi réseau et mentoring.</li>
+          <li><strong>Venture Capitalists</strong> : fonds d'investissement gérant l'argent de tiers (LPs), tickets 500K–50M€+, stades seed à growth, recherchent des returns 10x+.</li>
+          <li><strong>Différences clés</strong> : décision (individuelle BA vs comité VC), formalisme (due diligence légère BA vs complète VC), implication (BA souvent plus hands-on), horizon (BA flexible vs VC fund life 10 ans).</li>
+          <li><strong>Exit</strong> : acquisition, IPO, secondary buyout → les deux visent une exit pour réaliser leur plus-value.</li>
+          <li>Complémentarité : les BA "seed" les startups pour qu'elles deviennent éligibles aux VC.</li>
+        </ul>
+        <a href="ch6_financials.html" class="chapter-link">📖 Voir Chapitre 6 →</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <a href="index.html">← Retour à l'accueil</a></p>
+  <p style="margin-top:6px;font-size:0.8rem;color:#94a3b8;">Louvain School of Management · UCLouvain</p>
+</footer>
+
+<script>
+  let doneSet = new Set();
+  let flagSet = new Set();
+  let currentFilter = 'all';
+
+  function toggleQ(header) {
+    const panel = header.nextElementSibling;
+    const toggle = header.querySelector('.q-toggle');
+    const isOpen = panel.classList.contains('open');
+    panel.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+  }
+
+  function toggleDone(e, btn) {
+    e.stopPropagation();
+    const card = btn.closest('.question-card');
+    const q = card.dataset.q;
+    if (doneSet.has(q)) {
+      doneSet.delete(q);
+      btn.classList.remove('active');
+      card.classList.remove('done');
+    } else {
+      doneSet.add(q);
+      btn.classList.add('active');
+      card.classList.add('done');
+      // Remove flag if done
+      flagSet.delete(q);
+      card.querySelector('.q-flag').classList.remove('active');
+      card.classList.remove('flagged');
+    }
+    updateStats();
+    applyFilter();
+  }
+
+  function toggleFlag(e, btn) {
+    e.stopPropagation();
+    const card = btn.closest('.question-card');
+    const q = card.dataset.q;
+    if (flagSet.has(q)) {
+      flagSet.delete(q);
+      btn.classList.remove('active');
+      card.classList.remove('flagged');
+    } else {
+      flagSet.add(q);
+      btn.classList.add('active');
+      card.classList.add('flagged');
+      // Remove done if flagged
+      doneSet.delete(q);
+      card.querySelector('.q-check').classList.remove('active');
+      card.classList.remove('done');
+    }
+    updateStats();
+    applyFilter();
+  }
+
+  function updateStats() {
+    const done = doneSet.size;
+    const flagged = flagSet.size;
+    document.getElementById('doneCount').textContent = done;
+    document.getElementById('flagCount').textContent = flagged;
+    const pct = Math.round((done / 39) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = done + ' / 39';
+  }
+
+  function expandAll() {
+    document.querySelectorAll('.answer-panel').forEach(p => p.classList.add('open'));
+    document.querySelectorAll('.q-toggle').forEach(t => t.classList.add('open'));
+  }
+
+  function collapseAll() {
+    document.querySelectorAll('.answer-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.q-toggle').forEach(t => t.classList.remove('open'));
+  }
+
+  function filterCards(type) {
+    currentFilter = type;
+    document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+    document.getElementById('filter-' + type).classList.add('active');
+    applyFilter();
+  }
+
+  function applyFilter() {
+    document.querySelectorAll('.question-card').forEach(card => {
+      const q = card.dataset.q;
+      let show = true;
+      if (currentFilter === 'done') show = doneSet.has(q);
+      else if (currentFilter === 'flagged') show = flagSet.has(q);
+      else if (currentFilter === 'pending') show = !doneSet.has(q) && !flagSet.has(q);
+      card.style.display = show ? '' : 'none';
+    });
+    // Show/hide chapter sections based on visible cards
+    document.querySelectorAll('.chapter-section').forEach(section => {
+      const visible = [...section.querySelectorAll('.question-card')].some(c => c.style.display !== 'none');
+      section.style.display = visible ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

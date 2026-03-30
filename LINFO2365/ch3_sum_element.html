@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 3 — Contraintes Sum & Element</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); display:flex; align-items:center; gap:10px; }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; font-size:0.95rem; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:flex-start; }
+  .control-group { display:flex; flex-direction:column; gap:4px; min-width:120px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#d97706; }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+  canvas { max-width:100%; }
+  .domain-row { display:flex; gap:8px; align-items:center; margin:8px 0; flex-wrap:wrap; }
+  .domain-label { font-weight:700; color:var(--navy); font-size:0.9rem; width:30px; }
+  .domain-val { display:inline-block; background:var(--teal); color:white; border-radius:6px; padding:3px 10px; font-size:0.83rem; font-weight:600; margin:2px; }
+  .domain-val.removed { background:#fee2e2; color:#ef4444; text-decoration:line-through; }
+  .domain-val.fixed { background:var(--amber); color:var(--navy); }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 3 — Contraintes Sum & Element</h1>
+      <p>Propagation efficace avec Sparse Set pour les variables fixées</p>
+      <span class="chapter-badge">Chapitre 3 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- SUM CONSTRAINT -->
+<div class="section">
+  <h2>➕ La Contrainte Sum</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi la contrainte Sum ?</span>
+    <p>La contrainte <strong>Sum</strong> dit simplement : "la somme de ces variables doit être égale à (ou au plus) une certaine valeur". Par exemple : x₁ + x₂ + x₃ = 10, où x₁ ∈ {1,2,3}, x₂ ∈ {2,4,6}, x₃ ∈ {1,2,3,4}.</p>
+    <p><strong>Analogie :</strong> Imagine un budget de 100€. Tu as 3 postes de dépenses (variables). La contrainte dit que tu ne peux pas dépasser 100€ au total. Si tu fixes un poste à 60€, les autres ne peuvent plus dépasser 40€ au total → les domaines sont filtrés.</p>
+    <p><strong>Ce qui est malin :</strong> au lieu de recalculer la somme min/max à chaque fois sur <em>toutes</em> les variables, on utilise un <strong>Sparse Set</strong> pour séparer variables fixées / non-fixées. Quand une variable est fixée, on l'enlève de la liste des non-fixées.</p>
+    <div class="retenir">💡 La propagation Sum : ajuste les bornes de chaque variable en fonction des bornes min/max des autres.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Formules Sum</span>
+    <p class="phrase">📌 "La somme des variables doit valoir T. Donc chaque variable est bornée par T moins la somme des min/max des autres."</p>
+    <div class="pending-math" data-latex="\sum_{i=1}^{n} x_i = T"></div>
+    <p style="margin:8px 0;color:#065f46;"><strong>Filtrage des bornes :</strong></p>
+    <div class="pending-math" data-latex="\min(x_i) \geq T - \sum_{j \neq i} \max(x_j)"></div>
+    <div class="pending-math" data-latex="\max(x_i) \leq T - \sum_{j \neq i} \min(x_j)"></div>
+    <table>
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td>xᵢ</td><td>Variable i (valeur inconnue à déterminer)</td></tr>
+      <tr><td>T</td><td>Cible (la somme souhaitée)</td></tr>
+      <tr><td>min(xᵢ)</td><td>Valeur minimale encore possible pour xᵢ</td></tr>
+      <tr><td>max(xᵢ)</td><td>Valeur maximale encore possible pour xᵢ</td></tr>
+    </table>
+    <p style="margin-top:10px;color:#065f46;"><strong>Exemple :</strong> x₁∈{1..5}, x₂∈{2..8}, x₃∈{1..4}, T=10<br>
+    Borne min de x₁ ≥ 10 − max(x₂) − max(x₃) = 10 − 8 − 4 = −2 (pas de filtrage)<br>
+    Borne max de x₁ ≤ 10 − min(x₂) − min(x₃) = 10 − 2 − 1 = 7 → max(x₁) = 5 (inchangé)<br>
+    Si x₂ est fixé à 6 : max(x₁) ≤ 10 − 6 − 1 = 3 → x₁∈{1..3} ✂️</p>
+  </div>
+
+  <!-- DEMO SUM -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Propagation de Sum en temps réel</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Cible T : <span class="val" id="sumT">10</span></label>
+        <input type="range" id="sliderT" min="5" max="20" value="10" oninput="updateSum()">
+      </div>
+      <div class="control-group">
+        <label>min(x₁) : <span class="val" id="x1min_v">1</span></label>
+        <input type="range" id="x1min" min="1" max="5" value="1" oninput="updateSum()">
+      </div>
+      <div class="control-group">
+        <label>max(x₁) : <span class="val" id="x1max_v">5</span></label>
+        <input type="range" id="x1max" min="1" max="8" value="5" oninput="updateSum()">
+      </div>
+      <div class="control-group">
+        <label>min(x₂) : <span class="val" id="x2min_v">2</span></label>
+        <input type="range" id="x2min" min="1" max="5" value="2" oninput="updateSum()">
+      </div>
+      <div class="control-group">
+        <label>max(x₂) : <span class="val" id="x2max_v">7</span></label>
+        <input type="range" id="x2max" min="1" max="10" value="7" oninput="updateSum()">
+      </div>
+    </div>
+    <div id="sumResult" style="background:white;border-radius:10px;padding:16px;border:1.5px solid #e2e8f0;font-size:0.9rem;color:#334155;line-height:2;"></div>
+    <canvas id="sumChart" height="160" style="margin-top:16px;"></canvas>
+  </div>
+</div>
+
+<!-- ELEMENT CONSTRAINT -->
+<div class="section">
+  <h2>📋 La Contrainte Element</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi la contrainte Element ?</span>
+    <p>La contrainte <strong>Element1D</strong> dit : "la valeur de y doit être égale à T[x]", c'est-à-dire que y est la valeur à l'indice x dans un tableau T. C'est une façon élégante de modéliser des tables de correspondance en CP.</p>
+    <p><strong>Analogie :</strong> Pense à un tarif de parking. Le tableau T = [0, 5, 10, 15, 20] donne le tarif selon le nombre d'heures x. Si y (ton coût) est borné entre 5 et 15€, alors x (le nombre d'heures) ne peut être que {1, 2, 3}.</p>
+    <p><strong>Application TSP :</strong> Pour le voyageur de commerce, T = matrice des distances, x = ville suivante (variable), y = distance parcouru (variable). La contrainte Element1D lie la distance aux choix de villes.</p>
+    <div class="retenir">💡 Element1D permet de filtrer l'indice x d'après les bornes de y, et vice versa.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Formule Element1D</span>
+    <p class="phrase">📌 "y vaut T[x] : si x ne peut valoir que certains indices, alors y ne peut valoir que les valeurs correspondantes dans T."</p>
+    <div class="pending-math" data-latex="y = T[x]"></div>
+    <p style="margin:8px 0;color:#065f46;"><strong>Filtrage :</strong></p>
+    <div class="pending-math" data-latex="\min(y) \geq \min_{v \in D(x)} T[v]"></div>
+    <div class="pending-math" data-latex="\max(y) \leq \max_{v \in D(x)} T[v]"></div>
+    <div class="pending-math" data-latex="D(x) \leftarrow \{v \in D(x) \mid \min(y) \leq T[v] \leq \max(y)\}"></div>
+    <table>
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td>T</td><td>Tableau constant de valeurs (ex: distances)</td></tr>
+      <tr><td>x</td><td>Variable d'indice — quel élément du tableau ?</td></tr>
+      <tr><td>y</td><td>Variable de valeur — quelle valeur à l'indice x ?</td></tr>
+      <tr><td>D(x)</td><td>Domaine courant de x (indices encore possibles)</td></tr>
+    </table>
+  </div>
+
+  <!-- DEMO ELEMENT -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Contrainte Element1D interactive</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px;">Le tableau T est fixé. Ajuste les bornes de y et observe quels indices x sont filtrés.</p>
+    <div style="margin-bottom:14px;">
+      <strong>Tableau T</strong> = [<span id="tableT"></span>]
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>min(y) : <span class="val" id="yminV">0</span></label>
+        <input type="range" id="yminSlider" min="0" max="30" value="0" oninput="updateElement()">
+      </div>
+      <div class="control-group">
+        <label>max(y) : <span class="val" id="ymaxV">30</span></label>
+        <input type="range" id="ymaxSlider" min="0" max="30" value="30" oninput="updateElement()">
+      </div>
+    </div>
+    <div id="elementDomainX" style="margin:10px 0;"></div>
+    <div id="elementResult" style="background:white;border-radius:10px;padding:14px;border:1.5px solid #e2e8f0;font-size:0.88rem;color:#334155;"></div>
+    <canvas id="elementChart" height="160" style="margin-top:14px;"></canvas>
+  </div>
+</div>
+
+<!-- EFFICIENT SUM WITH SPARSE SET -->
+<div class="section">
+  <h2>⚡ Optimisation : Sparse Set pour Sum</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 Pourquoi avoir besoin d'optimiser Sum ?</span>
+    <p>Naïvement, à chaque appel de propagate() pour Sum, on recalcule la somme min et max sur <em>toutes</em> les variables — même celles déjà fixées. C'est du gaspillage : une variable fixée ne changera plus jamais.</p>
+    <p><strong>Solution :</strong> on maintient deux ensembles séparés avec un Sparse Set :<br>
+    • <strong>Fixed</strong> : variables fixées (leur contribution à la somme est constante)<br>
+    • <strong>NotFixed</strong> : variables non fixées (à propager)</p>
+    <p>Quand une variable est fixée, on la déplace de NotFixed vers Fixed en O(1). La propagation n'itère plus que sur NotFixed, ce qui devient plus efficace au fil de la recherche.</p>
+    <div class="retenir">💡 Complexité améliorée : O(#NotFixed) par propagation au lieu de O(n).</div>
+  </div>
+
+  <div class="demo-box">
+    <h3>📊 Démo — Efficacité avec Sparse Set</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>n variables : <span class="val" id="nVarsV">8</span></label>
+        <input type="range" id="nVarsSlider" min="3" max="20" value="8" oninput="updateSparseEff()">
+      </div>
+      <div class="control-group">
+        <label>Fixées : <span class="val" id="nFixedV">3</span></label>
+        <input type="range" id="nFixedSlider" min="0" max="18" value="3" oninput="updateSparseEff()">
+      </div>
+    </div>
+    <canvas id="effChart" height="180"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Sans optimisation : <span id="noOptOps">—</span> opérations</div>
+      <div class="stat-chip">Avec Sparse Set : <span id="optOps">—</span> opérations</div>
+      <div class="stat-chip">Gain : <span id="gainPct">—</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer><strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 3 : Sum & Element</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    const latex = el.dataset.latex;
+    if (latex) el.innerHTML = katex.renderToString(latex, {displayMode:true, throwOnError:false});
+  });
+  updateSum();
+  initElement();
+  updateSparseEff();
+});
+
+// ===== SUM DEMO =====
+let sumChart = null;
+function updateSum() {
+  const T = parseInt(document.getElementById('sliderT').value);
+  const x1min = parseInt(document.getElementById('x1min').value);
+  const x1max = parseInt(document.getElementById('x1max').value);
+  const x2min = parseInt(document.getElementById('x2min').value);
+  const x2max = parseInt(document.getElementById('x2max').value);
+  document.getElementById('sumT').textContent = T;
+  document.getElementById('x1min_v').textContent = x1min;
+  document.getElementById('x1max_v').textContent = x1max;
+  document.getElementById('x2min_v').textContent = x2min;
+  document.getElementById('x2max_v').textContent = x2max;
+  // x3 = T - x1 - x2, so x3min = T - x1max - x2max, x3max = T - x1min - x2min
+  const x3minRaw = T - x1max - x2max;
+  const x3maxRaw = T - x1min - x2min;
+  // Propagation filtering
+  const newX1min = Math.max(x1min, T - x2max - x3maxRaw);
+  const newX1max = Math.min(x1max, T - x2min - x3minRaw);
+  const newX2min = Math.max(x2min, T - x1max - x3maxRaw);
+  const newX2max = Math.min(x2max, T - x1min - x3minRaw);
+  const x3min = Math.max(x3minRaw, 0);
+  const x3max = Math.max(x3maxRaw, 0);
+  const feasible = newX1min <= newX1max && newX2min <= newX2max && x3min <= x3max && T >= x1min + x2min;
+  const resultDiv = document.getElementById('sumResult');
+  resultDiv.innerHTML = `
+    <strong>Avant propagation :</strong> x₁∈[${x1min},${x1max}], x₂∈[${x2min},${x2max}], x₃∈[${x3minRaw},${x3maxRaw}]<br>
+    <strong>Après propagation (Sum = ${T}) :</strong><br>
+    &nbsp;&nbsp;x₁ ∈ [<span style="color:var(--teal);font-weight:700">${Math.max(newX1min,x1min)}, ${Math.min(newX1max,x1max)}</span>]<br>
+    &nbsp;&nbsp;x₂ ∈ [<span style="color:var(--teal);font-weight:700">${Math.max(newX2min,x2min)}, ${Math.min(newX2max,x2max)}</span>]<br>
+    &nbsp;&nbsp;x₃ ∈ [<span style="color:var(--teal);font-weight:700">${x3min}, ${x3max}</span>]<br>
+    <strong style="color:${feasible?'#0D9488':'#ef4444'}">${feasible ? '✅ Propagation OK' : '❌ Contradiction ! Domaine vide → backtrack'}</strong>
+  `;
+  const ctx = document.getElementById('sumChart').getContext('2d');
+  if (sumChart) sumChart.destroy();
+  sumChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['x₁ (avant)', 'x₁ (après)', 'x₂ (avant)', 'x₂ (après)', 'x₃'],
+      datasets: [
+        { label: 'Min', data: [x1min, Math.max(newX1min,x1min), x2min, Math.max(newX2min,x2min), x3min], backgroundColor: '#bfdbfe', borderRadius: 4 },
+        { label: 'Max', data: [x1max, Math.min(newX1max,x1max), x2max, Math.min(newX2max,x2max), x3max], backgroundColor: '#0D9488', borderRadius: 4 }
+      ]
+    },
+    options: { responsive: true, plugins: { title: { display: true, text: `Intervalles des variables (Cible T=${T})` } }, scales: { y: { title: { display: true, text: 'Valeur' } } } }
+  });
+}
+
+// ===== ELEMENT DEMO =====
+const tableT = [3, 8, 5, 12, 2, 15, 7, 10, 1, 20];
+let elemChart = null;
+function initElement() {
+  document.getElementById('tableT').textContent = tableT.join(', ');
+  document.getElementById('ymaxSlider').max = Math.max(...tableT);
+  updateElement();
+}
+function updateElement() {
+  const ymin = parseInt(document.getElementById('yminSlider').value);
+  const ymax = parseInt(document.getElementById('ymaxSlider').value);
+  document.getElementById('yminV').textContent = ymin;
+  document.getElementById('ymaxV').textContent = ymax;
+  const validIndices = tableT.map((v,i) => ({i,v})).filter(({v}) => v >= ymin && v <= ymax);
+  const domainDiv = document.getElementById('elementDomainX');
+  domainDiv.innerHTML = '<strong>D(x) = {</strong> ' + tableT.map((v,i) => {
+    const ok = v >= ymin && v <= ymax;
+    return `<span class="domain-val${ok?'':' removed'}">${i}</span>`;
+  }).join(' ') + ' <strong>}</strong>';
+  const filteredYmin = validIndices.length ? Math.min(...validIndices.map(({v})=>v)) : '∅';
+  const filteredYmax = validIndices.length ? Math.max(...validIndices.map(({v})=>v)) : '∅';
+  document.getElementById('elementResult').innerHTML = `
+    y ∈ [${ymin}, ${ymax}] → filtrage sur x : <strong>${validIndices.length}</strong> indices valides sur ${tableT.length}<br>
+    Indices valides : {${validIndices.map(({i})=>i).join(', ')}}<br>
+    y filtré → [${filteredYmin}, ${filteredYmax}]
+  `;
+  const ctx = document.getElementById('elementChart').getContext('2d');
+  if (elemChart) elemChart.destroy();
+  elemChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: tableT.map((_,i) => `x=${i}`),
+      datasets: [{
+        label: 'T[x]',
+        data: tableT,
+        backgroundColor: tableT.map(v => v >= ymin && v <= ymax ? '#0D9488' : '#fee2e2'),
+        borderColor: tableT.map(v => v >= ymin && v <= ymax ? '#0f766e' : '#fca5a5'),
+        borderWidth: 2,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'Valeurs T[x] — vert = valide pour y ∈ [' + ymin + ',' + ymax + ']' },
+        legend: { display: false },
+        annotation: {}
+      },
+      scales: { y: { title: { display: true, text: 'Valeur T[x]' } } }
+    }
+  });
+}
+
+// ===== SPARSE EFF DEMO =====
+let effChart = null;
+function updateSparseEff() {
+  const n = parseInt(document.getElementById('nVarsSlider').value);
+  const nFixed = Math.min(parseInt(document.getElementById('nFixedSlider').value), n-1);
+  document.getElementById('nVarsV').textContent = n;
+  document.getElementById('nFixedV').textContent = nFixed;
+  document.getElementById('nFixedSlider').max = n-1;
+  const noOpt = n;
+  const withOpt = n - nFixed;
+  document.getElementById('noOptOps').textContent = noOpt;
+  document.getElementById('optOps').textContent = withOpt;
+  document.getElementById('gainPct').textContent = `−${((noOpt-withOpt)/noOpt*100).toFixed(0)}% d'opérations`;
+  const ctx = document.getElementById('effChart').getContext('2d');
+  if (effChart) effChart.destroy();
+  effChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Sans Sparse Set (naïf)', 'Avec Sparse Set'],
+      datasets: [{
+        label: 'Opérations',
+        data: [noOpt, withOpt],
+        backgroundColor: ['#f43f5e', '#0D9488'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: `n=${n} variables, ${nFixed} fixées` } },
+      scales: { y: { title: { display: true, text: 'Opérations / propagation' }, beginAtZero: true } }
+    }
+  });
+}
+</script>
+</body>
+</html>

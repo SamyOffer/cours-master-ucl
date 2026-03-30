@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.5 – Organisations | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:white;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom,var(--amber),var(--teal));}
+.header-inner{padding:32px 48px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:.82rem;color:#94a3b8;margin-bottom:10px;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+.chapter-badge{display:inline-block;background:linear-gradient(135deg,#f97316,#ea580c);color:white;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+header h1{font-size:1.9rem;font-weight:800;margin-bottom:6px;}
+header p.subtitle{color:#94a3b8;font-size:.95rem;}
+.header-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.1);color:#e2e8f0;font-size:.8rem;padding:4px 12px;border-radius:20px;}
+nav{background:white;border-bottom:1px solid #e2e8f0;padding:12px 48px;}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;}
+.nav-link{padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--gray);transition:all .2s;}
+.nav-link:hover,.nav-link.active{background:var(--teal);color:white;}
+main{max-width:1100px;margin:0 auto;padding:36px 48px;}
+.section{background:white;border-radius:14px;box-shadow:0 2px 16px rgba(30,58,95,.07);padding:32px;margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.section-icon{font-size:1.6rem;}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--navy);}
+.section-subtitle{font-size:.85rem;color:var(--gray);margin-top:2px;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.explain-intro .badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.explain-intro p{font-size:.9rem;line-height:1.7;color:#451a03;}
+.analogy{background:#fef3c7;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88rem;color:#78350f;border-left:3px solid #f59e0b;}
+.retenir{background:#fffbeb;border:1.5px solid var(--amber);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:.88rem;font-weight:600;color:#92400e;}
+.theory-box{background:#eff6ff;border-radius:10px;padding:18px 22px;margin:14px 0;border:1px solid #bfdbfe;}
+.theory-box h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.theory-box p{font-size:.88rem;line-height:1.65;color:#1e40af;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin:16px 0;}
+.icon-item{background:#f8fafc;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0;}
+.icon-item .emoji{font-size:1.8rem;margin-bottom:8px;}
+.icon-item .label{font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.icon-item .desc{font-size:.72rem;color:var(--gray);line-height:1.4;}
+.steps{margin:16px 0;}
+.step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;}
+.step-num{background:var(--navy);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;}
+.step-content h5{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.step-content p{font-size:.85rem;color:var(--gray);line-height:1.5;}
+.demo-box{background:#f8fafc;border-radius:12px;padding:24px;border:2px dashed #cbd5e1;margin-top:20px;}
+.demo-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.btn{background:var(--teal);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;margin:4px;}
+.btn:hover{background:#0f766e;}
+.btn-secondary{background:#f1f5f9;color:var(--navy);}
+canvas{max-width:100%;}
+.nice-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.88rem;}
+.nice-table th{background:var(--navy);color:white;padding:10px 14px;text-align:left;}
+.nice-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0;}
+.nice-table tr:hover td{background:#f8fafc;}
+/* Myth cards */
+.myths-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin:16px 0;}
+.myth-card{background:#f8fafc;border-radius:12px;padding:18px;border:1.5px solid #e2e8f0;}
+.myth-bad{font-size:.82rem;color:#991b1b;background:#fee2e2;border-radius:6px;padding:6px 10px;margin-bottom:8px;}
+.myth-good{font-size:.82rem;color:#065f46;background:#d1fae5;border-radius:6px;padding:6px 10px;}
+/* Skills radar */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0;}
+.skill-item{background:white;border-radius:10px;padding:14px;border:1px solid #e2e8f0;}
+.skill-item label{display:block;font-size:.8rem;font-weight:600;color:var(--gray);margin-bottom:6px;}
+.skill-item input{width:100%;accent-color:var(--teal);}
+.skill-value{font-weight:700;color:var(--teal);font-size:1rem;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:24px;font-size:.82rem;margin-top:40px;}
+footer span{color:var(--amber);}
+@media(max-width:700px){.header-inner,nav,main{padding-left:20px;padding-right:20px;} header h1{font-size:1.4rem;} .myths-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 5</div>
+    <div class="chapter-badge">Chapitre 5</div>
+    <h1>Organisations</h1>
+    <p class="subtitle">Entrepreneurs, équipes, structure organisationnelle, open innovation et gouvernance</p>
+    <div class="header-chips">
+      <span class="chip">🚀 Entrepreneur</span>
+      <span class="chip">👥 Équipe</span>
+      <span class="chip">🏛️ Structure</span>
+      <span class="chip">🌐 Open Innovation</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#myths" class="nav-link active">Mythes entrepreneur</a>
+    <a href="#profil" class="nav-link">Profil & compétences</a>
+    <a href="#equipe" class="nav-link">Équipes</a>
+    <a href="#structure" class="nav-link">Structure</a>
+    <a href="#open-innov" class="nav-link">Open Innovation</a>
+    <a href="#support" class="nav-link">Mécanismes de soutien</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : MYTHES ========== -->
+<div class="section" id="myths">
+  <div class="section-header">
+    <span class="section-icon">🎭</span>
+    <div>
+      <div class="section-title">Les Mythes de l'Entrepreneuriat</div>
+      <div class="section-subtitle">Ce qu'on croit vs ce que la recherche dit vraiment</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Qui est vraiment un entrepreneur ?</div>
+    <p>On a souvent une image romantique de l'entrepreneur : jeune génie qui crée une start-up dans son garage à 20 ans et devient milliardaire à 30 ans. La réalité statistique est très différente. L'entrepreneuriat, c'est aussi le médecin qui ouvre son cabinet, l'ingénieur qui lance un spin-off depuis une grande entreprise (corporate entrepreneur / intrapreneur), ou l'agriculteur qui diversifie son activité.</p>
+    <div class="analogy">
+      📊 <strong>La réalité statistique :</strong> L'âge moyen des fondateurs de start-ups à forte croissance aux USA est de 45 ans (MIT, 2018). Les serial entrepreneurs (qui ont déjà fondé une entreprise) ont un taux de succès bien plus élevé que les primo-entrepreneurs. Et les équipes mixtes (hommes/femmes, jeunes/expérimentés) performent mieux que les équipes homogènes.
+    </div>
+    <div class="retenir">💡 À retenir : L'entrepreneuriat n'est pas réservé aux jeunes génies. La recherche montre que l'expérience (passée d'entreprise/secteur), le réseau, et la complémentarité de l'équipe sont les meilleurs prédicteurs de succès.</div>
+  </div>
+
+  <div class="myths-grid">
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : Les entrepreneurs naissent, ne se font pas</div>
+      <div class="myth-good">✅ RÉALITÉ : L'entrepreneuriat s'apprend. Les compétences clés (réseautage, négociation, gestion financière) se développent. L'expérience professionnelle préalable est un prédicteur fort de succès.</div>
+    </div>
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : Les entrepreneurs aiment le risque</div>
+      <div class="myth-good">✅ RÉALITÉ : Les entrepreneurs gèrent et réduisent les risques (minimum viable product, pivot rapide). Ils sont tolérants à l'ambiguïté, pas amateurs de jeux à somme nulle.</div>
+    </div>
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : L'idée est la clé du succès</div>
+      <div class="myth-good">✅ RÉALITÉ : L'exécution > l'idée. Facebook n'était pas la première idée de réseau social. Google n'était pas le premier moteur de recherche. La différence = équipe + exécution + timing.</div>
+    </div>
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : Les entrepreneurs travaillent seuls</div>
+      <div class="myth-good">✅ RÉALITÉ : La majorité des scale-ups réussis sont fondées par des équipes (2-4 co-fondateurs). La complémentarité des compétences (technique + commercial + finance) est cruciale.</div>
+    </div>
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : Les grandes entreprises ne peuvent pas innover</div>
+      <div class="myth-good">✅ RÉALITÉ : L'intrapreneuriat (corporate entrepreneurship) est très efficace. Amazon Web Services, Google Maps, Gmail ont tous démarré comme projets internes. 3M consacre 15% du temps de ses employés à des projets libres.</div>
+    </div>
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : Les start-ups cherchent d'abord à faire du profit</div>
+      <div class="myth-good">✅ RÉALITÉ : Dans les premières années, l'objectif est la croissance et la validation du modèle. Le profit vient plus tard (ex : Amazon a été non-profitable pendant 10+ ans tout en créant des milliards de valeur).</div>
+    </div>
+    <div class="myth-card">
+      <div class="myth-bad">❌ MYTHE : Toutes les start-ups visent à devenir des "licornes" (>1 milliard $ de valorisation)</div>
+      <div class="myth-good">✅ RÉALITÉ (Gailly, 2018) : La plupart des start-ups innovantes sont des <strong>"MUPPETS"</strong> — Many Unsuccessful People Pursuing Entrepreneurship Through Stupid Ideas. Mais entre les échecs totaux et les licornes, il existe une vaste majorité de PME innovantes qui créent de la valeur durablement sans jamais atteindre une valorisation de milliard+. Viser la croissance raisonnable et la profitabilité peut être une stratégie tout aussi valide que viser l'hypercroissance.</div>
+    </div>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px;">
+    <h4>📖 L'entrepreneur corporatif selon Gartner (Gailly, 2018)</h4>
+    <p>La recherche de Gartner (1985), citée par Gailly, a mis fin au débat nature vs nurture : <strong>les entrepreneurs sont "fabriqués", pas "nés"</strong>. Gartner montre que les comportements entrepreneuriaux — identifier les opportunités, mobiliser les ressources, gérer l'incertitude — s'apprennent et se développent avec l'expérience. La question n'est pas "ai-je les gènes d'un entrepreneur ?" mais "ai-je les compétences, la volonté, et le contexte favorable pour agir comme un entrepreneur ?" Cela s'applique aussi bien aux fondateurs de start-ups qu'aux intrapreneurs dans de grandes organisations.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : PROFIL ========== -->
+<div class="section" id="profil">
+  <div class="section-header">
+    <span class="section-icon">👤</span>
+    <div>
+      <div class="section-title">Profil, Activités et Compétences de l'Entrepreneur</div>
+      <div class="section-subtitle">Qui est-il, que fait-il, et quelles compétences doit-il maîtriser ?</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Qu'est-ce qu'un entrepreneur fait au quotidien ?</div>
+    <p>Un entrepreneur, c'est quelqu'un qui identifie une opportunité, mobilise des ressources pour l'exploiter, et supporte l'incertitude associée. Au quotidien, c'est 50% de vente/persuasion (convaincre des clients, investisseurs, talents), 30% de résolution de problèmes urgents, et 20% de planification stratégique. Les "rock star CEO" glamourisés par les médias passent en réalité beaucoup de temps en réunions et à gérer des problèmes opérationnels.</p>
+    <div class="analogy">
+      🎭 <strong>Steve Jobs vs Bill Gates :</strong> Deux entrepreneurs très différents. Jobs (Apple) = vision produit + design + marketing émotionnel. Gates (Microsoft) = deals business + licensing + stratégie technologique. Aucun des deux n'était le "prototype parfait" — ils avaient des partenaires complémentaires (Jobs + Wozniak, Gates + Allen) qui compensaient leurs faiblesses.
+    </div>
+    <div class="retenir">💡 À retenir : Il n'existe pas UN profil type d'entrepreneur. Les 3 types reconnus dans la recherche sont : (1) l'entrepreneur "craftsman" (expert technique), (2) l'entrepreneur "opportuniste" (orienté croissance), (3) le "corporate entrepreneur" ou intrapreneur (au sein d'une grande organisation).</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="emoji">👁️</div><div class="label">Vision</div><div class="desc">Imaginer un futur désirable et convaincre les autres de le construire ensemble</div></div>
+    <div class="icon-item"><div class="emoji">🤝</div><div class="label">Négociation</div><div class="desc">Obtenir des ressources, convaincre des partenaires, closer des deals</div></div>
+    <div class="icon-item"><div class="emoji">🔄</div><div class="label">Résilience</div><div class="desc">Rebondir après les échecs et les pivots inévitables</div></div>
+    <div class="icon-item"><div class="emoji">🧩</div><div class="label">Problem-solving</div><div class="desc">Trouver des solutions créatives avec des ressources limitées</div></div>
+    <div class="icon-item"><div class="emoji">📊</div><div class="label">Gestion fin.</div><div class="desc">Comprendre les chiffres, gérer le cash, lever des fonds</div></div>
+    <div class="icon-item"><div class="emoji">🧠</div><div class="label">Ambidextrie</div><div class="desc">Gérer simultanément exploration (innovation) et exploitation (opérations)</div></div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📐 L'Ambidextrie : gérer exploitation ET exploration</h4>
+    <p>Le défi majeur des entrepreneurs corporatifs (intrapreneurs) est l'<strong>ambidextrie organisationnelle</strong> : gérer simultanément le cœur de métier actuel (exploitation = optimiser ce qui existe) ET les innovations futures (exploration = chercher de nouvelles opportunités). Ces deux modes requièrent des cultures et structures différentes — les grandes entreprises créent souvent des structures séparées (labs d'innovation, spin-offs) pour l'exploration. Gailly souligne trois formes d'ambidextrie : <em>structurelle</em> (unités séparées), <em>contextuelle</em> (culture qui permet aux individus de basculer entre modes), et <em>séquentielle</em> (alterner les périodes d'exploration et d'exploitation). <em>(Gailly, 2018)</em></p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px; background:#fff7ed; border-color:#f97316;">
+    <h4>⚡ La "politique de l'innovation" — un défi souvent sous-estimé (Gailly, 2018)</h4>
+    <p style="color:#9a3412;">Gailly insiste sur un aspect souvent ignoré : <strong>l'innovation est un acte politique dans les organisations</strong>. Innover, c'est remettre en cause les équilibres existants de pouvoir, de ressources et de reconnaissance. Les innovations radicales menacent les positions établies de certains managers — d'où des résistances internes qui n'ont rien à voir avec la qualité technique de l'innovation. Les corporate entrepreneurs doivent développer des compétences de <strong>coalition building</strong> : identifier les alliés ("sponsors" internes), neutraliser les opposants, et obtenir des ressources dans une organisation qui ne les a pas initialement prévues pour eux. Sans champion interne de haut niveau, la plupart des projets d'innovation corporative n'aboutissent pas.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : ÉQUIPES ========== -->
+<div class="section" id="equipe">
+  <div class="section-header">
+    <span class="section-icon">👥</span>
+    <div>
+      <div class="section-title">Équipes Entrepreneuriales et Diversité</div>
+      <div class="section-subtitle">Pourquoi les équipes performent mieux que les individus seuls</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi une équipe entrepreneuriale ?</div>
+    <p>Une équipe entrepreneuriale, c'est un groupe de personnes qui co-fondent et co-dirigent une nouvelle entreprise. La recherche montre systématiquement que les équipes fondent des start-ups plus valorisées et à plus forte croissance que les entrepreneurs solos. Pourquoi ? Parce qu'aucun individu n'est excellent dans tous les domaines à la fois.</p>
+    <div class="analogy">
+      🏀 <strong>Analogie sportive :</strong> Michael Jordan était le meilleur joueur du monde, mais les Chicago Bulls ont gagné 6 championnats seulement quand il était entouré de Scottie Pippen (défense), Dennis Rodman (rebounds) et Phil Jackson (coaching stratégique). L'équipe complémentaire > le génie solitaire.
+    </div>
+    <div class="retenir">💡 À retenir : La diversité (genre, background, nationalité, expertise) améliore la performance des équipes entrepreneuriales. Elle réduit les "angles morts" dans la prise de décision et enrichit le réseau de contacts. Mais elle requiert une gestion plus complexe des conflits.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th>Dimension</th><th>Solo entrepreneur</th><th>Équipe entrepreneuriale</th></tr>
+    <tr><td>🧠 Compétences</td><td>Limité aux compétences d'une personne</td><td>Compétences complémentaires (tech + commercial + finance)</td></tr>
+    <tr><td>⏰ Capacité travail</td><td>1 personne × 80h/sem maximum</td><td>N personnes = plusieurs fonctions parallèles</td></tr>
+    <tr><td>💰 Financement</td><td>Crédibilité moindre auprès des VCs</td><td>Les VCs préfèrent fortement les équipes (signe de validation)</td></tr>
+    <tr><td>🔄 Résilience</td><td>Aucune redondance si maladie/départ</td><td>L'entreprise ne dépend pas d'une seule personne</td></tr>
+    <tr><td>⚠️ Risque</td><td>Prise de décision parfois plus rapide</td><td>Conflits possibles — nécessite un accord fondateur solide</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 4 : STRUCTURE ========== -->
+<div class="section" id="structure">
+  <div class="section-header">
+    <span class="section-icon">🏛️</span>
+    <div>
+      <div class="section-title">Structure et Gouvernance d'Entreprise</div>
+      <div class="section-subtitle">Avantages et inconvénients de la taille — comment organiser la croissance</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la gouvernance d'entreprise ?</div>
+    <p>La gouvernance, c'est le système par lequel une entreprise est dirigée et contrôlée. C'est "qui décide de quoi, et comment". Une startup de 5 personnes a une gouvernance informelle (le fondateur décide de tout). Une entreprise cotée en bourse a un Conseil d'Administration, des actionnaires minoritaires, des règles légales strictes. La gouvernance évolue avec la taille de l'entreprise.</p>
+    <div class="analogy">
+      🌱→🌳 <strong>Du garage à la multinationale :</strong> Garage (1-5 personnes) : décisions informelles, tout le monde fait tout. PME (50 personnes) : départements fonctionnels, processus formels. Grande entreprise (5000 personnes) : divisions, hiérarchies, comités, procédures. La taille crée de la puissance (économies d'échelle, accès au capital) mais aussi de l'inertie (bureaucratie, lenteur d'adaptation).
+    </div>
+    <div class="retenir">💡 À retenir : Il n'y a pas de "bonne" taille — chaque taille a ses avantages et inconvénients. L'enjeu est d'adapter la structure à la stratégie et au stade de développement. Les grandes entreprises qui veulent innover doivent créer des espaces "small firm-like" pour l'intrapreneuriat.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th></th><th>Petite entreprise / Start-up</th><th>Grande entreprise</th></tr>
+    <tr><td>⚡ Agilité</td><td>✅ Décisions rapides, pivot facile</td><td>❌ Processus lents, bureaucratie</td></tr>
+    <tr><td>💰 Capital</td><td>❌ Financement difficile, "valley of death"</td><td>✅ Accès facile aux marchés financiers</td></tr>
+    <tr><td>🧠 Innovation</td><td>✅ Culture innovante, moins de filtres</td><td>❌ Résistance au changement ("innovator's dilemma")</td></tr>
+    <tr><td>📊 Économies d'échelle</td><td>❌ Coûts unitaires élevés</td><td>✅ Volume → coûts faibles par unité</td></tr>
+    <tr><td>🤝 Partenariats</td><td>❌ Manque de crédibilité initiale</td><td>✅ Réputation = levier pour les partenariats</td></tr>
+    <tr><td>👥 Talent</td><td>❌ Difficulté à attirer des profils séniors</td><td>✅ Marque employeur forte</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 5 : OPEN INNOVATION ========== -->
+<div class="section" id="open-innov">
+  <div class="section-header">
+    <span class="section-icon">🌐</span>
+    <div>
+      <div class="section-title">Open Innovation</div>
+      <div class="section-subtitle">Innover ensemble plutôt que seul — l'écosystème d'innovation</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi l'Open Innovation ?</div>
+    <p>L'Open Innovation (Henry Chesbrough, 2003) c'est l'idée que les entreprises peuvent et devraient utiliser des idées externes (et pas seulement internes) pour innover, et que les idées internes non utilisées devraient trouver des débouchés externes. En gros : ouvrir ses frontières à l'innovation collaborative avec des start-ups, universités, clients, fournisseurs.</p>
+    <div class="analogy">
+      🤝 <strong>Exemple Procter & Gamble :</strong> En 2000, P&G avait 8 000 chercheurs internes mais ne pouvait pas exploiter tout le potentiel d'innovation. Ils ont lancé "Connect+Develop" : 50% de leurs innovations devaient venir de l'externe (partenariats avec universités, start-ups, inventeurs indépendants). Résultat : 1 000 accords de collaboration → 35% d'augmentation du taux de succès des innovations → revenus x2 en 10 ans.
+    </div>
+    <div class="retenir">💡 À retenir : L'open innovation ne signifie pas "donner ses innovations aux concurrents". C'est une stratégie d'accélération : utiliser ce que d'autres ont développé plutôt que tout réinventer soi-même. Les risques : gestion de la PI, protection des savoirs stratégiques, dépendance aux partenaires.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="emoji">🏫</div><div class="label">Universités</div><div class="desc">Recherche fondamentale, accès aux thésards et aux nouvelles technologies</div></div>
+    <div class="icon-item"><div class="emoji">🚀</div><div class="label">Start-ups</div><div class="desc">Agilité, nouvelles idées, technologies disruptives (corporate venturing)</div></div>
+    <div class="icon-item"><div class="emoji">🤝</div><div class="label">Partenaires</div><div class="desc">Fournisseurs, distributeurs, complément de l'écosystème</div></div>
+    <div class="icon-item"><div class="emoji">👥</div><div class="label">Clients</div><div class="desc">Co-création, lead users, customer discovery</div></div>
+    <div class="icon-item"><div class="emoji">🏛️</div><div class="label">Gouvernements</div><div class="desc">Subventions R&D, réglementations favorables, clusters d'innovation</div></div>
+    <div class="icon-item"><div class="emoji">📡</div><div class="label">Communautés</div><div class="desc">Open source, hackathons, crowdsourcing d'idées</div></div>
+  </div>
+
+  <div class="theory-box" style="margin-top:18px;">
+    <h4>📖 Les 4 modes d'Open Innovation selon Gailly (2018)</h4>
+    <p>Gailly structure l'open innovation en quatre modes distincts selon le type de collaboration :</p>
+    <p style="margin-top:8px;"><strong>1. Sourcing externe</strong> — Incorporer des connaissances et technologies extérieures dans son processus d'innovation (in-licensing, achat de brevets, partenariats R&D, spin-in de start-ups). Exemple : ARM Holdings qui licencie son architecture de processeurs à des centaines d'entreprises.</p>
+    <p style="margin-top:8px;"><strong>2. Co-développement</strong> — Développer conjointement avec des partenaires (consortia de R&D, joint ventures d'innovation). Exemple : les consortia IMEC en microélectronique, regroupant grandes entreprises et universités.</p>
+    <p style="margin-top:8px;"><strong>3. Go-to-market collaboratif</strong> — Commercialiser ses innovations via des canaux ou partenaires externes (out-licensing, co-marketing). Exemple : Qualcomm qui développe et licencie ses technologies 5G à tous les fabricants de smartphones.</p>
+    <p style="margin-top:8px;"><strong>4. Spin-out</strong> — Créer des entités indépendantes pour exploiter des innovations qui ne correspondent pas au cœur de métier actuel. Exemple : PayPal spin-off d'eBay, Alphabet créé par Google pour ses projets moonshot.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 5b : MÉCANISMES DE SOUTIEN (Gailly) ========== -->
+<div class="section" id="support">
+  <div class="section-header">
+    <span class="section-icon">⚙️</span>
+    <div>
+      <div class="section-title">Mécanismes de Soutien à l'Innovation</div>
+      <div class="section-subtitle">Comment concevoir les structures et incitations qui favorisent l'innovation en entreprise</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🔧 Les leviers organisationnels de l'innovation</div>
+    <p>L'innovation ne survient pas spontanément — elle doit être <strong>cultivée et soutenue</strong> par des mécanismes organisationnels appropriés. Gailly identifie plusieurs familles de mécanismes que les entreprises peuvent mettre en place, selon leur stratégie d'innovation et leur culture.</p>
+    <div class="analogy">
+      🌱 <strong>Analogie :</strong> Faire pousser l'innovation, c'est comme jardiner. Tu peux avoir les meilleures graines (idées) mais sans le bon sol (culture), les bonnes conditions (ressources), et un bon entretien (processus), rien ne poussera. Les mécanismes de soutien, c'est l'infrastructure du jardin d'innovation.
+    </div>
+    <div class="retenir">💡 À retenir : Aucun mécanisme unique ne convient à toutes les entreprises. La combinaison optimale dépend du type d'innovation visé (incrémentale vs radicale), de la maturité de l'organisation, et de la culture existante.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th>Mécanisme</th><th>Comment ça fonctionne</th><th>Exemples connus</th><th>Idéal pour</th></tr>
+    <tr>
+      <td>⏰ Temps libre dédié</td>
+      <td>Allouer du temps officiel aux employés pour explorer des idées non liées à leur mission principale</td>
+      <td>3M (15% du temps), Google (20% du temps → Gmail, Google Maps)</td>
+      <td>Innovation émergente, engagement des employés</td>
+    </tr>
+    <tr>
+      <td>🏦 Fonds d'innovation internes</td>
+      <td>Budget dédié à des projets hors budget opérationnel normal, accessible sur proposition</td>
+      <td>Shell GameChanger, Ericsson's InnoVenture fund</td>
+      <td>Projets à risque moyen-élevé, early-stage</td>
+    </tr>
+    <tr>
+      <td>🚀 Accélérateurs internes</td>
+      <td>Programmes courts (3-6 mois) pour développer rapidement des projets d'intrapreneuriat</td>
+      <td>ABInBev ZX Ventures, Airbus Bizlab</td>
+      <td>Intrapreneuriat, transformation culturelle</td>
+    </tr>
+    <tr>
+      <td>💼 Corporate Venture Capital</td>
+      <td>Investir dans des start-ups externes pour surveiller les technologies disruptives et créer des synergies</td>
+      <td>Google Ventures, Intel Capital, Total Carbon Neutrality Ventures</td>
+      <td>Intelligence technologique, option sur acquisitions futures</td>
+    </tr>
+    <tr>
+      <td>🏆 Prix et recognition</td>
+      <td>Récompenser les comportements innovants, y compris les "beaux échecs" porteurs d'apprentissages</td>
+      <td>Tata Group "Dare to Try award" pour le meilleur échec innovant de l'année</td>
+      <td>Culture d'innovation, réduction de l'aversion au risque</td>
+    </tr>
+    <tr>
+      <td>🔬 Labs et centres d'innovation</td>
+      <td>Espaces physiques ou organisationnels dédiés à l'exploration, séparés des opérations</td>
+      <td>Google X, Amazon Lab126, ENGIE Digital</td>
+      <td>Innovation radicale, séparation exploitation/exploration</td>
+    </tr>
+  </table>
+
+  <div class="quote" style="margin-top:20px;">
+    <p>"The challenge is not to create a spark of innovation — it is to keep the fire burning. Most companies can generate one good idea; very few can systematically innovate year after year."</p>
+    <cite>— Benoit Gailly, Navigating Innovation (2018)</cite>
+  </div>
+</div>
+
+<!-- ========== SECTION 6 : DÉMO INTERACTIVE ========== -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <span class="section-icon">🎮</span>
+    <div>
+      <div class="section-title">Démo Interactive — Profil d'Entrepreneur</div>
+      <div class="section-subtitle">Évalue ton profil entrepreneurial sur les 6 compétences clés</div>
+    </div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">🧠 Auto-évaluation : Mon Profil Entrepreneurial</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:16px;">Évalue honnêtement tes compétences de 1 à 10. Pas de bonne ou mauvaise réponse — l'objectif est d'identifier tes forces et les complémentarités nécessaires dans ton équipe.</p>
+
+    <div class="skills-grid">
+      <div class="skill-item">
+        <label>💡 Vision & Créativité : <span class="skill-value" id="sv_vision">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="s_vision" oninput="updateSkills()">
+      </div>
+      <div class="skill-item">
+        <label>🤝 Réseautage & Relations : <span class="skill-value" id="sv_network">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="s_network" oninput="updateSkills()">
+      </div>
+      <div class="skill-item">
+        <label>💻 Compétences techniques : <span class="skill-value" id="sv_tech">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="s_tech" oninput="updateSkills()">
+      </div>
+      <div class="skill-item">
+        <label>📣 Vente & Persuasion : <span class="skill-value" id="sv_sales">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="s_sales" oninput="updateSkills()">
+      </div>
+      <div class="skill-item">
+        <label>💰 Finance & Chiffres : <span class="skill-value" id="sv_finance">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="s_finance" oninput="updateSkills()">
+      </div>
+      <div class="skill-item">
+        <label>🔄 Résilience & Stress : <span class="skill-value" id="sv_resilience">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="s_resilience" oninput="updateSkills()">
+      </div>
+    </div>
+
+    <canvas id="skillsChart" style="max-height:340px;"></canvas>
+
+    <div id="skills_advice" style="margin-top:16px;background:white;border-radius:10px;padding:16px;border:1px solid #e2e8f0;font-size:.88rem;"></div>
+    <button class="btn btn-secondary" onclick="resetSkills()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="ch4_modeles_affaires.html" style="color:var(--amber);">← Ch.4 Modèles d'affaires</a> &nbsp;|&nbsp; <a href="ch6_financials.html" style="color:var(--amber);">Ch.6 Financials →</a></p>
+</footer>
+
+<script>
+let skillsChart = null;
+
+function updateSkills() {
+  const vals = {
+    vision: +document.getElementById('s_vision').value,
+    network: +document.getElementById('s_network').value,
+    tech: +document.getElementById('s_tech').value,
+    sales: +document.getElementById('s_sales').value,
+    finance: +document.getElementById('s_finance').value,
+    resilience: +document.getElementById('s_resilience').value
+  };
+
+  Object.entries(vals).forEach(([k,v]) => {
+    document.getElementById('sv_'+k).textContent = v;
+  });
+
+  const avg = Object.values(vals).reduce((a,b)=>a+b,0)/6;
+  const weaknesses = [];
+  if (vals.vision < 6) weaknesses.push('Vision & Créativité');
+  if (vals.network < 6) weaknesses.push('Réseautage');
+  if (vals.tech < 6) weaknesses.push('Compétences techniques');
+  if (vals.sales < 6) weaknesses.push('Vente & Persuasion');
+  if (vals.finance < 6) weaknesses.push('Finance');
+  if (vals.resilience < 6) weaknesses.push('Résilience');
+
+  document.getElementById('skills_advice').innerHTML = `
+    <div style="font-weight:700;color:var(--navy);margin-bottom:8px;">Score global : ${avg.toFixed(1)}/10</div>
+    ${weaknesses.length > 0 ? `<div style="color:#991b1b;background:#fee2e2;padding:10px;border-radius:8px;margin-bottom:8px;">⚠️ Points à renforcer ou à compléter dans l'équipe : <strong>${weaknesses.join(', ')}</strong></div>` : '<div style="color:#065f46;background:#d1fae5;padding:10px;border-radius:8px;margin-bottom:8px;">✅ Profil équilibré ! Bon point de départ pour l\'entrepreneuriat.</div>'}
+    <div style="color:var(--gray);font-size:.82rem;">💡 En entrepreneuriat, l'équipe complémentaire compte plus que le profil individuel parfait. Identifie les dimensions faibles et cherche des co-fondateurs qui les compensent.</div>
+  `;
+
+  const ctx = document.getElementById('skillsChart').getContext('2d');
+  if (skillsChart) skillsChart.destroy();
+  skillsChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Vision & Créativité','Réseautage','Compétences tech.','Vente & Persuasion','Finance','Résilience'],
+      datasets: [{
+        label: 'Mon profil',
+        data: [vals.vision, vals.network, vals.tech, vals.sales, vals.finance, vals.resilience],
+        backgroundColor: 'rgba(249,115,22,0.15)',
+        borderColor: '#f97316',
+        borderWidth: 2,
+        pointBackgroundColor: '#f97316'
+      }, {
+        label: 'Profil idéal',
+        data: [8,8,8,8,8,8],
+        backgroundColor: 'rgba(13,148,136,0.05)',
+        borderColor: '#0D9488',
+        borderWidth: 1.5,
+        borderDash: [5,5],
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { r: { beginAtZero: true, max: 10, ticks: { stepSize: 2 } } },
+      plugins: { title: { display: true, text: 'Profil de compétences entrepreneuriales' }, legend: { position: 'top' } }
+    }
+  });
+}
+
+function resetSkills() {
+  ['s_vision','s_network','s_tech','s_sales','s_finance','s_resilience'].forEach(id => document.getElementById(id).value = 5);
+  updateSkills();
+}
+
+window.addEventListener('load', updateSkills);
+</script>
+</body>
+</html>

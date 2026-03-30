@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 2 — Frequent Itemset Mining</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+            --white: #FFFFFF;
+            --gray: #64748B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--navy);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        header > div {
+            display: flex;
+            align-items: stretch;
+        }
+
+        header .color-bar-amber {
+            background: var(--amber);
+            width: 6px;
+            flex-shrink: 0;
+        }
+
+        header .color-bar-teal {
+            background: var(--teal);
+            width: 4px;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        header .header-content {
+            padding: 16px 20px;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .course-title {
+            color: var(--amber);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header .course-name {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        header a {
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        header a:hover {
+            color: var(--amber);
+        }
+
+        .breadcrumb {
+            padding: 20px 30px;
+            font-size: 14px;
+            color: var(--gray);
+            background: var(--white);
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb a {
+            color: var(--teal);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--navy);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .section h2 {
+            color: var(--navy);
+            margin-bottom: 20px;
+            font-size: 28px;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: var(--teal);
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid var(--amber);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+
+        .explain-intro .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .explain-intro .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .explain-intro .emoji-item {
+            text-align: center;
+            padding: 12px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+        }
+
+        .explain-intro .emoji-item .emoji {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .explain-intro .emoji-item span {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid var(--teal);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .math-block .formula-label {
+            color: var(--navy);
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: inherit;
+        }
+
+        .math-block .formula-content {
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(13, 148, 136, 0.05);
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+
+        .theory-box {
+            background: var(--light);
+            border-left: 4px solid var(--navy);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box h4 {
+            color: var(--navy);
+            margin-bottom: 10px;
+        }
+
+        .symbol-table {
+            background: rgba(30, 58, 95, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .symbol-table p {
+            margin: 6px 0;
+        }
+
+        .symbol-table strong {
+            color: var(--navy);
+        }
+
+        .example-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--amber);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .example-box strong {
+            color: var(--navy);
+        }
+
+        .tip {
+            background: #dcfce7;
+            border-left: 4px solid #22c55e;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .tip strong {
+            color: var(--navy);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background: var(--navy);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        table tr:hover {
+            background: #f8fafc;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #fef3c7 0%, #dbeafe 100%);
+            border: 2px solid var(--amber);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .interactive-demo h3 {
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        .interactive-section {
+            margin: 20px 0;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--light);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--navy);
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb:hover {
+            background: var(--navy);
+        }
+
+        .control-group input[type="number"],
+        .control-group input[type="checkbox"] {
+            padding: 8px;
+            border: 2px solid var(--light);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .control-group input[type="number"]:focus {
+            border-color: var(--teal);
+            outline: none;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        .btn-secondary:hover {
+            background: var(--amber);
+            color: white;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid var(--teal);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card h4 {
+            color: var(--navy);
+            margin-bottom: 12px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 700;
+            color: var(--gray);
+        }
+
+        .result-value {
+            color: var(--navy);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            border: 2px solid var(--navy);
+            background: white;
+            color: var(--navy);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: var(--navy);
+            color: white;
+        }
+
+        .nav-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        footer .footer-title {
+            color: var(--amber);
+            font-weight: 700;
+        }
+
+        footer .footer-subtitle {
+            color: #94A3B8;
+            margin-top: 8px;
+        }
+
+        .pending-math {
+            display: inline-block;
+            margin: 0 4px;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="color-bar-amber"></div>
+            <div class="color-bar-teal"></div>
+            <div class="header-content">
+                <div>
+                    <div class="course-title">LINFO2364</div>
+                    <div class="course-name">Mining Patterns in Data</div>
+                </div>
+                <a href="index.html">← Accueil</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        🏠 <a href="index.html">Accueil</a> → <strong>Chapitre 2: Frequent Itemset Mining</strong>
+    </div>
+
+    <main>
+        <!-- Section 1 -->
+        <div class="section">
+            <h2>Section 1 — C'est quoi un Pattern Fréquent ?</h2>
+
+            <div class="explain-intro">
+                <span class="badge">🧒 C'est quoi un pattern ?</span>
+                <p style="margin-bottom: 15px;">
+                    Imagine que tu travailles à la caisse d'un supermarché. Après des milliers de tickets de caisse,
+                    tu remarques que les gens qui achètent des <span class="highlight">pâtes</span> achètent aussi souvent
+                    de la <span class="highlight">sauce tomate</span>. C'est un <strong>pattern fréquent</strong> !
+                </p>
+                <div class="emoji-grid">
+                    <div class="emoji-item">
+                        <span class="emoji">🛒</span>
+                        <span>Transactions</span>
+                    </div>
+                    <div class="emoji-item">
+                        <span class="emoji">📋</span>
+                        <span>Itemsets</span>
+                    </div>
+                    <div class="emoji-item">
+                        <span class="emoji">🔢</span>
+                        <span>Support</span>
+                    </div>
+                    <div class="emoji-item">
+                        <span class="emoji">🎯</span>
+                        <span>Pattern Fréquent</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="theory-box">
+                <h4>Définition</h4>
+                <p>
+                    Un <strong>pattern fréquent</strong> est un ensemble d'items (itemset) qui apparaît dans un nombre
+                    suffisant de transactions d'une base de données. La notion de "suffisant" est définie par un
+                    <strong>seuil de support minimum</strong>.
+                </p>
+            </div>
+
+            <div class="tip">
+                <strong>💡 À retenir :</strong> Les patterns fréquents sont la base de la découverte de règles d'association.
+                Ils représentent les comportements récurrents dans les données.
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section">
+            <h2>Section 2 — Base de Données Transactionnelle</h2>
+
+            <p>Voici un exemple typique de base de données transactionnelle :</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction</th>
+                        <th>Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>T1</strong></td>
+                        <td>pain, beurre, lait</td>
+                    </tr>
+                    <tr>
+                        <td><strong>T2</strong></td>
+                        <td>pain, café, beurre, oeufs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>T3</strong></td>
+                        <td>lait, café</td>
+                    </tr>
+                    <tr>
+                        <td><strong>T4</strong></td>
+                        <td>pain, lait, café, beurre</td>
+                    </tr>
+                    <tr>
+                        <td><strong>T5</strong></td>
+                        <td>café, oeufs</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Concepts clés</h3>
+            <p><strong>Item :</strong> Un produit individuel (pain, beurre, café, etc.)</p>
+            <p><strong>Transaction :</strong> Un ensemble d'items achetés ensemble</p>
+            <p><strong>Itemset :</strong> Un sous-ensemble arbitraire d'items</p>
+            <p><strong>k-itemset :</strong> Un itemset contenant exactement k items</p>
+
+            <h3>Mesures Mathématiques</h3>
+
+            <div class="math-block">
+                <div class="formula-label">1. Support Count</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="support\_count(I) = |cover_{\mathcal{D}}(I)|"></div>
+                </div>
+                <p style="margin-top: 12px;"><strong>Signification :</strong> Le nombre de transactions qui contiennent l'itemset I</p>
+                <div class="symbol-table">
+                    <p><strong>I</strong> = itemset</p>
+                    <p><strong>D</strong> = base de données</p>
+                    <p><strong>cover</strong> = ensemble des transactions couvrant I</p>
+                </div>
+                <div class="example-box">
+                    <strong>Exemple :</strong> support_count({pain, beurre}) = 3 (dans T1, T2, T4)
+                </div>
+            </div>
+
+            <div class="math-block">
+                <div class="formula-label">2. Support Relatif</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="support_{\mathcal{D}}(I) = \frac{support\_count(I)}{|\mathcal{D}|}"></div>
+                </div>
+                <p style="margin-top: 12px;"><strong>Signification :</strong> La proportion de transactions contenant l'itemset</p>
+                <div class="example-box">
+                    <strong>Exemple :</strong> support({pain, beurre}) = 3/5 = 0.6 = 60%
+                </div>
+            </div>
+
+            <div class="math-block">
+                <div class="formula-label">3. Fonction Match</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="match(I, \mathcal{D}(\tau)) = \begin{cases} 1 & \text{si } \mathcal{D}(\tau, i) = 1 \; \forall i \in I \\ 0 & \text{sinon} \end{cases}"></div>
+                </div>
+                <p style="margin-top: 12px;"><strong>Signification :</strong> Retourne 1 si la transaction τ contient tous les items de I</p>
+            </div>
+
+            <div class="math-block">
+                <div class="formula-label">4. Cover</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="cover_{\mathcal{D}}(I) = \{\tau \in \mathcal{T} \;|\; match(I, \mathcal{D}(\tau)) = 1\}"></div>
+                </div>
+                <p style="margin-top: 12px;"><strong>Signification :</strong> L'ensemble de toutes les transactions contenant I</p>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section">
+            <h2>Section 3 — Règles d'Association</h2>
+
+            <p>Une règle d'association est une implication de la forme <strong>A ⇒ B</strong>, où A et B sont des itemsets disjoints.</p>
+
+            <div class="math-block">
+                <div class="formula-label">Confiance d'une Règle</div>
+                <div class="formula-content">
+                    <div class="pending-math" data-latex="conf(A \Rightarrow B) = \frac{support\_count(A \cup B)}{support\_count(A)}"></div>
+                </div>
+                <p style="margin-top: 12px;"><strong>Signification :</strong> La probabilité que B soit acheté étant donné que A a été acheté</p>
+                <div class="example-box">
+                    <strong>Exemple :</strong> conf({pain} ⇒ {beurre}) = 3/4 = 75%
+                </div>
+            </div>
+
+            <h3>Interactive Demo 1: Calculateur de Support et Confiance</h3>
+
+            <div class="interactive-demo">
+                <h3>📊 Calculateur Interactif</h3>
+
+                <p style="margin-bottom: 15px; font-weight: 700; color: var(--navy);">
+                    Sélectionnez les items pour calculer le support et la confiance :
+                </p>
+
+                <div class="interactive-section">
+                    <h4 style="color: var(--navy); margin-bottom: 12px;">Transactions</h4>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="pain" class="item-checkbox"> pain
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="beurre" class="item-checkbox"> beurre
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="lait" class="item-checkbox"> lait
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="café" class="item-checkbox"> café
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="oeufs" class="item-checkbox"> oeufs
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="calcBtn">Calculer Support</button>
+                    <button class="btn-secondary" id="resetBtn">Réinitialiser</button>
+                </div>
+
+                <div id="resultCard" class="result-card" style="display: none;">
+                    <h4>Résultats</h4>
+                    <div class="result-item">
+                        <span class="result-label">Itemset sélectionné :</span>
+                        <span class="result-value" id="selectedItems">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Support Count :</span>
+                        <span class="result-value" id="supportCount">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Support Relatif :</span>
+                        <span class="result-value" id="supportRel">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const transactions = [
+                    ['pain', 'beurre', 'lait'],
+                    ['pain', 'café', 'beurre', 'oeufs'],
+                    ['lait', 'café'],
+                    ['pain', 'lait', 'café', 'beurre'],
+                    ['café', 'oeufs']
+                ];
+
+                document.getElementById('calcBtn').addEventListener('click', function() {
+                    const selected = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                        .map(cb => cb.value);
+
+                    if (selected.length === 0) {
+                        alert('Sélectionnez au moins un item');
+                        return;
+                    }
+
+                    let supportCount = 0;
+                    transactions.forEach(trans => {
+                        if (selected.every(item => trans.includes(item))) {
+                            supportCount++;
+                        }
+                    });
+
+                    const supportRel = (supportCount / transactions.length * 100).toFixed(1);
+
+                    document.getElementById('selectedItems').textContent = '{' + selected.join(', ') + '}';
+                    document.getElementById('supportCount').textContent = supportCount + ' / 5';
+                    document.getElementById('supportRel').textContent = supportRel + '%';
+                    document.getElementById('resultCard').style.display = 'block';
+                });
+
+                document.getElementById('resetBtn').addEventListener('click', function() {
+                    document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
+                    document.getElementById('resultCard').style.display = 'none';
+                });
+            </script>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section">
+            <h2>Section 4 — Algorithme Apriori</h2>
+
+            <div class="explain-intro">
+                <span class="badge">💡 L'Idée Clé</span>
+                <p>
+                    Imagine que tu veux trouver tous les groupes d'amis qui se retrouvent souvent dans les mêmes fêtes.
+                    La propriété magique : <strong>si un groupe de 3 amis est rare, alors tout groupe de 4 amis qui les
+                    inclut est aussi rare !</strong> Cela permet d'éliminer des candidats sans les tester.
+                </p>
+            </div>
+
+            <div class="theory-box">
+                <h4>Propriété d'Anti-Monotonie</h4>
+                <div class="formula-content" style="margin-top: 12px;">
+                    <div class="pending-math" data-latex="\text{Si } I \text{ n'est pas fréquent, alors } \forall J \supseteq I, J \text{ n'est pas fréquent}"></div>
+                </div>
+                <p style="margin-top: 12px;">
+                    Cette propriété fondamentale permet à Apriori de réduire drastiquement le nombre de candidats testés.
+                </p>
+            </div>
+
+            <h3>Étapes de l'Algorithme Apriori</h3>
+
+            <div style="background: #f0fdf4; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                <ol style="line-height: 2; color: var(--navy); font-weight: 500;">
+                    <li>Trouver tous les 1-itemsets fréquents (L₁)</li>
+                    <li>Générer les candidats 2-itemsets à partir de L₁</li>
+                    <li>Élaguer les candidats en utilisant l'anti-monotonie</li>
+                    <li>Trouver les 2-itemsets fréquents (L₂)</li>
+                    <li>Répéter jusqu'à ce qu'aucun nouveau itemset fréquent ne soit trouvé</li>
+                </ol>
+            </div>
+
+            <h3>Interactive Demo 2: Visualisation Apriori</h3>
+
+            <div class="interactive-demo">
+                <h3>🔍 Simulateur Apriori</h3>
+
+                <div class="control-group" style="margin-bottom: 20px;">
+                    <label>Support Minimum: <span id="supportThreshold">40</span>%</label>
+                    <input type="range" id="supportSlider" min="20" max="80" value="40">
+                    <button class="btn-primary" id="runApriori">Lancer Apriori</button>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="aprioriCanvas"></canvas>
+                </div>
+
+                <p id="aprioriMessage" style="text-align: center; color: var(--gray); margin-top: 15px;">
+                    Ajustez le seuil de support et cliquez sur "Lancer Apriori"
+                </p>
+            </div>
+
+            <script>
+                const canvas = document.getElementById('aprioriCanvas');
+                const ctx = canvas.getContext('2d');
+                const slider = document.getElementById('supportSlider');
+                const thresholdDisplay = document.getElementById('supportThreshold');
+
+                // Set canvas size
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                // Simple itemset data with support counts
+                const itemsets = {
+                    '1': {
+                        'A': 0.60, 'B': 0.65, 'C': 0.50, 'D': 0.45
+                    },
+                    '2': {
+                        'AB': 0.40, 'AC': 0.30, 'AD': 0.25,
+                        'BC': 0.35, 'BD': 0.28, 'CD': 0.22
+                    },
+                    '3': {
+                        'ABC': 0.20, 'ABD': 0.15, 'ACD': 0.12, 'BCD': 0.10
+                    }
+                };
+
+                slider.addEventListener('input', function() {
+                    thresholdDisplay.textContent = this.value;
+                });
+
+                document.getElementById('runApriori').addEventListener('click', function() {
+                    const minSupport = parseFloat(slider.value) / 100;
+                    drawAprioriLattice(minSupport);
+                });
+
+                function drawAprioriLattice(minSupport) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw nodes for different levels
+                    const colors = {
+                        frequent: '#0D9488',
+                        infrequent: '#EF4444',
+                        pruned: '#D1D5DB'
+                    };
+
+                    let y = 50;
+
+                    // Level 1
+                    ctx.fillStyle = '#1E3A5F';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillText('1-itemsets', 20, y);
+
+                    let x = 100;
+                    const level1Items = Object.entries(itemsets['1']);
+                    level1Items.forEach(([name, support]) => {
+                        const isFrequent = support >= minSupport;
+                        drawNode(x, y + 40, name, isFrequent ? colors.frequent : colors.infrequent, support);
+                        x += 120;
+                    });
+
+                    y += 100;
+                    ctx.fillText('2-itemsets', 20, y);
+                    x = 100;
+                    const level2Items = Object.entries(itemsets['2']);
+                    level2Items.forEach(([name, support], idx) => {
+                        const parent1 = name[0];
+                        const parent2 = name[1];
+                        const parent1Frequent = itemsets['1'][parent1] >= minSupport;
+                        const parent2Frequent = itemsets['1'][parent2] >= minSupport;
+
+                        const isFrequent = support >= minSupport;
+                        const isPruned = !parent1Frequent || !parent2Frequent;
+
+                        let color = colors.infrequent;
+                        if (isFrequent) color = colors.frequent;
+                        if (isPruned) color = colors.pruned;
+
+                        drawNode(x, y + 40, name, color, support, isPruned);
+                        x += 110;
+                        if (x > canvas.width - 80) {
+                            x = 100;
+                            y += 60;
+                        }
+                    });
+
+                    // Legend
+                    y = canvas.height - 40;
+                    drawLegend(20, y, colors);
+                }
+
+                function drawNode(x, y, label, color, support, isPruned = false) {
+                    // Draw circle
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 25, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Draw label
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(label, x, y - 10);
+
+                    // Draw support
+                    ctx.fillStyle = 'white';
+                    ctx.font = '10px Arial';
+                    ctx.fillText((support * 100).toFixed(0) + '%', x, y + 10);
+
+                    if (isPruned) {
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(x - 20, y - 20);
+                        ctx.lineTo(x + 20, y + 20);
+                        ctx.stroke();
+                    }
+                }
+
+                function drawLegend(x, y, colors) {
+                    ctx.fillStyle = '#1E3A5F';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'left';
+
+                    let offset = 0;
+                    Object.entries(colors).forEach(([label, color]) => {
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(x + offset, y, 8, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#1E3A5F';
+                        ctx.fillText(label.charAt(0).toUpperCase() + label.slice(1), x + offset + 15, y + 4);
+                        offset += 150;
+                    });
+                }
+            </script>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section">
+            <h2>Section 5 — FP-Growth Algorithm</h2>
+
+            <div class="explain-intro">
+                <span class="badge">🌳 L'Idée Clé</span>
+                <p>
+                    Plutôt que de générer des candidats comme Apriori, FP-Growth compresse la base de données
+                    dans une structure arborescente appelée <strong>FP-Tree</strong>. Les patterns fréquents sont
+                    ensuite extraits directement de cet arbre, sans générer de candidats.
+                </p>
+            </div>
+
+            <h3>Structure de l'Arbre FP</h3>
+            <p>
+                L'algorithme FP-Growth fonctionne en deux passes :
+            </p>
+            <ul style="margin-left: 20px; line-height: 2;">
+                <li><strong>Première passe :</strong> Compter la fréquence de chaque item</li>
+                <li><strong>Deuxième passe :</strong> Construire l'FP-Tree en triant les items par fréquence décroissante</li>
+            </ul>
+
+            <h3>Avantages vs Apriori</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Apriori</th>
+                        <th>FP-Growth</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Génération de candidats</strong></td>
+                        <td>Oui (coûteux)</td>
+                        <td>Non</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nombre de scans de la base</strong></td>
+                        <td>Élevé (k passes)</td>
+                        <td>2 passes seulement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mémoire</strong></td>
+                        <td>Peut être importante</td>
+                        <td>Compression avec FP-Tree</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance sur grandes bases</strong></td>
+                        <td>Lente</td>
+                        <td>Rapide</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <strong>💡 À retenir :</strong> FP-Growth est généralement plus efficace qu'Apriori sur les grandes bases
+                de données car il évite la génération coûteuse de candidats.
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section">
+            <h2>Section 6 — ECLAT Algorithm</h2>
+
+            <p>
+                ECLAT (Equivalence Class Cluster Transformation) utilise une représentation <strong>verticale</strong>
+                de la base de données, contrairement au format horizontal (transaction → items) utilisé par Apriori et FP-Growth.
+            </p>
+
+            <h3>Format Vertical : TID-lists</h3>
+
+            <p>
+                Au lieu de stocker (transaction → items), ECLAT stocke (item → liste de transactions) :
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>TID-list</th>
+                        <th>Support</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>pain</strong></td>
+                        <td>{T1, T2, T4}</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>beurre</strong></td>
+                        <td>{T1, T2, T4}</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>lait</strong></td>
+                        <td>{T1, T3, T4}</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>café</strong></td>
+                        <td>{T2, T3, T4, T5}</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>oeufs</strong></td>
+                        <td>{T2, T5}</td>
+                        <td>2</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Calcul du Support par Intersection</h3>
+
+            <div class="math-block">
+                <p style="margin-bottom: 12px;">
+                    Pour calculer le support d'un itemset composé, on fait l'<strong>intersection</strong> des TID-lists :
+                </p>
+                <div class="example-box">
+                    <strong>Exemple :</strong><br>
+                    TID({pain}) = {T1, T2, T4}<br>
+                    TID({beurre}) = {T1, T2, T4}<br>
+                    TID({pain, beurre}) = TID({pain}) ∩ TID({beurre}) = {T1, T2, T4}<br>
+                    support({pain, beurre}) = |{T1, T2, T4}| = 3
+                </div>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Avantage d'ECLAT :</strong> La représentation verticale permet des calculs de support très efficaces
+                par simple intersection d'ensembles.
+            </div>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="section">
+            <h2>Section 7 — Comparaison des Algorithmes</h2>
+
+            <h3>Interactive Demo 3: Comparaison de Performance</h3>
+
+            <div class="interactive-demo">
+                <h3>⚡ Simulateur de Performance</h3>
+
+                <div class="control-group" style="margin-bottom: 20px;">
+                    <label>Taille de la base de données: <span id="dbSizeDisplay">10,000</span> transactions</label>
+                    <input type="range" id="dbSizeSlider" min="1" max="100" value="1" step="1">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="compareBtn">Comparer les Algorithmes</button>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+
+                <p id="comparisonMessage" style="text-align: center; color: var(--gray); margin-top: 15px;">
+                    Ajustez la taille de la base et cliquez pour simuler
+                </p>
+            </div>
+
+            <script>
+                const dbSlider = document.getElementById('dbSizeSlider');
+                const dbDisplay = document.getElementById('dbSizeDisplay');
+                let comparisonChart = null;
+
+                dbSlider.addEventListener('input', function() {
+                    const size = Math.pow(10, this.value) * 1000;
+                    dbDisplay.textContent = size.toLocaleString();
+                });
+
+                document.getElementById('compareBtn').addEventListener('click', function() {
+                    const size = Math.pow(10, dbSlider.value) * 1000;
+                    const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+                    // Simulated data: time increases exponentially for Apriori
+                    const aprioriTime = Math.pow(size / 10000, 1.8) * 50;
+                    const fpGrowthTime = Math.pow(size / 10000, 1.2) * 30;
+                    const eclatTime = Math.pow(size / 10000, 1.1) * 35;
+
+                    if (comparisonChart) {
+                        comparisonChart.destroy();
+                    }
+
+                    comparisonChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Apriori', 'FP-Growth', 'ECLAT'],
+                            datasets: [{
+                                label: 'Temps d\'exécution (secondes)',
+                                data: [aprioriTime, fpGrowthTime, eclatTime],
+                                backgroundColor: ['#EF4444', '#0D9488', '#F59E0B'],
+                                borderColor: ['#DC2626', '#059669', '#D97706'],
+                                borderWidth: 2,
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        font: { size: 14, weight: 'bold' },
+                                        color: '#1E3A5F'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Performance comparative (' + size.toLocaleString() + ' transactions)',
+                                    font: { size: 16, weight: 'bold' },
+                                    color: '#1E3A5F'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Secondes',
+                                        font: { weight: 'bold' }
+                                    },
+                                    ticks: {
+                                        color: '#64748B',
+                                        font: { weight: '500' }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: '#64748B',
+                                        font: { weight: '500' }
+                                    },
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="ch1.html" class="nav-button">← Chapitre 1</a>
+            <a href="ch3_interesting_patterns.html" class="nav-button">Chapitre 3 →</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="footer-subtitle">Prof. Hélène Verhaeghe · UCLouvain · 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        // KaTeX rendering for all math expressions
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                try {
+                    katex.render(el.dataset.latex, el, {displayMode: true, throwOnError: false});
+                } catch(e) {
+                    console.log('KaTeX error:', e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

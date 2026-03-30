@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINFO2146 — Mobile & Embedded Computing</title>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:#fff;padding:0;position:relative;overflow:hidden;}
+.header-stripe{height:6px;background:linear-gradient(90deg,var(--amber) 0%,var(--teal) 100%);}
+.header-content{padding:2.5rem 2rem 2rem;position:relative;}
+.header-content::before{content:'';position:absolute;right:0;top:0;width:280px;height:100%;background:linear-gradient(135deg,var(--teal) 0%,transparent 70%);opacity:.25;}
+h1{font-size:2rem;font-weight:700;letter-spacing:-.5px;}
+.subtitle{color:#93c5fd;margin-top:.4rem;font-size:1rem;}
+.meta{margin-top:.8rem;display:flex;gap:1.5rem;font-size:.85rem;color:#94a3b8;}
+.meta span{display:flex;align-items:center;gap:.4rem;}
+main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
+.intro-card{background:var(--white);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:1.8rem;margin-bottom:2rem;border-left:5px solid var(--amber);}
+.intro-card h2{color:var(--navy);font-size:1.25rem;margin-bottom:.8rem;}
+.intro-card p{color:var(--gray);line-height:1.7;}
+.stats{display:flex;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
+.stat-box{background:var(--light);border-radius:10px;padding:.8rem 1.2rem;text-align:center;flex:1;min-width:120px;}
+.stat-box .num{font-size:1.6rem;font-weight:700;color:var(--teal);}
+.stat-box .lbl{font-size:.75rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;}
+.section-title{font-size:1.4rem;font-weight:700;color:var(--navy);margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid var(--amber);}
+.chapters{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;}
+.ch-card{background:var(--white);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:1.5rem;text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;border-top:4px solid var(--teal);}
+.ch-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.12);}
+.ch-num{font-size:.75rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem;}
+.ch-title{font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:.6rem;}
+.ch-desc{font-size:.85rem;color:var(--gray);line-height:1.6;flex:1;}
+.ch-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem;}
+.tag{background:var(--light);color:var(--teal);font-size:.72rem;padding:.2rem .6rem;border-radius:20px;font-weight:600;}
+.ch-card:nth-child(2n) {border-top-color:var(--amber);}
+.ch-card:nth-child(3n) {border-top-color:#8b5cf6;}
+.eval-section{background:var(--white);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:1.8rem;margin-top:2rem;}
+.eval-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem;}
+.eval-item{text-align:center;padding:1rem;background:var(--light);border-radius:10px;}
+.eval-pct{font-size:2rem;font-weight:800;color:var(--navy);}
+.eval-name{font-size:.8rem;color:var(--gray);margin-top:.3rem;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:1.5rem;margin-top:3rem;font-size:.85rem;}
+footer strong{color:#fff;}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-stripe"></div>
+  <div class="header-content">
+    <div class="ch-num" style="color:#fbbf24;font-size:.85rem;letter-spacing:2px;">LINFO2146 · UCLouvain</div>
+    <h1>Mobile & Embedded Computing</h1>
+    <div class="subtitle">Réseaux sans fil pour systèmes embarqués et Internet des Objets</div>
+    <div class="meta">
+      <span>👨‍🏫 Prof. Ramin Sadre</span>
+      <span>📅 2025–2026</span>
+      <span>🎓 Master en Informatique</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="intro-card">
+    <h2>🎯 De quoi parle ce cours ?</h2>
+    <p>Ce cours combine deux mondes fascinants : les <strong>systèmes embarqués</strong> (des petits ordinateurs dédiés à une tâche) et les <strong>réseaux sans fil</strong>. On va voir comment des capteurs minuscules (dans votre maison, dans la nature, dans les usines) communiquent entre eux et avec Internet — le tout avec très peu d'énergie.</p>
+    <div class="stats">
+      <div class="stat-box"><div class="num">11</div><div class="lbl">Chapitres</div></div>
+      <div class="stat-box"><div class="num">50%</div><div class="lbl">Examen</div></div>
+      <div class="stat-box"><div class="num">40%</div><div class="lbl">Projet</div></div>
+      <div class="stat-box"><div class="num">10%</div><div class="lbl">Continu</div></div>
+    </div>
+  </div>
+
+  <div class="section-title">📚 Chapitres du cours</div>
+
+  <div class="chapters">
+    <a href="ch1_intro.html" class="ch-card">
+      <div class="ch-num">Chapitre 1</div>
+      <div class="ch-title">Introduction & Internet des Objets</div>
+      <div class="ch-desc">Qu'est-ce qu'un système embarqué ? L'IoT, les capteurs sans fil (WSN), et le matériel typique des nœuds IoT.</div>
+      <div class="ch-tags"><span class="tag">IoT</span><span class="tag">WSN</span><span class="tag">Hardware</span><span class="tag">Microcontrôleur</span></div>
+    </a>
+
+    <a href="ch2_os.html" class="ch-card">
+      <div class="ch-num">Chapitre 2</div>
+      <div class="ch-title">Systèmes d'exploitation embarqués</div>
+      <div class="ch-desc">TinyOS, Contiki, RIOT, FreeRTOS — les OS spéciaux pour petits appareils. Modèles événementiel et coopératif.</div>
+      <div class="ch-tags"><span class="tag">TinyOS</span><span class="tag">Contiki</span><span class="tag">RTOS</span><span class="tag">Proto-threads</span></div>
+    </a>
+
+    <a href="ch3_physique.html" class="ch-card">
+      <div class="ch-num">Chapitre 3</div>
+      <div class="ch-title">Communication sans fil — Couche physique</div>
+      <div class="ch-desc">Ondes électromagnétiques, modulation (AM, FM, PM), codage de canal, interleaving, DSSS, OFDM.</div>
+      <div class="ch-tags"><span class="tag">Modulation</span><span class="tag">OFDM</span><span class="tag">DSSS</span><span class="tag">Codage</span></div>
+    </a>
+
+    <a href="ch4_propagation.html" class="ch-card">
+      <div class="ch-num">Chapitre 4</div>
+      <div class="ch-title">Propagation radio</div>
+      <div class="ch-desc">Équation de Friis, affaiblissement de trajectoire, SNIR, multipath fading, bandes ISM, dBm.</div>
+      <div class="ch-tags"><span class="tag">Friis</span><span class="tag">FSPL</span><span class="tag">dBm</span><span class="tag">Fading</span></div>
+    </a>
+
+    <a href="ch5_mac_fixe.html" class="ch-card">
+      <div class="ch-num">Chapitre 5</div>
+      <div class="ch-title">Accès au médium — Assignation fixe</div>
+      <div class="ch-desc">SDMA, FDMA, TDMA, CDMA — comment partager le canal radio entre plusieurs émetteurs.</div>
+      <div class="ch-tags"><span class="tag">TDMA</span><span class="tag">FDMA</span><span class="tag">CDMA</span><span class="tag">Multiplexage</span></div>
+    </a>
+
+    <a href="ch6_mac_aleatoire.html" class="ch-card">
+      <div class="ch-num">Chapitre 6</div>
+      <div class="ch-title">Accès aléatoire & CSMA/CA</div>
+      <div class="ch-desc">ALOHA, Slotted ALOHA, CSMA, CSMA/CA, backoff exponentiel — la base du WiFi et du 802.15.4.</div>
+      <div class="ch-tags"><span class="tag">ALOHA</span><span class="tag">CSMA/CA</span><span class="tag">Backoff</span><span class="tag">Collisions</span></div>
+    </a>
+
+    <a href="ch7_802154.html" class="ch-card">
+      <div class="ch-num">Chapitre 7</div>
+      <div class="ch-title">IEEE 802.15.4</div>
+      <div class="ch-desc">Standard pour réseaux personnels sans fil basse consommation. Format de trame, topologies, slotted/unslotted CSMA.</div>
+      <div class="ch-tags"><span class="tag">IEEE 802.15.4</span><span class="tag">PAN</span><span class="tag">ZigBee</span><span class="tag">Trame</span></div>
+    </a>
+
+    <a href="ch8_wifi.html" class="ch-card">
+      <div class="ch-num">Chapitre 8</div>
+      <div class="ch-title">WiFi (IEEE 802.11)</div>
+      <div class="ch-desc">Infrastructure vs ad-hoc, OFDM, MIMO, 802.11a/b/g/n/ac, DIFS/SIFS, RTS/CTS, calcul de débit.</div>
+      <div class="ch-tags"><span class="tag">WiFi</span><span class="tag">OFDM</span><span class="tag">MIMO</span><span class="tag">802.11</span></div>
+    </a>
+
+    <a href="ch9_6lowpan.html" class="ch-card">
+      <div class="ch-num">Chapitre 9</div>
+      <div class="ch-title">6LoWPAN</div>
+      <div class="ch-desc">IPv6 sur 802.15.4 : compression d'en-têtes, fragmentation, adressage mesh. Relier les capteurs à Internet.</div>
+      <div class="ch-tags"><span class="tag">IPv6</span><span class="tag">6LoWPAN</span><span class="tag">Compression</span><span class="tag">Fragmentation</span></div>
+    </a>
+
+    <a href="ch10_rpl.html" class="ch-card">
+      <div class="ch-num">Chapitre 10</div>
+      <div class="ch-title">Routage RPL</div>
+      <div class="ch-desc">Routing Protocol for LLN. DODAG, DIO/DAO/DIS, fonctions objectifs OF0 & MRHOF, ETX, Trickle Timer.</div>
+      <div class="ch-tags"><span class="tag">RPL</span><span class="tag">DODAG</span><span class="tag">ETX</span><span class="tag">Trickle</span></div>
+    </a>
+
+    <a href="ch11_mqtt_coap.html" class="ch-card">
+      <div class="ch-num">Chapitre 11</div>
+      <div class="ch-title">MQTT & CoAP</div>
+      <div class="ch-desc">Protocoles applicatifs IoT : CoAP (REST sur UDP) et MQTT (publish/subscribe). QoS, topics, retained messages.</div>
+      <div class="ch-tags"><span class="tag">MQTT</span><span class="tag">CoAP</span><span class="tag">REST</span><span class="tag">Pub/Sub</span></div>
+    </a>
+  </div>
+
+  <!-- QUIZ LINK -->
+  <div style="background:linear-gradient(135deg,#1e3a5f,#0d9488);border-radius:16px;padding:2rem;margin:2rem 0;text-align:center;color:#fff;">
+    <div style="font-size:2rem;margin-bottom:.5rem;">🎯</div>
+    <h2 style="color:#fff;margin-bottom:.5rem;">Quiz interactif — Tous chapitres</h2>
+    <p style="color:#a7f3d0;margin-bottom:1.2rem;">Entraîne-toi sur les 291 questions issues du cours : MCQ, Flashcards, Matching, Catégorisation, Vrai/Faux, Devinettes… avec vérification instantanée et score.</p>
+    <a href="quiz.html" style="display:inline-block;background:#f59e0b;color:#fff;padding:14px 32px;border-radius:10px;font-weight:700;font-size:1.05rem;text-decoration:none;">
+      ▶ Commencer le quiz →
+    </a>
+  </div>
+
+  <div class="eval-section">
+    <div class="section-title" style="margin-bottom:.5rem;">📊 Évaluation</div>
+    <div class="eval-grid">
+      <div class="eval-item"><div class="eval-pct" style="color:var(--teal);">50%</div><div class="eval-name">Examen écrit</div></div>
+      <div class="eval-item"><div class="eval-pct" style="color:var(--amber);">40%</div><div class="eval-name">Projet (groupes)</div></div>
+      <div class="eval-item"><div class="eval-pct" style="color:#8b5cf6;">10%</div><div class="eval-name">Évaluation continue</div></div>
+    </div>
+    <p style="margin-top:1rem;color:var(--gray);font-size:.85rem;">⚠️ Le projet et l'évaluation continue ne peuvent pas être repassés en août — la note obtenue en juin est conservée.</p>
+  </div>
+</main>
+
+<footer>
+  <strong>LINFO2146 — Mobile and Embedded Computing</strong><br>
+  Prof. Ramin Sadre · École Polytechnique de Louvain (EPL) · UCLouvain · 2025–2026
+</footer>
+</body>
+</html>

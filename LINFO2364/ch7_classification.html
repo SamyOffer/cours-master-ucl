@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 7 — Classification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8FAFC;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid #0D9488;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box {
+            background: #EFF6FF;
+            border-left: 4px solid #1E3A5F;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1E3A5F;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #1E3A5F;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #0D9488;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #1E3A5F;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .icon-card {
+            text-align: center;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .icon-card-emoji {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .icon-card-text {
+            font-weight: 600;
+            color: #1E3A5F;
+        }
+
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .example-card {
+            padding: 15px;
+            background: #F0FDF4;
+            border: 1px solid #0D9488;
+            border-radius: 8px;
+        }
+
+        .pending-math {
+            display: block;
+            margin: 15px 0;
+            padding: 15px;
+            background: #F0FDF4;
+            border-radius: 8px;
+        }
+
+        .demo-section {
+            background: #F1F5F9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #0D9488;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        button {
+            background: #0D9488;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0F766E;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #1E3A5F;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .tree-diagram {
+            background: #F0FDF4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre;
+            color: #1E3A5F;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-card {
+            padding: 15px;
+            background: #EFF6FF;
+            border: 1px solid #1E3A5F;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            color: #0D9488;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            color: #94A3B8;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: #0D9488;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-group {
+            margin: 15px 0;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+        }
+
+        .slider-label {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .rule-list {
+            background: #F0FDF4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .rule-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-left: 3px solid #0D9488;
+            border-radius: 4px;
+        }
+
+        .rule-condition {
+            font-weight: 600;
+            color: #1E3A5F;
+        }
+
+        .rule-confidence {
+            font-size: 0.9em;
+            color: #64748B;
+        }
+
+        .feature-form {
+            background: #F8FAFC;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .form-group {
+            margin: 12px 0;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #1E3A5F;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .form-label input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .confusion-matrix {
+            margin: 20px 0;
+        }
+
+        .cm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .cm-table th,
+        .cm-table td {
+            border: 2px solid #1E3A5F;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .cm-table th {
+            background: #1E3A5F;
+            color: white;
+        }
+
+        .cm-tp {
+            background: #D1FAE5;
+        }
+
+        .cm-tn {
+            background: #D1FAE5;
+        }
+
+        .cm-fp {
+            background: #FECACA;
+        }
+
+        .cm-fn {
+            background: #FECACA;
+        }
+
+        footer {
+            background: #1E3A5F;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        footer .title {
+            color: #F59E0B;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        footer .subtitle {
+            color: #94A3B8;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <header style="background:#1E3A5F; padding:0; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+        <div style="display:flex; align-items:stretch">
+            <div style="background:#F59E0B; width:6px; flex-shrink:0"></div>
+            <div style="background:#0D9488; width:4px; flex-shrink:0; margin-right:20px"></div>
+            <div style="padding:16px 20px; flex:1; display:flex; justify-content:space-between; align-items:center">
+                <div>
+                    <div style="color:#F59E0B; font-size:12px; text-transform:uppercase; letter-spacing:1px">LINFO2364</div>
+                    <div style="color:white; font-size:20px; font-weight:700">Mining Patterns in Data</div>
+                </div>
+                <a href="index.html" style="color:#94A3B8; text-decoration:none; font-size:14px">← Accueil</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            🏠 <a href="index.html">Accueil</a> → Chapitre 7
+        </div>
+
+        <h1>🎯 Chapitre 7 — Classification</h1>
+
+        <!-- Section 1: Qu'est-ce que la Classification ? -->
+        <div class="section">
+            <h2>Section 1 : C'est quoi la Classification ?</h2>
+
+            <div class="explain-intro">
+                <span class="badge">C'est quoi la classification ?</span>
+                <p><strong>Analogie simple :</strong> Pense à un médecin qui examine des symptômes (fièvre, toux, fatigue) et doit décider si c'est une grippe, un rhume, ou le COVID. La classification = apprendre automatiquement ces règles à partir de milliers de cas !</p>
+            </div>
+
+            <h3>Les deux phases</h3>
+            <div class="icon-grid">
+                <div class="icon-card">
+                    <div class="icon-card-emoji">📊</div>
+                    <div class="icon-card-text">Données d'entraînement</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🤖</div>
+                    <div class="icon-card-text">Modèle appris</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🆕</div>
+                    <div class="icon-card-text">Nouvelles données</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🎯</div>
+                    <div class="icon-card-text">Prédiction</div>
+                </div>
+            </div>
+
+            <h3>Phase d'apprentissage vs Phase de classification</h3>
+            <div class="theory-box">
+                <h4>1. Phase d'apprentissage (Training)</h4>
+                <p>Le classifier apprend un modèle à partir de données étiquetées : chaque exemple a un label connu.</p>
+
+                <h4>2. Phase de classification (Testing)</h4>
+                <p>Utiliser le modèle appris pour prédire les labels de nouvelles données (sans labels).</p>
+            </div>
+
+            <h3>Exemples concrets</h3>
+            <div class="examples">
+                <div class="example-card">
+                    <strong>💰 Banque</strong><br>
+                    Prêt "risqué" ou "sûr" ?
+                </div>
+                <div class="example-card">
+                    <strong>🍄 Champignon</strong><br>
+                    "Comestible" ou "vénéneux" ?
+                </div>
+                <div class="example-card">
+                    <strong>📧 Email</strong><br>
+                    "Spam" ou "pas spam" ?
+                </div>
+                <div class="example-card">
+                    <strong>👨‍⚕️ Médecin</strong><br>
+                    "Traitement A", "B" ou "C" ?
+                </div>
+            </div>
+
+            <h3>Classification vs Régression</h3>
+            <div class="theory-box">
+                <ul>
+                    <li><strong>Classification :</strong> Prédire une catégorie/label discret (ex: {spam, pas spam})</li>
+                    <li><strong>Régression :</strong> Prédire une valeur numérique continue (ex: prix d'une maison)</li>
+                </ul>
+            </div>
+
+            <h3>Mesure de qualité : Accuracy</h3>
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{Accuracy} = \frac{\text{Nombre de prédictions correctes}}{\text{Nombre total de prédictions}}"></div>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 1 : Classifieur kNN Simple</h3>
+            <div class="demo-section">
+                <p><strong>Cliquez sur le canvas pour ajouter des points. Le modèle les classe automatiquement :</strong></p>
+                <canvas id="knnCanvas" width="700" height="400"></canvas>
+                <button onclick="resetKNN()">Générer nouvelles données</button>
+                <div id="knnStats" style="margin-top: 15px; padding: 10px; background: #EFF6FF; border-radius: 8px;"></div>
+            </div>
+
+            <script>
+                let knnData = {red: [], blue: []};
+
+                function initKNNData() {
+                    knnData = {red: [], blue: []};
+                    // Generate initial data
+                    for (let i = 0; i < 15; i++) {
+                        knnData.red.push({x: Math.random() * 500 + 50, y: Math.random() * 200 + 50});
+                        knnData.blue.push({x: Math.random() * 500 + 50, y: Math.random() * 200 + 200});
+                    }
+                    drawKNN();
+                }
+
+                function drawKNN() {
+                    const canvas = document.getElementById('knnCanvas');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.fillStyle = '#F8FAFC';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw grid
+                    ctx.strokeStyle = '#E2E8F0';
+                    ctx.lineWidth = 1;
+                    for (let i = 0; i <= 700; i += 50) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, 0);
+                        ctx.lineTo(i, 400);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(0, i);
+                        ctx.lineTo(700, i);
+                        ctx.stroke();
+                    }
+
+                    // Draw decision boundary (simplified)
+                    const boundary = 200;
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.05)';
+                    ctx.fillRect(0, boundary, canvas.width, canvas.height - boundary);
+                    ctx.fillStyle = 'rgba(34, 197, 94, 0.05)';
+                    ctx.fillRect(0, 0, canvas.width, boundary);
+
+                    // Draw red points (class 0)
+                    knnData.red.forEach(p => {
+                        ctx.fillStyle = '#EF4444';
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+
+                    // Draw blue points (class 1)
+                    knnData.blue.forEach(p => {
+                        ctx.fillStyle = '#3B82F6';
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 6, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+
+                    // Labels
+                    ctx.fillStyle = '#64748B';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText('Classe 0 (Red)', 10, 30);
+                    ctx.fillText('Classe 1 (Blue)', 10, 50);
+                }
+
+                function resetKNN() {
+                    initKNNData();
+                    const stats = document.getElementById('knnStats');
+                    if (stats) {
+                        stats.innerHTML = '<strong>Données régénérées :</strong> ' + (knnData.red.length + knnData.blue.length) + ' points au total';
+                    }
+                }
+
+                document.getElementById('knnCanvas').addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const distToRed = Math.sqrt(Math.pow(x - 200, 2) + Math.pow(y - 100, 2));
+                    const distToBlue = Math.sqrt(Math.pow(x - 200, 2) + Math.pow(y - 300, 2));
+
+                    if (distToRed < distToBlue) {
+                        knnData.red.push({x: x, y: y});
+                    } else {
+                        knnData.blue.push({x: x, y: y});
+                    }
+                    drawKNN();
+                });
+
+                window.addEventListener('load', initKNNData);
+            </script>
+        </div>
+
+        <!-- Section 2: Arbres de Décision -->
+        <div class="section">
+            <h2>Section 2 : Arbres de Décision</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Arbres de décision</span>
+                <p><strong>Analogie :</strong> Un arbre de décision c'est comme un jeu de 20 questions. À chaque nœud, on pose une question sur les données. Selon la réponse, on va à gauche ou à droite jusqu'à atteindre une feuille (la prédiction) !</p>
+            </div>
+
+            <h3>Exemple : classifier les emails</h3>
+            <div class="tree-diagram">Est-ce que l'email contient "gratuit" ?
+├── OUI → Est-ce qu'il contient "urgent" ?
+│   ├── OUI → SPAM ✗
+│   └── NON → Est-ce qu'il vient d'un contact ?
+│       ├── OUI → PAS SPAM ✓
+│       └── NON → SPAM ✗
+└── NON → PAS SPAM ✓
+            </div>
+
+            <h3>Composants d'un arbre</h3>
+            <div class="theory-box">
+                <ul>
+                    <li><strong>Nœud interne :</strong> test sur un attribut (question)</li>
+                    <li><strong>Arête :</strong> valeur de l'attribut (réponse)</li>
+                    <li><strong>Feuille :</strong> classe prédite (destination finale)</li>
+                </ul>
+            </div>
+
+            <h3>Avantages des arbres de décision</h3>
+            <div class="theory-box">
+                <ul>
+                    <li>✅ Très interprétables (on peut lire les règles)</li>
+                    <li>✅ Pas besoin de normaliser les données</li>
+                    <li>✅ Gère bien les données catégorielles</li>
+                    <li>⚠️ Risque de surapprentissage (overfitting)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 3: De l'Arbre aux Règles -->
+        <div class="section">
+            <h2>Section 3 : De l'Arbre aux Règles</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Conversion en règles</span>
+                <p><strong>Idée :</strong> Un arbre de décision peut être converti en règles IF-THEN. Chaque chemin de la racine à une feuille = une règle !</p>
+            </div>
+
+            <h3>Exemple de conversion</h3>
+            <div class="math-block">
+                <p><strong>Chemin dans l'arbre :</strong></p>
+                <p>spam → contains "gratuit" YES → contains "urgent" YES → SPAM</p>
+                <p style="margin-top: 15px;"><strong>Règle IF-THEN :</strong></p>
+                <div class="pending-math" data-latex="\text{IF email contient 'gratuit' AND contient 'urgent' THEN class = SPAM}"></div>
+            </div>
+
+            <h3>Représentation d'une règle</h3>
+            <div class="math-block">
+                <div class="pending-math" data-latex="r: (\text{Condition})_1 \wedge (\text{Condition})_2 \wedge \ldots \wedge (\text{Condition})_n \Rightarrow \text{class}"></div>
+            </div>
+
+            <h3>Qualité d'une règle</h3>
+            <div class="theory-box">
+                <h4>Coverage (Couverture)</h4>
+                <div class="pending-math" data-latex="\text{coverage}(r) = \frac{|\text{exemples couverts par r}|}{|\text{total exemples}|}"></div>
+
+                <h4>Accuracy (Précision)</h4>
+                <div class="pending-math" data-latex="\text{accuracy}(r) = \frac{|\text{correctement classifiés par r}|}{|\text{couverts par r}|}"></div>
+            </div>
+        </div>
+
+        <!-- Section 4: Sequential Covering Algorithm -->
+        <div class="section">
+            <h2>Section 4 : Algorithme Sequential Covering</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Sequential Covering</span>
+                <p><strong>Idée :</strong> L'algorithme de couverture séquentielle apprend les règles une par une. Pour chaque règle apprise, on retire les exemples qu'elle couvre, et on répète !</p>
+            </div>
+
+            <h3>Étapes de l'algorithme</h3>
+            <div class="theory-box">
+                <ol>
+                    <li>Initialiser : liste de règles = [], exemples restants = D</li>
+                    <li>Tant que D n'est pas vide ET critère d'arrêt non atteint :
+                        <ul>
+                            <li>a) Apprendre la meilleure règle r couvrant certains exemples dans D</li>
+                            <li>b) Ajouter r à la liste de règles</li>
+                            <li>c) Retirer de D les exemples couverts par r</li>
+                        </ul>
+                    </li>
+                    <li>Retourner la liste de règles</li>
+                </ol>
+            </div>
+
+            <h3>Comment apprendre "la meilleure règle"</h3>
+            <div class="theory-box">
+                <p><strong>Stratégie : Beam Search</strong></p>
+                <ul>
+                    <li>Commencer avec une règle vide (couvre tout)</li>
+                    <li>Ajouter itérativement des conditions pour maximiser l'accuracy</li>
+                    <li>Arrêter quand la règle couvre assez d'exemples avec une bonne accuracy</li>
+                </ul>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 2 : Sequential Covering Visualization</h3>
+            <div class="demo-section">
+                <p><strong>Animation étape par étape du sequential covering :</strong></p>
+                <canvas id="coveringCanvas" width="700" height="400"></canvas>
+                <button onclick="animateCovering()">Lancer l'algorithme</button>
+                <div id="coveringInfo" style="margin-top: 15px;"></div>
+            </div>
+
+            <script>
+                let coveringStep = 0;
+
+                function drawCoveringExample() {
+                    const canvas = document.getElementById('coveringCanvas');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.fillStyle = '#F8FAFC';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const redPoints = [
+                        {x: 100, y: 100}, {x: 120, y: 130}, {x: 150, y: 110},
+                        {x: 130, y: 150}, {x: 160, y: 120}
+                    ];
+                    const bluePoints = [
+                        {x: 500, y: 100}, {x: 520, y: 130}, {x: 550, y: 110},
+                        {x: 530, y: 150}, {x: 560, y: 120}, {x: 480, y: 140},
+                        {x: 510, y: 160}, {x: 545, y: 145}
+                    ];
+
+                    // Draw regions based on step
+                    if (coveringStep >= 1) {
+                        ctx.fillStyle = 'rgba(209, 250, 229, 0.5)';
+                        ctx.fillRect(70, 80, 130, 100);
+                        ctx.strokeStyle = '#0D9488';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(70, 80, 130, 100);
+                    }
+
+                    if (coveringStep >= 2) {
+                        ctx.fillStyle = 'rgba(209, 250, 229, 0.5)';
+                        ctx.fillRect(470, 90, 130, 100);
+                        ctx.strokeStyle = '#0D9488';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(470, 90, 130, 100);
+                    }
+
+                    // Draw points
+                    redPoints.forEach((p, idx) => {
+                        const covered = coveringStep > 0 && idx < 5;
+                        ctx.fillStyle = covered ? '#D1D5DB' : '#EF4444';
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+
+                    bluePoints.forEach((p, idx) => {
+                        const covered = coveringStep > 1 && idx < 5;
+                        ctx.fillStyle = covered ? '#D1D5DB' : '#3B82F6';
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+                        ctx.fill();
+                    });
+
+                    // Labels
+                    ctx.fillStyle = '#64748B';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText('Classe RED', 10, 30);
+                    ctx.fillText('Classe BLUE', 10, 50);
+                }
+
+                function animateCovering() {
+                    const steps = 3;
+                    if (coveringStep < steps) {
+                        coveringStep++;
+                        drawCoveringExample();
+
+                        const info = document.getElementById('coveringInfo');
+                        if (info) {
+                            let text = '';
+                            if (coveringStep === 1) {
+                                text = '<strong>Étape 1 :</strong> Apprendre règle 1 (RED) → Couvre 5 exemples RED<br>Retirer ces exemples de D';
+                            } else if (coveringStep === 2) {
+                                text = '<strong>Étape 2 :</strong> Apprendre règle 2 (BLUE) → Couvre 5 exemples BLUE<br>Retirer ces exemples de D';
+                            } else if (coveringStep === 3) {
+                                text = '<strong>Étape 3 :</strong> D vide, algorithme terminé!<br><strong>Règles finales :</strong><br>Règle 1: condition1 ∧ condition2 ⇒ RED<br>Règle 2: condition3 ∧ condition4 ⇒ BLUE';
+                            }
+                            info.innerHTML = text;
+                        }
+                    }
+                }
+
+                window.addEventListener('load', function() {
+                    coveringStep = 0;
+                    drawCoveringExample();
+                });
+            </script>
+        </div>
+
+        <!-- Section 5: Classification Associative (CBA) -->
+        <div class="section">
+            <h2>Section 5 : Classification Associative (CBA)</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Règles d'association pour la classification</span>
+                <p><strong>Idée brillante :</strong> Utiliser les règles d'association (comme dans le chapitre 2) pour faire de la classification ! On mine des règles comme {symptôme1, symptôme2} ⇒ {maladie} directement !</p>
+            </div>
+
+            <h3>Étapes de CBA</h3>
+            <ol>
+                <li>Miner les règles d'association : Condition ⇒ Class (avec support et confidence min)</li>
+                <li>Trier les règles par priorité (confidence, puis support, puis longueur)</li>
+                <li>Pour une nouvelle exemple, appliquer la première règle qui correspond</li>
+            </ol>
+
+            <h3>Exemple : prédire les maladies</h3>
+            <div class="rule-list">
+                <div class="rule-item">
+                    <div class="rule-condition">Règle 1 :</div> {fièvre > 38, toux} ⇒ grippe
+                    <div class="rule-confidence">Confidence: 92% | Support: 15%</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-condition">Règle 2 :</div> {fièvre > 38} ⇒ infection
+                    <div class="rule-confidence">Confidence: 75% | Support: 30%</div>
+                </div>
+                <div class="rule-item">
+                    <div class="rule-condition">Règle 3 (défaut) :</div> {} ⇒ bien portant
+                    <div class="rule-confidence">Confidence: 60%</div>
+                </div>
+            </div>
+
+            <h3>Avantages de CBA</h3>
+            <div class="theory-box">
+                <ul>
+                    <li>✅ Très interprétable (les règles sont lisibles)</li>
+                    <li>✅ Utilise les algorithmes efficients de mining (Ch2-4)</li>
+                    <li>✅ Bonne accuracy en pratique</li>
+                    <li>✅ Peu de surapprentissage</li>
+                </ul>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 3 : Classification des Champignons</h3>
+            <div class="demo-section">
+                <p><strong>Entrez les caractéristiques d'un champignon et obtenez une prédiction :</strong></p>
+                <div class="feature-form">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="redcap" onchange="predictMushroom()"> Chapeau rouge
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="spotted" onchange="predictMushroom()"> Tacheté
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="ring" onchange="predictMushroom()"> Anneau
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="whitegill" onchange="predictMushroom()"> Lamelles blanches
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="bulbous" onchange="predictMushroom()"> Bulbeux
+                        </label>
+                    </div>
+                </div>
+
+                <div id="mushroomResult" style="padding: 15px; background: #F0FDF4; border-radius: 8px; margin-top: 15px;"></div>
+            </div>
+
+            <script>
+                function predictMushroom() {
+                    const redcap = document.getElementById('redcap').checked;
+                    const spotted = document.getElementById('spotted').checked;
+                    const ring = document.getElementById('ring').checked;
+                    const whitegill = document.getElementById('whitegill').checked;
+                    const bulbous = document.getElementById('bulbous').checked;
+
+                    const rules = [
+                        {conditions: [true, true, false, false, false], label: 'TOXIQUE', conf: 95},
+                        {conditions: [true, true, true, false, false], label: 'TOXIQUE', conf: 98},
+                        {conditions: [false, false, true, true, false], label: 'COMESTIBLE', conf: 88},
+                        {conditions: [false, false, false, true, true], label: 'COMESTIBLE', conf: 85}
+                    ];
+
+                    let prediction = 'INCONNU';
+                    let confidence = 0;
+
+                    for (const rule of rules) {
+                        const [c1, c2, c3, c4, c5] = rule.conditions;
+                        if ((c1 === false || redcap === c1) &&
+                            (c2 === false || spotted === c2) &&
+                            (c3 === false || ring === c3) &&
+                            (c4 === false || whitegill === c4) &&
+                            (c5 === false || bulbous === c5)) {
+                            prediction = rule.label;
+                            confidence = rule.conf;
+                            break;
+                        }
+                    }
+
+                    const resultDiv = document.getElementById('mushroomResult');
+                    if (resultDiv) {
+                        const color = prediction === 'TOXIQUE' ? '#EF4444' : '#22C55E';
+                        resultDiv.innerHTML = `<strong>Prédiction :</strong> <span style="color: ${color}; font-weight: 700; font-size: 1.2em;">${prediction}</span><br><strong>Confiance :</strong> ${confidence}%`;
+                    }
+                }
+
+                window.addEventListener('load', function() {
+                    const resultDiv = document.getElementById('mushroomResult');
+                    if (resultDiv) {
+                        resultDiv.innerHTML = '<strong>Sélectionnez les caractéristiques ci-dessus</strong>';
+                    }
+                });
+            </script>
+        </div>
+
+        <!-- Section 6: Évaluation d'un Classifieur -->
+        <div class="section">
+            <h2>Section 6 : Évaluation d'un Classifieur</h2>
+
+            <h3>Métriques principales</h3>
+
+            <h4>Accuracy (Précision globale)</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}"></div>
+            </div>
+
+            <h4>Precision (Précision)</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{Precision} = \frac{TP}{TP + FP}"></div>
+                <p>Parmi les exemples prédits positifs, combien sont réellement positifs ?</p>
+            </div>
+
+            <h4>Recall (Sensibilité/Rappel)</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{Recall} = \frac{TP}{TP + FN}"></div>
+                <p>Parmi les exemples vraiment positifs, combien avons-nous correctement identifiés ?</p>
+            </div>
+
+            <h4>F1-Score (Moyenne harmonique)</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}"></div>
+                <p>Balance entre Precision et Recall.</p>
+            </div>
+
+            <h3>Légende : TP, TN, FP, FN</h3>
+            <div class="theory-box">
+                <ul>
+                    <li><strong>TP (True Positive) :</strong> Correctement prédit comme positif</li>
+                    <li><strong>TN (True Negative) :</strong> Correctement prédit comme négatif</li>
+                    <li><strong>FP (False Positive) :</strong> Incorrectement prédit comme positif</li>
+                    <li><strong>FN (False Negative) :</strong> Incorrectement prédit comme négatif</li>
+                </ul>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 4 : Matrice de Confusion</h3>
+            <div class="demo-section">
+                <p><strong>Ajustez les sliders pour modifier TP, TN, FP, FN et voyez les métriques se mettre à jour :</strong></p>
+
+                <div class="slider-container">
+                    <div class="slider-group">
+                        <label class="slider-label">TP (True Positive) : <span class="slider-value" id="tpValue">45</span></label>
+                        <input type="range" id="tpSlider" min="0" max="100" value="45" onchange="updateMetrics()">
+                    </div>
+
+                    <div class="slider-group">
+                        <label class="slider-label">TN (True Negative) : <span class="slider-value" id="tnValue">40</span></label>
+                        <input type="range" id="tnSlider" min="0" max="100" value="40" onchange="updateMetrics()">
+                    </div>
+
+                    <div class="slider-group">
+                        <label class="slider-label">FP (False Positive) : <span class="slider-value" id="fpValue">8</span></label>
+                        <input type="range" id="fpSlider" min="0" max="100" value="8" onchange="updateMetrics()">
+                    </div>
+
+                    <div class="slider-group">
+                        <label class="slider-label">FN (False Negative) : <span class="slider-value" id="fnValue">7</span></label>
+                        <input type="range" id="fnSlider" min="0" max="100" value="7" onchange="updateMetrics()">
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">Matrice de Confusion</h3>
+                <div class="confusion-matrix">
+                    <table class="cm-table">
+                        <tr>
+                            <th></th>
+                            <th>Prédit Positif</th>
+                            <th>Prédit Négatif</th>
+                        </tr>
+                        <tr>
+                            <th>Réel Positif</th>
+                            <td class="cm-tp" id="cmTP">45</td>
+                            <td class="cm-fn" id="cmFN">7</td>
+                        </tr>
+                        <tr>
+                            <th>Réel Négatif</th>
+                            <td class="cm-fp" id="cmFP">8</td>
+                            <td class="cm-tn" id="cmTN">40</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>Métriques calculées</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Accuracy</div>
+                        <div class="metric-value" id="metricAccuracy">82%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Precision</div>
+                        <div class="metric-value" id="metricPrecision">85%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Recall</div>
+                        <div class="metric-value" id="metricRecall">87%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">F1-Score</div>
+                        <div class="metric-value" id="metricF1">86%</div>
+                    </div>
+                </div>
+
+                <h3>Interprétation</h3>
+                <div id="metricInterpretation" style="padding: 15px; background: #EFF6FF; border-radius: 8px; margin-top: 15px;"></div>
+
+                <h3>Distribution des prédictions</h3>
+                <canvas id="confusionChart" width="400" height="300" style="margin-top: 20px;"></canvas>
+            </div>
+
+            <script>
+                let confusionChart = null;
+
+                function updateMetrics() {
+                    const tp = parseInt(document.getElementById('tpSlider').value);
+                    const tn = parseInt(document.getElementById('tnSlider').value);
+                    const fp = parseInt(document.getElementById('fpSlider').value);
+                    const fn = parseInt(document.getElementById('fnSlider').value);
+
+                    // Update values
+                    document.getElementById('tpValue').textContent = tp;
+                    document.getElementById('tnValue').textContent = tn;
+                    document.getElementById('fpValue').textContent = fp;
+                    document.getElementById('fnValue').textContent = fn;
+
+                    document.getElementById('cmTP').textContent = tp;
+                    document.getElementById('cmTN').textContent = tn;
+                    document.getElementById('cmFP').textContent = fp;
+                    document.getElementById('cmFN').textContent = fn;
+
+                    // Calculate metrics
+                    const total = tp + tn + fp + fn;
+                    const accuracy = ((tp + tn) / total * 100).toFixed(1);
+                    const precision = (tp / (tp + fp) * 100).toFixed(1);
+                    const recall = (tp / (tp + fn) * 100).toFixed(1);
+                    const f1 = (2 * (precision * recall) / (parseFloat(precision) + parseFloat(recall))).toFixed(1);
+
+                    document.getElementById('metricAccuracy').textContent = accuracy + '%';
+                    document.getElementById('metricPrecision').textContent = precision + '%';
+                    document.getElementById('metricRecall').textContent = recall + '%';
+                    document.getElementById('metricF1').textContent = f1 + '%';
+
+                    // Interpretation
+                    let interp = '<strong>Interprétation :</strong> ';
+                    interp += `Votre modèle prédit correctement ${accuracy}% des cas. `;
+                    interp += `Parmi les prédictions positives, ${precision}% sont correctes. `;
+                    interp += `Parmi les vrais positifs, il en détecte ${recall}%.`;
+
+                    document.getElementById('metricInterpretation').innerHTML = interp;
+
+                    // Update chart
+                    updateConfusionChart(tp, tn, fp, fn);
+                }
+
+                function updateConfusionChart(tp, tn, fp, fn) {
+                    const ctx = document.getElementById('confusionChart');
+                    if (!ctx) return;
+
+                    if (confusionChart) {
+                        confusionChart.data.datasets[0].data = [tp, tn, fp, fn];
+                        confusionChart.update();
+                    } else {
+                        confusionChart = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['TP (Correct+)', 'TN (Correct-)', 'FP (Erreur+)', 'FN (Erreur-)'],
+                                datasets: [{
+                                    data: [tp, tn, fp, fn],
+                                    backgroundColor: ['#D1FAE5', '#D1FAE5', '#FECACA', '#FECACA'],
+                                    borderColor: ['#0D9488', '#0D9488', '#EF4444', '#EF4444'],
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {position: 'bottom'}
+                                }
+                            }
+                        });
+                    }
+                }
+
+                window.addEventListener('load', function() {
+                    updateMetrics();
+                });
+            </script>
+        </div>
+    </div>
+
+    <footer>
+        <div class="title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="subtitle">Hélène Verhaeghe, UCLouvain, 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                try {
+                    katex.render(el.dataset.latex, el, {displayMode: true, throwOnError: false});
+                } catch(e) {
+                    el.textContent = el.dataset.latex;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

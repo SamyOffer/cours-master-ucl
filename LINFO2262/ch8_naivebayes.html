@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch8 — Classificateur Naive Bayes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B;
+    --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; --dark:#1E293B;
+    --green:#059669; --red:#DC2626; --purple:#7C3AED;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark);}
+  header{background:var(--navy);padding:2rem 2rem 1.5rem;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;left:0;top:0;width:8px;height:100%;background:var(--amber);}
+  header::after{content:'';position:absolute;left:8px;top:0;width:3px;height:100%;background:var(--teal);}
+  .header-inner{margin-left:1rem;}
+  .back{display:inline-block;color:#94A3B8;text-decoration:none;font-size:.85rem;margin-bottom:.5rem;}
+  .back:hover{color:var(--amber);}
+  header h1{color:#fff;font-size:2rem;margin-bottom:.3rem;}
+  header p{color:#94A3B8;font-size:.95rem;}
+  .badge{display:inline-block;background:var(--amber);color:var(--navy);padding:.2rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700;margin-top:.5rem;}
+
+  main{max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem;}
+
+  .section{background:var(--white);border-radius:14px;padding:2rem;margin-bottom:2.5rem;box-shadow:0 2px 10px rgba(0,0,0,.07);}
+  .section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--light);}
+  .sec-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .section-title{font-size:1.25rem;font-weight:700;color:var(--navy);}
+  .section-sub{font-size:.85rem;color:var(--gray);margin-top:.15rem;}
+
+  .theory-box{background:var(--light);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem;}
+  .theory-box h4{color:var(--navy);font-size:.95rem;margin-bottom:.5rem;}
+  .theory-box p{font-size:.88rem;color:var(--gray);line-height:1.7;}
+  .formula-display{background:#1E293B;color:#E2E8F0;padding:1rem 1.25rem;border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;line-height:1.8;margin:.75rem 0;}
+  .formula-display .hl{color:var(--amber);}
+
+  /* Naive Bayes Interactive */
+  .nb-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  .attr-selector{display:flex;flex-direction:column;gap:1rem;}
+  .attr-row{background:var(--light);border-radius:8px;padding:.75rem 1rem;}
+  .attr-label{font-size:.78rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;}
+  .attr-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .attr-btn{padding:.3rem .8rem;border-radius:20px;border:2px solid #CBD5E1;background:white;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--gray);transition:all .15s;}
+  .attr-btn.active{background:var(--teal);border-color:var(--teal);color:white;}
+  .attr-btn:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+
+  .nb-result{background:var(--light);border-radius:10px;padding:1.25rem;}
+  .nb-result h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:1rem;}
+  .calc-step{font-size:.8rem;color:var(--gray);line-height:1.9;font-family:'Courier New',monospace;background:white;border-radius:6px;padding:.75rem;margin-bottom:.75rem;border-left:3px solid var(--teal);}
+  .calc-step .lbl{color:var(--navy);font-weight:700;}
+  .verdict-bar{display:flex;gap:.5rem;margin-top:.75rem;border-radius:8px;overflow:hidden;height:36px;}
+  .v-yes{background:var(--teal);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.85rem;transition:flex .4s;}
+  .v-no{background:var(--red);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.85rem;transition:flex .4s;}
+  .verdict-label{text-align:center;font-size:.9rem;font-weight:700;margin-top:.5rem;}
+  .verdict-yes{color:var(--teal);}
+  .verdict-no{color:var(--red);}
+
+  /* Dataset table */
+  .dataset-wrap{overflow-x:auto;margin:1rem 0;}
+  table.dataset{width:100%;border-collapse:collapse;font-size:.78rem;}
+  table.dataset th{background:var(--navy);color:white;padding:.4rem .6rem;text-align:left;}
+  table.dataset td{padding:.35rem .6rem;border-bottom:1px solid #E2E8F0;}
+  table.dataset tr:nth-child(even) td{background:#F8FAFF;}
+  table.dataset .yes-row td:last-child{color:var(--green);font-weight:700;}
+  table.dataset .no-row td:last-child{color:var(--red);font-weight:700;}
+
+  /* Laplace section */
+  .laplace-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  .laplace-panel{background:var(--light);border-radius:10px;padding:1.25rem;}
+  .laplace-panel h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:1rem;}
+  .count-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;}
+  .count-row label{font-size:.85rem;color:var(--gray);}
+  .count-row input[type=range]{width:120px;accent-color:var(--teal);}
+  .count-val{font-weight:700;color:var(--teal);width:2rem;text-align:right;font-size:.9rem;}
+  .prob-table{width:100%;font-size:.82rem;border-collapse:collapse;margin-top:.75rem;}
+  .prob-table td{padding:.3rem .5rem;border-bottom:1px solid #E2E8F0;}
+  .prob-table td:last-child{font-weight:700;text-align:right;}
+  .prob-table .raw{color:var(--navy);}
+  .prob-table .lap{color:var(--teal);}
+  .prob-table .zero{color:var(--red);}
+  .laplace-chart-wrap{height:180px;}
+
+  /* Text classification */
+  .text-demo{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem;}
+  .vocab-area{background:var(--light);border-radius:10px;padding:1.25rem;}
+  .vocab-area h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.75rem;}
+  .class-editor{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem;}
+  .class-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray);}
+  .class-words{width:100%;padding:.4rem .6rem;border:1.5px solid #CBD5E1;border-radius:6px;font-size:.82rem;font-family:inherit;}
+  .class-words:focus{outline:none;border-color:var(--teal);}
+  .test-area{background:var(--light);border-radius:10px;padding:1.25rem;}
+  .test-area h4{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.75rem;}
+  .test-input{width:100%;padding:.5rem .75rem;border:1.5px solid #CBD5E1;border-radius:6px;font-size:.85rem;font-family:inherit;margin-bottom:.75rem;}
+  .test-input:focus{outline:none;border-color:var(--teal);}
+  .text-result{font-size:.8rem;font-family:'Courier New',monospace;background:white;border-radius:6px;padding:.75rem;line-height:1.9;border-left:3px solid var(--amber);min-height:80px;}
+  .text-result .pos{color:var(--green);font-weight:700;}
+  .text-result .neg{color:var(--red);font-weight:700;}
+  .text-result .hl{color:var(--amber);font-weight:700;}
+  .classify-btn{background:var(--teal);color:white;border:none;border-radius:8px;padding:.5rem 1.25rem;font-size:.85rem;font-weight:700;cursor:pointer;margin-bottom:.75rem;}
+  .classify-btn:hover{background:#0b7e73;}
+
+  /* Log prior bars */
+  .score-bars{display:flex;gap:.5rem;margin-top:.75rem;}
+  .score-bar-wrap{flex:1;background:var(--light);border-radius:8px;overflow:hidden;}
+  .score-bar-inner{height:32px;display:flex;align-items:center;padding:0 .75rem;color:white;font-weight:700;font-size:.8rem;transition:width .4s;}
+  .bar-sport{background:var(--teal);}
+  .bar-tech{background:var(--purple);}
+
+  /* Conditional probabilities grid */
+  .cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1rem;}
+  .cp-card{background:var(--light);border-radius:8px;padding:.75rem;text-align:center;}
+  .cp-card .attr-name{font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gray);margin-bottom:.4rem;}
+  .cp-card .val-name{font-size:.8rem;color:var(--navy);font-weight:600;}
+  .cp-card .prob-yes{font-size:1.1rem;font-weight:800;color:var(--teal);}
+  .cp-card .prob-no{font-size:1.1rem;font-weight:800;color:var(--red);}
+  .cp-card .lbl{font-size:.7rem;color:var(--gray);}
+
+  footer{text-align:center;padding:1.5rem;color:#94A3B8;font-size:.82rem;background:var(--navy);margin-top:2rem;}
+  .nav-btns{display:flex;justify-content:space-between;margin-top:2rem;}
+  .nav-btn{padding:.6rem 1.25rem;border-radius:8px;background:var(--navy);color:white;text-decoration:none;font-size:.85rem;font-weight:700;}
+  .nav-btn:hover{background:var(--teal);}
+
+  /* ===== MATH BLOCK PANELS (KaTeX enhanced) ===== */
+  .math-block{background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1.5px solid #6EE7B7;border-left:4px solid #0D9488;border-radius:12px;padding:1.25rem 1.4rem;margin:.5rem 0 1.25rem;}
+  .math-phrase{font-size:.87rem;color:#064E3B;font-style:italic;margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px dashed #A7F3D0;line-height:1.5;}
+  .math-phrase strong{color:#0D9488;font-style:normal;}
+  .math-eq{text-align:center;padding:.6rem .5rem;margin:.5rem 0;overflow-x:auto;background:rgba(255,255,255,.7);border-radius:8px;}
+  .math-eq .katex-display{margin:.3rem 0;}
+  .math-vars-wrap{margin:.75rem 0;}
+  .math-vars-title{font-size:.72rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.35rem;}
+  .math-vars-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .math-vars-table td{padding:.28rem .4rem;border-bottom:1px solid #D1FAE5;vertical-align:top;}
+  .math-vars-table td:first-child{white-space:nowrap;padding-right:.75rem;min-width:70px;font-weight:600;color:#065F46;}
+  .math-vars-table tr:last-child td{border-bottom:none;}
+  .math-vars-table .katex{font-size:.85em;}
+  .math-example{background:#FFFBEB;border-radius:7px;padding:.6rem .85rem;margin-top:.65rem;border-left:3px solid #F59E0B;}
+  .math-example .ex-title{font-size:.72rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;}
+  .math-example p{font-size:.82rem;color:#78350F;line-height:1.65;margin:0;}
+  /* hide original formula-box once math-block is present */
+  .formula-box.enhanced{display:none!important;}
+  .formula-display.enhanced{display:none!important;}
+  
+  /* ===== BEGINNER EXPLANATION BLOCKS ===== */
+  .explain-intro{background:linear-gradient(135deg,#FFFBEB 0%,#FFF7ED 100%);border:1.5px solid #FCD34D;border-left:5px solid #F59E0B;border-radius:0 14px 14px 0;padding:1.3rem 1.5rem;margin:0 0 1.5rem;}
+  .ei-badge{display:inline-flex;align-items:center;gap:.35rem;background:#F59E0B;color:white;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:.22rem .7rem;border-radius:999px;margin-bottom:.7rem;}
+  .explain-intro p{font-size:.91rem;color:#78350F;line-height:1.82;margin:.45rem 0;}
+  .explain-intro p strong{color:#92400E;font-weight:700;}
+  .explain-intro p em{color:#B45309;font-style:italic;}
+  .explain-analogy{background:white;border-radius:10px;padding:.9rem 1.15rem;margin:.9rem 0;font-size:.88rem;line-height:1.82;border:1.5px solid #FDE68A;color:#78350F;}
+  .explain-analogy .an-title{font-size:.72rem;font-weight:800;color:#D97706;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem;display:block;}
+  .explain-visual{display:flex;gap:.5rem;flex-wrap:wrap;margin:.85rem 0;}
+  .ev-item{background:white;border-radius:10px;padding:.6rem .85rem;font-size:.82rem;color:#78350F;border:1.5px solid #FDE68A;text-align:center;flex:1;min-width:110px;}
+  .ev-item .ev-emoji{font-size:1.5rem;display:block;margin-bottom:.25rem;}
+  .ev-item .ev-label{font-weight:700;color:#92400E;font-size:.8rem;display:block;margin-bottom:.15rem;}
+  .explain-steps{list-style:none;padding:0;margin:.7rem 0;}
+  .explain-steps li{padding:.35rem 0 .35rem 1.5rem;position:relative;font-size:.88rem;color:#78350F;line-height:1.7;border-bottom:1px dashed #FDE68A;}
+  .explain-steps li:last-child{border-bottom:none;}
+  .explain-steps li::before{content:"→";position:absolute;left:0;color:#F59E0B;font-weight:700;}
+  .explain-key{background:#FEF3C7;border-radius:8px;padding:.65rem .95rem;margin-top:.8rem;font-size:.86rem;color:#92400E;font-weight:600;line-height:1.65;border-left:3px solid #F59E0B;}
+  .explain-key::before{content:"💡 À retenir : ";}
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="back">← Retour au menu</a>
+    <h1>🧩 Classificateur Naive Bayes</h1>
+    <p>Chapitre 8 — Hypothèse d'indépendance, lissage de Laplace, classification de texte</p>
+    <span class="badge">3 démos interactives</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ========== SECTION 1 : PlayTennis Naive Bayes ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#FEF3C7;color:#D97706">🎾</div>
+    <div>
+      <div class="section-title">Classificateur Naive Bayes — PlayTennis</div>
+      <div class="section-sub">Sélectionne les conditions météo et observe le calcul étape par étape</div>
+    </div>
+  </div>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Décider si tu joues au tennis selon la météo</div>
+  <p>Imagine qu'il fasse chaud, humide, et du vent. Est-ce que tu joues au tennis ? Naive Bayes répond à cette question en <strong>multipliant des probabilités simples</strong> apprises sur un historique de 14 journées.</p>
+  <p>Le mot '<strong>Naive</strong>' vient d'une hypothèse simplificatrice : le modèle suppose que <em>chaque attribut est indépendant des autres</em>. En réalité, la température et l'humidité sont corrélées — mais cette hypothèse 'naïve' fonctionne étonnamment bien en pratique !</p>
+  <div class="explain-analogy">
+    <span class="an-title">🎯 Comment ça marche étape par étape</span>
+    On veut prédire : Outlook=Sunny, Temperature=Hot, Humidity=High, Wind=Weak.<br><br>
+    <strong>Pour Yes :</strong> P(Yes) = 9/14 × P(Sunny|Yes)=2/9 × P(Hot|Yes)=2/9 × P(High|Yes)=3/9 × P(Weak|Yes)=6/9 = <strong>0.0053</strong><br>
+    <strong>Pour No :</strong> P(No) = 5/14 × 3/5 × 2/5 × 4/5 × 2/5 = <strong>0.0206</strong><br><br>
+    0.0206 &gt; 0.0053 → <strong>Prédiction : No</strong> (pas de tennis par temps chaud et humide !)
+  </div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">🌤️</span><span class="ev-label">Attributs</span>Chaque condition météo est traitée indépendamment.</div>
+    <div class="ev-item"><span class="ev-emoji">📊</span><span class="ev-label">P(xᵢ|Classe)</span>Probabilités apprises sur l'historique.</div>
+    <div class="ev-item"><span class="ev-emoji">✖️</span><span class="ev-label">Multiplication</span>On multiplie toutes les proba (hypothèse d'indép. !).</div>
+    <div class="ev-item"><span class="ev-emoji">🏆</span><span class="ev-label">argmax</span>On choisit la classe avec le plus grand score.</div>
+  </div>
+  <div class="explain-key">Malgré son hypothèse simpliste, Naive Bayes est souvent très compétitif. C'est rapide, simple, et interprétable. Sélectionne les attributs météo et observe le calcul en temps réel !</div>
+</div>
+
+
+  <div class="theory-box">
+    <h4>Hypothèse d'indépendance conditionnelle</h4>
+    <p>Naive Bayes suppose que les attributs sont <strong>conditionnellement indépendants</strong> connaissant la classe. Cela simplifie radicalement le calcul :</p>
+  </div>
+  <div class="formula-display">
+    <span class="hl">P(C|x₁,...,xₙ) ∝ P(C) × ∏ᵢ P(xᵢ|C)</span><br>
+    → Décision : argmax<sub>C</sub> P(C) × P(x₁|C) × P(x₂|C) × ... × P(xₙ|C)
+  </div>
+  <div class="pending-math" data-phrase="Naive Bayes suppose l'indépendance conditionnelle des attributs et prédit la classe avec le plus grand score prior × vraisemblances." data-latex="\hat{C} = \underset{C}{\arg\max}\;P(C)\prod_{i=1}^{n}P(x_i\mid C)" data-vars='[{"sym": "\\hat{C}", "desc": "Classe prédite (argmax = la classe avec le plus grand score)"}, {"sym": "P(C)", "desc": "Probabilité a priori de la classe C (proportion de C dans le dataset)"}, {"sym": "P(x_i\\mid C)", "desc": "Vraisemblance : probabilité que l&apos;attribut i vale xᵢ dans la classe C"}, {"sym": "\\prod_{i=1}^{n}", "desc": "Produit sur tous les attributs — hypothèse d&apos;indépendance conditionnelle !"}]' data-example="PlayTennis, Outlook=Sunny, Wind=Strong. P(Yes)=9/14=0.643. P(Sunny|Yes)=2/9. P(Strong|Yes)=3/9. Score(Yes)=0.643×0.222×0.333=0.0476. Score(No)=5/14×3/5×3/5=0.129. → Prédit No."></div>
+  <div class="formula-display">
+    <span class="hl">Estimation MV :</span>  P(xᵢ = v | C = c) = |{t : xᵢ(t)=v ∧ C(t)=c}| / |{t : C(t)=c}|
+  </div>
+  <div class="pending-math" data-phrase="L'estimation par maximum de vraisemblance calcule P(xᵢ=v|C) simplement comme la fréquence de v parmi les exemples de classe C dans le dataset." data-latex="\hat{P}(x_i=v\mid C=c) = \frac{\bigl|\{t : x_i(t)=v \wedge C(t)=c\}\bigr|}{\bigl|\{t : C(t)=c\}\bigr|}" data-vars='[{"sym": "\\hat{P}(x_i=v\\mid C=c)", "desc": "Probabilité estimée que l&apos;attribut i vaille v dans la classe c"}, {"sym": "|\\{t:x_i(t)=v\\wedge C(t)=c\\}|", "desc": "Nombre d&apos;exemples de classe c ayant la valeur v pour l&apos;attribut i"}, {"sym": "|\\{t:C(t)=c\\}|", "desc": "Nombre total d&apos;exemples de classe c"}]' data-example="PlayTennis : Outlook=Sunny parmi les Yes (9 au total) : seulement 2 exemples → P(Sunny|Yes) = 2/9 ≈ 0.222. Parmi les No (5 au total) : 3 exemples → P(Sunny|No) = 3/5 = 0.600."></div>
+
+  <details style="margin-bottom:1.5rem;">
+    <summary style="cursor:pointer;font-size:.85rem;font-weight:700;color:var(--navy);padding:.5rem 0;">📋 Voir le dataset PlayTennis (14 exemples)</summary>
+    <div class="dataset-wrap">
+      <table class="dataset" id="ptTable"></table>
+    </div>
+  </details>
+
+  <div class="nb-grid">
+    <div class="attr-selector" id="attrSelector">
+      <div class="attr-row">
+        <div class="attr-label">Outlook</div>
+        <div class="attr-btns" data-attr="Outlook">
+          <button class="attr-btn active" data-val="Sunny">Sunny</button>
+          <button class="attr-btn" data-val="Overcast">Overcast</button>
+          <button class="attr-btn" data-val="Rain">Rain</button>
+        </div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">Temperature</div>
+        <div class="attr-btns" data-attr="Temperature">
+          <button class="attr-btn active" data-val="Hot">Hot</button>
+          <button class="attr-btn" data-val="Mild">Mild</button>
+          <button class="attr-btn" data-val="Cool">Cool</button>
+        </div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">Humidity</div>
+        <div class="attr-btns" data-attr="Humidity">
+          <button class="attr-btn active" data-val="High">High</button>
+          <button class="attr-btn" data-val="Normal">Normal</button>
+        </div>
+      </div>
+      <div class="attr-row">
+        <div class="attr-label">Wind</div>
+        <div class="attr-btns" data-attr="Wind">
+          <button class="attr-btn active" data-val="Weak">Weak</button>
+          <button class="attr-btn" data-val="Strong">Strong</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nb-result">
+      <h4>Calcul Naive Bayes</h4>
+      <div id="nbCalcSteps"></div>
+      <div class="verdict-bar" id="verdictBar">
+        <div class="v-yes" id="vYes" style="flex:9">Jouer (9)</div>
+        <div class="v-no" id="vNo" style="flex:5">Ne pas jouer (5)</div>
+      </div>
+      <div class="verdict-label" id="verdictLabel">→ Décision : <span class="verdict-yes">YES</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem;">
+    <div style="font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.75rem;">Probabilités conditionnelles appris (avec lissage α=1)</div>
+    <div class="cp-grid" id="cpGrid"></div>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : Lissage de Laplace ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#DCFCE7;color:#059669">🔧</div>
+    <div>
+      <div class="section-title">Lissage de Laplace — Smoothing</div>
+      <div class="section-sub">Évite les probabilités nulles qui annulent tout le produit</div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>Problème des zéros</h4>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Le problème du zéro qui annule tout</div>
+  <p>Imagine que dans tout ton historique de 14 jours, il n'y a jamais eu de jour avec <strong>Outlook=Overcast et Play=No</strong>. Donc P(Overcast|No) = 0/5 = 0. Maintenant, si on te demande de prédire pour Outlook=Overcast, le score pour No sera... 0 × (autres probabilités) = <strong>0</strong> !</p>
+  <p>Un seul zéro annule TOUT le calcul, peu importe les autres probabilités. C'est le problème des <strong>probabilités nulles</strong> — catastrophique en Naive Bayes et en général dans tout modèle probabiliste.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 La solution : Laplace dit 'ajoute 1 à tout'</span>L'idée est simple : au lieu de compter les occurrences exactes, on <strong>ajoute α pseudo-observations</strong> pour chaque valeur possible :<br><br>Sans lissage : P(Overcast|No) = 0/5 = <strong>0</strong> → problème !<br>Avec α=1 : P(Overcast|No) = (0+1)/(5+3) = 1/8 = <strong>0.125</strong> → raisonnable !<br><br>On divise par (count(classe) + α×|V|) pour que les probabilités continuent de sommer à 1.<br>|V| = nombre de valeurs possibles de l'attribut (ex: 3 pour Outlook : Sunny, Overcast, Rain)<br><br>💡 Avec α=1 : lissage de Laplace (classique). Avec α→0 : retour au MLE. Avec α grand : on se rapproche d'une distribution uniforme (toutes les valeurs également probables).</div>
+  <ul class="explain-steps">
+    <li>Mets count=0 et α=0 → probabilité = 0 → problème !</li>
+    <li>Mets α=1 → probabilité = 1/(total+|V|) → toujours positif.</li>
+    <li>Observe comment l'IC change selon α : plus α est grand, plus on s'éloigne des données.</li>
+  </ul>
+  <div class="explain-key">Le lissage de Laplace (add-1 smoothing) est la correction la plus simple contre le problème des zéros. Des variantes plus sophistiquées existent (Good-Turing, Kneser-Ney pour le langage naturel) mais add-1 reste la référence.</div>
+</div>
+
+    <p>Si une valeur n'apparaît jamais dans la classe dans les données d'entraînement, P(v|C) = 0, ce qui <strong>annule tout le produit</strong>. Le lissage de Laplace ajoute α pseudo-exemples pour chaque valeur possible.</p>
+  </div>
+  <div class="formula-display">
+    <span class="hl">Sans lissage :</span>  P(xᵢ=v | C=c) = count(v,c) / count(c)<br>
+    <span class="hl">Avec Laplace (α) :</span>  P(xᵢ=v | C=c) = (count(v,c) + α) / (count(c) + α × |V|)
+  </div>
+  <div class="pending-math" data-phrase="Le lissage de Laplace ajoute α pseudo-observations pour chaque valeur possible, évitant ainsi les probabilités nulles qui bloqueraient tout calcul en annulant le produit." data-latex="\hat{P}(x_i=v\mid C=c) = \frac{\mathrm{count}(v,c)+\alpha}{\mathrm{count}(c)+\alpha\cdot|V_i|}" data-vars='[{"sym": "\\mathrm{count}(v,c)", "desc": "Nombre d&apos;exemples de classe c ayant la valeur v (peut être 0 !)"}, {"sym": "\\alpha", "desc": "Paramètre de lissage. α=1 (lissage de Laplace), α→0 = MLE, α grand = uniforme"}, {"sym": "\\mathrm{count}(c)", "desc": "Nombre total d&apos;exemples de classe c"}, {"sym": "|V_i|", "desc": "Nombre de valeurs distinctes possibles pour l&apos;attribut i"}]' data-example="Outlook (|V|=3), C=No (5 exemples). count(Overcast,No)=0. Sans lissage : P=0 → annule tout ! Avec α=1 : P=(0+1)/(5+3)=1/8=0.125. count(Sunny,No)=3 → P=(3+1)/(5+3)=4/8=0.5."></div>
+
+  <div class="laplace-grid">
+    <div class="laplace-panel">
+      <h4>Paramètres du lissage</h4>
+      <div class="count-row">
+        <label>count(v, c) — nb d'occurrences :</label>
+        <input type="range" id="lcCount" min="0" max="10" value="0" oninput="updateLaplace()">
+        <span class="count-val" id="lcCountVal">0</span>
+      </div>
+      <div class="count-row">
+        <label>count(c) — taille de la classe :</label>
+        <input type="range" id="lcTotal" min="2" max="50" value="9" oninput="updateLaplace()">
+        <span class="count-val" id="lcTotalVal">9</span>
+      </div>
+      <div class="count-row">
+        <label>|V| — nb de valeurs possibles :</label>
+        <input type="range" id="lcV" min="2" max="10" value="3" oninput="updateLaplace()">
+        <span class="count-val" id="lcVVal">3</span>
+      </div>
+      <div class="count-row">
+        <label>α — paramètre de lissage :</label>
+        <input type="range" id="lcAlpha" min="0" max="5" step="0.5" value="1" oninput="updateLaplace()">
+        <span class="count-val" id="lcAlphaVal">1</span>
+      </div>
+
+      <table class="prob-table" style="margin-top:1rem;">
+        <tr><td>Sans lissage :</td><td class="raw" id="probRaw">0/9 = 0.000</td></tr>
+        <tr><td>Avec lissage α :</td><td class="lap" id="probLap">1/12 = 0.083</td></tr>
+        <tr><td>Risque si count=0 :</td><td class="zero" id="probZero">Annule tout le produit !</td></tr>
+      </table>
+    </div>
+
+    <div class="laplace-panel">
+      <h4>Impact du lissage sur les probabilités</h4>
+      <p style="font-size:.8rem;color:var(--gray);margin-bottom:.75rem;">Variation de P(v|c) selon le count, pour α=1 et les paramètres actuels :</p>
+      <div class="laplace-chart-wrap"><canvas id="laplaceChart"></canvas></div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;background:var(--light);border-radius:10px;padding:1.25rem;">
+    <h4 style="font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.75rem;">En pratique sur PlayTennis — attribut Outlook, classe Yes (9 exemples)</h4>
+    <p style="font-size:.82rem;color:var(--gray);margin-bottom:.75rem;">Sans lissage, si on teste "Overcast + Yes = 4", "Sunny + Yes = 2", "Rain + Yes = 3". Mais supposons une valeur jamais vue...</p>
+    <div id="laplaceExample"></div>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : Classification de texte ========== -->
+<div class="section">
+  <div class="section-header">
+    <div class="sec-icon" style="background:#F3E8FF;color:#7C3AED">📝</div>
+    <div>
+      <div class="section-title">Classification de Texte — Bag of Words</div>
+      <div class="section-sub">Entraîne le modèle sur deux classes, puis classifie n'importe quelle phrase</div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>Modèle Bag-of-Words pour le texte</h4>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Détecter du spam avec des mots</div>
+  <p>Comment savoir si un email est un spam juste en regardant ses mots ? Si l'email contient 'GRATUIT', 'URGENT', 'PROMO', il est probablement spam. Si il contient 'réunion', 'rapport', 'budget', c'est probablement un email professionnel.</p>
+  <p>Le modèle Bag-of-Words traite chaque mot comme un attribut indépendant (encore notre hypothèse naive !). On apprend P(mot|classe) sur des emails étiquetés, et on classifie en multipliant toutes ces probabilités.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Pourquoi des log-probabilités ?</span>Imagine 500 mots dans un email. On doit multiplier 500 petites probabilités (souvent < 0.01). Le résultat est un nombre minuscule comme 0.01^500 = 10^(-1000). Les ordinateurs ne peuvent pas représenter un nombre aussi petit !<br><br>La solution : utiliser les <strong>logarithmes</strong>. log(a×b) = log(a) + log(b). Au lieu de multiplier, on <strong>additionne des log-probabilités</strong> — beaucoup plus stable numériquement.<br><br>log(0.01) = -4.6. Additionner 500 fois -4.6 = -2300. Un nombre qu'un ordinateur peut facilement manipuler !<br><br>🏆 On choisit la classe avec le <strong>score le plus élevé</strong> (les scores sont négatifs, on prend le moins négatif).</div>
+  <ul class="explain-steps">
+    <li>Ajoute des mots d'exemple pour la classe 'Sport' et 'Tech' dans les zones de texte.</li>
+    <li>Clique 'Construire le modèle' pour apprendre les probabilités de chaque mot.</li>
+    <li>Tape une phrase dans la zone de test et observe le calcul mot par mot.</li>
+    <li>Les mots discriminants (ceux qui distinguent le plus les deux classes) s'affichent en bas.</li>
+  </ul>
+  <div class="explain-key">Naive Bayes est à la base des premiers filtres anti-spam (SpamAssassin, années 2000). Malgré sa simplicité, il était remarquablement efficace. Aujourd'hui supplanté par les transformers, mais toujours utile pour comprendre les fondamentaux !</div>
+</div>
+
+    <p>Chaque mot du vocabulaire est un attribut binaire (présent/absent) ou une fréquence. On calcule <strong>log P(C) + Σ log P(wᵢ|C)</strong> pour éviter les underflows numériques, et on choisit la classe avec le score le plus élevé.</p>
+  </div>
+  <div class="formula-display">
+    <span class="hl">Score(C) = log P(C) + Σ_{w∈doc} log P(w|C)</span><br>
+    P(w|C) = (count(w,C) + 1) / (count(tous mots de C) + |Vocabulaire|)   ← Laplace α=1
+  </div>
+  <div class="pending-math" data-phrase="En classification de texte, on utilise les log-probabilités pour éviter les underflows numériques causés par la multiplication de centaines de petites probabilités." data-latex="\text{Score}(C) = \log P(C) + \sum_{w\in\text{doc}}\log P(w\mid C), \quad P(w\mid C)=\frac{\text{count}(w,C)+1}{\text{total\_mots}(C)+|V|}" data-vars='[{"sym": "\\text{Score}(C)", "desc": "Log-score de la classe C — on choisit la classe avec le score le plus élevé"}, {"sym": "\\log P(C)", "desc": "Log-prior de C (ex : log(0.5) = -0.69 si classes équibalancées)"}, {"sym": "\\log P(w\\mid C)", "desc": "Log-vraisemblance du mot w dans la classe C"}, {"sym": "\\text{count}(w,C)", "desc": "Nombre d&apos;occurrences du mot w dans les documents de classe C"}, {"sym": "|V|", "desc": "Taille du vocabulaire total (tous les mots uniques des deux classes)"}]' data-example="Doc = 'football win'. Score(Sport)=log(0.5)+log P(football|Sport)+log P(win|Sport) = -0.69+(-1.2)+(-0.9)=-2.79. Score(Tech)=-0.69+(-3.1)+(-2.8)=-6.59. On choisit Sport car -2.79 > -6.59."></div>
+
+  <div class="text-demo">
+    <div class="vocab-area">
+      <h4>Données d'entraînement</h4>
+      <p style="font-size:.78rem;color:var(--gray);margin-bottom:.75rem;">Ajoute des mots représentatifs pour chaque classe (séparés par des espaces). Les mots peuvent se répéter pour augmenter leur poids.</p>
+      <div class="class-editor">
+        <div class="class-label" style="color:var(--teal);">Classe A — Sport</div>
+        <textarea class="class-words" id="wordsA" rows="3">football match goal player team win championship tournament soccer basketball score game sport</textarea>
+      </div>
+      <div class="class-editor">
+        <div class="class-label" style="color:var(--purple);">Classe B — Technologie</div>
+        <textarea class="class-words" id="wordsB" rows="3">computer software algorithm data neural network code python machine learning model train deep</textarea>
+      </div>
+      <button class="classify-btn" onclick="buildModel()" style="width:100%;margin-top:.5rem;">Construire le modèle</button>
+      <div id="modelInfo" style="font-size:.78rem;color:var(--gray);margin-top:.5rem;"></div>
+    </div>
+
+    <div class="test-area">
+      <h4>Tester une phrase</h4>
+      <input type="text" class="test-input" id="testPhrase" value="the player scored a great goal" placeholder="Entrez une phrase à classer..." oninput="classifyText()">
+      <div class="text-result" id="textResult">Construis d'abord le modèle →</div>
+      <div style="margin-top:.75rem;font-size:.78rem;color:var(--gray);font-weight:600;">Scores log-vraisemblance :</div>
+      <div class="score-bars" id="scoreBars" style="margin-top:.3rem;">
+        <div style="flex:1;background:var(--light);border-radius:8px;padding:.4rem .6rem;font-size:.78rem;color:var(--gray);">Construire le modèle d'abord</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;background:var(--light);border-radius:10px;padding:1.25rem;">
+    <h4 style="font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:.75rem;">Top mots discriminants (les plus différents entre classes)</h4>
+    <div id="topWords" style="display:flex;flex-wrap:wrap;gap:.4rem;"></div>
+  </div>
+</div>
+
+<div class="nav-btns">
+  <a href="ch7_bayes.html" class="nav-btn">← Ch7 Apprentissage Bayésien</a>
+  <a href="index.html" class="nav-btn">🏠 Menu principal</a>
+</div>
+
+</main>
+
+<footer>LINFO2262 Machine Learning — UCLouvain — Prof. Pierre Dupont — Guide interactif</footer>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const playTennis = [
+  {Outlook:'Sunny',   Temperature:'Hot',  Humidity:'High',   Wind:'Weak',   Play:'No'},
+  {Outlook:'Sunny',   Temperature:'Hot',  Humidity:'High',   Wind:'Strong', Play:'No'},
+  {Outlook:'Overcast',Temperature:'Hot',  Humidity:'High',   Wind:'Weak',   Play:'Yes'},
+  {Outlook:'Rain',    Temperature:'Mild', Humidity:'High',   Wind:'Weak',   Play:'Yes'},
+  {Outlook:'Rain',    Temperature:'Cool', Humidity:'Normal', Wind:'Weak',   Play:'Yes'},
+  {Outlook:'Rain',    Temperature:'Cool', Humidity:'Normal', Wind:'Strong', Play:'No'},
+  {Outlook:'Overcast',Temperature:'Cool', Humidity:'Normal', Wind:'Strong', Play:'Yes'},
+  {Outlook:'Sunny',   Temperature:'Mild', Humidity:'High',   Wind:'Weak',   Play:'No'},
+  {Outlook:'Sunny',   Temperature:'Cool', Humidity:'Normal', Wind:'Weak',   Play:'Yes'},
+  {Outlook:'Rain',    Temperature:'Mild', Humidity:'Normal', Wind:'Weak',   Play:'Yes'},
+  {Outlook:'Sunny',   Temperature:'Mild', Humidity:'Normal', Wind:'Strong', Play:'Yes'},
+  {Outlook:'Overcast',Temperature:'Mild', Humidity:'High',   Wind:'Strong', Play:'Yes'},
+  {Outlook:'Overcast',Temperature:'Hot',  Humidity:'Normal', Wind:'Weak',   Play:'Yes'},
+  {Outlook:'Rain',    Temperature:'Mild', Humidity:'High',   Wind:'Strong', Play:'No'}
+];
+const ATTRS = ['Outlook','Temperature','Humidity','Wind'];
+const ATTR_VALS = {
+  Outlook:['Sunny','Overcast','Rain'],
+  Temperature:['Hot','Mild','Cool'],
+  Humidity:['High','Normal'],
+  Wind:['Weak','Strong']
+};
+let nbSelection = {Outlook:'Sunny', Temperature:'Hot', Humidity:'High', Wind:'Weak'};
+
+// ============================================================
+// Build dataset table
+// ============================================================
+function buildTable(){
+  const tbl = document.getElementById('ptTable');
+  const heads = [...ATTRS,'Play'];
+  let h = '<tr>' + heads.map(a=>`<th>${a}</th>`).join('') + '</tr>';
+  let rows = playTennis.map(ex=>{
+    const cls = ex.Play==='Yes'?'yes-row':'no-row';
+    return `<tr class="${cls}">` + heads.map(a=>`<td>${ex[a]}</td>`).join('') + '</tr>';
+  }).join('');
+  tbl.innerHTML = h + rows;
+}
+
+// ============================================================
+// Naive Bayes computation
+// ============================================================
+function nbCompute(sel, alpha=1){
+  const classes = ['Yes','No'];
+  const N = playTennis.length;
+  const counts = {};
+  classes.forEach(c=>{
+    counts[c] = playTennis.filter(x=>x.Play===c).length;
+  });
+
+  const result = {};
+  classes.forEach(c=>{
+    const Nc = counts[c];
+    let logProb = Math.log((Nc + alpha) / (N + alpha * 2)); // prior
+    const terms = [];
+    ATTRS.forEach(attr=>{
+      const v = sel[attr];
+      const Vsize = ATTR_VALS[attr].length;
+      const cnt = playTennis.filter(x=>x.Play===c && x[attr]===v).length;
+      const p = (cnt + alpha) / (Nc + alpha * Vsize);
+      logProb += Math.log(p);
+      terms.push({attr, v, cnt, Nc, Vsize, p});
+    });
+    result[c] = {logProb, terms, prior: (Nc + alpha)/(N + alpha*2), Nc};
+  });
+  return result;
+}
+
+function updateNB(){
+  const alpha = 1;
+  const res = nbCompute(nbSelection, alpha);
+
+  // normalize to probabilities
+  const logY = res['Yes'].logProb, logN = res['No'].logProb;
+  const maxL = Math.max(logY, logN);
+  const pY = Math.exp(logY - maxL), pN = Math.exp(logN - maxL);
+  const sum = pY + pN;
+  const normY = pY/sum, normN = pN/sum;
+
+  // Steps HTML
+  let html = '';
+  ['Yes','No'].forEach(c=>{
+    const r = res[c];
+    const col = c==='Yes' ? 'var(--teal)' : 'var(--red)';
+    html += `<div class="calc-step">`;
+    html += `<span class="lbl" style="color:${col}">P(${c}|x) ∝</span><br>`;
+    html += `  P(${c}) = ${r.Nc}/14 = ${r.prior.toFixed(3)}`;
+    r.terms.forEach(t=>{
+      html += `<br>  × P(${t.attr}=${t.v}|${c}) = (${t.cnt}+1)/(${t.Nc}+${t.Vsize}) = <b>${t.p.toFixed(3)}</b>`;
+    });
+    html += `<br>  <b>= ${(c==='Yes'?normY:normN).toFixed(4)}</b> (normalisé)`;
+    html += `</div>`;
+  });
+  document.getElementById('nbCalcSteps').innerHTML = html;
+
+  // bar
+  document.getElementById('vYes').style.flex = normY.toString();
+  document.getElementById('vNo').style.flex = normN.toString();
+  document.getElementById('vYes').textContent = `Oui ${(normY*100).toFixed(1)}%`;
+  document.getElementById('vNo').textContent = `Non ${(normN*100).toFixed(1)}%`;
+
+  const lbl = document.getElementById('verdictLabel');
+  if(normY > normN){
+    lbl.innerHTML = `→ Décision : <span class="verdict-yes">YES — Jouer au tennis</span>`;
+  } else {
+    lbl.innerHTML = `→ Décision : <span class="verdict-no">NO — Ne pas jouer</span>`;
+  }
+
+  updateCPGrid(alpha);
+}
+
+function updateCPGrid(alpha=1){
+  const classes = ['Yes','No'];
+  const N = playTennis.length;
+  let html = '';
+  ATTRS.forEach(attr=>{
+    const v = nbSelection[attr];
+    const col_yes = 'var(--teal)', col_no = 'var(--red)';
+    const Nc_yes = playTennis.filter(x=>x.Play==='Yes').length;
+    const Nc_no = playTennis.filter(x=>x.Play==='No').length;
+    const Vsize = ATTR_VALS[attr].length;
+    const cnt_yes = playTennis.filter(x=>x.Play==='Yes'&&x[attr]===v).length;
+    const cnt_no  = playTennis.filter(x=>x.Play==='No' &&x[attr]===v).length;
+    const pY = (cnt_yes + alpha)/(Nc_yes + alpha*Vsize);
+    const pN = (cnt_no  + alpha)/(Nc_no  + alpha*Vsize);
+    html += `<div class="cp-card">
+      <div class="attr-name">${attr}</div>
+      <div class="val-name">${v}</div>
+      <div class="lbl">P(v|Yes)</div>
+      <div class="prob-yes">${pY.toFixed(3)}</div>
+      <div class="lbl">P(v|No)</div>
+      <div class="prob-no">${pN.toFixed(3)}</div>
+    </div>`;
+  });
+  document.getElementById('cpGrid').innerHTML = html;
+}
+
+// Attribute buttons
+document.getElementById('attrSelector').addEventListener('click', e=>{
+  if(!e.target.classList.contains('attr-btn')) return;
+  const grp = e.target.closest('[data-attr]');
+  const attr = grp.dataset.attr;
+  grp.querySelectorAll('.attr-btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  nbSelection[attr] = e.target.dataset.val;
+  updateNB();
+});
+
+// ============================================================
+// LAPLACE SECTION
+// ============================================================
+let laplaceChart = null;
+
+function updateLaplace(){
+  const count = +document.getElementById('lcCount').value;
+  const total = +document.getElementById('lcTotal').value;
+  const V     = +document.getElementById('lcV').value;
+  const alpha = +document.getElementById('lcAlpha').value;
+
+  document.getElementById('lcCountVal').textContent  = count;
+  document.getElementById('lcTotalVal').textContent  = total;
+  document.getElementById('lcVVal').textContent      = V;
+  document.getElementById('lcAlphaVal').textContent  = alpha;
+
+  const raw = count === 0 ? '0 / ' + total + ' = 0.000 ⚠️' : `${count}/${total} = ${(count/total).toFixed(3)}`;
+  const lapVal = (count + alpha) / (total + alpha * V);
+  const lap = `(${count}+${alpha}) / (${total}+${alpha}×${V}) = ${lapVal.toFixed(3)}`;
+
+  document.getElementById('probRaw').textContent = raw;
+  document.getElementById('probLap').textContent = lap;
+  document.getElementById('probZero').textContent = count===0 && alpha===0 ?
+    'ZÉRO → annule le produit !' : alpha===0 ? `0 (sans lissage, proba = ${(count/total).toFixed(3)})` : 'Évité grâce au lissage ✓';
+  document.getElementById('probZero').style.color = (count===0 && alpha===0) ? 'var(--red)' : 'var(--green)';
+
+  // Chart: P(v|c) as a function of count, for current alpha, total, V
+  const xs = Array.from({length:total+1},(_,i)=>i);
+  const raw_ys = xs.map(x => x/total);
+  const lap_ys = xs.map(x => (x+alpha)/(total+alpha*V));
+
+  if(laplaceChart){
+    laplaceChart.data.labels = xs;
+    laplaceChart.data.datasets[0].data = raw_ys;
+    laplaceChart.data.datasets[1].data = lap_ys;
+    laplaceChart.update();
+  }
+
+  // Example with PlayTennis
+  const outlook_yes = {Sunny:2, Overcast:4, Rain:3};
+  const N_yes = 9; const V_out = 3;
+  let exHtml = '<table class="prob-table" style="width:100%"><tr><th style="text-align:left">Valeur</th><th>count(v,Yes)</th><th>Sans lissage</th><th>Avec α=1</th></tr>';
+  ['Sunny','Overcast','Rain','Inconnu'].forEach(v=>{
+    const c = outlook_yes[v] || 0;
+    const raw2 = c/N_yes;
+    const lp = (c+1)/(N_yes+V_out+1);
+    const cl = raw2===0 ? 'class="zero"':'class="raw"';
+    exHtml += `<tr><td>${v}</td><td>${c}</td><td ${cl}>${raw2.toFixed(3)}${raw2===0?' ⚠️':''}</td><td class="lap">${lp.toFixed(3)}</td></tr>`;
+  });
+  exHtml += '</table>';
+  document.getElementById('laplaceExample').innerHTML = exHtml;
+}
+
+function initLaplaceChart(){
+  const ctx = document.getElementById('laplaceChart').getContext('2d');
+  const total = 9, V = 3, alpha = 1;
+  const xs = Array.from({length:total+1},(_,i)=>i);
+  laplaceChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: xs,
+      datasets:[
+        {label:'Sans lissage', data: xs.map(x=>x/total), borderColor:'#DC2626', fill:false, tension:.3, pointRadius:4},
+        {label:'Avec α=1', data: xs.map(x=>(x+1)/(total+V)), borderColor:'#0D9488', fill:false, tension:.3, pointRadius:4}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:11}}}},
+      scales:{
+        x:{title:{display:true,text:'count(v,c)',font:{size:10}}},
+        y:{title:{display:true,text:'P(v|c)',font:{size:10}},min:0,max:1}
+      }
+    }
+  });
+}
+
+// ============================================================
+// TEXT CLASSIFICATION
+// ============================================================
+let modelA = null, modelB = null, vocab = null;
+
+function tokenize(text){
+  return text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>1);
+}
+
+function buildModel(){
+  const wordsA = tokenize(document.getElementById('wordsA').value);
+  const wordsB = tokenize(document.getElementById('wordsB').value);
+
+  const allWords = [...new Set([...wordsA,...wordsB])];
+  vocab = allWords;
+
+  // count frequencies
+  const freqA = {}, freqB = {};
+  allWords.forEach(w=>{ freqA[w]=0; freqB[w]=0; });
+  wordsA.forEach(w=>{ if(freqA[w]!==undefined) freqA[w]++; });
+  wordsB.forEach(w=>{ if(freqB[w]!==undefined) freqB[w]++; });
+
+  modelA = {freq: freqA, total: wordsA.length, priorLog: Math.log(wordsA.length/(wordsA.length+wordsB.length))};
+  modelB = {freq: freqB, total: wordsB.length, priorLog: Math.log(wordsB.length/(wordsA.length+wordsB.length))};
+
+  const V = vocab.length;
+  document.getElementById('modelInfo').innerHTML =
+    `Modèle construit : ${V} mots dans le vocabulaire. ${wordsA.length} mots classe A, ${wordsB.length} classe B.`;
+
+  // Top discriminating words
+  const disc = vocab.map(w=>{
+    const pA = (freqA[w]+1)/(modelA.total+V);
+    const pB = (freqB[w]+1)/(modelB.total+V);
+    return {w, diff: Math.abs(Math.log(pA)-Math.log(pB)), favA: pA>pB};
+  }).sort((a,b)=>b.diff-a.diff).slice(0,20);
+
+  const tw = document.getElementById('topWords');
+  tw.innerHTML = disc.map(d=>{
+    const col = d.favA ? 'var(--teal)' : 'var(--purple)';
+    const lbl = d.favA ? 'A' : 'B';
+    return `<span style="padding:.25rem .6rem;border-radius:20px;background:${col}22;color:${col};font-size:.78rem;font-weight:700;">${d.w} <small>(${lbl})</small></span>`;
+  }).join('');
+
+  classifyText();
+}
+
+function classifyText(){
+  if(!modelA) return;
+  const phrase = document.getElementById('testPhrase').value;
+  const words = tokenize(phrase);
+  if(words.length===0){
+    document.getElementById('textResult').innerHTML = 'Entrez une phrase à classer.';
+    return;
+  }
+  const V = vocab.length;
+  let scoreA = modelA.priorLog, scoreB = modelB.priorLog;
+  let steps = '';
+  steps += `Phrase : "${phrase}"\nMots traités : ${words.join(', ')}\n\n`;
+  steps += `Score(A) = log P(A) + Σ log P(w|A)\n`;
+
+  words.forEach(w=>{
+    const cA = modelA.freq[w]||0;
+    const cB = modelB.freq[w]||0;
+    const pA = (cA+1)/(modelA.total+V);
+    const pB = (cB+1)/(modelB.total+V);
+    scoreA += Math.log(pA);
+    scoreB += Math.log(pB);
+    const favA = pA>pB;
+    steps += `  <span class="${favA?'pos':'neg'}">${w}</span>: log P(A)=${Math.log(pA).toFixed(2)}, log P(B)=${Math.log(pB).toFixed(2)}\n`;
+  });
+
+  steps += `\nScore final A = <span class="hl">${scoreA.toFixed(3)}</span>\n`;
+  steps += `Score final B = <span class="hl">${scoreB.toFixed(3)}</span>\n`;
+  const winner = scoreA > scoreB ? 'A (Sport)' : 'B (Tech)';
+  const col = scoreA > scoreB ? 'var(--teal)' : 'var(--purple)';
+  steps += `\n→ Classe prédite : <b style="color:${col}">${winner}</b>`;
+
+  document.getElementById('textResult').innerHTML = steps;
+
+  // Score bars
+  const minS = Math.min(scoreA, scoreB);
+  const rangeS = Math.max(1, Math.abs(scoreA - scoreB));
+  const barA = scoreA > scoreB ? 100 : Math.max(10, 50 - (scoreB - scoreA)/rangeS * 40);
+  const barB = scoreB > scoreA ? 100 : Math.max(10, 50 - (scoreA - scoreB)/rangeS * 40);
+
+  document.getElementById('scoreBars').innerHTML = `
+    <div style="flex:1">
+      <div style="font-size:.7rem;color:var(--teal);font-weight:700;margin-bottom:.2rem">A — Sport</div>
+      <div style="background:var(--light);border-radius:4px;height:24px;overflow:hidden">
+        <div style="height:100%;width:${barA}%;background:var(--teal);display:flex;align-items:center;padding:0 .5rem;color:white;font-size:.72rem;font-weight:700">${scoreA.toFixed(2)}</div>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:.7rem;color:var(--purple);font-weight:700;margin-bottom:.2rem">B — Tech</div>
+      <div style="background:var(--light);border-radius:4px;height:24px;overflow:hidden">
+        <div style="height:100%;width:${barB}%;background:var(--purple);display:flex;align-items:center;padding:0 .5rem;color:white;font-size:.72rem;font-weight:700">${scoreB.toFixed(2)}</div>
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildTable();
+updateNB();
+initLaplaceChart();
+updateLaplace();
+buildModel();
+</script>
+
+<script>
+(function waitForKatex(tries){
+  if(tries<=0) return;
+  if(typeof katex==='undefined'){setTimeout(()=>waitForKatex(tries-1),150);return;}
+  
+  function rk(latex,display){
+    try{return katex.renderToString(latex,{displayMode:!!display,throwOnError:false});}
+    catch(e){return '<code>'+latex+'</code>';}
+  }
+  
+  document.querySelectorAll('.pending-math').forEach(function(pm){
+    const phrase  = pm.dataset.phrase  || '';
+    const latex   = pm.dataset.latex   || '';
+    const latex2  = pm.dataset.latex2  || '';
+    const example = pm.dataset.example || '';
+    let vars = [];
+    try{ vars = JSON.parse(pm.dataset.vars || '[]'); } catch(e){}
+    
+    let varsRows = vars.map(v=>
+      '<tr><td>'+rk(v.sym)+'</td><td>'+v.desc+'</td></tr>'
+    ).join('');
+    
+    let html = '<div class="math-block">';
+    if(phrase) html += '<div class="math-phrase">📌 <em><strong>En une phrase :</strong> '+phrase+'</em></div>';
+    if(latex)  html += '<div class="math-eq">'+rk(latex,true)+'</div>';
+    if(latex2) html += '<div class="math-eq">'+rk(latex2,true)+'</div>';
+    if(vars.length){
+      html += '<div class="math-vars-wrap"><div class="math-vars-title">🔤 Décryptage des symboles :</div>';
+      html += '<table class="math-vars-table">'+varsRows+'</table></div>';
+    }
+    if(example) html += '<div class="math-example"><div class="ex-title">💡 Exemple concret :</div><p>'+example+'</p></div>';
+    html += '</div>';
+    
+    pm.outerHTML = html;
+  });
+  
+  // mark enhanced formula-boxes
+  document.querySelectorAll('.formula-box,.formula-display').forEach(function(fb){
+    if(fb.nextElementSibling && fb.nextElementSibling.classList && fb.nextElementSibling.classList.contains('math-block')){
+      fb.classList.add('enhanced');
+    }
+  });
+  
+})(30);
+</script>
+</body>
+</html>

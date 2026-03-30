@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 4 — Contraintes de Table</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:center; }
+  .control-group { display:flex; flex-direction:column; gap:4px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+  canvas { max-width:100%; }
+  /* TABLE VIZ */
+  .tuple-table { border-collapse:collapse; width:100%; font-size:0.88rem; margin:12px 0; }
+  .tuple-table th { background:var(--navy); color:white; padding:8px 12px; text-align:center; }
+  .tuple-table td { padding:7px 12px; text-align:center; border:1px solid #e2e8f0; }
+  .tuple-table tr.valid { background:#d1fae5; }
+  .tuple-table tr.invalid { background:#fee2e2; opacity:0.5; text-decoration:line-through; color:#ef4444; }
+  .tuple-table tr.valid td { color:#065f46; font-weight:600; }
+  /* BITSET VIZ */
+  .bitrow { display:flex; gap:4px; flex-wrap:wrap; margin:8px 0; align-items:center; }
+  .bit { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-weight:700; font-size:0.9rem; border:2px solid #e2e8f0; }
+  .bit.on { background:var(--teal); color:white; border-color:var(--teal); }
+  .bit.off { background:#f1f5f9; color:#94a3b8; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 4 — Contraintes de Table</h1>
+      <p>Relations extensionnelles, tuples valides et algorithme CT (Compact Table)</p>
+      <span class="chapter-badge">Chapitre 4 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- WHAT IS TABLE -->
+<div class="section">
+  <h2>📋 Qu'est-ce qu'une Contrainte de Table ?</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi une Table ?</span>
+    <p>Imagine un menu de restaurant avec des règles de combinaisons : certaines entrées vont avec certains plats et certains desserts, d'autres non. La contrainte de Table, c'est exactement ça : une <strong>liste de combinaisons autorisées</strong> (les tuples).</p>
+    <p>Par exemple, pour 3 variables (x, y, z) qui prennent des valeurs dans {0,1,2}, une table peut dire : les seules combinaisons valides sont (0,1,2), (1,0,2), (2,1,0). Toutes les autres sont interdites.</p>
+    <p><strong>Avantages :</strong> très général — on peut exprimer n'importe quelle relation en énumérant ses solutions. Parfait pour des règles complexes difficiles à formuler avec des inégalités.</p>
+    <div class="retenir">💡 Table = définition en extension de la contrainte. On liste TOUTES les combinaisons valides.</div>
+  </div>
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">📜</div><h4>Relation en extension</h4><p>On liste explicitement tous les tuples valides</p></div>
+    <div class="icon-item"><div class="icon">🔍</div><h4>Filtrage</h4><p>Supprimer les valeurs qui n'apparaissent dans aucun tuple valide</p></div>
+    <div class="icon-item"><div class="icon">⚡</div><h4>Compact Table</h4><p>Algorithme efficace avec bitsets pour filtrer rapidement</p></div>
+    <div class="icon-item"><div class="icon">🧩</div><h4>Usage</h4><p>Règles de configuration, sudoku avancé, planification</p></div>
+  </div>
+</div>
+
+<!-- FILTRAGE NAIF -->
+<div class="section">
+  <h2>🔍 Filtrage : Retirer les Valeurs Sans Support</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi "avoir un support" ?</span>
+    <p>Une valeur v pour la variable xᵢ a un <strong>support</strong> s'il existe au moins un tuple valide dans la table qui assigne la valeur v à xᵢ ET qui est cohérent avec les domaines actuels des autres variables.</p>
+    <p><strong>Analogie :</strong> tu cherches un appartement. Une contrainte de table dit : "les seules combinaisons (quartier, taille, prix) que tu acceptes sont celles de la liste". Si tous les appartements de ton quartier préféré dans la liste sont maintenant hors budget (domaine de prix réduit), ce quartier n'a plus de support → il est retiré du domaine.</p>
+    <div class="retenir">💡 Filtrage table = supprimer toute valeur qui n'est soutenue par aucun tuple encore compatible.</div>
+  </div>
+
+  <ul class="steps">
+    <li><p>Pour chaque variable xᵢ et chaque valeur v ∈ D(xᵢ) :</p></li>
+    <li><p>Chercher un tuple t dans la table tel que t[i] = v ET pour tout j ≠ i, t[j] ∈ D(xⱼ)</p></li>
+    <li><p>Si aucun tel tuple n'existe → retirer v de D(xᵢ)</p></li>
+    <li><p>Répéter jusqu'au fixpoint (aucune valeur retirée)</p></li>
+  </ul>
+
+  <!-- TABLE INTERACTIVE DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Filtrage de Table interactif</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px;">Ajuste les domaines des variables et observe quels tuples deviennent invalides, et quelles valeurs sont filtrées.</p>
+    <div class="controls">
+      <div>
+        <strong>D(x) :</strong>
+        <label><input type="checkbox" id="dx0" checked onchange="updateTable()"> 0</label> &nbsp;
+        <label><input type="checkbox" id="dx1" checked onchange="updateTable()"> 1</label> &nbsp;
+        <label><input type="checkbox" id="dx2" checked onchange="updateTable()"> 2</label>
+      </div>
+      <div>
+        <strong>D(y) :</strong>
+        <label><input type="checkbox" id="dy0" checked onchange="updateTable()"> 0</label> &nbsp;
+        <label><input type="checkbox" id="dy1" checked onchange="updateTable()"> 1</label> &nbsp;
+        <label><input type="checkbox" id="dy2" checked onchange="updateTable()"> 2</label>
+      </div>
+      <div>
+        <strong>D(z) :</strong>
+        <label><input type="checkbox" id="dz0" checked onchange="updateTable()"> 0</label> &nbsp;
+        <label><input type="checkbox" id="dz1" checked onchange="updateTable()"> 1</label> &nbsp;
+        <label><input type="checkbox" id="dz2" checked onchange="updateTable()"> 2</label>
+      </div>
+    </div>
+    <div id="tableViz"></div>
+    <div id="tableResult" style="margin-top:12px;padding:14px;background:white;border-radius:10px;border:1.5px solid #e2e8f0;font-size:0.88rem;color:#334155;"></div>
+  </div>
+</div>
+
+<!-- COMPACT TABLE (CT) -->
+<div class="section">
+  <h2>⚡ Compact Table (CT) — Filtrage Efficace avec BitSets</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le Compact Table ?</span>
+    <p>L'approche naïve vérifie chaque valeur de chaque variable contre tous les tuples → très lent pour de grandes tables. <strong>Compact Table (CT)</strong> utilise des <strong>masques de bits</strong> pour accélérer énormément.</p>
+    <p><strong>Idée :</strong> Représente l'ensemble des tuples valides comme un <em>bitset</em> — un nombre binaire où le bit i vaut 1 si le tuple i est encore possible. Pour filtrer, on fait des opérations AND sur des bitsets pré-calculés.</p>
+    <p><strong>Analogie :</strong> Imagine que chaque tuple est une lumière (allumée = valide, éteinte = invalide). Pour savoir quels tuples restent valides si x=0, tu allumes seulement les lumières des tuples où x=0. Tu fais ça pour toutes les variables, et tu fais un ET logique → seules les lumières allumées partout restent.</p>
+    <div class="retenir">💡 CT réduit le filtrage à des opérations bitwise (AND, OR) qui sont ultra-rapides sur les processeurs modernes.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Algorithme CT</span>
+    <p class="phrase">📌 "Le masque de tuples supportés = intersection des masques de chaque valeur dans son domaine"</p>
+    <div class="pending-math" data-latex="\text{supTuples} = \bigcap_{i} \bigcup_{v \in D(x_i)} \text{mask}[i][v]"></div>
+    <table>
+      <tr><th>Terme</th><th>Signification</th></tr>
+      <tr><td>mask[i][v]</td><td>BitSet : bit j = 1 si le tuple j a la valeur v pour la variable xᵢ</td></tr>
+      <tr><td>∪ sur D(xᵢ)</td><td>OR de tous les masques des valeurs encore dans le domaine de xᵢ</td></tr>
+      <tr><td>∩ sur i</td><td>AND de tous les masques pour toutes les variables</td></tr>
+      <tr><td>supTuples</td><td>BitSet final : bit j=1 ssi le tuple j est encore compatible</td></tr>
+    </table>
+    <p style="margin-top:10px;color:#065f46;"><strong>Filtrage :</strong> La valeur v de la variable xᵢ peut être retirée si <code>(supTuples AND mask[i][v]) = 0</code> — c'est-à-dire qu'aucun tuple compatible n'utilise la valeur v pour xᵢ.</p>
+  </div>
+
+  <!-- BITSET DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Visualisation BitSet CT</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:14px;">La table a 8 tuples (indexés 0-7). Les masques pour chaque valeur de chaque variable sont affichés. L'intersection donne les tuples encore supportés.</p>
+    <div id="ctViz"></div>
+    <div class="controls" style="margin-top:14px;">
+      <div>
+        <strong>D(x) :</strong>
+        <label><input type="checkbox" id="ctx0" checked onchange="updateCT()"> 0</label> &nbsp;
+        <label><input type="checkbox" id="ctx1" checked onchange="updateCT()"> 1</label> &nbsp;
+        <label><input type="checkbox" id="ctx2" onchange="updateCT()"> 2</label>
+      </div>
+      <div>
+        <strong>D(y) :</strong>
+        <label><input type="checkbox" id="cty0" checked onchange="updateCT()"> 0</label> &nbsp;
+        <label><input type="checkbox" id="cty1" checked onchange="updateCT()"> 1</label>
+      </div>
+    </div>
+    <div id="ctResult" style="margin-top:12px;padding:14px;background:white;border-radius:10px;border:1.5px solid #e2e8f0;font-size:0.88rem;"></div>
+  </div>
+</div>
+
+<!-- PERF COMPARISON -->
+<div class="section">
+  <h2>📊 Comparaison des Performances</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 Pourquoi CT est-il meilleur ?</span>
+    <p>L'algorithme naïf a une complexité de O(t × n × d) où t = nombre de tuples, n = nombre de variables, d = taille max des domaines. CT réduit ça à O(t/w × n × d) où w est la taille d'un mot machine (ex: 64 bits) — un facteur 64 de gain !</p>
+    <div class="retenir">💡 Le gain en pratique peut être de 10x à 100x selon la taille de la table.</div>
+  </div>
+  <div class="demo-box">
+    <h3>📈 Temps de filtrage estimé</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Tuples (t) : <span class="val" id="tVal">100</span></label>
+        <input type="range" id="tSlider" min="10" max="1000" value="100" oninput="updatePerf()">
+      </div>
+      <div class="control-group">
+        <label>Variables (n) : <span class="val" id="nValP">4</span></label>
+        <input type="range" id="nSliderP" min="2" max="10" value="4" oninput="updatePerf()">
+      </div>
+      <div class="control-group">
+        <label>Taille domaine (d) : <span class="val" id="dVal">5</span></label>
+        <input type="range" id="dSlider" min="2" max="20" value="5" oninput="updatePerf()">
+      </div>
+    </div>
+    <canvas id="perfChart" height="180"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Naïf : <span id="naifOps">—</span> op.</div>
+      <div class="stat-chip">CT : <span id="ctOps">—</span> op. (÷64)</div>
+      <div class="stat-chip">Accélération : <span id="speedup">—</span>×</div>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer><strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 4 : Contraintes de Table</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    if (el.dataset.latex) el.innerHTML = katex.renderToString(el.dataset.latex, {displayMode:true, throwOnError:false});
+  });
+  updateTable();
+  updateCT();
+  updatePerf();
+});
+
+// ===== TABLE DEMO =====
+// 8 tuples for 3 variables x,y,z with values in {0,1,2}
+const tuples = [[0,1,2],[1,0,2],[2,1,0],[0,0,1],[1,2,0],[2,0,1],[0,2,1],[1,1,0]];
+function getChecked(prefix) {
+  return [0,1,2].filter(v => document.getElementById(prefix+v)?.checked);
+}
+function updateTable() {
+  const dx = getChecked('dx'), dy = getChecked('dy'), dz = getChecked('dz');
+  const tableDiv = document.getElementById('tableViz');
+  let html = '<table class="tuple-table"><tr><th>Tuple</th><th>x</th><th>y</th><th>z</th><th>Valide ?</th></tr>';
+  const validTuples = [];
+  tuples.forEach((t,i) => {
+    const ok = dx.includes(t[0]) && dy.includes(t[1]) && dz.includes(t[2]);
+    if (ok) validTuples.push(t);
+    html += `<tr class="${ok?'valid':'invalid'}"><td>${i}</td><td>${t[0]}</td><td>${t[1]}</td><td>${t[2]}</td><td>${ok?'✅':'❌'}</td></tr>`;
+  });
+  html += '</table>';
+  tableDiv.innerHTML = html;
+  // Compute filtered domains
+  const suppX = new Set(validTuples.map(t=>t[0]));
+  const suppY = new Set(validTuples.map(t=>t[1]));
+  const suppZ = new Set(validTuples.map(t=>t[2]));
+  const filtX = dx.filter(v => suppX.has(v));
+  const filtY = dy.filter(v => suppY.has(v));
+  const filtZ = dz.filter(v => suppZ.has(v));
+  document.getElementById('tableResult').innerHTML = `
+    <strong>${validTuples.length} tuple(s)</strong> valide(s) sur ${tuples.length}<br>
+    Domaines après filtrage :<br>
+    &nbsp;&nbsp;D(x) = {${filtX.join(', ')}} ${filtX.length<dx.length?`<span style="color:var(--teal)">← ${dx.filter(v=>!suppX.has(v)).join(',')} retiré(s)</span>`:'(inchangé)'}<br>
+    &nbsp;&nbsp;D(y) = {${filtY.join(', ')}} ${filtY.length<dy.length?`<span style="color:var(--teal)">← ${dy.filter(v=>!suppY.has(v)).join(',')} retiré(s)</span>`:'(inchangé)'}<br>
+    &nbsp;&nbsp;D(z) = {${filtZ.join(', ')}} ${filtZ.length<dz.length?`<span style="color:var(--teal)">← ${dz.filter(v=>!suppZ.has(v)).join(',')} retiré(s)</span>`:'(inchangé)'}
+  `;
+}
+
+// ===== CT DEMO =====
+// 8 tuples: (x,y) where x in {0,1,2}, y in {0,1}
+const ctTuples = [[0,0],[0,1],[1,0],[1,1],[2,0],[0,0],[1,1],[2,1]];
+// Precompute masks: mask[var][val] = bitset as array of 0/1
+function makeMask(varIdx, val) { return ctTuples.map(t => t[varIdx]===val ? 1 : 0); }
+const ctMasks = {
+  x: { 0: makeMask(0,0), 1: makeMask(0,1), 2: makeMask(0,2) },
+  y: { 0: makeMask(1,0), 1: makeMask(1,1) }
+};
+function andMasks(a, b) { return a.map((v,i) => v & b[i]); }
+function orMasks(a, b) { return a.map((v,i) => v | b[i]); }
+function updateCT() {
+  const dx = [0,1,2].filter(v => document.getElementById('ctx'+v)?.checked);
+  const dy = [0,1].filter(v => document.getElementById('cty'+v)?.checked);
+  // Compute supTuples
+  let maskX = new Array(ctTuples.length).fill(0);
+  dx.forEach(v => { maskX = orMasks(maskX, ctMasks.x[v]||new Array(ctTuples.length).fill(0)); });
+  let maskY = new Array(ctTuples.length).fill(0);
+  dy.forEach(v => { maskY = orMasks(maskY, ctMasks.y[v]||new Array(ctTuples.length).fill(0)); });
+  const supTuples = andMasks(maskX, maskY);
+  const vizDiv = document.getElementById('ctViz');
+  let html = '';
+  const renderBits = (bits, label) => `<div style="margin:6px 0"><strong>${label}:</strong><div class="bitrow">${bits.map((b,i)=>`<div class="bit ${b?'on':'off'}">${b}</div>`).join('')}</div></div>`;
+  html += renderBits(ctMasks.x[0], 'mask[x][0]');
+  html += renderBits(ctMasks.x[1], 'mask[x][1]');
+  html += renderBits(ctMasks.x[2], 'mask[x][2]');
+  html += renderBits(ctMasks.y[0], 'mask[y][0]');
+  html += renderBits(ctMasks.y[1], 'mask[y][1]');
+  html += '<hr style="margin:10px 0;border-color:#e2e8f0;">';
+  html += renderBits(maskX, `OR des masques x pour D(x)={${dx.join(',')}}`)
+  html += renderBits(maskY, `OR des masques y pour D(y)={${dy.join(',')}}`)
+  html += '<hr style="margin:10px 0;border-color:#e2e8f0;">';
+  html += renderBits(supTuples, '✅ supTuples = maskX AND maskY');
+  vizDiv.innerHTML = html;
+  const validCount = supTuples.filter(b=>b).length;
+  // Filter x values
+  const filtX = dx.filter(v => andMasks(supTuples, ctMasks.x[v]||new Array(ctTuples.length).fill(0)).some(b=>b));
+  const filtY = dy.filter(v => andMasks(supTuples, ctMasks.y[v]||new Array(ctTuples.length).fill(0)).some(b=>b));
+  document.getElementById('ctResult').innerHTML = `
+    <strong>${validCount} tuple(s) supporté(s)</strong><br>
+    D(x) filtré = {${filtX.join(', ')}}<br>
+    D(y) filtré = {${filtY.join(', ')}}
+  `;
+}
+
+// ===== PERF CHART =====
+let perfChart = null;
+function updatePerf() {
+  const t = parseInt(document.getElementById('tSlider').value);
+  const n = parseInt(document.getElementById('nSliderP').value);
+  const d = parseInt(document.getElementById('dSlider').value);
+  document.getElementById('tVal').textContent = t;
+  document.getElementById('nValP').textContent = n;
+  document.getElementById('dVal').textContent = d;
+  const naif = t * n * d;
+  const ct = Math.ceil(t/64) * n * d;
+  const speedup = (naif/ct).toFixed(1);
+  document.getElementById('naifOps').textContent = naif.toLocaleString();
+  document.getElementById('ctOps').textContent = ct.toLocaleString();
+  document.getElementById('speedup').textContent = speedup;
+  const ctx = document.getElementById('perfChart').getContext('2d');
+  if (perfChart) perfChart.destroy();
+  perfChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Filtrage naïf', 'Compact Table (CT)'],
+      datasets: [{ data: [naif, ct], backgroundColor: ['#f43f5e', '#0D9488'], borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: `Opérations de filtrage — t=${t}, n=${n}, d=${d}` } },
+      scales: { y: { type: 'logarithmic', title: { display: true, text: 'Opérations (échelle log)' } } }
+    }
+  });
+}
+</script>
+</body>
+</html>

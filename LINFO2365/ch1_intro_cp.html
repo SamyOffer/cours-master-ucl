@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 1 — Introduction à la Programmation par Contraintes</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #1E3A5F; --teal: #0D9488; --amber: #F59E0B;
+    --light: #EFF6FF; --white: #FFFFFF; --gray: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: #1e293b; }
+
+  header { background: var(--navy); color: white; border-bottom: 5px solid var(--amber); }
+  .header-inner { display: flex; align-items: center; }
+  .header-stripe { width: 10px; background: var(--amber); align-self: stretch; flex-shrink: 0; }
+  .header-stripe2 { width: 6px; background: var(--teal); align-self: stretch; flex-shrink: 0; margin-left: 4px; }
+  .header-content { padding: 24px 36px; }
+  .breadcrumb { font-size: 0.85rem; color: #93c5fd; margin-bottom: 8px; }
+  .breadcrumb a { color: #93c5fd; text-decoration: none; }
+  .breadcrumb a:hover { color: white; }
+  .header-content h1 { font-size: 1.9rem; font-weight: 800; }
+  .header-content p { color: #93c5fd; margin-top: 6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 36px 24px; }
+
+  .section { background: var(--white); border-radius: 14px; box-shadow: 0 2px 12px rgba(30,58,95,0.07); padding: 32px; margin-bottom: 28px; }
+  .section h2 { color: var(--navy); font-size: 1.35rem; font-weight: 700; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 2px solid var(--light); display:flex; align-items:center; gap:10px; }
+
+  .explain-intro { background: #fffbeb; border-left: 5px solid var(--amber); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+
+  .math-block { background: #f0fdf4; border-left: 5px solid var(--teal); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; font-size:0.95rem; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .katex-display { overflow-x:auto; padding:8px 0; }
+
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; }
+
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+
+  /* Demo styles */
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:center; }
+  .control-group { display:flex; flex-direction:column; gap:4px; min-width:140px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#d97706; }
+  .btn-navy { background:var(--navy); color:white; }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+
+  canvas { max-width:100%; }
+
+  .code-block { background:#1e293b; color:#e2e8f0; border-radius:10px; padding:18px 22px; font-family:'Courier New',monospace; font-size:0.83rem; line-height:1.6; overflow-x:auto; margin:14px 0; }
+  .code-block .kw { color:#7dd3fc; }
+  .code-block .cm { color:#6b7280; }
+  .code-block .st { color:#86efac; }
+
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 1 — Introduction à la Programmation par Contraintes</h1>
+      <p>Du problème des N-Reines à TinyCSP — comprendre CP de zéro</p>
+      <span class="chapter-badge">Chapitre 1 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- SECTION 1: C'est quoi CP? -->
+<div class="section">
+  <h2>🧩 Qu'est-ce que la Programmation par Contraintes ?</h2>
+
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi la PC ?</span>
+    <p>Imagine que tu dois <strong>placer des rois d'échecs sur un plateau</strong> sans qu'ils se mangent mutuellement. Tu pourrais essayer toutes les combinaisons possibles — mais ça prendrait une éternité. La Programmation par Contraintes (CP), c'est une façon de dire <em>"voilà les règles du jeu"</em>, et laisser l'ordinateur trouver une solution intelligemment.</p>
+    <p><strong>Analogie :</strong> C'est comme résoudre un Sudoku. Tu n'essaies pas toutes les combinaisons — tu utilises les règles (chaque ligne, colonne, région doit avoir 1-9 exactement une fois) pour <em>éliminer</em> des chiffres impossibles, jusqu'à trouver la solution.</p>
+    <div class="retenir">💡 À retenir : En CP, tu <em>décris</em> le problème (variables + contraintes), et le solveur trouve la solution. C'est déclaratif.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item">
+      <div class="icon">📦</div>
+      <h4>Variables</h4>
+      <p>Ce qu'on cherche à déterminer. Ex : la colonne de chaque reine</p>
+    </div>
+    <div class="icon-item">
+      <div class="icon">🎯</div>
+      <h4>Domaines</h4>
+      <p>Les valeurs possibles pour chaque variable. Ex : {1, 2, 3, ..., N}</p>
+    </div>
+    <div class="icon-item">
+      <div class="icon">📏</div>
+      <h4>Contraintes</h4>
+      <p>Les règles à respecter. Ex : pas deux reines sur la même ligne</p>
+    </div>
+    <div class="icon-item">
+      <div class="icon">🔍</div>
+      <h4>Solveur</h4>
+      <p>L'algorithme qui explore les possibilités et trouve une solution</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Définition formelle d'un CSP :</strong> Un problème de satisfaction de contraintes est un triplet ⟨X, D, C⟩ où :</p>
+    <p>• <strong>X</strong> = ensemble de variables {x₁, x₂, ..., xₙ}</p>
+    <p>• <strong>D</strong> = ensemble de domaines {D₁, D₂, ..., Dₙ} (chaque Dᵢ = valeurs possibles pour xᵢ)</p>
+    <p>• <strong>C</strong> = ensemble de contraintes (relations sur les variables)</p>
+    <p>Une <strong>solution</strong> est une affectation de valeurs aux variables qui satisfait toutes les contraintes.</p>
+  </div>
+</div>
+
+<!-- SECTION 2: N-Queens -->
+<div class="section">
+  <h2>♟️ Le Problème des N-Reines</h2>
+
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le problème des N-Reines ?</span>
+    <p>Place <strong>N reines</strong> sur un échiquier N×N de façon à ce qu'aucune reine ne menace une autre. En échecs, une reine attaque toutes les cases de sa rangée, sa colonne et ses diagonales.</p>
+    <p><strong>Modélisation intelligente :</strong> Au lieu d'un booléen par case (N² variables), on utilise <strong>une variable par colonne</strong> indiquant sur quelle rangée se trouve la reine de cette colonne. On a ainsi seulement N variables, chacune avec un domaine {0, ..., N-1}.</p>
+    <div class="retenir">💡 Le bon modèle réduit drastiquement la taille de l'espace de recherche !</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Formules</span>
+    <p class="phrase">📌 "Deux reines ne se menacent pas si elles sont sur des rangées différentes et des diagonales différentes"</p>
+    <div class="pending-math"
+      data-latex="\forall i \neq j: q_i \neq q_j \quad \text{(pas même rangée)}"
+      data-phrase="Les reines i et j ne sont pas sur la même rangée"></div>
+    <div class="pending-math"
+      data-latex="\forall i \neq j: |q_i - q_j| \neq |i - j| \quad \text{(pas même diagonale)}"
+      data-phrase="Les reines i et j ne sont pas sur la même diagonale"></div>
+    <table>
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td>qᵢ</td><td>La rangée de la reine dans la colonne i</td></tr>
+      <tr><td>i, j</td><td>Indices de colonne (0 à N-1)</td></tr>
+      <tr><td>|qᵢ - qⱼ|</td><td>Différence de rangées (valeur absolue)</td></tr>
+      <tr><td>|i - j|</td><td>Différence de colonnes</td></tr>
+    </table>
+    <p><strong>Exemple (N=4) :</strong> Si q₀=1, q₁=3 : |1-3|=2, |0-1|=1 → 2 ≠ 1 ✅ pas en diagonale.</p>
+  </div>
+
+  <!-- DEMO N-Queens -->
+  <div class="demo-box">
+    <h3>🎮 Démo interactive — N-Reines</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>Taille N : <span class="val" id="nVal">6</span></label>
+        <input type="range" id="nSlider" min="4" max="10" value="6" oninput="document.getElementById('nVal').textContent=this.value; resetQueens();">
+      </div>
+      <button class="btn" onclick="solveQueens()">▶ Résoudre pas à pas</button>
+      <button class="btn btn-amber" onclick="resetQueens()">↺ Réinitialiser</button>
+      <button class="btn btn-navy" onclick="findAllSolutions()">🔢 Compter toutes les solutions</button>
+    </div>
+    <canvas id="queensCanvas" width="400" height="400" style="display:block;margin:0 auto;max-width:100%;cursor:pointer;border:2px solid #e2e8f0;border-radius:8px;"></canvas>
+    <div class="stats-row" id="queensStats">
+      <div class="stat-chip">Étapes : <span id="stepCount">0</span></div>
+      <div class="stat-chip">Backtrack : <span id="backCount">0</span></div>
+      <div class="stat-chip">Solutions : <span id="solCount">?</span></div>
+      <div class="stat-chip" id="statusChip">Statut : <span>En attente</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: DFS + Filtrage -->
+<div class="section">
+  <h2>🌳 Recherche DFS + Filtrage</h2>
+
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi DFS ?</span>
+    <p><strong>DFS = Depth-First Search</strong> = recherche en profondeur d'abord. Imagine un labyrinthe : tu choisis un chemin, tu avances le plus loin possible, et si tu te retrouves bloqué, tu reviens sur tes pas (<em>backtrack</em>) et tu essaies un autre chemin.</p>
+    <p>En CP, on construit un <strong>arbre de recherche</strong> : à chaque nœud, on choisit une variable et une valeur. Si une contradiction apparaît, on revient en arrière.</p>
+    <p><strong>Le filtrage</strong> (ou propagation) : avant de continuer, on élimine les valeurs impossibles dans les domaines. C'est ce qui rend CP puissant — on taille l'arbre avant même d'explorer.</p>
+    <div class="retenir">💡 DFS seul = force brute. DFS + filtrage = exploration intelligente.</div>
+  </div>
+
+  <ul class="steps">
+    <li><p><strong>Choisir une variable</strong> non encore fixée (par ex. la première avec le plus petit domaine)</p></li>
+    <li><p><strong>Essayer une valeur</strong> de son domaine — créer un nœud dans l'arbre</p></li>
+    <li><p><strong>Propager</strong> : éliminer les valeurs impossibles dans les autres domaines</p></li>
+    <li><p>Si <strong>échec</strong> (domaine vide) → backtrack : défaire les choix et essayer une autre valeur</p></li>
+    <li><p>Si <strong>tous les domaines sont des singletons</strong> → solution trouvée !</p></li>
+  </ul>
+
+  <div class="demo-box">
+    <h3>📊 Démo — Comparaison Brute Force vs DFS+Filtrage</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>N (taille échiquier) : <span class="val" id="compN">6</span></label>
+        <input type="range" id="compSlider" min="4" max="12" value="6" oninput="document.getElementById('compN').textContent=this.value;updateComparison();">
+      </div>
+    </div>
+    <canvas id="compChart" height="200"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Brute force : <span id="bfNodes">—</span> nœuds</div>
+      <div class="stat-chip">DFS+Filtrage : <span id="dfNodes">—</span> nœuds (estim.)</div>
+      <div class="stat-chip">Réduction : <span id="reduc">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: TinyCSP -->
+<div class="section">
+  <h2>⚙️ TinyCSP — Rendre CP Générique</h2>
+
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi TinyCSP ?</span>
+    <p>Au lieu d'écrire du code spécialisé pour chaque problème (N-Reines, Sudoku, coloration de graphe...), on crée une <strong>architecture réutilisable</strong> : TinyCSP. C'est un mini-solveur CP avec des abstractions claires.</p>
+    <p><strong>Analogie :</strong> C'est comme créer une machine à résoudre les puzzles en général, plutôt qu'une machine spécialisée uniquement pour le Sudoku.</p>
+    <div class="retenir">💡 TinyCSP pose les bases de MiniCP, le vrai solveur du cours.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item">
+      <div class="icon">📦</div>
+      <h4>Variable</h4>
+      <p>Objet avec un domaine modifiable. Supporte remove(v), fix(v), isFixed()</p>
+    </div>
+    <div class="icon-item">
+      <div class="icon">📋</div>
+      <h4>Constraint</h4>
+      <p>Interface avec post() et propagate(). post() = s'abonner aux événements</p>
+    </div>
+    <div class="icon-item">
+      <div class="icon">⚡</div>
+      <h4>Solver</h4>
+      <p>Gère les contraintes, déclenche la propagation, et le backtrack</p>
+    </div>
+    <div class="icon-item">
+      <div class="icon">🌳</div>
+      <h4>DFSearch</h4>
+      <p>Construit l'arbre de recherche, gère les branchements</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Paradigme déclaratif avec TinyCSP :</strong></p>
+    <p>• L'utilisateur <em>déclare</em> variables, domaines et contraintes</p>
+    <p>• Le solveur gère tout le reste (propagation, backtrack, recherche)</p>
+    <p>• Les contraintes sont réutilisables d'un problème à l'autre</p>
+    <p>• Le code CP pour les N-Reines ressemble à ceci :</p>
+  </div>
+  <div class="code-block">
+    <span class="cm">// Variables : une par colonne</span><br>
+    <span class="kw">IntVar</span>[] q = <span class="kw">makeIntVarArray</span>(cp, n, n); <span class="cm">// n variables, domaine {0..n-1}</span><br>
+    <br>
+    <span class="cm">// Contraintes : pas sur la même rangée</span><br>
+    cp.post(<span class="kw">new</span> <span class="kw">AllDifferent</span>(q));<br>
+    <br>
+    <span class="cm">// Contraintes : pas sur la même diagonale</span><br>
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n; i++)<br>
+    &nbsp;&nbsp;<span class="kw">for</span> (<span class="kw">int</span> j = i+1; j &lt; n; j++) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;cp.post(<span class="kw">new</span> NotEqual(q[i], q[j], i-j)); <span class="cm">// diag</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;cp.post(<span class="kw">new</span> NotEqual(q[i], q[j], j-i)); <span class="cm">// anti-diag</span><br>
+    &nbsp;&nbsp;}<br>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 1 : Introduction
+</footer>
+
+<script>
+// ===== KATEX RENDERING =====
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    const latex = el.dataset.latex;
+    if (latex) {
+      el.innerHTML = katex.renderToString(latex, {displayMode: true, throwOnError: false});
+    }
+  });
+  resetQueens();
+  updateComparison();
+});
+
+// ===== N-QUEENS DEMO =====
+let queensState = { n: 6, queens: [], steps: 0, backs: 0, solving: false, timer: null };
+
+function getN() { return parseInt(document.getElementById('nSlider').value); }
+
+function resetQueens() {
+  clearInterval(queensState.timer);
+  const n = getN();
+  queensState = { n, queens: Array(n).fill(-1), steps: 0, backs: 0, solving: false, timer: null, col: 0, stack: [] };
+  document.getElementById('stepCount').textContent = '0';
+  document.getElementById('backCount').textContent = '0';
+  document.getElementById('solCount').textContent = '?';
+  document.getElementById('statusChip').innerHTML = 'Statut : <span>En attente</span>';
+  drawQueensBoard([]);
+}
+
+function drawQueensBoard(queens) {
+  const canvas = document.getElementById('queensCanvas');
+  const ctx = canvas.getContext('2d');
+  const n = getN();
+  const size = Math.min(canvas.width, canvas.height);
+  const cell = size / n;
+  ctx.clearRect(0, 0, size, size);
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      ctx.fillStyle = (r + c) % 2 === 0 ? '#f0f4f8' : '#cbd5e1';
+      ctx.fillRect(c * cell, r * cell, cell, cell);
+    }
+  }
+  queens.forEach((row, col) => {
+    if (row >= 0) {
+      ctx.fillStyle = '#0D9488';
+      ctx.beginPath();
+      const cx = col * cell + cell/2, cy = row * cell + cell/2, r = cell * 0.38;
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${cell*0.4}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('♛', cx, cy + 1);
+    }
+  });
+}
+
+function isSafe(queens, col, row) {
+  for (let c = 0; c < col; c++) {
+    if (queens[c] === row || Math.abs(queens[c] - row) === Math.abs(c - col)) return false;
+  }
+  return true;
+}
+
+function solveQueens() {
+  if (queensState.solving) return;
+  const n = getN();
+  resetQueens();
+  queensState.solving = true;
+  queensState.n = n;
+  let queens = Array(n).fill(-1);
+  let col = 0;
+  let rowTry = Array(n).fill(0);
+  document.getElementById('statusChip').innerHTML = 'Statut : <span style="color:var(--teal)">⚡ En cours...</span>';
+
+  queensState.timer = setInterval(() => {
+    if (col >= n) {
+      clearInterval(queensState.timer);
+      queensState.solving = false;
+      drawQueensBoard(queens);
+      document.getElementById('statusChip').innerHTML = 'Statut : <span style="color:green">✅ Solution !</span>';
+      document.getElementById('solCount').textContent = countSolutions(n);
+      return;
+    }
+    if (col < 0) {
+      clearInterval(queensState.timer);
+      queensState.solving = false;
+      document.getElementById('statusChip').innerHTML = 'Statut : <span style="color:red">❌ Pas de solution</span>';
+      return;
+    }
+    let placed = false;
+    while (rowTry[col] < n) {
+      const row = rowTry[col];
+      rowTry[col]++;
+      queensState.steps++;
+      if (isSafe(queens, col, row)) {
+        queens[col] = row;
+        col++;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      queens[col] = -1;
+      rowTry[col] = 0;
+      col--;
+      queensState.backs++;
+      if (col >= 0) queens[col] = -1;
+    }
+    document.getElementById('stepCount').textContent = queensState.steps;
+    document.getElementById('backCount').textContent = queensState.backs;
+    drawQueensBoard(queens);
+  }, 120);
+}
+
+function countSolutions(n) {
+  let count = 0;
+  function bt(col, queens) {
+    if (col === n) { count++; return; }
+    for (let row = 0; row < n; row++) {
+      if (isSafe(queens, col, row)) { queens[col] = row; bt(col + 1, queens); queens[col] = -1; }
+    }
+  }
+  bt(0, Array(n).fill(-1));
+  return count;
+}
+
+function findAllSolutions() {
+  const n = getN();
+  const c = countSolutions(n);
+  document.getElementById('solCount').textContent = c;
+  document.getElementById('statusChip').innerHTML = `Statut : <span>${c} solution${c>1?'s':''} trouvée${c>1?'s':''}</span>`;
+}
+
+// ===== COMPARISON CHART =====
+let compChart = null;
+function updateComparison() {
+  const n = parseInt(document.getElementById('compSlider').value);
+  const bf = Math.pow(n, n);
+  const dfs = Math.round(bf * 0.015 * Math.log(n));
+  document.getElementById('bfNodes').textContent = bf.toLocaleString();
+  document.getElementById('dfNodes').textContent = dfs.toLocaleString();
+  const redPct = (100 - dfs/bf*100).toFixed(1);
+  document.getElementById('reduc').textContent = `${redPct}% de nœuds évités`;
+
+  const ctx = document.getElementById('compChart').getContext('2d');
+  if (compChart) compChart.destroy();
+  compChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Brute Force (N^N)', 'DFS + Filtrage'],
+      datasets: [{
+        data: [bf, dfs],
+        backgroundColor: ['#f43f5e', '#0D9488'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: `Nœuds explorés pour N=${n} reines` } },
+      scales: { y: { type: 'logarithmic', title: { display: true, text: 'Nœuds (échelle log)' } } }
+    }
+  });
+}
+</script>
+</body>
+</html>

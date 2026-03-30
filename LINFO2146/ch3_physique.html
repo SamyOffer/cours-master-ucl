@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch3 — Couche physique | LINFO2146</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:#fff;}
+.header-stripe{height:6px;background:linear-gradient(90deg,var(--amber),var(--teal));}
+.header-content{padding:1.8rem 2rem;}
+.breadcrumb{font-size:.85rem;color:#93c5fd;margin-bottom:.5rem;}
+.breadcrumb a{color:#93c5fd;text-decoration:none;}
+.breadcrumb a:hover{color:#fff;}
+h1{font-size:1.8rem;font-weight:700;}
+.subtitle{color:#93c5fd;font-size:.95rem;margin-top:.3rem;}
+main{max-width:960px;margin:0 auto;padding:2rem 1.5rem;}
+.section{background:var(--white);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:1.8rem;margin-bottom:1.5rem;}
+.section h2{color:var(--navy);font-size:1.2rem;font-weight:700;margin-bottom:1rem;}
+.section h3{color:var(--teal);font-size:1rem;font-weight:700;margin:1.2rem 0 .6rem;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;}
+.explain-intro .badge{display:inline-block;background:var(--amber);color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;}
+.explain-intro p,.explain-intro li{color:#78350f;line-height:1.7;}
+.explain-intro ul{padding-left:1.2rem;}
+.retenir{background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;}
+.retenir::before{content:'💡 À retenir : ';}
+.math-block{background:#f0fdf4;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;}
+.math-block .badge{display:inline-block;background:var(--teal);color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;}
+.math-block .phrase{color:#065f46;font-style:italic;margin-bottom:.8rem;font-size:.95rem;}
+.math-render{text-align:center;margin:1rem 0;padding:1rem;background:#fff;border-radius:8px;}
+.symbol-table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem;}
+.symbol-table th{background:var(--teal);color:#fff;padding:.5rem .8rem;text-align:left;}
+.symbol-table td{padding:.45rem .8rem;border-bottom:1px solid #d1fae5;}
+.symbol-table tr:nth-child(even) td{background:#f0fdf4;}
+.theory-box{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;}
+.theory-box .badge{display:inline-block;background:#3b82f6;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin:1rem 0;}
+.icon-item{background:var(--light);border-radius:10px;padding:.8rem;text-align:center;}
+.icon-item .ico{font-size:1.8rem;margin-bottom:.3rem;}
+.icon-item .lbl{font-size:.8rem;font-weight:700;color:var(--navy);}
+.icon-item .desc{font-size:.75rem;color:var(--gray);margin-top:.2rem;}
+.demo-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1.4rem;margin:1rem 0;}
+.demo-box h4{color:var(--navy);font-size:.95rem;font-weight:700;margin-bottom:1rem;}
+.controls{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;margin-bottom:1rem;}
+.ctrl-group{display:flex;flex-direction:column;gap:.4rem;}
+.ctrl-group label{font-size:.8rem;font-weight:600;color:var(--gray);}
+input[type=range]{width:160px;accent-color:var(--teal);}
+.val-display{font-size:.85rem;color:var(--teal);font-weight:700;}
+canvas{display:block;width:100%;border-radius:8px;border:1px solid #e2e8f0;background:#fff;}
+.calc-display{background:#1e293b;color:#4ade80;font-family:monospace;font-size:.82rem;padding:.8rem 1rem;border-radius:8px;margin-top:.8rem;line-height:1.9;white-space:pre;}
+table.info-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0;}
+.info-table th{background:var(--navy);color:#fff;padding:.5rem .8rem;text-align:left;}
+.info-table td{padding:.45rem .8rem;border-bottom:1px solid #e2e8f0;}
+.info-table tr:nth-child(even) td{background:#f8fafc;}
+select{padding:.4rem .6rem;border-radius:6px;border:1px solid #e2e8f0;font-size:.9rem;}
+input[type=text]{padding:.4rem;border-radius:6px;border:1px solid #e2e8f0;width:110px;font-size:.9rem;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:1.5rem;margin-top:3rem;font-size:.85rem;}
+footer strong{color:#fff;}
+.nav-bottom{display:flex;justify-content:space-between;margin-top:2rem;}
+.nav-btn{background:var(--teal);color:#fff;text-decoration:none;padding:.7rem 1.4rem;border-radius:8px;font-weight:600;font-size:.9rem;}
+.nav-btn.prev{background:var(--gray);}
+.nav-btn.next{background:var(--navy);}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-stripe"></div>
+  <div class="header-content">
+    <div class="breadcrumb"><a href="index.html">← Accueil</a> / Chapitre 3</div>
+    <h1>📻 Communication sans fil — Couche physique</h1>
+    <div class="subtitle">Ondes EM, modulation (AM/FM/PM), codage de canal, interleaving, DSSS</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== SECTION 1 : ONDES EM ===== -->
+<div class="section">
+  <h2>🌊 1. Ondes électromagnétiques</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi une onde radio ?</div>
+    <p>Imagine jeter un caillou dans l'eau : des cercles se propagent autour du point d'impact. Une onde radio c'est pareil, mais invisible — c'est une oscillation du champ électromagnétique qui se propage dans l'espace à la vitesse de la lumière (3×10⁸ m/s).</p>
+    <p>Ton téléphone, le WiFi, la radio FM — tout ça utilise des ondes électromagnétiques à différentes <strong>fréquences</strong> pour transporter des informations.</p>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="ico">📻</div><div class="lbl">Radio AM/FM</div><div class="desc">0.5–108 MHz</div></div>
+      <div class="icon-item"><div class="ico">📶</div><div class="lbl">WiFi</div><div class="desc">2.4 GHz / 5 GHz</div></div>
+      <div class="icon-item"><div class="ico">📱</div><div class="lbl">5G</div><div class="desc">Sub-6GHz / mmWave</div></div>
+      <div class="icon-item"><div class="ico">🔵</div><div class="lbl">Bluetooth</div><div class="desc">2.4 GHz (ISM)</div></div>
+    </div>
+    <div class="retenir">Plus la fréquence est haute, plus on peut transmettre de données rapidement — mais la portée diminue et les obstacles bloquent plus facilement le signal.</div>
+  </div>
+
+  <!-- DÉMO 1 : Onde sinusoïdale -->
+  <div class="demo-box">
+    <h4>🎮 Démo — Onde sinusoïdale : E(t) = A · sin(2π·f·t + φ)</h4>
+    <p style="font-size:.85rem;color:var(--gray);margin-bottom:1rem;">Modifiez amplitude, fréquence et phase pour voir l'effet sur l'onde.</p>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Amplitude A : <span class="val-display" id="wave-amp-lbl">1.0</span></label>
+        <input type="range" id="wave-amp" min="0.1" max="2" step="0.1" value="1.0">
+      </div>
+      <div class="ctrl-group">
+        <label>Fréquence f (Hz) : <span class="val-display" id="wave-freq-lbl">2</span></label>
+        <input type="range" id="wave-freq" min="1" max="8" step="0.5" value="2">
+      </div>
+      <div class="ctrl-group">
+        <label>Phase φ (rad) : <span class="val-display" id="wave-phase-lbl">0.0</span></label>
+        <input type="range" id="wave-phase" min="0" max="6.28" step="0.1" value="0">
+      </div>
+    </div>
+    <canvas id="waveCanvas" height="160"></canvas>
+    <div class="calc-display" id="waveCalc">E(t) = 1.0 × sin(2π × 2 × t + 0.0)</div>
+  </div>
+</div>
+
+<!-- ===== SECTION 2 : FOURIER ===== -->
+<div class="section">
+  <h2>📊 2. Analyse de Fourier — Décomposition en fréquences</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la décomposition de Fourier ?</div>
+    <p>Imagine un accord de piano avec plusieurs touches enfoncées en même temps : tu entends plusieurs fréquences superposées. La décomposition de Fourier dit : <strong>tout signal complexe peut être vu comme une somme de sinus simples</strong> à différentes fréquences.</p>
+    <p>En radio, plus tu veux envoyer de données vite, plus le signal contient de hautes fréquences. L'électronique + l'antenne doivent être optimisées pour ces fréquences.</p>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Formule — Signal comme somme de sinusoïdes</div>
+    <div class="phrase">📌 En une phrase : tout signal s(t) peut s'écrire comme une somme d'ondes sinusoïdales de fréquences, phases et amplitudes différentes (théorème de Fourier).</div>
+    <div class="math-render" id="fourierFormula">⏳ Chargement KaTeX...</div>
+    <table class="symbol-table">
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td>Aᵢ</td><td>Amplitude du i-ème composant (force du signal)</td></tr>
+      <tr><td>fᵢ</td><td>Fréquence en Hz (ex: 2.4 GHz pour WiFi)</td></tr>
+      <tr><td>φᵢ</td><td>Phase en radians (décalage temporel)</td></tr>
+      <tr><td>t</td><td>Temps en secondes</td></tr>
+    </table>
+  </div>
+
+  <!-- DÉMO 2 : Superposition de sinusoïdes -->
+  <div class="demo-box">
+    <h4>🎮 Démo — Superposition de sinusoïdes (Fourier)</h4>
+    <p style="font-size:.85rem;color:var(--gray);margin-bottom:1rem;">Activez des composantes pour construire un signal complexe par superposition.</p>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label><input type="checkbox" id="f1-on" checked> Composante f₁ : <span class="val-display">1 Hz</span></label>
+        <input type="range" id="f1-amp" min="0.1" max="1.5" step="0.1" value="1.0">
+        <span style="font-size:.8rem;color:var(--gray)">Amplitude : <span class="val-display" id="f1-amp-lbl">1.0</span></span>
+      </div>
+      <div class="ctrl-group">
+        <label><input type="checkbox" id="f2-on" checked> Composante f₂ : <span class="val-display">3 Hz</span></label>
+        <input type="range" id="f2-amp" min="0.1" max="1.5" step="0.1" value="0.5">
+        <span style="font-size:.8rem;color:var(--gray)">Amplitude : <span class="val-display" id="f2-amp-lbl">0.5</span></span>
+      </div>
+      <div class="ctrl-group">
+        <label><input type="checkbox" id="f3-on"> Composante f₃ : <span class="val-display">5 Hz</span></label>
+        <input type="range" id="f3-amp" min="0.1" max="1.5" step="0.1" value="0.3">
+        <span style="font-size:.8rem;color:var(--gray)">Amplitude : <span class="val-display" id="f3-amp-lbl">0.3</span></span>
+      </div>
+    </div>
+    <canvas id="fourierCanvas" height="200"></canvas>
+    <div class="calc-display" id="fourierCalc">Signal = A₁·sin(2π·f₁·t) + A₂·sin(2π·f₂·t) + ...</div>
+  </div>
+</div>
+
+<!-- ===== SECTION 3 : MODULATION ===== -->
+<div class="section">
+  <h2>🎛️ 3. Modulation — Encoder l'information dans une onde</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la modulation ?</div>
+    <p>Imagine une lampe de poche. Pour transmettre un message en morse, tu <strong>l'allumes et l'éteins</strong> selon un code. La lumière c'est la <strong>porteuse</strong> — son intensité est <strong>modulée</strong> pour porter l'information.</p>
+    <p>En radio, on module l'<strong>Amplitude</strong> (ASK/AM), la <strong>Fréquence</strong> (FSK/FM), ou la <strong>Phase</strong> (PSK/PM) d'une onde porteuse pour transporter des bits.</p>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="ico">📡</div><div class="lbl">ASK (AM)</div><div class="desc">Amplitude varie selon les bits</div></div>
+      <div class="icon-item"><div class="ico">📻</div><div class="lbl">FSK (FM)</div><div class="desc">Fréquence varie selon les bits</div></div>
+      <div class="icon-item"><div class="ico">🔄</div><div class="lbl">PSK (PM)</div><div class="desc">Phase varie selon les bits</div></div>
+      <div class="icon-item"><div class="ico">✳️</div><div class="lbl">QAM</div><div class="desc">Amplitude + Phase → plus de bits</div></div>
+    </div>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Formule — Onde porteuse modulée</div>
+    <div class="phrase">📌 En une phrase : la porteuse est un sinus dont on varie A(t), f(t) ou φ(t) au cours du temps pour encoder des données.</div>
+    <div class="math-render" id="modulFormula">⏳ Chargement KaTeX...</div>
+    <table class="symbol-table">
+      <tr><th>Symbole</th><th>Signification</th><th>Modulation</th></tr>
+      <tr><td>A(t)</td><td>Amplitude (force du signal)</td><td>ASK / AM</td></tr>
+      <tr><td>f(t)</td><td>Fréquence (Hz)</td><td>FSK / FM</td></tr>
+      <tr><td>φ(t)</td><td>Phase (radians)</td><td>PSK / PM</td></tr>
+    </table>
+    <div style="background:#fff;padding:.8rem;border-radius:8px;margin-top:.8rem;font-size:.88rem;">
+      <strong>Exemple QAM-64 :</strong> 8 amplitudes × 8 phases = 64 symboles = <strong>6 bits</strong> par symbole → utilisé dans WiFi 802.11a/g !
+    </div>
+  </div>
+
+  <!-- DÉMO 3 : Modulation -->
+  <div class="demo-box">
+    <h4>🎮 Démo — Visualiser ASK, FSK, PSK sur une séquence de bits</h4>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Type de modulation :</label>
+        <select id="modType">
+          <option value="ask">ASK — Amplitude Shift Keying</option>
+          <option value="fsk">FSK — Frequency Shift Keying</option>
+          <option value="psk">PSK — Phase Shift Keying</option>
+          <option value="qam">QAM — Amplitude + Phase</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Séquence de bits (8 bits max, 0 et 1 uniquement) :</label>
+        <input type="text" id="bitInput" value="10110010" maxlength="8">
+      </div>
+    </div>
+    <canvas id="modCanvas" height="220"></canvas>
+    <div class="calc-display" id="modCalc">ASK : bit 1 = grande amplitude, bit 0 = petite amplitude</div>
+  </div>
+</div>
+
+<!-- ===== SECTION 4 : CODAGE ===== -->
+<div class="section">
+  <h2>🔐 4. Codage de canal — Protection contre les erreurs</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le codage de canal ?</div>
+    <p>Imagine envoyer une lettre dans un pays où les facteurs perdent parfois des pages. Tu envoies des <strong>copies de chaque page</strong> (redondance) pour que le destinataire puisse reconstruire le texte même si certaines pages sont perdues.</p>
+    <ul>
+      <li><strong>Bits de parité</strong> : un bit supplémentaire pour détecter 1 erreur</li>
+      <li><strong>CRC</strong> (Cyclic Redundancy Check) : détecte plusieurs erreurs</li>
+      <li><strong>Block coding</strong> : ajoute des bits de correction à des blocs de données</li>
+    </ul>
+    <div class="retenir">Le codage de canal ajoute de la redondance pour permettre au récepteur de détecter et corriger des erreurs de transmission.</div>
+  </div>
+
+  <h3>L'interleaving — Contre les erreurs en rafale (burst errors)</h3>
+  <div class="explain-intro" style="background:#f0fdf4;border-color:var(--teal);">
+    <div class="badge" style="background:var(--teal);">🧒 Le problème des burst errors</div>
+    <p>Un parasite électrique peut corrompre plusieurs bits consécutifs (erreur en rafale). Si tous ces bits sont dans le même mot de code, le code correcteur ne peut pas les corriger.</p>
+    <p><strong>Solution — Interleaving :</strong> on entremêle les données avant transmission. Ex : "Hello" "World" → "HWeol" "rllod". Une rafale n'affecte alors qu'un bit par mot de code.</p>
+    <div class="retenir">Interleaving = mélanger les données pour distribuer les erreurs en rafale sur plusieurs mots de code différents → chaque mot n'a qu'une seule erreur → corrigeable.</div>
+  </div>
+
+  <!-- DÉMO 4 : Interleaving -->
+  <div class="demo-box">
+    <h4>🎮 Démo — Interleaving et erreurs en rafale</h4>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Position de la rafale : <span class="val-display" id="burstPos-lbl">3</span></label>
+        <input type="range" id="burst-pos" min="0" max="8" value="3">
+      </div>
+      <div class="ctrl-group">
+        <label>Longueur de la rafale : <span class="val-display" id="burstLen-lbl">3</span></label>
+        <input type="range" id="burst-len" min="1" max="5" value="3">
+      </div>
+    </div>
+    <canvas id="interleaveCanvas" height="230"></canvas>
+    <div class="calc-display" id="interleaveLog">Bougez les sliders pour voir l'effet de l'interleaving</div>
+  </div>
+</div>
+
+<!-- ===== SECTION 5 : DSSS ===== -->
+<div class="section">
+  <h2>📡 5. DSSS — Étalement de spectre</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le DSSS ?</div>
+    <p>Au lieu d'envoyer chaque bit directement, on le <strong>multiplie par une séquence de code</strong> (des ±1 appelés "chips"). Le signal résultant est beaucoup plus large en fréquence mais plus bas en amplitude → moins sensible aux interférences étroites.</p>
+    <p>DSSS = <strong>D</strong>irect-<strong>S</strong>equence <strong>S</strong>pread <strong>S</strong>pectrum. Utilisé dans IEEE 802.11b et IEEE 802.15.4.</p>
+    <div class="retenir">Le récepteur qui connaît le code peut retrouver le bit original par corrélation. Les interférences qui ne connaissent pas le code apparaissent comme du bruit faible.</div>
+  </div>
+
+  <div class="theory-box">
+    <div class="badge">📌 Exemple numérique du cours</div>
+    <p><strong>Émetteur A</strong> envoie bit "1". Code A : (-1, +1, -1, -1, +1, +1). Signal A = (+1)×code = <strong>(-1,+1,-1,-1,+1,+1)</strong></p>
+    <p style="margin-top:.5rem;"><strong>Émetteur B</strong> envoie bit "0" (→ -1). Code B : (+1,+1,-1,+1,-1,+1). Signal B = (-1,-1,+1,-1,+1,-1)</p>
+    <p style="margin-top:.5rem;"><strong>Signal reçu</strong> (superposition) : (-2, 0, 0, -2, +2, 0)</p>
+    <p style="margin-top:.5rem;"><strong>Décodage A</strong> : (-2,0,0,-2,+2,0) · (-1,+1,-1,-1,+1,+1) = 2+0+0+2+2+0 = <strong>+6 &gt; 0 → bit "1" ✅</strong></p>
+  </div>
+
+  <!-- DÉMO 5 : DSSS -->
+  <div class="demo-box">
+    <h4>🎮 Démo — DSSS : visualisation chip par chip</h4>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Bit à envoyer : <span class="val-display" id="dsss-bit-lbl">1</span></label>
+        <input type="range" id="dsss-bit" min="0" max="1" step="1" value="1">
+      </div>
+      <div class="ctrl-group">
+        <label>Longueur du code (chips) : <span class="val-display" id="dsss-len-lbl">6</span></label>
+        <input type="range" id="dsss-len" min="3" max="11" step="1" value="6">
+      </div>
+    </div>
+    <canvas id="dsssCanvas" height="260"></canvas>
+    <div class="calc-display" id="dsssCalc">Visualisation du signal original vs signal étalé</div>
+  </div>
+
+  <h3>Comparaison des technologies PHY</h3>
+  <table class="info-table">
+    <tr><th>Technologie</th><th>Modulation</th><th>Débit</th><th>Usage</th></tr>
+    <tr><td>IEEE 802.11b</td><td>DSSS + BPSK/QPSK</td><td>1–11 Mbps</td><td>WiFi ancienne génération</td></tr>
+    <tr><td>IEEE 802.11a/g</td><td>OFDM + QAM-64</td><td>54 Mbps</td><td>WiFi moderne</td></tr>
+    <tr><td>IEEE 802.15.4 (2.4GHz)</td><td>DSSS + O-QPSK</td><td>250 kbps</td><td>Capteurs IoT</td></tr>
+    <tr><td>Bluetooth</td><td>GFSK / DQPSK</td><td>1–3 Mbps</td><td>Wearables, audio</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION : PARAMÈTRES DE MODULATION ========== -->
+<div class="section">
+  <h2>🎛️ Récap : Paramètres de modulation</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Les 3 boutons du signal</div>
+    <p>Un signal sinusoïdal a trois caractéristiques qu'on peut faire varier pour coder l'information. Chaque variation donne une technique de modulation différente.</p>
+    <div class="retenir">Signal porteur : c(t) = A(t) · cos(2π f(t) t + φ(t)) — on peut modifier A, f ou φ !</div>
+  </div>
+
+  <table class="info-table">
+    <tr><th>Paramètre modifié</th><th>Acronyme</th><th>Nom complet</th><th>Description</th></tr>
+    <tr>
+      <td><strong>Amplitude A(t)</strong></td>
+      <td><span style="background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;font-weight:700">ASK</span></td>
+      <td>Amplitude Shift Keying</td>
+      <td>La puissance du signal varie selon le bit (fort = 1, faible = 0)</td>
+    </tr>
+    <tr>
+      <td><strong>Fréquence f(t)</strong></td>
+      <td><span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:4px;font-weight:700">FSK</span></td>
+      <td>Frequency Shift Keying</td>
+      <td>La fréquence du signal change selon le bit (haute fréq. = 1, basse = 0)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase φ(t)</strong></td>
+      <td><span style="background:#fce7f3;color:#9d174d;padding:2px 8px;border-radius:4px;font-weight:700">PSK</span></td>
+      <td>Phase Shift Keying</td>
+      <td>La phase du signal est décalée à chaque changement de bit</td>
+    </tr>
+    <tr>
+      <td><strong>Amplitude + Phase</strong></td>
+      <td><span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-weight:700">QAM</span></td>
+      <td>Quadrature Amplitude Modulation</td>
+      <td>Combine ASK et PSK pour encoder plusieurs bits par symbole (plus efficace)</td>
+    </tr>
+  </table>
+
+  <h3 style="margin-top:1.2rem;">Signal baseband vs signal porteur</h3>
+  <table class="info-table">
+    <tr><th>Grandeur</th><th>Signal Baseband m(t)</th><th>Signal Porteur c(t)</th></tr>
+    <tr><td>Fréquence</td><td>Basse : [0 … f<sub>b</sub>]</td><td>Haute : f<sub>c</sub> (centaines de MHz)</td></tr>
+    <tr><td>Contenu</td><td>Le codeword numérique à transmettre</td><td>Onde sinusoïdale pure</td></tr>
+    <tr><td>Rôle</td><td>Porte l'information</td><td>Transporte le signal dans les airs</td></tr>
+    <tr><td>Après modulation</td><td colspan="2">Signal résultant : plage [f<sub>c</sub> − f<sub>b</sub>, f<sub>c</sub> + f<sub>b</sub>]</td></tr>
+  </table>
+
+  <div class="theory-box" style="margin-top:1rem;">
+    <div class="badge">📐 Débit maximal (théorème de Nyquist)</div>
+    <p>Dans des conditions parfaites (sans bruit), avec m amplitudes différentes :</p>
+    <div class="math-block" style="font-size:1.1rem;text-align:center;padding:1rem;">
+      Débit max = 2 × Bandwidth × log₂(m)
+    </div>
+    <p>Exemple : BW = 1 MHz, 4 amplitudes (2 bits/symbole) → Débit max = 4 Mbps</p>
+  </div>
+
+  <h3 style="margin-top:1.2rem;">Chaîne de transmission complète</h3>
+  <div style="background:#eff6ff;border-radius:10px;padding:1rem;overflow-x:auto;">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;font-size:.85rem;font-weight:600;">
+      <div style="background:#1e3a5f;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Source<br><small style="font-weight:400">Données brutes</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#0d9488;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Encodeur<br>source<br><small style="font-weight:400">ex: PCM</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#0d9488;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Encodeur<br>canal<br><small style="font-weight:400">FEC, CRC</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#f59e0b;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Modulateur<br><small style="font-weight:400">ASK/FSK/PSK</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#6b7280;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Canal<br>sans fil<br><small style="font-weight:400">bruit, interf.</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#f59e0b;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Démodulateur<br><small style="font-weight:400">synchro, bruit</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#0d9488;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Décodeur<br>canal<br><small style="font-weight:400">correc. erreurs</small></div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#0d9488;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Décodeur<br>source</div>
+      <span style="color:#94a3b8">→</span>
+      <div style="background:#1e3a5f;color:#fff;padding:8px 12px;border-radius:8px;text-align:center;">Destination</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1.5rem;">Défis de démodulation</h3>
+  <table class="info-table">
+    <tr><th>Défi</th><th>Description</th></tr>
+    <tr><td><strong>Synchronisation de bits</strong></td><td>Trouver les frontières exactes de chaque bit dans le signal reçu</td></tr>
+    <tr><td><strong>Synchronisation de trames</strong></td><td>Identifier le début et la fin d'une trame dans le flux de bits</td></tr>
+    <tr><td><strong>Bruit</strong></td><td>Perturbations aléatoires ajoutées au signal pendant la propagation</td></tr>
+    <tr><td><strong>Interférences</strong></td><td>Signaux d'autres émetteurs qui se superposent au signal voulu</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION : PROBLÈME DE LA STATION CACHÉE ========== -->
+<div class="section">
+  <h2>🫥 Le problème de la station cachée (Hidden Terminal Problem)</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Pourquoi CSMA ne suffit pas en WiFi/IoT ?</div>
+    <p>En réseau filaire, si deux câbles transmettent en même temps, on détecte la collision électriquement. En sans-fil, c'est plus compliqué : un nœud peut ne pas entendre un autre nœud qui est pourtant en train d'émettre !</p>
+    <div class="retenir">La station cachée = un nœud qui ne peut pas entendre un autre nœud concurrent, mais dont les signaux créent quand même une collision chez le destinataire commun.</div>
+  </div>
+
+  <h3>Scénario avec 3 stations équidistantes A, B, C</h3>
+  <div style="background:#eff6ff;border-radius:10px;padding:1.2rem;margin:1rem 0;">
+    <div style="text-align:center;font-size:1.2rem;font-weight:700;margin-bottom:1rem;">
+      <span style="background:#1e3a5f;color:#fff;padding:6px 16px;border-radius:8px;">A</span>
+      <span style="color:#94a3b8;font-size:1.5rem;margin:0 12px;">━━━━━</span>
+      <span style="background:#0d9488;color:#fff;padding:6px 16px;border-radius:8px;">B</span>
+      <span style="color:#94a3b8;font-size:1.5rem;margin:0 12px;">━━━━━</span>
+      <span style="background:#1e3a5f;color:#fff;padding:6px 16px;border-radius:8px;">C</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:.9rem;">
+      <div style="background:#d1fae5;padding:10px;border-radius:8px;">
+        <strong>✅ Dans la portée de B :</strong><br>A peut entendre B<br>C peut entendre B
+      </div>
+      <div style="background:#fee2e2;padding:10px;border-radius:8px;">
+        <strong>❌ Hors portée :</strong><br>A ne peut PAS entendre C<br>C ne peut PAS entendre A
+      </div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <div class="badge">📌 Déroulement du problème</div>
+    <ol style="padding-left:1.2rem;color:#1e40af;line-height:2;">
+      <li><strong>A</strong> commence à transmettre vers <strong>B</strong></li>
+      <li><strong>C</strong> veut aussi transmettre. C écoute le canal → il semble <em>libre</em> (C n'entend pas A)</li>
+      <li><strong>C commence à transmettre</strong> vers B en même temps que A</li>
+      <li><strong>Collision chez B</strong> : B reçoit les deux signaux mélangés → trame corrompue</li>
+      <li>Ni A ni C ne détectent la collision (ils ne s'entendent pas)</li>
+    </ol>
+    <p style="margin-top:.5rem;"><strong>Conséquence :</strong> CSMA/CD ne fonctionne pas en sans-fil — on ne peut pas toujours "entendre" si le canal est vraiment libre.</p>
+  </div>
+
+  <h3 style="margin-top:1.2rem;">Solution : RTS/CTS</h3>
+  <table class="info-table">
+    <tr><th>Étape</th><th>Action</th><th>Qui agit</th></tr>
+    <tr><td>1</td><td>Envoie <strong>RTS</strong> (Request To Send) à B après que le canal est libre depuis IFS</td><td>A → B</td></tr>
+    <tr><td>2</td><td>Répond avec <strong>CTS</strong> (Clear To Send) à A (après SIFS)</td><td>B → A (diffusé)</td></tr>
+    <tr><td>3</td><td>Entend le CTS de B → sait que B est occupé → attend</td><td>C (entend le CTS)</td></tr>
+    <tr><td>4</td><td>Commence à envoyer ses données, en toute sécurité</td><td>A → B</td></tr>
+  </table>
+</div>
+
+<!-- ===== SECTION 9 : MODÈLES DE RÉSEAU — OSI ET TCP/IP ===== -->
+<div class="section">
+  <h2>📶 Modèles de réseau — OSI et TCP/IP dans les réseaux IoT</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Pourquoi plusieurs couches ?</div>
+    <p>Imagine construire une maison : tu as besoin de fondations solides, puis un cadre, puis des murs, puis l'électricité, puis la décoration. Chaque étage repose sur celui du dessous. Un réseau c'est pareil ! Les <strong>modèles en couches</strong> divisent la communication en étages, où chaque couche a un rôle précis et ne doit pas se soucier des détails des autres couches.</p>
+  </div>
+
+  <h3>Modèle OSI (7 couches)</h3>
+  <p>Le <strong>modèle OSI</strong> (Open Systems Interconnection) est un standard international qui décrit comment les systèmes informatiques communiquent. Il a 7 couches :</p>
+  <ul style="margin:0.8rem 0 0 1.5rem;">
+    <li><strong>7. Application</strong> (HTTP, SMTP, DNS, CoAP, MQTT)</li>
+    <li><strong>6. Présentation</strong> (compression, chiffrement, traduction de formats)</li>
+    <li><strong>5. Session</strong> (établissement et gestion de sessions)</li>
+    <li><strong>4. Transport</strong> (TCP, UDP, fiabilité end-to-end)</li>
+    <li><strong>3. Réseau</strong> (routage, adressage IP)</li>
+    <li><strong>2. Liaison de données</strong> (MAC, encadrage, accès au médium)</li>
+    <li><strong>1. Physique</strong> (transmission des bits, modulation, antennes)</li>
+  </ul>
+
+  <h3>Modèle TCP/IP simplifié (5 couches) — le modèle IoT</h3>
+  <p>En pratique IoT, on utilise un modèle simplifié à <strong>5 couches</strong> :</p>
+
+  <div class="theory-box">
+    <div class="badge">📌 Pile TCP/IP pour IoT</div>
+    <p><strong>Couche 5 : Application</strong></p>
+    <ul style="margin:0.3rem 0 0 1.2rem; font-size:0.95rem;">
+      <li><strong>CoAP</strong> (Constrained Application Protocol) : léger, sans état, pour capteurs avec peu de ressources. Port 5683 UDP.</li>
+      <li><strong>MQTT</strong> (Message Queuing Telemetry Transport) : pub/sub, excellent pour IoT. Port 1883 TCP.</li>
+      <li><strong>HTTP</strong> : lourd, peu efficace pour batterie, mais utilisé en rétroréseaux.</li>
+    </ul>
+    <p style="margin-top:0.8rem;"><strong>Couche 4 : Transport</strong></p>
+    <ul style="margin:0.3rem 0 0 1.2rem; font-size:0.95rem;">
+      <li><strong>UDP</strong> : sans connexion, pas de handshake, léger (bon pour batterie). Pas de garantie de livraison.</li>
+      <li><strong>TCP</strong> : avec connexion, fiable mais lourd (handshake, accusé de réception, buffers). Éviter en IoT batterie.</li>
+    </ul>
+    <p style="margin-top:0.8rem;"><strong>Couche 3 : Réseau</strong></p>
+    <ul style="margin:0.3rem 0 0 1.2rem; font-size:0.95rem;">
+      <li><strong>IPv6</strong> : adressage universel, stateless autoconfiguration (parfait IoT).</li>
+      <li><strong>RPL</strong> (Routing Protocol for Low-power and Lossy networks) : routage par arborescence, efficace en énergie.</li>
+    </ul>
+    <p style="margin-top:0.8rem;"><strong>Couche 2 : MAC / Liaison</strong></p>
+    <ul style="margin:0.3rem 0 0 1.2rem; font-size:0.95rem;">
+      <li>Encadrage : découpe données en trames, ajoute adresses MAC source/destination.</li>
+      <li><strong>CSMA/CA</strong> (IEEE 802.15.4) : écoute le canal, attend si occupé, puis envoie (collision évitée).</li>
+      <li><strong>TDMA</strong> : chaque nœud a son créneau horaire (déterministe, très efficace).</li>
+    </ul>
+    <p style="margin-top:0.8rem;"><strong>Couche 1 : Physique</strong></p>
+    <ul style="margin:0.3rem 0 0 1.2rem; font-size:0.95rem;">
+      <li><strong>IEEE 802.15.4</strong> (2.4 GHz, ±80 kHz BW, ~250 kbps) : standard pour Zigbee, 6LoWPAN.</li>
+      <li><strong>LoRa</strong> (868/915 MHz, spread-spectrum, portée km) : pour données rares, très basse puissance.</li>
+    </ul>
+  </div>
+
+  <h3>Tableau : Couches et protocoles IoT correspondants</h3>
+  <table class="info-table">
+    <tr><th>Couche</th><th>Rôle</th><th>Protocoles/Technologies IoT</th><th>Chapitre du cours</th></tr>
+    <tr><td><strong>5. Application</strong></td><td>Données applicatives (température, commande)</td><td>CoAP, MQTT, HTTP</td><td>Ch 6-7</td></tr>
+    <tr><td><strong>4. Transport</strong></td><td>End-to-end, fiabilité optionnelle</td><td>UDP (CoAP), TCP (MQTT/HTTP), QUIC</td><td>Ch 6</td></tr>
+    <tr><td><strong>3. Réseau</strong></td><td>Routage, adressage</td><td>IPv6, RPL, 6LoWPAN</td><td>Ch 5, 6</td></tr>
+    <tr><td><strong>2. MAC/Liaison</strong></td><td>Accès médium, fiabilité locale</td><td>CSMA/CA, TDMA, IEEE 802.15.4 MAC</td><td>Ch 3 (caché), 5</td></tr>
+    <tr><td><strong>1. Physique</strong></td><td>Transmission bits, modulation</td><td>IEEE 802.15.4 PHY, LoRa, WiFi PHY</td><td>Ch 3 (courant)</td></tr>
+  </table>
+
+  <h3>Pourquoi UDP plutôt que TCP en IoT ?</h3>
+  <div class="example-box">
+    <p><strong>TCP:</strong> Handshake 3-way, acknowledgements, congestion control, retransmissions → <strong>beaucoup de paquets</strong> même pour peu de données. Idéal web/vidéo où chaque octet compte.</p>
+    <p style="margin-top:0.5rem;"><strong>UDP:</strong> Envoie juste les données, aucun établissement. Le protocole application (CoAP) ajoute la fiabilité optionnelle si nécessaire → <strong>très efficace énergie</strong>.</p>
+    <div class="retenir">En IoT, on préfère <strong>UDP à TCP</strong> car TCP est trop lourd (handshake, congestion control, buffers). CoAP ajoute la fiabilité au niveau applicatif si nécessaire.</div>
+  </div>
+</div>
+
+<!-- ===== SECTION 10 : TYPES DE RÉSEAUX SANS FIL — BAN À WAN ===== -->
+<div class="section">
+  <h2>📻 Types de réseaux sans fil — du BAN au WAN</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Combien loin je peux envoyer ma donnée ?</div>
+    <p>Les réseaux sans fil ne sont pas tous identiques. Certains sont minuscules (bracelet connecté qui parle à ta montre, 1 mètre), d'autres énormes (satellite qui couvre un pays, 1000+ km). On classifie les réseaux par <strong>zone de couverture</strong> (range).</p>
+  </div>
+
+  <h3>Les 5 types de réseaux (du plus proche au plus lointain)</h3>
+
+  <div class="theory-box">
+    <div class="badge">📌 Hiérarchie de couverture</div>
+
+    <p style="margin-bottom:0.8rem;"><strong>🔹 BAN (Body Area Network) : &lt;1 mètre</strong></p>
+    <ul style="margin:0 0 0.8rem 1.2rem; font-size:0.95rem;">
+      <li>Capteurs sur/autour du corps (fréquence cardiaque, température).</li>
+      <li>Technologies : <strong>NFC</strong> (&lt;10 cm), <strong>Bluetooth LE</strong> (10 m, mais data rate bas = efficace batterie).</li>
+      <li>Exemple : bracelet fitness ↔ téléphone.</li>
+    </ul>
+
+    <p style="margin-bottom:0.8rem;"><strong>🔹 PAN (Personal Area Network) : ~10–100 mètres</strong></p>
+    <ul style="margin:0 0 0.8rem 1.2rem; font-size:0.95rem;">
+      <li>Domicile, bureau, campus réduit. C'est <strong>le réseau favori d'IoT WSN</strong>.</li>
+      <li>Technologies : <strong>IEEE 802.15.4</strong> (Zigbee, 6LoWPAN), <strong>Bluetooth Classic</strong>, <strong>Z-Wave</strong>.</li>
+      <li>Data rate : 250 kbps (802.15.4), puissance basse, batterie = mois/ans.</li>
+      <li>Exemple : capteurs température dans appart → hub central.</li>
+    </ul>
+
+    <p style="margin-bottom:0.8rem;"><strong>🔹 LAN (Local Area Network) : ~100 m–1 km</strong></p>
+    <ul style="margin:0 0 0.8rem 1.2rem; font-size:0.95rem;">
+      <li>Bâtiment, étage, usine, campus.</li>
+      <li>Technologies : <strong>WiFi 802.11</strong> (2.4/5/6 GHz), <strong>Ethernet câblé</strong>.</li>
+      <li>Data rate : 50–1000+ Mbps, consommation plus haute (WiFi = batterie ~heures).</li>
+      <li>Exemple : caméra IP, imprimante réseau.</li>
+    </ul>
+
+    <p style="margin-bottom:0.8rem;"><strong>🔹 MAN (Metropolitan Area Network) : ~1–10 km</strong></p>
+    <ul style="margin:0 0 0.8rem 1.2rem; font-size:0.95rem;">
+      <li>Ville, campus large, parc industriel.</li>
+      <li>Technologies : <strong>WiMAX</strong> (maintenant obsolète), certains déploiements <strong>LoRa</strong> municipaux.</li>
+      <li>Intermédiaire entre LAN efficace et WAN long-range.</li>
+    </ul>
+
+    <p style="margin-bottom:0.8rem;"><strong>🔹 WAN (Wide Area Network) : &gt;10 km</strong></p>
+    <ul style="margin:0 0 0 1.2rem; font-size:0.95rem;">
+      <li>Région, pays, globe. Réseau décentralisé, infrastructure lourde (base stations, satellites).</li>
+      <li>Technologies : <strong>LoRaWAN</strong> (>30 km rural, ~1–5 km urbain, bande libre 868 MHz), <strong>Sigfox</strong> (même bande, ultra-étroit), <strong>LTE/NB-IoT</strong> (réseau cellulaire), <strong>5G</strong>, <strong>Satellites</strong>.</li>
+      <li>Data rate : LoRa 50 bps–11 kbps (très bas), NB-IoT ~250 kbps, batterie mois/ans.</li>
+      <li>Exemple : capteur de qualité d'air urbain → cloud, station météo rurale.</li>
+    </ul>
+  </div>
+
+  <h3>Tableau comparatif : Réseaux sans fil</h3>
+  <table class="info-table">
+    <tr>
+      <th>Type</th>
+      <th>Portée typique</th>
+      <th>Exemples technologiques</th>
+      <th>Débit (ordre de grandeur)</th>
+      <th>Consommation</th>
+    </tr>
+    <tr>
+      <td><strong>BAN</strong></td>
+      <td>&lt;1 m</td>
+      <td>NFC, Bluetooth LE</td>
+      <td>1–250 kbps</td>
+      <td>Ultra-basse</td>
+    </tr>
+    <tr>
+      <td><strong>PAN</strong></td>
+      <td>10–100 m</td>
+      <td>802.15.4 (Zigbee), Bluetooth, Z-Wave</td>
+      <td>250 kbps</td>
+      <td>Basse (mois–ans batterie)</td>
+    </tr>
+    <tr>
+      <td><strong>LAN</strong></td>
+      <td>100 m–1 km</td>
+      <td>WiFi 802.11, Ethernet</td>
+      <td>50–1000+ Mbps</td>
+      <td>Moyenne (heures batterie)</td>
+    </tr>
+    <tr>
+      <td><strong>MAN</strong></td>
+      <td>1–10 km</td>
+      <td>WiMAX, LoRa urbain</td>
+      <td>1–10 Mbps</td>
+      <td>Moyenne à basse</td>
+    </tr>
+    <tr>
+      <td><strong>WAN</strong></td>
+      <td>&gt;10 km</td>
+      <td>LoRaWAN, Sigfox, NB-IoT, 5G, Satellite</td>
+      <td>50 bps–10 Mbps</td>
+      <td>Très basse (LoRa/Sigfox) à moyenne (NB-IoT/5G)</td>
+    </tr>
+  </table>
+
+  <h3>Architecture typique : IoT WSN avec backhaul WAN</h3>
+  <p>Un réseau de capteurs IoT classique fonctionne ainsi :</p>
+  <ul style="margin:0.8rem 0 0 1.5rem;">
+    <li>Les nœuds capteurs communiquent en <strong>PAN</strong> (IEEE 802.15.4, Zigbee) : efficace, économe en batterie, portée locale.</li>
+    <li>Un ou plusieurs <strong>routeurs/répéteurs</strong> relient le PAN à l'extérieur (réseau maillé, RPL).</li>
+    <li>La <strong>passerelle</strong> (gateway) se connecte au <strong>WAN</strong> (LoRaWAN, NB-IoT, WiFi) pour envoyer les données au cloud.</li>
+  </ul>
+  <p style="margin-top:0.8rem;">Exemple concret : capteurs de température dans une maison (PAN 802.15.4) → box domotique (gateway WiFi) → serveur cloud (WAN).</p>
+
+  <div class="retenir">En IoT, on préfère un réseau local PAN pour la communication courte-portée (énergie efficace), relié par un WAN robuste pour le backhaul vers le cloud.</div>
+</div>
+
+<!-- ===== SECTION 11 : DÉMODULATION & DÉFIS ===== -->
+<div class="section">
+  <h2>📡 Démodulation — Défis côté récepteur</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Recevoir un signal, c'est compliqué !</div>
+    <p>Envoyer un signal modulé est une chose. Le <strong>démoduler correctement</strong> côté récepteur est une tout autre affaire. Plusieurs défis se posent simultanément.</p>
+  </div>
+
+  <div class="theory-box">
+    <div class="badge">📘 Théorie : Défis de la démodulation</div>
+    <ul style="padding-left:1.2rem;line-height:1.8;">
+      <li><strong>Synchronisation de bits</strong> : quand commence exactement un symbole ou un bit ? Le récepteur doit trouver les frontières temporelles précises.</li>
+      <li><strong>Synchronisation de trames</strong> : quand commence un paquet/trame dans le flux de bits reçu ?</li>
+      <li><strong>Dérive de fréquence</strong> : l'émetteur et le récepteur n'écoutent pas exactement sur la même fréquence (à cause du vieillissement électronique, des variations de température…)</li>
+      <li><strong>Bruit et interférences</strong> : le canal radio ajoute du bruit qui peut faire confondre un "0" avec un "1"</li>
+    </ul>
+    <p style="margin-top:.6rem;">Ces problèmes sont résolus par une combinaison de <strong>matériel spécialisé</strong> et d'<strong>algorithmes de traitement du signal</strong> — sujet du domaine des télécommunications, pas du cours LINFO2146.</p>
+    <div class="retenir">La démodulation est le processus inverse de la modulation : le récepteur doit retrouver les bits originaux à partir du signal reçu bruité.</div>
+  </div>
+</div>
+
+<!-- ===== SECTION 12 : CAPACITÉ DE SHANNON & NYQUIST ===== -->
+<div class="section">
+  <h2>📏 Capacité maximale d'un canal — Nyquist &amp; Shannon</h2>
+
+  <div class="theory-box">
+    <div class="badge">📘 Théorie : Débit maximal (Nyquist)</div>
+    <p>Dans des conditions idéales (sans bruit), le débit binaire maximal d'un canal de bande passante <em>B</em> utilisant une modulation à <em>m</em> niveaux d'amplitude est :</p>
+    <div style="background:#fff;border-radius:8px;padding:.8rem;margin:.8rem 0;text-align:center;font-size:1.1rem;font-weight:700;">
+      Débit max = 2 × Bande passante × log₂(m)
+    </div>
+    <p>Exemples :</p>
+    <ul style="padding-left:1.2rem;line-height:1.8;">
+      <li>ASK simple (2 niveaux, m=2) : Débit max = 2 × B × 1 = 2B</li>
+      <li>QAM-16 (16 symboles, m=16) : Débit max = 2 × B × 4 = 8B</li>
+      <li>QAM-64 (64 symboles) : Débit max = 2 × B × 6 = 12B</li>
+    </ul>
+    <p style="margin-top:.6rem;"><strong>En pratique</strong>, on ne peut pas utiliser des <em>m</em> très grands à cause du bruit — les symboles se confondent. Le choix de la modulation est un compromis entre <strong>efficacité spectrale</strong> (bits/Hz) et <strong>robustesse</strong> aux erreurs.</p>
+    <div class="retenir">Plus m est grand, plus on transmet de bits par symbole, mais plus le signal est sensible au bruit. WiFi 6 utilise QAM-1024 (10 bits/symbole) dans des conditions de signal excellentes.</div>
+  </div>
+</div>
+
+</main>
+
+<div style="max-width:960px;margin:0 auto;padding:0 1.5rem;">
+<div class="nav-bottom">
+  <a href="ch2_os.html" class="nav-btn prev">← Ch2 : OS embarqués</a>
+  <a href="quiz.html" class="nav-btn" style="background:#f59e0b;">🎯 Quiz</a>
+  <a href="ch4_propagation.html" class="nav-btn next">Ch4 : Propagation →</a>
+</div>
+</div>
+
+<footer>
+  <strong>LINFO2146 — Mobile and Embedded Computing</strong><br>
+  Prof. Ramin Sadre · UCLouvain · 2025–2026 | Chapitre 3 : Couche physique
+</footer>
+
+<script>
+// ============================================================
+// UTILITAIRE : dessine sur un canvas avec largeur réelle
+// ============================================================
+function getCtx(id, h) {
+  const c = document.getElementById(id);
+  c.width  = c.parentElement.clientWidth - 32; // demo-box padding
+  c.height = h;
+  return { c, ctx: c.getContext('2d'), W: c.width, H: h };
+}
+
+// ============================================================
+// DÉMO 1 — ONDE SINUSOÏDALE
+// ============================================================
+function drawWave() {
+  const A     = parseFloat(document.getElementById('wave-amp').value);
+  const f     = parseFloat(document.getElementById('wave-freq').value);
+  const phi   = parseFloat(document.getElementById('wave-phase').value);
+  document.getElementById('wave-amp-lbl').textContent   = A.toFixed(1);
+  document.getElementById('wave-freq-lbl').textContent  = f;
+  document.getElementById('wave-phase-lbl').textContent = phi.toFixed(1);
+  document.getElementById('waveCalc').textContent =
+    `E(t) = ${A.toFixed(1)} × sin(2π × ${f} × t + ${phi.toFixed(1)})`;
+
+  const { c, ctx, W, H } = getCtx('waveCanvas', 160);
+
+  // Fond + axe
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+
+  // Onde
+  ctx.strokeStyle = '#0D9488'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let x = 0; x < W; x++) {
+    const t = (x / W) * 2;
+    const y = H/2 - A * (H/2 - 16) * Math.sin(2 * Math.PI * f * t + phi);
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Labels axes
+  ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('0', 4, H/2 - 4);
+  ctx.fillText('t →', W - 20, H/2 - 6);
+  ctx.fillStyle = '#0D9488'; ctx.textAlign = 'left';
+  ctx.fillText(`A=${A.toFixed(1)}`, 6, 16);
+}
+
+document.getElementById('wave-amp').oninput   = drawWave;
+document.getElementById('wave-freq').oninput  = drawWave;
+document.getElementById('wave-phase').oninput = drawWave;
+
+// ============================================================
+// DÉMO 2 — FOURIER (SUPERPOSITION)
+// ============================================================
+function drawFourier() {
+  const on1 = document.getElementById('f1-on').checked;
+  const on2 = document.getElementById('f2-on').checked;
+  const on3 = document.getElementById('f3-on').checked;
+  const a1  = parseFloat(document.getElementById('f1-amp').value);
+  const a2  = parseFloat(document.getElementById('f2-amp').value);
+  const a3  = parseFloat(document.getElementById('f3-amp').value);
+  document.getElementById('f1-amp-lbl').textContent = a1.toFixed(1);
+  document.getElementById('f2-amp-lbl').textContent = a2.toFixed(1);
+  document.getElementById('f3-amp-lbl').textContent = a3.toFixed(1);
+
+  const { c, ctx, W, H } = getCtx('fourierCanvas', 200);
+  ctx.clearRect(0, 0, W, H);
+
+  // Axe
+  ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+
+  const colors = ['#ef4444','#3b82f6','#8b5cf6'];
+  const freqs  = [1, 3, 5];
+  const amps   = [a1, a2, a3];
+  const ons    = [on1, on2, on3];
+
+  // Draw individual components faintly
+  ons.forEach((on, idx) => {
+    if (!on) return;
+    ctx.strokeStyle = colors[idx] + '55'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x < W; x++) {
+      const t = (x / W) * 2;
+      const y = H/2 - amps[idx] * (H/2 - 20) * Math.sin(2 * Math.PI * freqs[idx] * t);
+      x === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  });
+
+  // Draw combined signal
+  ctx.strokeStyle = '#0D9488'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let x = 0; x < W; x++) {
+    const t = (x / W) * 2;
+    let sum = 0;
+    ons.forEach((on, idx) => {
+      if (on) sum += amps[idx] * Math.sin(2 * Math.PI * freqs[idx] * t);
+    });
+    const totalAmp = amps.filter((_,i)=>ons[i]).reduce((a,b)=>a+b, 0) || 1;
+    const y = H/2 - (sum / totalAmp) * (H/2 - 20);
+    x === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Legend
+  const active = ons.map((on,i)=>on?`f${i+1}=${freqs[i]}Hz(×${amps[i].toFixed(1)})`:'').filter(Boolean);
+  document.getElementById('fourierCalc').textContent =
+    `Signal combiné (vert) = ${active.length ? active.join(' + ') : 'Aucune composante active'}
+Chaque couleur = une composante sinusoïdale individuelle`;
+}
+
+['f1-on','f2-on','f3-on','f1-amp','f2-amp','f3-amp'].forEach(id =>
+  document.getElementById(id).oninput = drawFourier
+);
+
+// ============================================================
+// DÉMO 3 — MODULATION ASK / FSK / PSK / QAM
+// ============================================================
+function drawModulation() {
+  const type = document.getElementById('modType').value;
+  const raw  = document.getElementById('bitInput').value.replace(/[^01]/g,'') || '10110010';
+  const bits = raw.split('').slice(0,8).map(Number);
+
+  const { c, ctx, W, H } = getCtx('modCanvas', 220);
+  ctx.clearRect(0, 0, W, H);
+
+  const n    = bits.length;
+  const segW = W / n;
+  const fc   = 4.5; // cycles per segment
+  const mid  = H * 0.55;
+
+  // Bit labels + separators
+  bits.forEach((b, i) => {
+    ctx.fillStyle = b ? '#10b981' : '#ef4444';
+    ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('bit ' + b, i * segW + segW / 2, 16);
+    if (i > 0) {
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(i*segW,22); ctx.lineTo(i*segW,H-10); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  });
+
+  // Axe zéro
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(W,mid); ctx.stroke();
+
+  // Signal modulé
+  const amp0 = H * 0.18;
+  const amp1 = H * 0.35;
+  ctx.strokeStyle = '#0D9488'; ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  for (let x = 0; x < W; x++) {
+    const bi  = Math.min(Math.floor(x / segW), n - 1);
+    const bit = bits[bi];
+    const t   = (x % segW) / segW;
+    let y;
+    if (type === 'ask') {
+      const a = bit ? amp1 : amp0 * 0.4;
+      y = mid - a * Math.sin(2 * Math.PI * fc * t);
+    } else if (type === 'fsk') {
+      const fLocal = bit ? fc * 2 : fc;
+      y = mid - amp1 * Math.sin(2 * Math.PI * fLocal * t);
+    } else if (type === 'psk') {
+      const ph = bit ? Math.PI : 0;
+      y = mid - amp1 * Math.sin(2 * Math.PI * fc * t + ph);
+    } else { // qam
+      const a  = bit ? amp1 : amp0 * 0.7;
+      const ph = bit ? 0   : Math.PI / 3;
+      y = mid - a * Math.sin(2 * Math.PI * fc * t + ph);
+    }
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  const descriptions = {
+    ask: 'ASK — Amplitude Shift Keying\nbit 1 → grande amplitude  |  bit 0 → petite amplitude',
+    fsk: 'FSK — Frequency Shift Keying\nbit 1 → haute fréquence (×2)  |  bit 0 → basse fréquence',
+    psk: 'PSK — Phase Shift Keying\nbit 1 → déphasage π (180°)  |  bit 0 → pas de déphasage',
+    qam: 'QAM — Quadrature Amplitude Modulation\nCombine amplitude ET phase → plus de bits par symbole'
+  };
+  document.getElementById('modCalc').textContent = descriptions[type];
+}
+
+document.getElementById('modType').onchange  = drawModulation;
+document.getElementById('bitInput').oninput  = () => {
+  document.getElementById('bitInput').value =
+    document.getElementById('bitInput').value.replace(/[^01]/g,'').slice(0,8);
+  drawModulation();
+};
+
+// ============================================================
+// DÉMO 4 — INTERLEAVING
+// ============================================================
+function drawInterleaving() {
+  const pos = parseInt(document.getElementById('burst-pos').value);
+  const len = parseInt(document.getElementById('burst-len').value);
+  document.getElementById('burstPos-lbl').textContent = pos;
+  document.getElementById('burstLen-lbl').textContent = len;
+
+  const { c, ctx, W, H } = getCtx('interleaveCanvas', 230);
+  ctx.clearRect(0, 0, W, H);
+
+  const w1 = 'Hello', w2 = 'World';
+  const combined = (w1 + w2).split('');       // 10 chars, sans interleaving
+  const interleaved = [];
+  for (let i = 0; i < Math.max(w1.length, w2.length); i++) {
+    if (i < w1.length) interleaved.push(w1[i]);
+    if (i < w2.length) interleaved.push(w2[i]);
+  }
+
+  const N    = combined.length;  // 10
+  const startX = 110;
+  const cw   = Math.min(34, (W - startX - 10) / N);
+
+  function drawRow(chars, y, label, highlightIdxs, hlColor) {
+    ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(label, 4, y + 19);
+    chars.forEach((ch, i) => {
+      const x   = startX + i * cw;
+      const isH = highlightIdxs.includes(i);
+      ctx.fillStyle = isH ? hlColor : '#e2e8f0';
+      ctx.fillRect(x + 1, y, cw - 2, 28);
+      ctx.fillStyle = isH ? '#fff' : '#1e293b';
+      ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+      ctx.fillText(ch, x + cw / 2, y + 19);
+    });
+  }
+
+  // Burst positions
+  const burstIdxNoIL   = Array.from({ length: len }, (_, i) => (pos + i) % N);
+  const burstIdxIL     = Array.from({ length: len }, (_, i) => (pos + i) % N);
+
+  // --- Ligne 1 : sans interleaving ---
+  drawRow(combined, 10, 'Sans interleaving:', burstIdxNoIL, '#ef4444');
+
+  // --- Ligne 2 : avec interleaving ---
+  drawRow(interleaved, 55, 'Avec interleaving:', burstIdxIL, '#f59e0b');
+
+  // Désentrelacer et marquer erreurs
+  const ilWithErrors = interleaved.map((ch, i) => burstIdxIL.includes(i) ? '?' : ch);
+  const deIL = [];
+  for (let i = 0; i < w1.length; i++) deIL.push(ilWithErrors[i * 2] ?? '?');
+  for (let i = 0; i < w2.length; i++) deIL.push(ilWithErrors[i * 2 + 1] ?? '?');
+  const errorsDeIL = deIL.map((ch, i) => ch === '?' ? i : -1).filter(i => i >= 0);
+
+  // --- Ligne 3 : après désentrelacement ---
+  drawRow(deIL, 100, 'Après désenlacement:', errorsDeIL, '#f59e0b');
+
+  // Légende
+  ctx.fillStyle='#ef4444'; ctx.fillRect(10,145,14,14);
+  ctx.fillStyle='#1e293b'; ctx.font='11px sans-serif'; ctx.textAlign='left';
+  ctx.fillText('Erreur rafale (sans IL) : plusieurs erreurs dans le même mot → difficile à corriger',30,157);
+  ctx.fillStyle='#f59e0b'; ctx.fillRect(10,168,14,14);
+  ctx.fillText('Erreurs distribuées (avec IL) : max 1 erreur par mot → code correcteur suffit !',30,180);
+
+  // Bilan
+  const errInW1 = burstIdxNoIL.filter(i => i < w1.length).length;
+  const errInW2 = burstIdxNoIL.filter(i => i >= w1.length).length;
+  const maxErrIL= Math.max(
+    burstIdxIL.filter(i=>i%2===0).length,
+    burstIdxIL.filter(i=>i%2===1).length
+  );
+  document.getElementById('interleaveLog').textContent =
+    `Sans interleaving : ${errInW1} erreurs dans "Hello", ${errInW2} dans "World"\n` +
+    `Avec interleaving : max ${maxErrIL} erreur par mot → ${maxErrIL <= 1 ? '✅ corrigeable !' : '⚠️ peut nécessiter plus de redondance'}`;
+}
+
+document.getElementById('burst-pos').oninput = drawInterleaving;
+document.getElementById('burst-len').oninput = drawInterleaving;
+
+// ============================================================
+// DÉMO 5 — DSSS
+// ============================================================
+function drawDSSS() {
+  const bitVal = parseInt(document.getElementById('dsss-bit').value); // 0 ou 1
+  const clen   = parseInt(document.getElementById('dsss-len').value);
+  document.getElementById('dsss-bit-lbl').textContent = bitVal;
+  document.getElementById('dsss-len-lbl').textContent = clen;
+
+  // Code fixe alterné : -1, +1, -1, +1, ...
+  const code   = Array.from({ length: clen }, (_, i) => i % 2 === 0 ? -1 : 1);
+  const bit    = bitVal === 1 ? 1 : -1;
+  const spread = code.map(c => c * bit);
+
+  const { c, ctx, W, H } = getCtx('dsssCanvas', 260);
+  ctx.clearRect(0, 0, W, H);
+
+  const rowH  = 65;
+  const barW  = (W - 120) / clen;
+  const labels = [`Bit ${bitVal} (${bit > 0 ? '+1' : '-1'})`, `Code DSSS (${clen} chips)`, 'Signal émis (bit × code)'];
+  const colors = [bit > 0 ? '#10b981' : '#3b82f6', '#8b5cf6', '#f59e0b'];
+  const dataSets = [[bit], code, spread];
+
+  dataSets.forEach((data, ri) => {
+    const y0 = 8 + ri * (rowH + 8);
+    ctx.fillStyle = '#64748b'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(labels[ri], 4, y0 + rowH / 2 + 4);
+    const mx = dataSets[ri].length;
+    const bw = (W - 120) / mx;
+    data.forEach((v, i) => {
+      const x    = 110 + i * bw;
+      const barH = Math.abs(v) * rowH * 0.38;
+      const barY = v > 0 ? y0 + rowH / 2 - barH : y0 + rowH / 2;
+      ctx.fillStyle = v > 0 ? colors[ri] : '#ef4444';
+      ctx.fillRect(x + 2, barY, bw - 4, barH);
+      ctx.fillStyle = '#1e293b'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText((v > 0 ? '+' : '') + v, x + bw / 2, v > 0 ? barY - 2 : barY + barH + 10);
+    });
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(110, y0+rowH/2); ctx.lineTo(W-4, y0+rowH/2); ctx.stroke();
+  });
+
+  const correlation = code.reduce((sum, c, i) => sum + c * spread[i], 0);
+  document.getElementById('dsssCalc').textContent =
+    `Bit ${bitVal} (${bit>0?'+1':'-1'}) × Code [${code.join(', ')}]\n= Signal [${spread.join(', ')}]\n\nDécodage : corrélation = Signal · Code = ${spread.map((s,i)=>s+'×'+code[i]).join(' + ')} = ${correlation}\n${correlation > 0 ? '→ corrélation > 0 → bit "1" ✅' : '→ corrélation < 0 → bit "0" ✅'}`;
+}
+
+document.getElementById('dsss-bit').oninput = drawDSSS;
+document.getElementById('dsss-len').oninput = drawDSSS;
+
+// ============================================================
+// KATEX — Rendu des formules
+// ============================================================
+function renderKatex() {
+  if (!window.katex) { setTimeout(renderKatex, 200); return; }
+  document.getElementById('fourierFormula').innerHTML = katex.renderToString(
+    's(t) = A_1\\sin(2\\pi f_1 t+\\varphi_1) + A_2\\sin(2\\pi f_2 t+\\varphi_2) + \\cdots',
+    {displayMode:true, throwOnError:false}
+  );
+  document.getElementById('modulFormula').innerHTML = katex.renderToString(
+    'E_x(t) = A(t)\\cdot\\sin\\!\\bigl(2\\pi\\cdot f(t)\\cdot t + \\varphi(t)\\bigr)',
+    {displayMode:true, throwOnError:false}
+  );
+}
+
+// ============================================================
+// INIT (après rendu DOM complet)
+// ============================================================
+window.addEventListener('load', () => {
+  renderKatex();
+  drawWave();
+  drawFourier();
+  drawModulation();
+  drawInterleaving();
+  drawDSSS();
+});
+
+window.addEventListener('resize', () => {
+  drawWave();
+  drawFourier();
+  drawModulation();
+  drawInterleaving();
+  drawDSSS();
+});
+</script>
+</body>
+</html>

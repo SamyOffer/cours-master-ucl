@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch1 — Introduction & IoT | LINFO2146</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:#fff;padding:0;}
+.header-stripe{height:6px;background:linear-gradient(90deg,var(--amber),var(--teal));}
+.header-content{padding:1.8rem 2rem;}
+.breadcrumb{font-size:.85rem;color:#93c5fd;margin-bottom:.5rem;}
+.breadcrumb a{color:#93c5fd;text-decoration:none;}
+.breadcrumb a:hover{color:#fff;}
+h1{font-size:1.8rem;font-weight:700;}
+.subtitle{color:#93c5fd;font-size:.95rem;margin-top:.3rem;}
+main{max-width:960px;margin:0 auto;padding:2rem 1.5rem;}
+.section{background:var(--white);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:1.8rem;margin-bottom:1.5rem;}
+.section h2{color:var(--navy);font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.section h3{color:var(--teal);font-size:1rem;font-weight:700;margin:1.2rem 0 .6rem;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;}
+.explain-intro .badge{display:inline-block;background:var(--amber);color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;}
+.explain-intro p{color:#78350f;line-height:1.7;margin-bottom:.6rem;}
+.explain-intro ul{color:#78350f;padding-left:1.2rem;line-height:1.8;}
+.retenir{background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;}
+.retenir::before{content:'💡 À retenir : ';}
+.math-block{background:#f0fdf4;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;}
+.math-block .badge{display:inline-block;background:var(--teal);color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;}
+.math-block .phrase{color:#065f46;font-style:italic;margin-bottom:.8rem;}
+.math-render{text-align:center;margin:1rem 0;padding:1rem;background:#fff;border-radius:8px;}
+.symbol-table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem;}
+.symbol-table th{background:var(--teal);color:#fff;padding:.5rem .8rem;text-align:left;}
+.symbol-table td{padding:.45rem .8rem;border-bottom:1px solid #d1fae5;}
+.symbol-table tr:nth-child(even) td{background:#f0fdf4;}
+.theory-box{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;}
+.theory-box .badge{display:inline-block;background:#3b82f6;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin:1rem 0;}
+.icon-item{background:var(--light);border-radius:10px;padding:.8rem;text-align:center;}
+.icon-item .ico{font-size:1.8rem;margin-bottom:.3rem;}
+.icon-item .lbl{font-size:.8rem;font-weight:700;color:var(--navy);}
+.icon-item .desc{font-size:.75rem;color:var(--gray);margin-top:.2rem;}
+.steps{counter-reset:step;margin:1rem 0;}
+.step{display:flex;gap:.8rem;margin-bottom:.8rem;align-items:flex-start;}
+.step-num{background:var(--teal);color:#fff;font-weight:700;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;}
+.step-text{color:#1e293b;line-height:1.6;padding-top:.1rem;}
+.demo-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:1.4rem;margin:1rem 0;}
+.demo-box h4{color:var(--navy);font-size:.95rem;font-weight:700;margin-bottom:1rem;}
+.controls{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1rem;}
+.ctrl-group{display:flex;flex-direction:column;gap:.3rem;}
+.ctrl-group label{font-size:.8rem;font-weight:600;color:var(--gray);}
+input[type=range]{width:160px;accent-color:var(--teal);}
+.val-display{font-size:.85rem;color:var(--teal);font-weight:700;}
+button.btn{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:.5rem 1.2rem;font-size:.85rem;cursor:pointer;font-weight:600;}
+button.btn:hover{background:#0f766e;}
+button.btn-amber{background:var(--amber);}
+button.btn-amber:hover{background:#d97706;}
+canvas.demo-canvas{border:1px solid #e2e8f0;border-radius:8px;background:#fff;max-width:100%;}
+.calc-display{background:#1e293b;color:#4ade80;font-family:monospace;font-size:.85rem;padding:.8rem 1rem;border-radius:8px;margin-top:.8rem;line-height:1.8;}
+table.info-table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1rem 0;}
+.info-table th{background:var(--navy);color:#fff;padding:.5rem .8rem;text-align:left;}
+.info-table td{padding:.45rem .8rem;border-bottom:1px solid #e2e8f0;}
+.info-table tr:nth-child(even) td{background:#f8fafc;}
+.tag{display:inline-block;background:var(--light);color:var(--teal);font-size:.75rem;padding:.2rem .6rem;border-radius:20px;font-weight:600;margin:.2rem;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:1.5rem;margin-top:3rem;font-size:.85rem;}
+footer strong{color:#fff;}
+.nav-bottom{display:flex;justify-content:space-between;margin-top:2rem;}
+.nav-btn{background:var(--teal);color:#fff;text-decoration:none;padding:.7rem 1.4rem;border-radius:8px;font-weight:600;font-size:.9rem;}
+.nav-btn.next{background:var(--navy);}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-stripe"></div>
+  <div class="header-content">
+    <div class="breadcrumb"><a href="index.html">← Accueil</a> / Chapitre 1</div>
+    <h1>🌐 Introduction — Systèmes embarqués & Internet des Objets</h1>
+    <div class="subtitle">IoT, WSN, matériel, interruptions — les bases du cours LINFO2146</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ========== SECTION 1 : SYSTÈMES EMBARQUÉS ========== -->
+<div class="section">
+  <h2>🔧 1. Systèmes embarqués</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un système embarqué ?</div>
+    <p>Imagine un petit ordinateur caché à l'intérieur d'un objet, comme dans votre machine à laver ou dans l'airbag d'une voiture. Il n'a pas d'écran, pas de clavier — il fait juste <strong>une seule chose, mais très bien</strong>.</p>
+    <p><em>"Un système embarqué est un système informatique avec une fonction dédiée au sein d'un système mécanique ou électrique plus grand."</em></p>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="ico">🫧</div><div class="lbl">Machine à laver</div><div class="desc">Contrôle les cycles, la température</div></div>
+      <div class="icon-item"><div class="ico">🚗</div><div class="lbl">Voiture</div><div class="desc">50–100 microcontrôleurs par véhicule !</div></div>
+      <div class="icon-item"><div class="ico">🌡️</div><div class="lbl">Thermostat</div><div class="desc">Lit une température, commande le chauffage</div></div>
+      <div class="icon-item"><div class="ico">📡</div><div class="lbl">Routeur</div><div class="desc">Achemine les paquets réseau</div></div>
+    </div>
+    <div class="retenir">Un système embarqué est cheap, petit, peu gourmand en énergie, robuste, et souvent connecté au monde physique via des capteurs.</div>
+  </div>
+
+  <h3>Caractéristiques clés</h3>
+  <div class="icon-grid">
+    <div class="icon-item"><div class="ico">💸</div><div class="lbl">Bon marché</div><div class="desc">Un microcontrôleur ATMEGA8A coûte &lt;0,10€</div></div>
+    <div class="icon-item"><div class="ico">🔋</div><div class="lbl">Basse conso</div><div class="desc">Fonctionne sur pile pendant des années</div></div>
+    <div class="icon-item"><div class="ico">🌡️</div><div class="lbl">Robuste</div><div class="desc">Fonctionne de −30°C à +80°C</div></div>
+    <div class="icon-item"><div class="ico">⚡</div><div class="lbl">Temps-réel</div><div class="desc">Réponse garantie en quelques ms</div></div>
+  </div>
+
+  <h3>Types de processeurs embarqués</h3>
+  <table class="info-table">
+    <tr><th>Type</th><th>Description</th><th>Exemple</th></tr>
+    <tr><td><strong>Microcontrôleur</strong></td><td>CPU + RAM + interfaces sur une seule puce</td><td>ATmega128L (WSN)</td></tr>
+    <tr><td><strong>ASIC</strong></td><td>Circuit intégré sur mesure, très efficace</td><td>Chipset WiFi</td></tr>
+    <tr><td><strong>DSP</strong></td><td>Processeur spécialisé traitement du signal</td><td>Téléphones</td></tr>
+    <tr><td><strong>SoC</strong></td><td>CPU + GPU + interfaces intégrés</td><td>BCM2711 (Raspberry Pi 4)</td></tr>
+  </table>
+
+  <div class="theory-box">
+    <div class="badge">📌 Exemples réels du cours</div>
+    <p><strong>ATMEGA8A</strong> : 8-bit, 4MHz, 1KB SRAM, 8KB flash — prix &lt;0,10€. Utilisé dans des appareils simples.</p>
+    <p style="margin-top:.5rem;"><strong>BCM2711 (Raspberry Pi 4B)</strong> : SoC 64-bit quad-core ARM A72 à 1,5GHz + GPU 500MHz. Nécessite une RAM externe.</p>
+    <p style="margin-top:.5rem;"><strong>Voiture moderne</strong> : 50 à 100 microprocesseurs pour le moteur, les airbags, ABS, climatisation, divertissement...</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : WSN ========== -->
+<div class="section">
+  <h2>📡 2. Réseaux de capteurs sans fil (WSN)</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un WSN ?</div>
+    <p>Imagine des centaines de petits capteurs éparpillés dans une forêt, sur une montagne ou dans une usine. Chacun mesure quelque chose (température, humidité, vibration) et envoie ses données sans fil à un serveur — comme une <strong>toile d'araignée numérique</strong>.</p>
+    <p>WSN = <strong>W</strong>ireless <strong>S</strong>ensor <strong>N</strong>etwork. Premier WSN : projet SmartDust (2001, Berkeley/UCLA).</p>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="ico">🌲</div><div class="lbl">Forêts</div><div class="desc">Surveillance de l'écosystème</div></div>
+      <div class="icon-item"><div class="ico">🏔️</div><div class="lbl">Alpes</div><div class="desc">Permafrost (projet PermaSense)</div></div>
+      <div class="icon-item"><div class="ico">🏭</div><div class="lbl">Industrie</div><div class="desc">Surveillance d'équipements</div></div>
+      <div class="icon-item"><div class="ico">🚒</div><div class="lbl">Catastrophes</div><div class="desc">Gestion des crises</div></div>
+    </div>
+    <div class="retenir">Un WSN = un réseau de petits nœuds avec capteurs + radio + batterie qui coopèrent pour transmettre leurs mesures sur de longues distances via plusieurs sauts (multi-hop).</div>
+  </div>
+
+  <h3>Exemple : Nœud Shockfish TinyNode 584 (PermaSense, 2007)</h3>
+  <div class="theory-box">
+    <div class="badge">📌 Cas réel : Alpes suisses à −30°C</div>
+    <p>Ce nœud surveille le permafrost dans les Alpes suisses, inaccessibles 7 mois sur 12. Il doit fonctionner par grand froid avec des batteries.</p>
+    <table class="info-table" style="margin-top:.8rem;">
+      <tr><th>Composant</th><th>Valeur</th></tr>
+      <tr><td>Mode veille</td><td><strong>12 µA</strong> (quasi rien !)</td></tr>
+      <tr><td>Mode transmission</td><td><strong>14 mA</strong></td></tr>
+      <tr><td>Batterie</td><td>Lithium-thionyl chloride (Li-SOCl2)</td></tr>
+    </table>
+    <p style="margin-top:.5rem;color:var(--gray);font-size:.85rem;">💡 Grâce au mode veille très efficace, la batterie dure plusieurs années !</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : IOT ========== -->
+<div class="section">
+  <h2>🌍 3. Internet des Objets (IoT)</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi l'IoT ?</div>
+    <p>Pense à tous les objets de ta vie quotidienne (frigo, lampe, voiture, thermostat) qui sont connectés à Internet et qui <strong>communiquent entre eux et avec des serveurs dans le cloud</strong>.</p>
+    <p>L'IoT = WSN + adressabilité + protocoles standardisés + traitement cloud/edge.</p>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="ico">🏠</div><div class="lbl">Maison connectée</div><div class="desc">Lumières, thermostat, sécurité</div></div>
+      <div class="icon-item"><div class="ico">⌚</div><div class="lbl">Wearables</div><div class="desc">Montres, capteurs santé</div></div>
+      <div class="icon-item"><div class="ico">🏙️</div><div class="lbl">Smart City</div><div class="desc">Éclairage, parkings, déchets</div></div>
+      <div class="icon-item"><div class="ico">🌾</div><div class="lbl">Agriculture</div><div class="desc">Humidité sol, irrigation auto</div></div>
+    </div>
+  </div>
+
+  <h3>Différence WSN vs IoT</h3>
+  <table class="info-table">
+    <tr><th></th><th>WSN</th><th>IoT</th></tr>
+    <tr><td>Adressabilité</td><td>Limitée</td><td>✅ IPv6, RFID</td></tr>
+    <tr><td>Protocoles</td><td>Propriétaires</td><td>✅ Standards (CoAP, MQTT)</td></tr>
+    <tr><td>Cloud</td><td>Optionnel</td><td>✅ Intégré</td></tr>
+    <tr><td>Découverte</td><td>Difficile</td><td>✅ Automatique</td></tr>
+  </table>
+
+  <h3>Technologies réseau pour IoT</h3>
+  <div class="icon-grid">
+    <div class="icon-item"><div class="ico">🔵</div><div class="lbl">Bluetooth/BLE</div><div class="desc">Quelques mètres, oreillettes, wearables</div></div>
+    <div class="icon-item"><div class="ico">📶</div><div class="lbl">WiFi</div><div class="desc">Maison, bâtiments, haute vitesse</div></div>
+    <div class="icon-item"><div class="ico">🟤</div><div class="lbl">IEEE 802.15.4</div><div class="desc">Faible consommation, capteurs</div></div>
+    <div class="icon-item"><div class="ico">📡</div><div class="lbl">LoRa/LPWAN</div><div class="desc">Longue portée, campagne, compteurs</div></div>
+  </div>
+</div>
+
+<!-- ========== SECTION 4 : HARDWARE ========== -->
+<div class="section">
+  <h2>🔩 4. Matériel WSN/IoT moderne</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un "mote" ?</div>
+    <p>Un <strong>mote</strong> (= nœud WSN) c'est une petite carte électronique de la taille d'une pièce de monnaie. Elle a un micro-processeur minuscule, une radio, des capteurs, et une batterie — le tout conçu pour consommer le moins possible.</p>
+    <div class="retenir">La clé d'un bon mote : CPU lent + radio basse consommation + mode veille agressif = batterie qui dure des années !</div>
+  </div>
+
+  <h3>Comparaison : Z1 (Zolertia) vs RE-Mote</h3>
+  <table class="info-table">
+    <tr><th>Caractéristique</th><th>Z1 (vieux)</th><th>RE-Mote (récent)</th></tr>
+    <tr><td>CPU</td><td>16-bit RISC, 16MHz</td><td>ARM Cortex-M3, 32MHz</td></tr>
+    <tr><td>Flash</td><td>92 KB</td><td>512 KB</td></tr>
+    <tr><td>RAM</td><td>8 KB</td><td>32 KB</td></tr>
+    <tr><td>Veille</td><td>0.5 µA</td><td>150 nA (!)</td></tr>
+    <tr><td>Radio</td><td>CC2420, 2.4 GHz</td><td>IEEE 802.15.4 + 868/915 MHz</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 5 : INTERRUPTS ========== -->
+<div class="section">
+  <h2>⚡ 5. Interruptions vs Polling</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le polling ?</div>
+    <p>Imagine un vigile qui regarde une porte toutes les 5 secondes pour voir si quelqu'un entre. Il ne fait que ça, en boucle. C'est le <strong>polling</strong> : vérifier en permanence si quelque chose s'est passé.</p>
+    <p>Le problème ? Le vigile ne peut rien faire d'autre, et il est épuisé (= le CPU consomme de l'énergie en permanence).</p>
+    <div class="retenir">Polling = simple à programmer mais gaspille de l'énergie. Interruptions = plus complexe mais le CPU peut dormir entre deux événements.</div>
+  </div>
+
+  <div class="explain-intro" style="background:#f0fdf4;border-color:var(--teal);">
+    <div class="badge" style="background:var(--teal);">🧒 C'est quoi une interruption ?</div>
+    <p>Maintenant imagine que la porte a une sonnette. Le vigile peut dormir, et la sonnette le réveille quand quelqu'un arrive. C'est une <strong>interruption</strong> : un signal matériel qui interrompt le CPU pour lui dire "quelque chose s'est passé !"</p>
+    <p>Quand une interruption arrive, le CPU :</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Stoppe l'exécution du programme en cours</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Sauvegarde l'adresse de la prochaine instruction (sur la pile)</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Sauvegarde l'état des registres (coûteux !)</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Saute à la routine de service d'interruption (ISR) dans la table des vecteurs</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Reprend l'exécution là où il s'était arrêté</div></div>
+    </div>
+  </div>
+
+  <!-- DÉMO INTERACTIVE : Simulation Polling vs Interrupts -->
+  <div class="demo-box">
+    <h4>🎮 Démo interactive — Polling vs Interruptions</h4>
+    <p style="font-size:.85rem;color:var(--gray);margin-bottom:1rem;">Compare la consommation énergétique des deux approches. Ajuste la fréquence des événements.</p>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Fréquence d'événements (par seconde) : <span class="val-display" id="evtFreq">2</span></label>
+        <input type="range" min="1" max="20" value="2" oninput="updatePollDemo(this.value)">
+      </div>
+      <div class="ctrl-group">
+        <label>Période de polling (ms) : <span class="val-display" id="pollPeriod">50</span></label>
+        <input type="range" min="5" max="200" value="50" step="5" oninput="updatePollPeriod(this.value)">
+      </div>
+    </div>
+    <canvas id="energyChart" height="180"></canvas>
+    <div class="calc-display" id="energyCalc">Calcul en cours...</div>
+  </div>
+
+  <h3>Comparaison résumée</h3>
+  <table class="info-table">
+    <tr><th></th><th>Polling</th><th>Interruptions</th></tr>
+    <tr><td>Complexité</td><td>✅ Simple (boucle while)</td><td>⚠️ Nécessite ISR + Table des vecteurs</td></tr>
+    <tr><td>Énergie</td><td>❌ CPU actif en permanence</td><td>✅ CPU peut dormir</td></tr>
+    <tr><td>Latence</td><td>Proportionnelle à la période</td><td>Quelques µs ou ms</td></tr>
+    <tr><td>Risque</td><td>Manquer des événements rapides</td><td>Conditions de course (race conditions)</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 6 : DÉFI COMMUNICATION ========== -->
+<div class="section">
+  <h2>📶 6. Défi : Communication multi-saut</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Le problème de la portée</div>
+    <p>Un capteur dans les Alpes ne peut pas envoyer directement ses données à un serveur à Bruxelles — il n'a pas assez de puissance. Solution : les données "sautent" de nœud en nœud, comme une chaîne de relais humains.</p>
+    <p>C'est ce qu'on appelle un réseau <strong>multi-hop</strong>. Mais ça crée de nouveaux défis :</p>
+    <ul>
+      <li>Les nœuds ne connaissent pas toujours leurs voisins (réseau dynamique)</li>
+      <li>Des nœuds peuvent disparaître (batterie morte, panne)</li>
+      <li>Il faut des algorithmes de routage robustes et auto-organisés</li>
+    </ul>
+    <div class="retenir">La solution au problème d'énergie + portée = réseau maillé (mesh) multi-hop avec des protocoles de routage intelligents comme RPL (Chapitre 10).</div>
+  </div>
+
+  <!-- DÉMO CANVAS : Réseau multi-hop animé -->
+  <div class="demo-box">
+    <h4>🎮 Démo — Propagation dans un réseau multi-hop</h4>
+    <div class="controls">
+      <button class="btn" onclick="sendPacket()">📨 Envoyer un paquet</button>
+      <button class="btn btn-amber" onclick="resetNetwork()">↺ Réinitialiser</button>
+    </div>
+    <canvas id="networkCanvas" width="600" height="300" class="demo-canvas" style="width:100%;"></canvas>
+    <div class="calc-display" id="networkLog">Cliquez sur "Envoyer un paquet" pour démarrer la simulation</div>
+  </div>
+</div>
+
+<!-- ========== SECTION 7 : ARCHITECTURES IoT ========== -->
+<div class="section">
+  <h2>🔌 7. Architectures de communication IoT</h2>
+
+  <h3>Types de réseaux sans fil : portée et technologie</h3>
+  <div class="explain-intro">
+    <div class="badge">🧒 Quels réseaux pour quel besoin ?</div>
+    <p>Les appareils IoT ne communiquent pas tous de la même manière. Un pacemaker implé dans un cœur n'utilise pas la même radio qu'un capteur agricole à 5 km de distance. Chaque type de réseau a sa place dans l'écosystème IoT.</p>
+  </div>
+
+  <table class="info-table">
+    <tr><th>Type de réseau</th><th>Portée</th><th>Technologie typique</th><th>Conso. énergie</th><th>Débit</th></tr>
+    <tr><td><strong>BAN</strong> (Body Area Network)</td><td>&lt;1 m</td><td>Bluetooth LE, NFC</td><td>Très basse (µW)</td><td>100 kb/s – 1 Mb/s</td></tr>
+    <tr><td><strong>PAN</strong> (Personal Area)</td><td>10–100 m</td><td>IEEE 802.15.4, Bluetooth, Zigbee</td><td>Basse (mW)</td><td>20–250 kb/s</td></tr>
+    <tr><td><strong>LAN</strong> (Local Area)</td><td>100 m – 1 km</td><td>WiFi (802.11), Thread</td><td>Moyenne (100+ mW)</td><td>1–50 Mb/s</td></tr>
+    <tr><td><strong>MAN/WAN</strong></td><td>&gt;1 km</td><td>LoRa, LTE-M, NB-IoT, 5G</td><td>Moyenne–haute</td><td>10 kb/s – 100 Mb/s</td></tr>
+  </table>
+
+  <h3>Où traiter les données ? On-device vs Edge vs Cloud</h3>
+  <div class="theory-box">
+    <div class="badge">📌 Trois lieux de traitement</div>
+    <div style="margin-top:.8rem;line-height:1.8;">
+      <p><strong>1. On-device (mote)</strong></p>
+      <ul style="padding-left:1.2rem;color:#1e40af;margin-bottom:.8rem;">
+        <li><strong>Latence :</strong> ✅ Minimale (calcul immédiat sur le capteur)</li>
+        <li><strong>Bande passante :</strong> ✅ Épargne la radio (traite localement)</li>
+        <li><strong>Confidentialité :</strong> ✅ Données sensibles ne quittent pas le capteur</li>
+        <li><strong>Limitation :</strong> ❌ Ressources très contraintes (CPU, RAM, énergie)</li>
+      </ul>
+
+      <p><strong>2. Edge/Fog computing (passerelle, gateway)</strong></p>
+      <ul style="padding-left:1.2rem;color:#1e40af;margin-bottom:.8rem;">
+        <li><strong>Latence :</strong> ⚖️ Intermédiaire (ms–ms)</li>
+        <li><strong>Ressources :</strong> ⚖️ Plus disponibles qu'un mote, moins qu'un cloud</li>
+        <li><strong>Rôle :</strong> Agrègation, fusion, filtrage avant envoi vers cloud</li>
+        <li><strong>Exemple :</strong> Passerelle WiFi reçoit 100 capteurs 802.15.4, agrège, envoie résumé vers Internet</li>
+      </ul>
+
+      <p><strong>3. Cloud (serveur distant)</strong></p>
+      <ul style="padding-left:1.2rem;color:#1e40af;">
+        <li><strong>Puissance :</strong> ✅ Calcul massif, apprentissage automatique, big data</li>
+        <li><strong>Latence :</strong> ❌ Élevée (100+ms voire s), pas bon pour temps-réel</li>
+        <li><strong>Bande passante :</strong> ❌ Chaque capteur doit envoyer vers Internet (coûteux en énergie)</li>
+        <li><strong>Cas d'usage :</strong> Analyse historique, ML, tableaux de bord</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Le modèle TCP/IP pour IoT</h3>
+  <div class="explain-intro">
+    <div class="badge">🧒 Rappel : qu'est-ce que le modèle TCP/IP ?</div>
+    <p>C'est une pile de protocoles en couches. Chaque couche offre un service à la couche au-dessus. Pour l'IoT, c'est crucial : les motes implémentent souvent une version allégée de TCP/IP.</p>
+  </div>
+
+  <table class="info-table">
+    <tr><th>Couche</th><th>Rôle</th><th>Protocoles IoT</th><th>Couche(s) du cours</th></tr>
+    <tr><td><strong>Physique</strong></td><td>Signaux électriques sur le fil/air</td><td>IEEE 802.15.4 PHY (2.4 GHz, 868 MHz)</td><td>Chapitre 3</td></tr>
+    <tr><td><strong>MAC</strong> (Liaison de données)</td><td>Accès au médium, détection de collisions</td><td>CSMA, TDMA, IEEE 802.15.4 MAC</td><td>Chapitre 4</td></tr>
+    <tr><td><strong>Réseau</strong></td><td>Routage, adressage</td><td>IPv6, 6LoWPAN, RPL</td><td>Chapitres 10, 11</td></tr>
+    <tr><td><strong>Transport</strong></td><td>Fiabilité, contrôle de débit</td><td>UDP (léger), TCP (rare en IoT)</td><td>Chapitre 5</td></tr>
+    <tr><td><strong>Application</strong></td><td>Services pour l'utilisateur</td><td>CoAP, MQTT, HTTP</td><td>Chapitre 6</td></tr>
+  </table>
+
+  <h3>Les 4 grands défis de l'IoT</h3>
+  <div class="math-block">
+    <div class="badge">⚠️ Défis = compromis de conception</div>
+    <p style="margin-bottom:.8rem;"><strong>1. Énergie.</strong> Les piles doivent durer des années. Chaque bit transmis coûte 1000× plus que chaque calcul CPU. Solution : dormir autant que possible, compresser les données.</p>
+    <p style="margin-bottom:.8rem;"><strong>2. Communication.</strong> Les liens radio sont lossy (des paquets se perdent). Il faut des protocoles robustes et adaptatifs. IPv6 avec checksums et retransmissions.</p>
+    <p style="margin-bottom:.8rem;"><strong>3. Calcul.</strong> Un mote a ~1–32 KB de RAM (vs 4 GB sur un PC). Pas assez pour un OS type Linux. TinyOS/Contiki utilisent des événements plutôt que threads pour économiser la pile.</p>
+    <p><strong>4. Déploiement.</strong> Souvent 100s à 1000s de nœuds. Si 1 % des motes est défaillant, tu dois auto-organiser le réseau et re-router les paquets.</p>
+  </div>
+
+  <div class="retenir">L'IoT n'est pas juste "mettre un WiFi dans un objet". C'est tout un système de compromis entre énergie, portée, débit, coût et complexité.</div>
+</div>
+
+<!-- ========== SECTION : ENABLERS IOT ========== -->
+<div class="section">
+  <h2>🚀 8. Facteurs technologiques de l'IoT</h2>
+  <div class="explain-intro">
+    <div class="badge">🧒 Pourquoi l'IoT est possible aujourd'hui ?</div>
+    <p>L'IoT n'est pas né d'une seule invention, mais de <strong>six avancées technologiques majeures</strong> convergentes au cours des 20 dernières années.</p>
+  </div>
+
+  <table class="info-table">
+    <tr><th>#</th><th>Domaine</th><th>Apport pour l'IoT</th></tr>
+    <tr><td>1</td><td>Systèmes embarqués &amp; WSN</td><td>Calcul basse consommation, communication sans fil, OS légers, protocoles auto-organisants</td></tr>
+    <tr><td>2</td><td>Automatisation industrielle</td><td>Protocoles machine-to-machine (M2M)</td></tr>
+    <tr><td>3</td><td>Cloud &amp; Big Data</td><td>Stockage et traitement massif des données de capteurs, data mining</td></tr>
+    <tr><td>4</td><td>Systèmes distribués &amp; web</td><td>Grid computing, découverte de services, REST (style architectural web)</td></tr>
+    <tr><td>5</td><td>Adressabilité</td><td>RFID pour l'identification d'objets, IPv6 pour des milliards d'adresses</td></tr>
+    <tr><td>6</td><td>Systèmes autonomes</td><td>Agents logiciels, auto-organisation, intelligence artificielle embarquée</td></tr>
+  </table>
+
+  <div class="theory-box">
+    <div class="badge">📘 Théorie</div>
+    <p>Un système IoT complet ne se résume pas aux capteurs. Il nécessite aussi : des <strong>serveurs cloud</strong> pour stocker et analyser des milliards de mesures, des <strong>algorithmes d'IA</strong> pour la prédiction, des <strong>protocoles standardisés</strong> entre fabricants différents, et des <strong>APIs</strong> permettant aux smartphones et PC d'accéder aux données de manière sécurisée et efficace.</p>
+    <p style="margin-top:.6rem;">L'IoT <em>étend</em> le concept des WSN en ajoutant : adressabilité et découverte des appareils, protocoles standardisés de communication appareil-à-appareil et appareil-à-serveur, et traitement automatisé des données (sur l'appareil, à la périphérie "edge" ou dans le cloud).</p>
+    <div class="retenir">L'IoT = WSN + adressabilité + protocoles standardisés + traitement intelligent des données.</div>
+  </div>
+</div>
+
+<!-- ========== SECTION : JTAG / BSL ========== -->
+<div class="section">
+  <h2>🔌 9. Programmation et débogage matériel : JTAG &amp; BSL</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Comment charger du code sur un microcontrôleur ?</div>
+    <p>Sur un PC, on double-clique sur un installateur. Sur un microcontrôleur vide, il faut une <strong>interface physique spéciale</strong> pour charger le programme dans la mémoire flash.</p>
+  </div>
+
+  <h3>JTAG (Joint Test Action Group)</h3>
+  <div class="theory-box">
+    <div class="badge">📘 Théorie</div>
+    <p>JTAG est le nom d'un standard d'interface de débogage matériel. Malgré le nom d'une association, il est utilisé pour désigner l'interface elle-même. Il permet de :</p>
+    <ul style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+      <li>Écrire du code et des données dans la mémoire flash ou RAM du microcontrôleur (MCU) <strong>sans utiliser d'interface de communication standard</strong></li>
+      <li>Déboguer le code directement sur le MCU depuis un PC : points d'arrêt (breakpoints), exécution pas-à-pas, lecture de la mémoire et des registres</li>
+    </ul>
+  </div>
+
+  <h3>Bootstrap Loader (BSL)</h3>
+  <div class="theory-box">
+    <div class="badge">📘 Théorie</div>
+    <p>Le BSL est similaire au JTAG : il permet d'écrire dans la mémoire flash ou RAM via une interface série. JTAG et BSL sont nécessaires si l'appareil est <strong>complètement vide</strong>, c'est-à-dire qu'aucun chargeur de démarrage n'est présent en mémoire.</p>
+    <p style="margin-top:.5rem;">En général, le fabricant pré-installe un <strong>firmware</strong> sur l'appareil permettant de le mettre à jour via USB — ce qui évite d'avoir recours au JTAG/BSL pour les mises à jour ultérieures.</p>
+    <div class="retenir">JTAG = débogage et programmation matérielle. BSL = programmation via interface série. Les deux sont nécessaires pour un appareil "vierge".</div>
+  </div>
+</div>
+
+<!-- ========== SECTION : PROFIL DE CONSOMMATION ========== -->
+<div class="section">
+  <h2>🔋 10. Profil de consommation énergétique</h2>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Pourquoi l'énergie est critique ?</div>
+    <p>Un capteur IoT en milieu hostile (ex: PermaSense dans les Alpes, -30°C) doit tenir des mois ou années sur batterie. Chaque milliseconde d'activité du CPU ou de la radio coûte de l'énergie précieuse.</p>
+  </div>
+
+  <div class="theory-box">
+    <div class="badge">📘 Théorie : Exemple Shockfish</div>
+    <p>Le nœud Shockfish (projet PermaSense, 2007) optimisait sa consommation en suivant un profil d'activité cyclique :</p>
+    <ul style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+      <li><strong>Phase 1</strong> — Allumer régulièrement la radio pour scanner la présence d'autres nœuds</li>
+      <li><strong>Phase 2</strong> — Si aucun nœud trouvé → réduire la durée d'écoute</li>
+      <li><strong>Phase 3</strong> — Lire les capteurs, écrire sur la carte SD. Ne pas tenter d'envoyer.</li>
+    </ul>
+    <p style="margin-top:.6rem;">Dans ce cas d'usage, <strong>l'économie d'énergie primait sur la vitesse de communication</strong>. Le nœud consommait : 12 μA en veille, 14 mA pendant les transmissions — une différence de 1000× !</p>
+    <div class="retenir">Stratégie clé : minimiser le temps de réveil de la radio (la composante la plus énergivore) et dormir le plus possible entre les transmissions.</div>
+  </div>
+
+  <table class="info-table">
+    <tr><th>Composant</th><th>Consommation typique</th></tr>
+    <tr><td>CPU en veille (sleep)</td><td>~ 1–15 μA</td></tr>
+    <tr><td>CPU actif</td><td>~ 1–8 mA</td></tr>
+    <tr><td>Radio en réception (listen)</td><td>~ 10–20 mA</td></tr>
+    <tr><td>Radio en émission (transmit)</td><td>~ 17–27 mA</td></tr>
+    <tr><td>Radio en veille (sleep)</td><td>~ 1 μA</td></tr>
+  </table>
+</div>
+
+</main>
+
+<div style="max-width:960px;margin:0 auto;padding:0 1.5rem;">
+<div class="nav-bottom">
+  <a href="index.html" class="nav-btn">← Accueil</a>
+  <a href="quiz.html" class="nav-btn" style="background:#f59e0b;">🎯 Quiz</a>
+  <a href="ch2_os.html" class="nav-btn next">Chapitre 2 : Systèmes d'exploitation →</a>
+</div>
+</div>
+
+<footer>
+  <strong>LINFO2146 — Mobile and Embedded Computing</strong><br>
+  Prof. Ramin Sadre · UCLouvain · 2025–2026 | Chapitre 1 : Introduction & IoT
+</footer>
+
+<script>
+// ===== ENERGY CHART =====
+let evtFreqVal = 2, pollPeriodVal = 50;
+let energyChart;
+
+function initEnergyChart(){
+  const ctx = document.getElementById('energyChart').getContext('2d');
+  energyChart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Polling (CPU actif)', 'Interruptions (avec veille)'],
+      datasets:[{
+        label:'Consommation relative (%)',
+        data:[100, 10],
+        backgroundColor:['#ef4444','#10b981'],
+        borderRadius:8
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}
+    }
+  });
+  updateCalc();
+}
+
+function updatePollDemo(v){
+  evtFreqVal = parseInt(v);
+  document.getElementById('evtFreq').textContent = v;
+  recalcEnergy();
+}
+function updatePollPeriod(v){
+  pollPeriodVal = parseInt(v);
+  document.getElementById('pollPeriod').textContent = v;
+  recalcEnergy();
+}
+
+function recalcEnergy(){
+  // Polling: CPU toujours actif → 100%
+  // Interrupts: actif seulement pendant traitement (estimé à 5ms par evt)
+  const eventsPerSec = evtFreqVal;
+  const processingTime = 5; // ms par événement
+  const interruptDuty = (eventsPerSec * processingTime) / 1000 * 100; // %
+  const irqEnergy = Math.min(95, Math.max(5, interruptDuty));
+
+  energyChart.data.datasets[0].data = [100, irqEnergy];
+  energyChart.update();
+  updateCalc();
+}
+
+function updateCalc(){
+  const evtsPerSec = evtFreqVal;
+  const period = pollPeriodVal;
+  const pollsPerSec = Math.round(1000/period);
+  const processingMs = 5;
+  const irqDuty = (evtsPerSec * processingMs / 1000 * 100).toFixed(1);
+  document.getElementById('energyCalc').innerHTML =
+    `Polling : ${pollsPerSec} vérifications/s → CPU actif 100% du temps
+Interruptions : ${evtsPerSec} événements/s × ${processingMs}ms traitement = ${irqDuty}% du temps actif
+Économie d'énergie estimée : ${(100 - irqDuty).toFixed(1)}%`;
+}
+
+// ===== NETWORK SIMULATION =====
+const nodes = [
+  {id:0, x:50, y:150, label:'Capteur', color:'#3b82f6'},
+  {id:1, x:150, y:80, label:'Nœud A', color:'#3b82f6'},
+  {id:2, x:150, y:220, label:'Nœud B', color:'#3b82f6'},
+  {id:3, x:280, y:150, label:'Nœud C', color:'#3b82f6'},
+  {id:4, x:380, y:80, label:'Nœud D', color:'#3b82f6'},
+  {id:5, x:480, y:150, label:'Serveur', color:'#3b82f6'},
+];
+const edges = [[0,1],[0,2],[1,3],[2,3],[3,4],[3,5],[4,5]];
+const path = [0,1,3,4,5];
+let animStep = -1, animTimer = null;
+
+function drawNetwork(highlightPath, step){
+  const canvas = document.getElementById('networkCanvas');
+  const ctx = canvas.getContext('2d');
+  const scaleX = canvas.width / 600;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // draw edges
+  edges.forEach(([a,b])=>{
+    const na=nodes[a], nb=nodes[b];
+    ctx.beginPath();
+    ctx.moveTo(na.x*scaleX,na.y);
+    ctx.lineTo(nb.x*scaleX,nb.y);
+    ctx.strokeStyle='#cbd5e1';
+    ctx.lineWidth=2;
+    ctx.stroke();
+  });
+
+  // draw path highlight
+  if(step>=0){
+    for(let i=0;i<Math.min(step,path.length-1);i++){
+      const a=nodes[path[i]], b=nodes[path[i+1]];
+      ctx.beginPath();
+      ctx.moveTo(a.x*scaleX,a.y);
+      ctx.lineTo(b.x*scaleX,b.y);
+      ctx.strokeStyle='#f59e0b';
+      ctx.lineWidth=3;
+      ctx.stroke();
+    }
+  }
+
+  // draw nodes
+  nodes.forEach((n,i)=>{
+    let col = '#e2e8f0';
+    if(step>=0 && path.indexOf(i)>=0 && path.indexOf(i)<=step) col='#fbbf24';
+    if(i===0) col = step>=0 ? '#fbbf24' : '#3b82f6';
+    if(i===5) col = step>=path.length-1 && step>=0 ? '#10b981' : '#1e3a5f';
+    ctx.beginPath();
+    ctx.arc(n.x*scaleX,n.y,20,0,Math.PI*2);
+    ctx.fillStyle=col;
+    ctx.fill();
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.fillStyle='#1e293b';
+    ctx.font='bold 9px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(n.label,n.x*scaleX,n.y+32);
+  });
+
+  // packet animation
+  if(step>0 && step<path.length){
+    const prev=nodes[path[step-1]], curr=nodes[path[step]];
+    ctx.beginPath();
+    ctx.arc(curr.x*scaleX,curr.y,8,0,Math.PI*2);
+    ctx.fillStyle='#f59e0b';
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 9px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('📦',curr.x*scaleX,curr.y+4);
+  }
+}
+
+function sendPacket(){
+  if(animTimer) clearInterval(animTimer);
+  animStep = 0;
+  const log = document.getElementById('networkLog');
+  const labels = ['Capteur','Nœud A','Nœud C','Nœud D','Serveur ✅'];
+  animTimer = setInterval(()=>{
+    drawNetwork(true, animStep);
+    if(animStep < path.length){
+      log.textContent = `Saut ${animStep}/${path.length-1} : paquet au ${labels[Math.min(animStep,labels.length-1)]}`;
+      animStep++;
+    } else {
+      clearInterval(animTimer);
+      log.textContent = `✅ Paquet arrivé ! ${path.length-1} sauts effectués. Chemin : Capteur → Nœud A → Nœud C → Nœud D → Serveur`;
+    }
+  }, 600);
+}
+
+function resetNetwork(){
+  if(animTimer) clearInterval(animTimer);
+  animStep = -1;
+  drawNetwork(false, -1);
+  document.getElementById('networkLog').textContent = 'Cliquez sur "Envoyer un paquet" pour démarrer la simulation';
+}
+
+window.addEventListener('load', ()=>{
+  initEnergyChart();
+  drawNetwork(false, -1);
+});
+</script>
+</body>
+</html>

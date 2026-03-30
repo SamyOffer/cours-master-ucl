@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 5 — La Contrainte AllDifferent</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:center; }
+  .control-group { display:flex; flex-direction:column; gap:4px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .stats-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .stat-chip { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:8px 14px; font-size:0.85rem; }
+  .stat-chip span { font-weight:700; color:var(--teal); }
+  canvas { max-width:100%; }
+  .graph-container { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin:16px 0; }
+  .domain-display { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0; align-items:center; }
+  .var-domain { background:white; border:2px solid #e2e8f0; border-radius:8px; padding:8px 12px; font-size:0.85rem; }
+  .var-domain.fixed-d { border-color:var(--amber); background:#fffbeb; }
+  .var-domain strong { color:var(--navy); }
+  .val-tag { display:inline-block; background:var(--teal); color:white; border-radius:4px; padding:1px 7px; font-size:0.78rem; margin:2px; }
+  .val-tag.removed { background:#fee2e2; color:#ef4444; text-decoration:line-through; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 5 — La Contrainte AllDifferent</h1>
+      <p>Décomposition, Forward Checking, Couplage Maximum et Théorème de Berge</p>
+      <span class="chapter-badge">Chapitre 5 / 7</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- INTRO ALLDIFF -->
+<div class="section">
+  <h2>🔵 Qu'est-ce qu'AllDifferent ?</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi AllDifferent ?</span>
+    <p>La contrainte <strong>AllDifferent</strong> dit simplement : "toutes les variables doivent avoir des valeurs <em>différentes</em>". C'est la contrainte phare du Sudoku — chaque ligne, colonne et région doit contenir 1 à 9 sans répétition.</p>
+    <p><strong>Pourquoi ne pas juste utiliser O(n²) contraintes ≠ ?</strong> On pourrait poster une contrainte "xᵢ ≠ xⱼ" pour chaque paire — c'est la <em>décomposition binaire</em>. Mais une contrainte globale unique est plus puissante et plus efficace : elle peut détecter des incohérences que la décomposition raterait.</p>
+    <div class="retenir">💡 AllDifferent global >> Décomposition binaire : plus de filtrage, moins de temps de calcul.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Définition formelle</span>
+    <p class="phrase">📌 "Toutes les variables du tableau x doivent avoir des valeurs deux à deux distinctes"</p>
+    <div class="pending-math" data-latex="\forall i, j \in \{1..n\}: i \neq j \Rightarrow x_i \neq x_j"></div>
+    <p style="color:#065f46;"><strong>Décomposition en n(n-1)/2 contraintes binaires :</strong> Pour n=10 variables, cela donne 45 contraintes NotEqual — mais AllDifferent global fait mieux !</p>
+  </div>
+</div>
+
+<!-- FORWARD CHECKING -->
+<div class="section">
+  <h2>⚡ Forward Checking (FWC) — Filtrage Efficace</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le Forward Checking ?</span>
+    <p>Quand une variable est fixée à une valeur v, on retire v du domaine de <em>toutes</em> les autres variables non fixées. C'est intuitif — si x₂ = 3, alors x₁, x₃, x₄, ... ne peuvent plus valoir 3.</p>
+    <p><strong>Avec un Sparse Set :</strong> On maintient deux partitions : Fixed (variables fixées) et NotFixed. Quand une variable est fixée, on ne parcourt que NotFixed. Complexité : Θ(#NotFixed) au lieu de Θ(n²) pour la décomposition binaire.</p>
+    <div class="retenir">💡 FWC avec Sparse Set = filtrage proportionnel aux variables non encore fixées — optimal !</div>
+  </div>
+
+  <!-- FWC DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Forward Checking interactif</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:12px;">Clique sur "Fixer une variable" pour simuler une fixation et voir le FWC en action.</p>
+    <div id="fwcDomains" class="domain-display"></div>
+    <div class="controls" style="margin-top:10px;">
+      <button class="btn" onclick="fixNextVar()">▶ Fixer variable suivante</button>
+      <button class="btn btn-amber" onclick="resetFWC()">↺ Réinitialiser</button>
+    </div>
+    <div id="fwcLog" style="margin-top:10px;padding:12px;background:white;border-radius:8px;border:1.5px solid #e2e8f0;font-size:0.85rem;min-height:50px;color:#334155;"></div>
+    <div class="stats-row">
+      <div class="stat-chip">Variables fixées : <span id="fwcFixed">0</span></div>
+      <div class="stat-chip">Opérations FWC : <span id="fwcOps">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BIPARTITE GRAPH & MATCHING -->
+<div class="section">
+  <h2>🕸️ Graphe Biparti & Couplage Maximum</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le graphe variable-valeur ?</span>
+    <p>Pour aller plus loin que FWC, on construit un <strong>graphe biparti</strong> : d'un côté les variables, de l'autre les valeurs. Une arête relie xᵢ à v si v ∈ D(xᵢ).</p>
+    <p>AllDifferent est faisable si et seulement si ce graphe a un <strong>couplage maximum de taille n</strong> — c'est-à-dire qu'on peut assigner une valeur distincte à chaque variable.</p>
+    <p><strong>Analogie :</strong> c'est comme un problème d'affectation de jobs à des travailleurs — chaque worker ne peut faire qu'un seul job, chaque job ne peut être fait que par un seul worker. Peut-on tout affecter ?</p>
+    <div class="retenir">💡 AllDifferent est faisable ⟺ il existe un couplage parfait dans le graphe biparti variables-valeurs.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Condition de faisabilité</span>
+    <p class="phrase">📌 "AllDifferent(x₁,...,xₙ) est satisfaisable ssi il existe un couplage de taille n dans le graphe biparti"</p>
+    <div class="pending-math" data-latex="\exists M \text{ couplage de taille } n \text{ dans } G = (X \cup V, E)"></div>
+    <table>
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td>G</td><td>Graphe biparti : variables à gauche, valeurs à droite</td></tr>
+      <tr><td>E</td><td>Arêtes : (xᵢ, v) ∈ E ssi v ∈ D(xᵢ)</td></tr>
+      <tr><td>M</td><td>Couplage = ensemble d'arêtes sans nœud en commun</td></tr>
+      <tr><td>|M| = n</td><td>Toutes les variables sont couvertes = couplage parfait</td></tr>
+    </table>
+  </div>
+
+  <!-- MATCHING DEMO -->
+  <div class="demo-box">
+    <h3>🎮 Démo — Couplage Maximum (graphe biparti)</h3>
+    <canvas id="matchCanvas" width="580" height="260" style="max-width:100%;display:block;margin:0 auto;background:white;border-radius:8px;"></canvas>
+    <div class="controls" style="margin-top:12px;">
+      <button class="btn" onclick="augmentMatching()">▶ Augmenter le couplage</button>
+      <button class="btn btn-amber" onclick="resetMatching()">↺ Réinitialiser</button>
+    </div>
+    <div id="matchLog" style="margin-top:10px;padding:12px;background:white;border-radius:8px;border:1.5px solid #e2e8f0;font-size:0.85rem;color:#334155;min-height:40px;"></div>
+  </div>
+</div>
+
+<!-- BERGE'S THEOREM & DOMAIN CONSISTENCY -->
+<div class="section">
+  <h2>🧠 Théorème de Berge — Cohérence de Domaine</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi la cohérence de domaine ?</span>
+    <p>FWC et le couplage nous disent si AllDifferent est <em>faisable</em>, mais pas toutes les valeurs à retirer. La <strong>cohérence de domaine</strong> (DC) va plus loin : on retire toute valeur qui ne fait partie d'<em>aucun</em> couplage parfait.</p>
+    <p>Le <strong>théorème de Berge (1970)</strong> dit : une arête (xᵢ, v) appartient à <em>un</em> couplage maximum si et seulement si elle fait partie du couplage actuel M, OU elle appartient à un cycle ou chemin alternant de longueur paire dans le graphe résiduel.</p>
+    <p><strong>L'algorithme de Régin (1994)</strong> exploite ce théorème : il calcule les composantes fortement connexes (SCC) du graphe résiduel. Toute arête reliant deux SCC différentes et n'appartenant pas à M peut être retirée !</p>
+    <div class="retenir">💡 Régin (1994) : Couplage max + SCC → cohérence de domaine en O(m√n).</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Théorème de Berge & Filtrage</span>
+    <p class="phrase">📌 "Une arête peut être retirée si elle n'est pas dans M et ne fait partie d'aucun cycle dans le graphe résiduel pour M"</p>
+    <div class="pending-math" data-latex="e \notin M \text{ et } e \text{ relie deux SCC différentes} \Rightarrow \text{retirer } e"></div>
+    <table>
+      <tr><th>Étape</th><th>Description</th></tr>
+      <tr><td>1. Couplage M</td><td>Calculer un couplage maximum couvrant toutes les variables</td></tr>
+      <tr><td>2. Graphe orienté</td><td>← pour les arêtes dans M, → pour les autres + nœud dummy</td></tr>
+      <tr><td>3. SCC</td><td>Trouver toutes les composantes fortement connexes (Tarjan/Kosaraju)</td></tr>
+      <tr><td>4. Filtrage</td><td>Retirer toute arête ∉ M reliant deux SCC différentes</td></tr>
+    </table>
+    <p style="margin-top:10px;color:#065f46;"><strong>Complexité :</strong> O(m√n) pour le couplage + O(m) pour les SCC = O(m√n) au total, où m = nombre d'arêtes dans le graphe.</p>
+  </div>
+
+  <!-- PERF COMPARISON ALLDIFF -->
+  <div class="demo-box">
+    <h3>📊 Comparaison des approches AllDifferent — Problème des N-Reines</h3>
+    <div class="controls">
+      <div class="control-group">
+        <label>N (taille échiquier) : <span class="val" id="nQueensA">15</span></label>
+        <input type="range" id="nQSlider" min="8" max="30" value="15" oninput="updateAllDiffComp()">
+      </div>
+    </div>
+    <canvas id="allDiffChart" height="200"></canvas>
+    <div class="stats-row">
+      <div class="stat-chip">Décomposition binaire : <span id="binTime">—</span></div>
+      <div class="stat-chip">FWC (Sparse Set) : <span id="fwcTime">—</span></div>
+      <div class="stat-chip">DC (Régin) : <span id="dcTime">—</span></div>
+    </div>
+    <p style="font-size:0.82rem;color:var(--gray);margin-top:10px;">* D'après les benchmarks du cours : 15-reines → Bin: 63s, FWC: 43s, DC: meilleur pour les grands problèmes.</p>
+  </div>
+</div>
+
+</main>
+<footer><strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 5 : AllDifferent</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    if (el.dataset.latex) el.innerHTML = katex.renderToString(el.dataset.latex, {displayMode:true, throwOnError:false});
+  });
+  resetFWC();
+  resetMatching();
+  updateAllDiffComp();
+});
+
+// ===== FWC DEMO =====
+let fwcState = { domains:[], fixed:0, ops:0 };
+const initDomains = [[1,2,3,4,5],[2,3,4,5],[1,3,4,5],[1,2,3,5],[2,4,5]];
+const fixValues = [3,1,5,2,4];
+function resetFWC() {
+  fwcState = { domains:initDomains.map(d=>[...d]), fixed:0, ops:0 };
+  document.getElementById('fwcFixed').textContent = '0';
+  document.getElementById('fwcOps').textContent = '0';
+  document.getElementById('fwcLog').textContent = 'Cliquer sur "Fixer variable suivante" pour commencer...';
+  renderFWC();
+}
+function renderFWC() {
+  const div = document.getElementById('fwcDomains');
+  div.innerHTML = fwcState.domains.map((d,i) => {
+    const isFixed = i < fwcState.fixed;
+    return `<div class="var-domain${isFixed?' fixed-d':''}">
+      <strong>x${i+1}${isFixed?' = '+fixValues[i]:''}</strong><br>
+      {${d.map(v=>`<span class="val-tag">${v}</span>`).join('')}}
+    </div>`;
+  }).join('');
+}
+function fixNextVar() {
+  if (fwcState.fixed >= fwcState.domains.length) return;
+  const i = fwcState.fixed;
+  const v = fixValues[i];
+  fwcState.domains[i] = [v];
+  fwcState.fixed++;
+  let ops = 0;
+  for (let j = 0; j < fwcState.domains.length; j++) {
+    if (j !== i) {
+      const before = fwcState.domains[j].length;
+      fwcState.domains[j] = fwcState.domains[j].filter(x => x !== v);
+      ops++;
+    }
+  }
+  fwcState.ops += ops;
+  document.getElementById('fwcFixed').textContent = fwcState.fixed;
+  document.getElementById('fwcOps').textContent = fwcState.ops;
+  document.getElementById('fwcLog').innerHTML = `x${i+1} fixée à <strong>${v}</strong> → retrait de ${v} dans ${ops} variables non fixées (NotFixed = ${fwcState.domains.length - fwcState.fixed})`;
+  renderFWC();
+}
+
+// ===== MATCHING DEMO =====
+// 4 variables, values {1,2,3,4,5}, domains
+const matchVars = ['x₁', 'x₂', 'x₃', 'x₄'];
+const matchDomains = [[1,2,3],[2,3,4],[1,3,5],[2,4,5]];
+let matchState = { matching:[-1,-1,-1,-1], step:0 };
+const augSteps = [
+  { m:[1,-1,-1,-1], msg:"x₁ → 1 (greedy)" },
+  { m:[1,2,-1,-1], msg:"x₂ → 2 (greedy)" },
+  { m:[1,2,3,-1], msg:"x₃ → 3 (greedy)" },
+  { m:[1,2,3,4], msg:"x₄ → 4 : couplage parfait ✅ Toutes variables couvertes !" },
+];
+function resetMatching() { matchState = { matching:[-1,-1,-1,-1], step:0 }; drawMatching(); document.getElementById('matchLog').textContent = 'Cliquer sur "Augmenter" pour construire le couplage.'; }
+function augmentMatching() {
+  if (matchState.step >= augSteps.length) return;
+  const s = augSteps[matchState.step];
+  matchState.matching = s.m.slice();
+  matchState.step++;
+  drawMatching();
+  document.getElementById('matchLog').textContent = s.msg;
+}
+function drawMatching() {
+  const canvas = document.getElementById('matchCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const varX = 100, valX = 460;
+  const varY = (i) => 40 + i * 55;
+  const valY = (v) => 20 + (v-1) * 46;
+  const allVals = [1,2,3,4,5];
+  // Draw edges
+  matchVars.forEach((_, i) => {
+    matchDomains[i].forEach(v => {
+      const inMatch = matchState.matching[i] === v;
+      ctx.strokeStyle = inMatch ? '#0D9488' : '#cbd5e1';
+      ctx.lineWidth = inMatch ? 3 : 1;
+      ctx.beginPath();
+      ctx.moveTo(varX+20, varY(i));
+      ctx.lineTo(valX-20, valY(v));
+      ctx.stroke();
+    });
+  });
+  // Draw variable nodes
+  matchVars.forEach((name, i) => {
+    const matched = matchState.matching[i] !== -1;
+    ctx.beginPath(); ctx.arc(varX, varY(i), 20, 0, Math.PI*2);
+    ctx.fillStyle = matched ? '#0D9488' : '#1E3A5F';
+    ctx.fill();
+    ctx.fillStyle = 'white'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(name, varX, varY(i));
+  });
+  // Draw value nodes
+  allVals.forEach(v => {
+    const matched = matchState.matching.includes(v);
+    ctx.beginPath(); ctx.arc(valX, valY(v), 18, 0, Math.PI*2);
+    ctx.fillStyle = matched ? '#F59E0B' : '#e2e8f0';
+    ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = matched ? '#1E3A5F' : '#475569'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(v, valX, valY(v));
+  });
+  // Labels
+  ctx.fillStyle = '#1E3A5F'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Variables', varX, 10);
+  ctx.fillText('Valeurs', valX, 10);
+}
+
+// ===== ALLDIFF COMPARISON =====
+let allDiffChart = null;
+function updateAllDiffComp() {
+  const n = parseInt(document.getElementById('nQSlider').value);
+  document.getElementById('nQueensA').textContent = n;
+  // Estimated relative times based on benchmarks
+  const bin = n <= 15 ? 63 * (n/15)**3 : 63 * (n/15)**4;
+  const fwc = n <= 15 ? 43 * (n/15)**2.8 : 43 * (n/15)**3.5;
+  const dc = n <= 15 ? 35 * (n/15)**2.4 : 35 * (n/15)**3.0;
+  document.getElementById('binTime').textContent = bin.toFixed(0) + 's (estim.)';
+  document.getElementById('fwcTime').textContent = fwc.toFixed(0) + 's (estim.)';
+  document.getElementById('dcTime').textContent = dc.toFixed(0) + 's (estim.)';
+  const ctx = document.getElementById('allDiffChart').getContext('2d');
+  if (allDiffChart) allDiffChart.destroy();
+  allDiffChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Décomposition binaire', 'FWC (Sparse Set)', 'DC (Régin 1994)'],
+      datasets: [{ data: [bin, fwc, dc], backgroundColor: ['#f43f5e','#F59E0B','#0D9488'], borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, title: { display: true, text: `Temps estimé — problème des ${n}-Reines` } },
+      scales: { y: { title: { display: true, text: 'Temps (s, estimé)' } } }
+    }
+  });
+}
+</script>
+</body>
+</html>

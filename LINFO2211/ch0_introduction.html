@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.0 – Introduction | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy: #1E3A5F; --teal: #0D9488; --amber: #F59E0B;
+  --light: #EFF6FF; --white: #FFFFFF; --gray: #64748B;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #1e293b; }
+
+/* Header */
+header { background: var(--navy); color: white; position: relative; overflow: hidden; }
+header::before { content:''; position:absolute; left:0;top:0;bottom:0;width:8px;
+  background: linear-gradient(to bottom, var(--amber), var(--teal)); }
+.header-inner { padding: 32px 48px; max-width: 1100px; margin: 0 auto; }
+.breadcrumb { font-size: 0.82rem; color: #94a3b8; margin-bottom: 10px; }
+.breadcrumb a { color: var(--amber); text-decoration: none; }
+.chapter-badge { display:inline-block; background: linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:white; padding:4px 14px; border-radius:20px; font-size:0.75rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
+header h1 { font-size: 1.9rem; font-weight: 800; margin-bottom: 6px; }
+header p.subtitle { color: #94a3b8; font-size: 0.95rem; }
+.header-chips { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+.chip { background:rgba(255,255,255,0.1); color:#e2e8f0; font-size:0.8rem;
+  padding:4px 12px; border-radius:20px; }
+
+/* Nav */
+nav { background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 48px; }
+.nav-inner { max-width:1100px; margin:0 auto; display:flex; gap:6px; flex-wrap:wrap; }
+.nav-link { padding:6px 14px; border-radius:20px; font-size:0.82rem; font-weight:600;
+  text-decoration:none; color:var(--gray); transition:all 0.2s; }
+.nav-link:hover, .nav-link.active { background:var(--teal); color:white; }
+
+/* Main */
+main { max-width: 1100px; margin: 0 auto; padding: 36px 48px; }
+
+/* Section */
+.section { background: white; border-radius: 14px; box-shadow: 0 2px 16px rgba(30,58,95,0.07);
+  padding: 32px; margin-bottom: 28px; }
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom: 24px; }
+.section-icon { font-size: 1.6rem; }
+.section-title { font-size: 1.3rem; font-weight: 700; color: var(--navy); }
+.section-subtitle { font-size: 0.85rem; color: var(--gray); margin-top: 2px; }
+
+/* Explain intro */
+.explain-intro {
+  background: #fffbeb; border-left: 4px solid var(--amber);
+  border-radius: 0 10px 10px 0; padding: 20px 24px; margin-bottom: 20px;
+}
+.explain-intro .badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background: var(--amber); color: white; padding: 4px 12px;
+  border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+  margin-bottom: 10px;
+}
+.explain-intro h4 { font-size: 1rem; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+.explain-intro p { font-size: 0.9rem; line-height: 1.7; color: #451a03; }
+.explain-intro .analogy {
+  background: #fef3c7; border-radius: 8px; padding: 12px 16px; margin: 12px 0;
+  font-size: 0.88rem; color: #78350f; border-left: 3px solid #f59e0b;
+}
+.retenir { background: #fffbeb; border: 1.5px solid var(--amber); border-radius: 8px;
+  padding: 10px 16px; margin-top: 14px; font-size: 0.88rem; font-weight: 600; color: #92400e; }
+
+/* Math block */
+.math-block {
+  background: #f0fdf4; border-left: 4px solid var(--teal);
+  border-radius: 0 10px 10px 0; padding: 20px 24px; margin-bottom: 20px;
+}
+.math-block .badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background: var(--teal); color: white; padding: 4px 12px;
+  border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+  margin-bottom: 10px;
+}
+.math-block .phrase { font-size: 0.9rem; color: #065f46; margin-bottom: 12px; font-style: italic; }
+.formula-display { background: white; border-radius: 10px; padding: 18px;
+  text-align: center; margin: 14px 0; border: 1.5px solid #d1fae5;
+  overflow-x: auto; }
+.vars-table { width:100%; border-collapse:collapse; margin-top:12px; font-size:0.85rem; }
+.vars-table th { background:#d1fae5; color:#065f46; padding:8px 12px; text-align:left; }
+.vars-table td { padding:8px 12px; border-bottom:1px solid #e7fdf1; }
+.vars-table tr:last-child td { border-bottom:none; }
+.example-box { background:#ecfdf5; border-radius:8px; padding:14px 16px; margin-top:12px;
+  font-size:0.88rem; color:#064e3b; }
+
+/* Theory box */
+.theory-box {
+  background: #eff6ff; border-radius: 10px; padding: 18px 22px;
+  margin: 14px 0; border: 1px solid #bfdbfe;
+}
+.theory-box h4 { font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.theory-box p { font-size: 0.88rem; line-height: 1.65; color: #1e40af; }
+
+/* Icon grid */
+.icon-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap:14px; margin:16px 0; }
+.icon-item { background: #f8fafc; border-radius: 10px; padding: 16px; text-align:center; border: 1px solid #e2e8f0; }
+.icon-item .emoji { font-size: 1.8rem; margin-bottom: 8px; }
+.icon-item .label { font-size: 0.8rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+.icon-item .desc { font-size: 0.75rem; color: var(--gray); line-height: 1.4; }
+
+/* Steps */
+.steps { margin: 16px 0; }
+.step { display:flex; gap:14px; margin-bottom: 14px; align-items:flex-start; }
+.step-num { background: var(--navy); color: white; width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; flex-shrink:0; }
+.step-content h5 { font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:3px; }
+.step-content p { font-size:0.85rem; color:var(--gray); line-height:1.5; }
+
+/* Interactive demo */
+.demo-box {
+  background: #f8fafc; border-radius: 12px; padding: 24px;
+  border: 2px dashed #cbd5e1; margin-top: 20px;
+}
+.demo-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:16px;
+  display:flex; align-items:center; gap:8px; }
+.demo-controls { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:16px; margin-bottom:20px; }
+.control-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--gray); margin-bottom:6px; }
+.control-group input[type=range] { width:100%; accent-color: var(--teal); }
+.control-value { font-size:1.1rem; font-weight:700; color:var(--teal); }
+.demo-result { background: white; border-radius:10px; padding:16px; border:1px solid #e2e8f0; font-size:0.9rem; }
+.result-row { display:flex; justify-content:space-between; padding:6px 0;
+  border-bottom:1px solid #f1f5f9; font-size:0.88rem; }
+.result-row:last-child { border-bottom:none; }
+.result-label { color:var(--gray); }
+.result-value { font-weight:700; color:var(--navy); }
+.result-highlight { color: var(--teal); font-size:1.05rem; }
+canvas { max-width:100%; }
+.btn { background:var(--teal); color:white; border:none; padding:8px 18px;
+  border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:600; margin:4px; }
+.btn:hover { background:#0f766e; }
+.btn-secondary { background: #f1f5f9; color: var(--navy); }
+.btn-secondary:hover { background: #e2e8f0; }
+
+/* Quote */
+.quote { background: var(--navy); color: white; border-radius: 12px; padding: 20px 24px;
+  margin: 16px 0; font-style: italic; }
+.quote p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 8px; }
+.quote cite { font-size: 0.8rem; color: var(--amber); font-style: normal; font-weight: 600; }
+
+/* Table */
+.nice-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:0.88rem; }
+.nice-table th { background: var(--navy); color:white; padding:10px 14px; text-align:left; }
+.nice-table td { padding:9px 14px; border-bottom:1px solid #e2e8f0; }
+.nice-table tr:hover td { background:#f8fafc; }
+
+/* Footer */
+footer { background:var(--navy); color:#94a3b8; text-align:center; padding:24px;
+  font-size:0.82rem; margin-top:40px; }
+footer span { color:var(--amber); }
+
+@media (max-width:700px) {
+  .header-inner, nav, main { padding-left:20px; padding-right:20px; }
+  header h1 { font-size:1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 0</div>
+    <div class="chapter-badge">Chapitre 0</div>
+    <h1>Introduction – New Venture Management</h1>
+    <p class="subtitle">Les fondamentaux : organisations, entreprises, ressources et création de valeur</p>
+    <div class="header-chips">
+      <span class="chip">🏢 Organisation</span>
+      <span class="chip">🚀 Entrepreneur</span>
+      <span class="chip">💡 Création de valeur</span>
+      <span class="chip">⚖️ Éthique</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#organisation" class="nav-link active">Organisation</a>
+    <a href="#business" class="nav-link">Entreprise typique</a>
+    <a href="#ressources" class="nav-link">Ressources</a>
+    <a href="#ethique" class="nav-link">Éthique</a>
+    <a href="#megatendances" class="nav-link">Mégatendances</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : ORGANISATION ========== -->
+<div class="section" id="organisation">
+  <div class="section-header">
+    <span class="section-icon">🏢</span>
+    <div>
+      <div class="section-title">Qu'est-ce qu'une Organisation ?</div>
+      <div class="section-subtitle">La brique fondamentale de tout projet entrepreneurial</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi une organisation ?</div>
+    <p>Imagine un groupe de personnes qui veulent atteindre un but commun qu'elles n'arriveraient pas à atteindre seules. C'est ça une organisation ! Que ce soit 3 amis qui ouvrent un food truck ou 100 000 employés chez Amazon, le principe est le même.</p>
+    <div class="analogy">
+      🍕 <strong>Analogie :</strong> Une équipe de foot, c'est une organisation. Il y a des joueurs (ressources humaines), un terrain et des ballons (ressources physiques), un entraîneur (leadership), un club qui finance (ressources financières), et un objectif commun : gagner des matchs. Sans organisation, 11 individus séparés ne peuvent pas jouer ensemble.
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">🎯</div><div class="label">But commun</div><div class="desc">Un objectif partagé qui justifie l'existence du groupe</div></div>
+      <div class="icon-item"><div class="emoji">👥</div><div class="label">Personnes</div><div class="desc">Des individus avec des rôles et compétences différents</div></div>
+      <div class="icon-item"><div class="emoji">🔧</div><div class="label">Ressources</div><div class="desc">Capital, outils, technologies, informations</div></div>
+      <div class="icon-item"><div class="emoji">📋</div><div class="label">Structure</div><div class="desc">Des règles, processus et hiérarchies pour coordonner</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Une organisation = des personnes + des ressources + une structure + un but commun. L'entreprise est un type particulier d'organisation qui vise à créer de la valeur économique.</div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📖 Définition académique</h4>
+    <p>Une organisation est un système social délibérément constitué pour atteindre des objectifs définis, caractérisé par une division du travail, une coordination entre les membres et une frontière avec son environnement. Les entreprises sont des organisations dont la finalité principale est la création de valeur économique pour leurs parties prenantes.</p>
+  </div>
+
+  <div class="theory-box" style="margin-top:14px; border-color:#fbbf24; background:#fffbeb;">
+    <h4>🌪️ Le monde VUCA — un défi permanent pour les organisations</h4>
+    <p style="color:#92400e;">Les organisations évoluent aujourd'hui dans un monde <strong>VUCA</strong> : <strong>V</strong>olatile (changements rapides et imprévisibles), <strong>U</strong>ncertain (futur difficile à prévoir), <strong>C</strong>omplexe (interdépendances multiples), <strong>A</strong>mbigu (difficile d'interpréter les signaux du marché). Ce contexte rend la gestion traditionnelle insuffisante et pousse les entreprises à développer une capacité d'innovation permanente. L'entrepreneur — interne ou externe — devient la figure centrale de l'adaptation organisationnelle dans ce monde en mutation continue. <em>(Gailly, Navigating Innovation, 2018)</em></p>
+  </div>
+
+  <h3 style="color:var(--navy);margin:20px 0 12px;font-size:1.05rem;">Les défis clés d'une organisation</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h5>Coordination</h5>
+        <p>Comment faire travailler ensemble des individus avec des intérêts parfois divergents ? (ex : les actionnaires veulent du profit, les employés veulent de bons salaires)</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h5>Légitimité ("Liability of Newness")</h5>
+        <p>Une nouvelle organisation doit construire sa crédibilité. Les nouvelles entreprises ont un taux d'échec élevé car elles manquent d'historique et de confiance établie.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h5>Allocation des ressources</h5>
+        <p>Quelles ressources mobiliser ? Comment les obtenir ? (financement, talents, technologies)</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h5>Adaptation à l'environnement</h5>
+        <p>L'organisation doit s'adapter en permanence aux changements du marché, de la technologie et de la réglementation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : BUSINESS TYPIQUE ========== -->
+<div class="section" id="business">
+  <div class="section-header">
+    <span class="section-icon">🏪</span>
+    <div>
+      <div class="section-title">Les Éléments d'une Entreprise Typique</div>
+      <div class="section-subtitle">Comprendre comment une business fonctionne de A à Z</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi une entreprise ?</div>
+    <p>Une entreprise, c'est une organisation qui crée de la valeur en transformant des ressources (matières premières, travail, capital) en produits ou services que des clients sont prêts à payer. La différence entre ce que ça coûte à produire et ce que les clients paient, c'est la marge — la base de la survie de l'entreprise.</p>
+    <div class="analogy">
+      🥐 <strong>Exemple concret :</strong> Une boulangerie achète de la farine pour 0,50€/baguette, paie le boulanger, le loyer, l'énergie → coût total = 0,80€. Elle vend la baguette 1,20€. Marge = 0,40€ par baguette. Avec 500 baguettes/jour → 200€/jour de marge. Mais si elle vend seulement 100 baguettes/jour → 40€/jour, pas assez pour survivre !
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">💰</div><div class="label">Capital</div><div class="desc">Argent pour démarrer et financer la croissance</div></div>
+      <div class="icon-item"><div class="emoji">🧠</div><div class="label">Know-how</div><div class="desc">Compétences, brevets, expertise technique</div></div>
+      <div class="icon-item"><div class="emoji">🤝</div><div class="label">Réseau</div><div class="desc">Relations avec clients, fournisseurs, partenaires</div></div>
+      <div class="icon-item"><div class="emoji">🏭</div><div class="label">Infrastructure</div><div class="desc">Usines, logiciels, équipements</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Une entreprise transforme des ressources en valeur. Sa survie dépend de sa capacité à créer plus de valeur qu'elle n'en consomme — c'est la <strong>profitabilité</strong>.</div>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Formule fondamentale</div>
+    <p class="phrase">En une phrase : la valeur créée par une entreprise est la différence entre le prix que les clients paient et le coût des ressources utilisées.</p>
+    <div class="formula-display pending-math"
+      data-latex="Valeur\ Cr\acute{e}\acute{e}e = Prix\ de\ Vente - Co\hat{u}t\ des\ Ressources"
+      data-phrase="La valeur créée (ou marge brute) est ce qui reste après avoir payé tous les inputs nécessaires à la production."
+      data-vars='[["Prix de Vente", "Ce que le client paie pour le produit ou service"],["Coût des Ressources", "Salaires + Matières premières + Énergie + Loyer + ..."]]'
+      data-example="Boulangerie : Prix vente baguette = 1,20€. Coût ressources = 0,80€. Valeur créée = 1,20 - 0,80 = 0,40€ par baguette.">
+    </div>
+    <table class="vars-table">
+      <tr><th>Symbole</th><th>Signification</th></tr>
+      <tr><td><strong>Prix de Vente</strong></td><td>Ce que le client paie — dépend de la demande, la concurrence, le positionnement</td></tr>
+      <tr><td><strong>Coût des Ressources</strong></td><td>Matières premières + main d'œuvre + capital + overhead</td></tr>
+      <tr><td><strong>Valeur Créée</strong></td><td>La marge brute — doit couvrir les coûts fixes pour être profitable</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : RESSOURCES ========== -->
+<div class="section" id="ressources">
+  <div class="section-header">
+    <span class="section-icon">🔑</span>
+    <div>
+      <div class="section-title">Les Ressources Clés d'une Entreprise</div>
+      <div class="section-subtitle">Ce dont une entreprise a besoin pour créer de la valeur</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi les ressources ?</div>
+    <p>Les ressources, c'est tout ce dont une entreprise a besoin pour fonctionner. Pense à ça comme les ingrédients d'une recette : sans les bons ingrédients dans les bonnes proportions, le gâteau ne sort pas bien. Pour une start-up technologique comme Spotify au début, les ressources clés étaient : l'algorithme de streaming (technologie), l'équipe d'ingénieurs (humain), les droits musicaux (partenariats), et les 8 millions $ levés en 2008 (financier).</p>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">💵</div><div class="label">Financières</div><div class="desc">Capital propre, dettes, subventions. Ex : 500k€ levés auprès d'investisseurs</div></div>
+      <div class="icon-item"><div class="emoji">🏭</div><div class="label">Physiques</div><div class="desc">Usines, équipements, locaux. Ex : une machine qui produit 1000 unités/heure</div></div>
+      <div class="icon-item"><div class="emoji">🧠</div><div class="label">Intellectuelles</div><div class="desc">Brevets, marques, données, logiciels. Ex : l'algorithme de Google</div></div>
+      <div class="icon-item"><div class="emoji">👥</div><div class="label">Humaines</div><div class="desc">Compétences, expérience, culture. Ex : une équipe de 5 ingénieurs séniors</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Les ressources d'une entreprise varient selon son stade et son secteur. Pour une start-up, les ressources humaines (équipe) et intellectuelles (technologie) sont souvent les plus critiques.</div>
+  </div>
+
+  <div class="quote">
+    <p>"When a business with a reputation for poor fundamentals meets a management team with a reputation for brilliance, it's the reputation of the former that remains intact."</p>
+    <cite>— Warren Buffet</cite>
+  </div>
+</div>
+
+<!-- ========== SECTION 4 : ÉTHIQUE ========== -->
+<div class="section" id="ethique">
+  <div class="section-header">
+    <span class="section-icon">⚖️</span>
+    <div>
+      <div class="section-title">Dilemmes Éthiques en Entreprise</div>
+      <div class="section-subtitle">Actionnaires vs Parties prenantes — une tension fondamentale</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi l'éthique en entreprise ?</div>
+    <p>Imagine que tu diriges une usine de chaussures. Pour maximiser le profit de tes actionnaires, tu pourrais licencier des employés, délocaliser en Asie et polluer davantage. Mais est-ce éthique ? L'éthique en entreprise, c'est la tension entre : <strong>maximiser la valeur pour les actionnaires</strong> vs <strong>prendre en compte toutes les parties prenantes</strong> (employés, clients, communautés, environnement).</p>
+    <div class="analogy">
+      ⚖️ <strong>Cas concret :</strong> En 2015, Volkswagen a découvert que ses ingénieurs avaient truqué les tests d'émissions sur 11 millions de voitures. À court terme, ça augmentait les ventes. À long terme : 30 milliards € de pertes, des poursuites judiciaires, une réputation détruite. L'éthique, ce n'est pas seulement moral — c'est souvent aussi rentable sur le long terme.
+    </div>
+    <div class="retenir">💡 À retenir : La vision "shareholders" ne vise que le profit des propriétaires. La vision "stakeholders" intègre toutes les parties affectées. La tendance actuelle va vers le stakeholder management — aussi pour des raisons stratégiques.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr>
+      <th>Vision</th><th>Objectif principal</th><th>Parties concernées</th><th>Exemple</th>
+    </tr>
+    <tr>
+      <td>📊 Shareholders</td>
+      <td>Maximiser la valeur actionnariale (profit, dividendes, cours boursier)</td>
+      <td>Actionnaires uniquement</td>
+      <td>Milton Friedman (1970) : "The social responsibility of business is to increase its profits"</td>
+    </tr>
+    <tr>
+      <td>🌍 Stakeholders</td>
+      <td>Créer de la valeur pour tous les acteurs affectés</td>
+      <td>Employés, clients, fournisseurs, communautés, gouvernement, environnement</td>
+      <td>Patagonia : "We're in business to save our home planet"</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 5 : MÉGATENDANCES (Gailly) ========== -->
+<div class="section" id="megatendances">
+  <div class="section-header">
+    <span class="section-icon">🌍</span>
+    <div>
+      <div class="section-title">Mégatendances — Le "Nouveau Normal"</div>
+      <div class="section-subtitle">Les grandes forces structurelles qui transforment l'environnement des entreprises</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🔭 Pourquoi les mégatendances comptent ?</div>
+    <p>Les mégatendances sont des transformations profondes et durables qui reconfigurent les marchés, les technologies et les modes de vie à l'échelle mondiale. Contrairement aux tendances passagères, elles façonnent le <strong>"nouveau normal"</strong> dans lequel toutes les entreprises devront opérer — qu'elles le veuillent ou non. Les ignorer, c'est risquer de voir son modèle d'affaires rendu obsolète en quelques années.</p>
+    <div class="analogy">
+      📱 <strong>Exemple :</strong> La mégatendance de la digitalisation a rendu obsolètes des industries entières (agences de voyage, encyclopédies papier, location de DVD) tout en créant de nouvelles opportunités (e-commerce, streaming, télémédecine). Les entreprises qui ont survécu sont celles qui ont anticipé ce changement structurel plutôt que de le subir.
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">👴</div><div class="label">Démographie</div><div class="desc">Vieillissement, urbanisation, émergence de nouvelles classes moyennes</div></div>
+      <div class="icon-item"><div class="emoji">🌡️</div><div class="label">Climat</div><div class="desc">Transition énergétique, réglementation carbone, économie circulaire</div></div>
+      <div class="icon-item"><div class="emoji">💻</div><div class="label">Digitalisation / IA</div><div class="desc">Big data, automatisation, plateformes numériques, IA générative</div></div>
+      <div class="icon-item"><div class="emoji">🌐</div><div class="label">Mondialisation</div><div class="desc">Chaînes d'approvisionnement globales, nouvelles puissances économiques</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Les mégatendances sont à la fois des <strong>menaces</strong> (pour les entreprises qui ne s'adaptent pas) et des <strong>opportunités</strong> (pour celles qui les anticipent). L'analyse SWOT doit toujours être lue à travers le prisme des mégatendances.</div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📖 Mégatendances selon Gailly (Navigating Innovation, 2018)</h4>
+    <p>Gailly identifie les mégatendances comme des forces structurelles qui redéfinissent les règles du jeu pour toutes les industries. Elles créent ce qu'il appelle le <em>"nouveau normal"</em> — un environnement durablement transformé où les anciennes recettes stratégiques ne fonctionnent plus. La capacité à repérer, interpréter et répondre à ces tendances devient une compétence stratégique centrale pour tout gestionnaire d'innovation. Ces mégatendances sont à la fois des <strong>sources d'opportunités</strong> d'innovation et des <strong>facteurs de disruption</strong> des acteurs établis.</p>
+  </div>
+
+  <h3 style="color:var(--navy);margin:20px 0 12px;font-size:1.05rem;">Impact sur les forces, faiblesses, opportunités et menaces (SWOT)</h3>
+  <table class="nice-table">
+    <tr>
+      <th>Mégatendance</th><th>Opportunités potentielles</th><th>Menaces potentielles</th>
+    </tr>
+    <tr>
+      <td>🌡️ Transition climatique</td>
+      <td>Marché des énergies renouvelables, éco-conception, mobilité verte, économie circulaire</td>
+      <td>Coûts de conformité, disruption des industries fossiles, risques physiques</td>
+    </tr>
+    <tr>
+      <td>💻 Digitalisation / IA</td>
+      <td>Nouveaux modèles de service, personnalisation massive, efficience opérationnelle</td>
+      <td>Obsolescence de certains métiers, cybersécurité, dépendance technologique</td>
+    </tr>
+    <tr>
+      <td>👴 Vieillissement</td>
+      <td>Silver economy, santé, services aux aînés, solutions d'accessibilité</td>
+      <td>Pénurie de main-d'œuvre, pression sur les systèmes de retraites</td>
+    </tr>
+    <tr>
+      <td>🌐 Mondialisation / Déglobalisation</td>
+      <td>Accès à de nouveaux marchés, talents internationaux, diversification</td>
+      <td>Concurrence accrue, instabilité géopolitique, reshoring forcé</td>
+    </tr>
+  </table>
+
+  <div class="quote" style="margin-top:20px;">
+    <p>"Innovation is 1% inspiration and 99% perspiration. The real challenge is not having a great idea — it is executing it successfully in a complex and fast-changing environment."</p>
+    <cite>— Benoit Gailly, Navigating Innovation (2018)</cite>
+  </div>
+</div>
+
+<!-- ========== SECTION 6 : DÉMO INTERACTIVE ========== -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <span class="section-icon">🎮</span>
+    <div>
+      <div class="section-title">Démo Interactive — Modèle Économique Simple</div>
+      <div class="section-subtitle">Explore comment les paramètres affectent la profitabilité d'une start-up</div>
+    </div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">🏪 Simulateur : Ma Start-up</div>
+    <p style="font-size:0.88rem;color:var(--gray);margin-bottom:16px;">Ajuste les paramètres pour voir comment évolue la profitabilité de ton entreprise.</p>
+
+    <div class="demo-controls">
+      <div class="control-group">
+        <label>💰 Prix de vente (€) : <span class="control-value" id="v_price">50</span>€</label>
+        <input type="range" min="10" max="200" value="50" id="price" oninput="updateDemo()">
+      </div>
+      <div class="control-group">
+        <label>🔧 Coût variable/unité (€) : <span class="control-value" id="v_vc">20</span>€</label>
+        <input type="range" min="5" max="150" value="20" id="varCost" oninput="updateDemo()">
+      </div>
+      <div class="control-group">
+        <label>🏭 Coûts fixes/mois (€) : <span class="control-value" id="v_fc">3000</span>€</label>
+        <input type="range" min="500" max="20000" step="500" value="3000" id="fixedCost" oninput="updateDemo()">
+      </div>
+      <div class="control-group">
+        <label>📦 Unités vendues/mois : <span class="control-value" id="v_units">200</span></label>
+        <input type="range" min="10" max="1000" step="10" value="200" id="units" oninput="updateDemo()">
+      </div>
+    </div>
+
+    <div class="demo-result">
+      <div class="result-row"><span class="result-label">Chiffre d'affaires</span><span class="result-value" id="r_ca">—</span></div>
+      <div class="result-row"><span class="result-label">Coûts variables totaux</span><span class="result-value" id="r_cv">—</span></div>
+      <div class="result-row"><span class="result-label">Marge sur coûts variables</span><span class="result-value" id="r_mcv">—</span></div>
+      <div class="result-row"><span class="result-label">Coûts fixes</span><span class="result-value" id="r_cf">—</span></div>
+      <div class="result-row"><span class="result-label">⚡ Seuil de rentabilité</span><span class="result-value" id="r_sr">—</span></div>
+      <div class="result-row"><span class="result-label">💹 Résultat net</span><span class="result-value result-highlight" id="r_net">—</span></div>
+    </div>
+
+    <canvas id="profitChart" style="margin-top:20px; max-height:280px;"></canvas>
+
+    <div style="margin-top:16px;">
+      <button class="btn" onclick="resetDemo()">🔄 Réinitialiser</button>
+      <button class="btn btn-secondary" onclick="setBreakeven()">📍 Montrer le seuil de rentabilité</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="index.html" style="color:var(--amber);">← Retour à l'accueil</a> &nbsp;|&nbsp; <a href="ch1_business_planning.html" style="color:var(--amber);">Chapitre 1 : Business Planning →</a></p>
+</footer>
+
+<script>
+// ============ KaTeX rendering ============
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.pending-math').forEach(el => {
+    const latex = el.getAttribute('data-latex');
+    if (latex && typeof katex !== 'undefined') {
+      el.innerHTML = katex.renderToString(latex, { displayMode: true, throwOnError: false });
+    }
+  });
+});
+
+// ============ Demo ============
+let profitChartObj = null;
+
+function fmt(n) { return (n >= 0 ? '+' : '') + n.toFixed(0) + ' €'; }
+function fmtAbs(n) { return n.toFixed(0) + ' €'; }
+
+function updateDemo() {
+  const price = +document.getElementById('price').value;
+  const vc = +document.getElementById('varCost').value;
+  const fc = +document.getElementById('fixedCost').value;
+  const units = +document.getElementById('units').value;
+
+  document.getElementById('v_price').textContent = price;
+  document.getElementById('v_vc').textContent = vc;
+  document.getElementById('v_fc').textContent = fc.toLocaleString();
+  document.getElementById('v_units').textContent = units;
+
+  const ca = price * units;
+  const cvTotal = vc * units;
+  const mcv = ca - cvTotal;
+  const margin = price - vc;
+  const sr = margin > 0 ? Math.ceil(fc / margin) : Infinity;
+  const net = mcv - fc;
+
+  document.getElementById('r_ca').textContent = fmtAbs(ca) + ' €';
+  document.getElementById('r_cv').textContent = '- ' + fmtAbs(cvTotal) + ' €';
+  document.getElementById('r_mcv').textContent = fmtAbs(mcv) + ' € (' + (ca > 0 ? (mcv/ca*100).toFixed(1) : 0) + '%)';
+  document.getElementById('r_cf').textContent = '- ' + fmtAbs(fc) + ' €';
+  document.getElementById('r_sr').textContent = isFinite(sr) ? sr + ' unités' : '⚠️ Impossible (VC > Prix !)';
+
+  const netEl = document.getElementById('r_net');
+  netEl.textContent = fmt(net) + ' €';
+  netEl.style.color = net >= 0 ? '#059669' : '#dc2626';
+
+  // Chart
+  const labels = [];
+  const revenues = [];
+  const costs = [];
+  const profits = [];
+  const maxU = Math.max(units * 1.5, sr * 1.2, 50);
+
+  for (let u = 0; u <= maxU; u += Math.max(1, Math.floor(maxU / 20))) {
+    labels.push(u);
+    const rev = price * u;
+    const cost = vc * u + fc;
+    revenues.push(rev);
+    costs.push(cost);
+    profits.push(rev - cost);
+  }
+
+  const ctx = document.getElementById('profitChart').getContext('2d');
+  if (profitChartObj) profitChartObj.destroy();
+  profitChartObj = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Chiffre d\'affaires (€)', data: revenues, borderColor: '#0D9488', backgroundColor: 'rgba(13,148,136,0.08)', tension: 0.1, fill: false },
+        { label: 'Coûts totaux (€)', data: costs, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', tension: 0.1, fill: false },
+        { label: 'Résultat (€)', data: profits, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.1, fill: true }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Analyse de rentabilité en fonction des unités vendues' }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Unités vendues' } },
+        y: { title: { display: true, text: 'Euros (€)' } }
+      }
+    }
+  });
+}
+
+function resetDemo() {
+  document.getElementById('price').value = 50;
+  document.getElementById('varCost').value = 20;
+  document.getElementById('fixedCost').value = 3000;
+  document.getElementById('units').value = 200;
+  updateDemo();
+}
+
+function setBreakeven() {
+  const price = +document.getElementById('price').value;
+  const vc = +document.getElementById('varCost').value;
+  const fc = +document.getElementById('fixedCost').value;
+  const margin = price - vc;
+  if (margin > 0) {
+    const sr = Math.ceil(fc / margin);
+    document.getElementById('units').value = sr;
+    updateDemo();
+    alert('📍 Au seuil de rentabilité : ' + sr + ' unités vendues → Résultat = 0€');
+  } else {
+    alert('⚠️ Impossible ! Le coût variable est supérieur au prix de vente.');
+  }
+}
+
+// Init
+window.addEventListener('load', updateDemo);
+</script>
+</body>
+</html>

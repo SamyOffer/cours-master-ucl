@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 7 : IEEE 802.15.4 | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .math-block h3 {
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: block;
+            margin: 1rem 0;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .icon-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 4px;
+            border: 2px solid var(--light);
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .icon-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .icon-item p {
+            color: var(--navy);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 0.7rem 1.5rem;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #0f766e;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 7 : IEEE 802.15.4</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 7 : IEEE 802.15.4</h1>
+
+        <p>802.15.4 est le standard de base pour les réseaux IoT à faible puissance. C'est le protocole qui alimente ZigBee, 6LoWPAN, Thread et Bluetooth Low Energy (en partie). Comparé au WiFi, c'est 10x plus lent mais 10x moins consommateur de puissance.</p>
+
+        <!-- Présentation -->
+        <h2>1. Présentation 802.15.4</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Le standard IoT</div>
+            <p>802.15.4 = "Wireless Personal Area Networks" (WPAN). C'est fait pour connecter des capteurs à bas débit, sur courte distance, avec batterie longue durée.</p>
+            <div class="analogy">
+                📡 <strong>Analogie :</strong> Si WiFi est l'autoroute à 100 km/h pour transférer des films en HD, 802.15.4 est la petite route à 5 km/h qui consomme 10x moins d'essence pour la même distance à pied. Idéal pour les capteurs qui envoient juste quelques bytes tous les 10 secondes.
+            </div>
+        </div>
+
+        <div class="icon-grid">
+            <div class="icon-item">
+                <div class="icon">📏</div>
+                <p>Portée : 10-75m</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">⚡</div>
+                <p>Débit : 250 kbps</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">🔋</div>
+                <p>Consommation : ~20 mA</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">📶</div>
+                <p>Fréq : 2.4 GHz</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">🔢</div>
+                <p>16 canaux 2.4GHz</p>
+            </div>
+            <div class="icon-item">
+                <div class="icon">🔧</div>
+                <p>Easy to use</p>
+            </div>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Caractéristique</th>
+                    <th>WiFi 802.11</th>
+                    <th>802.15.4</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Débit</strong></td>
+                    <td>11-600 Mbps</td>
+                    <td>250 kbps (= 0.25 Mbps)</td>
+                </tr>
+                <tr>
+                    <td><strong>Consommation (TX)</strong></td>
+                    <td>~300-500 mA</td>
+                    <td>~20-30 mA</td>
+                </tr>
+                <tr>
+                    <td><strong>Portée (outdoor)</strong></td>
+                    <td>~100-300 m</td>
+                    <td>10-100 m</td>
+                </tr>
+                <tr>
+                    <td><strong>Topologie</strong></td>
+                    <td>Infrastructure BSS</td>
+                    <td>Star, Mesh</td>
+                </tr>
+                <tr>
+                    <td><strong>MAC</strong></td>
+                    <td>CSMA/CA (DCF)</td>
+                    <td>CSMA/CA (beacon-based ou non-slotted)</td>
+                </tr>
+                <tr>
+                    <td><strong>Cas d'usage</strong></td>
+                    <td>Streaming, Web, mobilité</td>
+                    <td>Capteurs, IoT, domotique</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="retenir">
+            ✅ 802.15.4 est le fondement de ZigBee, 6LoWPAN, Thread et Bluetooth LE. C'est LE standard pour l'IoT bas débit, bas coût et batterie longue durée.
+        </div>
+
+        <!-- Couche Physique -->
+        <h2>2. Couche Physique (PHY)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Fréquences & Modulation</div>
+            <p>802.15.4 fonctionne sur trois bandes ISM (Industrial, Scientific, Medical) libres d'accès.</p>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Bande</th>
+                    <th>Fréquence</th>
+                    <th>Canaux</th>
+                    <th>Largeur par canal</th>
+                    <th>Débit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>European (868 MHz)</td>
+                    <td>868.0 - 868.6 MHz</td>
+                    <td>1</td>
+                    <td>600 kHz</td>
+                    <td>20 kbps (BPSK)</td>
+                </tr>
+                <tr>
+                    <td>ISM 900 MHz</td>
+                    <td>902-928 MHz (US)</td>
+                    <td>10</td>
+                    <td>2 MHz</td>
+                    <td>40 kbps (BPSK)</td>
+                </tr>
+                <tr>
+                    <td style="background: #d1fae5;"><strong>2.4 GHz (WPAN)</strong></td>
+                    <td style="background: #d1fae5;">2400 - 2483.5 MHz</td>
+                    <td style="background: #d1fae5;"><strong>16</strong></td>
+                    <td style="background: #d1fae5;">5 MHz</td>
+                    <td style="background: #d1fae5;"><strong>250 kbps (O-QPSK)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Modulation : DSSS + O-QPSK</h3>
+            <p><strong>DSSS :</strong> Direct Sequence Spread Spectrum (aussi utilisé par CDMA). Chaque bit est étalé sur 32 chips.</p>
+            <p style="margin-top: 0.5rem;"><strong>O-QPSK :</strong> Offset Quadrature Phase Shift Keying. Deux voies en quadrature (cosinus et sinus) pour doubler le débit.</p>
+            <p style="margin-top: 0.5rem;"><strong>Résultat :</strong> 32 chips × 2 voies × 15.625 kchips/s = 250 kbps théorique. ✓</p>
+        </div>
+
+        <div class="demo-box">
+            <h3>📊 Démo : Les 16 canaux 802.15.4 à 2.4 GHz et chevauchement WiFi</h3>
+            <canvas id="channelCanvas" width="900" height="300"></canvas>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+                <strong>Bleu :</strong> Canaux 802.15.4 (11-26, espacés de 5 MHz) | <strong>Rouge :</strong> Canaux WiFi 1, 6, 11 (non-overlappant, espacés de 25 MHz)
+            </p>
+        </div>
+
+        <!-- Topologies -->
+        <h2>3. Topologies</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Star vs Cluster-tree vs Mesh</div>
+            <p>IEEE 802.15.4 supporte <strong>trois topologies</strong> de réseau. Il est important de connaître leurs noms et caractéristiques pour l'examen !</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0;">
+            <div style="background:#eff6ff;border-radius:10px;padding:1rem;border:2px solid #3b82f6;">
+                <h3 style="color: #1e3a5f; margin-bottom:.5rem;">⭐ Topologie Star</h3>
+                <p style="font-size:.9rem;">Un <strong>coordinateur PAN</strong> central (FFD). Tous les appareils (RFD ou FFD) communiquent <em>uniquement</em> avec le coordinateur.</p>
+                <ul style="margin-left:1.2rem;margin-top:.5rem;font-size:.85rem;line-height:1.8">
+                    <li>Simple à mettre en place</li>
+                    <li>Point unique de défaillance</li>
+                    <li>Portée = portée du coordinateur</li>
+                    <li>Ex: ZigBee light, BLE</li>
+                </ul>
+            </div>
+
+            <div style="background:#f0fdf4;border-radius:10px;padding:1rem;border:2px solid #10b981;">
+                <h3 style="color: #065f46; margin-bottom:.5rem;">🌳 Topologie Cluster-Tree</h3>
+                <p style="font-size:.9rem;">Arbre hiérarchique de coordinateurs FFD avec des feuilles RFD. Chaque coordinateur gère sa propre sous-zone.</p>
+                <ul style="margin-left:1.2rem;margin-top:.5rem;font-size:.85rem;line-height:1.8">
+                    <li>Portée étendue (multi-hop)</li>
+                    <li>Structure hiérarchique</li>
+                    <li>Pas de boucles dans l'arbre</li>
+                    <li>Utilisé dans ZigBee</li>
+                </ul>
+            </div>
+
+            <div style="background:#fdf4ff;border-radius:10px;padding:1rem;border:2px solid #9333ea;">
+                <h3 style="color: #6b21a8; margin-bottom:.5rem;">🕸️ Peer-to-Peer (Mesh)</h3>
+                <p style="font-size:.9rem;">N'importe quel FFD peut communiquer avec n'importe quel autre FFD dans sa portée. Pas de hiérarchie.</p>
+                <ul style="margin-left:1.2rem;margin-top:.5rem;font-size:.85rem;line-height:1.8">
+                    <li>Résilience maximale</li>
+                    <li>Routage complexe (RPL)</li>
+                    <li>Portée augmente avec les nœuds</li>
+                    <li>Utilisé avec 6LoWPAN/RPL</li>
+                </ul>
+            </div>
+        </div>
+
+        <table class="info-table" style="margin-top:.5rem">
+            <tr><th>Topologie</th><th>Nœuds requis</th><th>Multi-hop</th><th>Tolérance aux pannes</th></tr>
+            <tr><td>⭐ Star</td><td>1 FFD coordinateur + RFD</td><td>❌ Non (single-hop)</td><td>Faible (SPOF)</td></tr>
+            <tr><td>🌳 Cluster-tree</td><td>FFD coordinateurs + RFD</td><td>✅ Oui (via coordinateurs)</td><td>Moyenne</td></tr>
+            <tr><td>🕸️ Peer-to-peer</td><td>FFD uniquement (+ optionnel RFD)</td><td>✅ Oui</td><td>✅ Élevée</td></tr>
+        </table>
+
+        <div class="demo-box">
+            <h3>🖼️ Démo interactive : Topologies Star vs Mesh</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h4 style="color: var(--navy); margin-bottom: 0.5rem;">Star</h4>
+                    <canvas id="starCanvas" width="400" height="320"></canvas>
+                </div>
+                <div>
+                    <h4 style="color: var(--navy); margin-bottom: 0.5rem;">Mesh</h4>
+                    <canvas id="meshCanvas" width="400" height="320"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Format de trame -->
+        <h2>4. Format de trame 802.15.4</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Compacité</div>
+            <p>802.15.4 est extrêmement compact : la trame complète fait max 127 bytes ! 💪</p>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Partie</th>
+                    <th>Signification</th>
+                    <th>Taille</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PHR</strong></td>
+                    <td>Physical Header (longueur de frame)</td>
+                    <td>1 byte</td>
+                </tr>
+                <tr>
+                    <td><strong>MHR</strong></td>
+                    <td>MAC Header (Frame Control, Seq, adresses)</td>
+                    <td>Jusqu'à 25 bytes</td>
+                </tr>
+                <tr>
+                    <td><strong>Payload</strong></td>
+                    <td>Données utiles (ex: ZigBee, 6LoWPAN)</td>
+                    <td>Jusqu'à 102 bytes</td>
+                </tr>
+                <tr>
+                    <td><strong>MFR</strong></td>
+                    <td>MAC Footer (FCS = Frame Check Sequence, CRC)</td>
+                    <td>2 bytes</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background: #fee2e2; border-left: 3px solid #dc2626; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+            <p><strong>⚠️ Problème :</strong> IPv6 a un en-tête de 40 bytes minimum. Reste pour données = 102 - 25 - 40 = 37 bytes ! Donc IPv6 ne rentre pas bien. Solution : 6LoWPAN (Chapitre 9).</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Adressage 802.15.4</h3>
+            <p><strong>Adresse courte (PAN ID + 16-bit address) :</strong> 2 + 2 = 4 bytes. Utilisée dans le même PAN.</p>
+            <p style="margin-top: 0.5rem;"><strong>Adresse longue (IEEE EUI-64) :</strong> 8 bytes. Adresse MAC globalement unique.</p>
+            <p style="margin-top: 0.5rem;"><strong>PAN ID :</strong> Personal Area Network ID (2 bytes). Identifie le réseau (exemple: ZigBee Home a un PAN ID spécifique).</p>
+        </div>
+
+        <!-- CSMA/CA 802.15.4 -->
+        <h2>5. CSMA/CA 802.15.4 (non-slotté)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">MAC Layer</div>
+            <p>802.15.4 utilise CSMA/CA similaire à WiFi, mais avec des variantes adaptées au low-power.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>CSMA/CA non-slotté 802.15.4</h3>
+            <p><strong>CCA (Clear Channel Assessment) :</strong> Écoute le canal.</p>
+            <p style="margin-top: 0.5rem;"><strong>Backoff aléatoire :</strong> Attend une durée aléatoire [0, CW] en unités de time slot.</p>
+            <p style="margin-top: 0.5rem;"><strong>Transmission :</strong> Envoie le frame si le canal reste libre.</p>
+            <p style="margin-top: 0.5rem;"><strong>ACK :</strong> Le destinataire envoie un ACK après un délai TAck.</p>
+            <p style="margin-top: 0.5rem;"><strong>Fenêtre de contention (CW) :</strong> Augmente en cas d'échec jusqu'à CW_max (par défaut : 4).</p>
+        </div>
+
+        <div class="demo-box">
+            <h3>⏱️ Démo animée : CSMA/CA 802.15.4</h3>
+            <canvas id="csma802Canvas" width="900" height="300"></canvas>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 4px;">
+                <button id="csmaPlayBtn" style="margin-right: 1rem;">▶ Démarrer</button>
+                <button id="csmaResetBtn">🔄 Réinitialiser</button>
+            </div>
+        </div>
+
+        <div class="retenir">
+            ✅ 802.15.4 CSMA/CA est plus simple que WiFi, avec CW plus petit (4 au lieu de 1023) pour réduire la latence et la consommation.
+        </div>
+
+        <!-- Mode Slotté — Beacon-Enabled Mode -->
+        <h2>6. 🕐 Mode Slotté — Beacon-Enabled Mode</h2>
+
+        <div class="explain-intro">
+            <div class="badge">MAC Layer</div>
+            <p>Le mode slotté (beacon-enabled) ajoute une structure temporelle au réseau. Le coordinateur envoie régulièrement des BEACON frames pour annoncer la structure de la superframe.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Fonctionnement du Mode Slotté</h3>
+            <p><strong>BEACON frames :</strong> Le coordinateur PAN envoie des trames BEACON périodiquement pour synchroniser tous les nœuds et annoncer la structure de la superframe.</p>
+            <p style="margin-top: 0.5rem;"><strong>Structure de la Superframe :</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>Beacon :</strong> Annonce la structure (adresses actives, GTS en attente, etc.)</li>
+                <li><strong>CAP (Contention Access Period) :</strong> 11 time slots. Tous les nœuds concourent via Slotted CSMA/CA.</li>
+                <li><strong>CFP (Contention Free Period) :</strong> Jusqu'à 5 GTS (Guaranteed Time Slots). Slots TDMA réservés pour des nœuds spécifiques.</li>
+                <li><strong>Periode Inactive :</strong> Tous les nœuds peuvent dormir pour économiser de l'énergie.</li>
+            </ul>
+            <p style="margin-top: 0.5rem;"><strong>Beacon Interval (BI) :</strong> BI = aBaseSuperframeDuration × 2^BO, où BO = Beacon Order (0–14).</p>
+            <p style="margin-top: 0.5rem;"><strong>Superframe Duration (SD) :</strong> SD = aBaseSuperframeDuration × 2^SO, où SO = Superframe Order (0–14). Doit respecter SO ≤ BO.</p>
+            <p style="margin-top: 0.5rem;"><strong>CAP (Slotted CSMA/CA) :</strong> Tous les nœuds concourent normalement. Accès par contention.</p>
+            <p style="margin-top: 0.5rem;"><strong>CFP (Garantis TDMA) :</strong> GTS (Guaranteed Time Slots) réservés. Un nœud demande un GTS pendant le CAP → le coordinateur l'assigne dans le BEACON suivant.</p>
+            <p style="margin-top: 0.5rem;"><strong>Avantages :</strong> Latence prévisible (GTS), les nœuds peuvent dormir → bien meilleure efficacité énergétique.</p>
+            <p style="margin-top: 0.5rem;"><strong>Inconvénients :</strong> Nécessite une synchronisation stricte, le coordinateur est un point de défaillance unique.</p>
+        </div>
+
+        <div class="comparison-table">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Caractéristique</th>
+                        <th>Mode Non-Slotté</th>
+                        <th>Mode Slotté</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Synchronisation</strong></td>
+                        <td>Non requise</td>
+                        <td style="background: #d1fae5;">Requise (BEACON)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Support GTS</strong></td>
+                        <td>Non</td>
+                        <td style="background: #d1fae5;">Oui (TDMA)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Écoute du récepteur</strong></td>
+                        <td>Constante (toujours actif)</td>
+                        <td style="background: #d1fae5;">Périodique (peut dormir)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consommation énergétique</strong></td>
+                        <td>Élevée</td>
+                        <td style="background: #d1fae5;">Basse</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Latence</strong></td>
+                        <td>Variable (attente aléatoire)</td>
+                        <td style="background: #d1fae5;">Prévisible (GTS)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="retenir">
+            ✅ Le mode slotté est essentiel pour les applications IoT alimentées par batterie. Les nœuds synchronisés peuvent dormir lors de la periode inactive, réduisant drastiquement la consommation.
+        </div>
+
+        <!-- TSCH — Time Slotted Channel Hopping -->
+        <h2>7. 📡 TSCH — Time Slotted Channel Hopping</h2>
+
+        <div class="explain-intro">
+            <div class="badge">MAC Layer</div>
+            <p>TSCH combine TDMA (Time Division Multiple Access) et frequency hopping (saut de fréquence) pour créer un réseau déterministe et resilient aux interférences.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Architecture TSCH</h3>
+            <p><strong>Slotframe :</strong> Un planning répétitif de timeslots. Chaque slot dure 10 ms. La bande 2.4 GHz contient 16 canaux.</p>
+            <p style="margin-top: 0.5rem;"><strong>Fonction de saut de fréquence :</strong></p>
+            <p style="margin-left: 2rem; margin-top: 0.5rem; font-family: monospace; background: #f0fdf4; padding: 0.8rem; border-radius: 4px;">
+                channel = (ASN + channel_offset) mod num_channels
+            </p>
+            <p style="margin-top: 0.5rem;">Où :</p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>ASN :</strong> Absolute Slot Number (incrémente à chaque slot)</li>
+                <li><strong>channel_offset :</strong> Assigné à chaque lien du planning</li>
+                <li><strong>num_channels :</strong> Nombre de canaux disponibles (16 par défaut en 2.4 GHz)</li>
+            </ul>
+            <p style="margin-top: 0.5rem;"><strong>Types de slots :</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>Dedicated slots :</strong> Réservés pour un lien spécifique (point-à-point).</li>
+                <li><strong>Shared slots :</strong> Plusieurs nœuds concourent avec CSMA.</li>
+            </ul>
+            <p style="margin-top: 0.5rem;"><strong>Approches de planification :</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>Static (Orchestra) :</strong> Planned à l'avance, pas de recalcul.</li>
+                <li><strong>Centralized :</strong> Network manager calcule le planning global.</li>
+                <li><strong>Decentralized :</strong> Algorithmes distribués (ex: TSCH-RPL).</li>
+            </ul>
+            <p style="margin-top: 0.5rem;"><strong>Avantages :</strong> Diversité fréquentielle (une interférence sur un canal → utiliser un autre), efficacité TDMA, latence déterministe.</p>
+            <p style="margin-top: 0.5rem;"><strong>Utilisé dans :</strong> 6TiSCH (standard IETF combinant 6LoWPAN + TSCH + RPL), IoT industriel (usines, grilles intelligentes).</p>
+        </div>
+
+        <div class="retenir">
+            ✅ TSCH apporte du déterminisme et de la résilience. Le saut de fréquence automatique évite les interférences stables. Parfait pour les applications critiques.
+        </div>
+
+        <!-- Sécurité et Adressage IEEE 802.15.4 -->
+        <h2>8. 🔒 Sécurité et Adressage IEEE 802.15.4</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Security & Addressing</div>
+            <p>802.15.4 fournit deux types d'adresses et un chiffrement AES-128 optionnel au niveau MAC.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Sécurité 802.15.4</h3>
+            <p><strong>Chiffrement de trame :</strong> AES-128 optionnel dans l'en-tête MAC. Contrôlé par le champ Security Level.</p>
+            <p style="margin-top: 0.5rem;"><strong>Modes de sécurité :</strong></p>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li><strong>None :</strong> Pas de sécurité.</li>
+                <li><strong>MIC-32, MIC-64, MIC-128 :</strong> Message Integrity Code (intégrité uniquement, pas de confidentialité).</li>
+                <li><strong>ENC :</strong> Chiffrement (confidentialité uniquement).</li>
+                <li><strong>ENC-MIC :</strong> Chiffrement + intégrité (sécurité maximale).</li>
+            </ul>
+            <h3 style="margin-top: 1.5rem;">Adressage</h3>
+            <p><strong>PAN ID :</strong> 16 bits. Identifie le Personal Area Network. Les nœuds dans des PAN différents ne communiquent pas directement.</p>
+            <p style="margin-top: 0.5rem;"><strong>Adresse courte (16 bits) :</strong> Assignée par le coordinateur, valide uniquement dans le PAN. Format: [PAN ID | 16-bit address].</p>
+            <p style="margin-top: 0.5rem;"><strong>Adresse longue (IEEE EUI-64, 64 bits) :</strong> Adresse MAC globalement unique. Format: [OUI | Identificateur nœud]. Utilisée pour l'authentification de sécurité.</p>
+            <h3 style="margin-top: 1.5rem;">Sélection du Coordinateur</h3>
+            <p><strong>Coordinateur :</strong> Le dispositif ayant la meilleure qualité de lien vers la racine/sink devient coordinateur.</p>
+        </div>
+
+        <div class="retenir">
+            ✅ Combinaison d'adresses courtes (efficace en bande passante) et longues (globalement uniques). Sécurité AES optional mais critère pour ZigBee.
+        </div>
+    </div>
+
+    <!-- ===== SECTION : PROTOCOLES AU-DESSUS DE 802.15.4 ===== -->
+    <div class="section">
+        <h2>🧱 9. Protocoles construits sur IEEE 802.15.4</h2>
+
+        <div class="explain-intro">
+            <div class="badge">🧒 802.15.4 est la fondation, pas la maison complète !</div>
+            <p>IEEE 802.15.4 ne définit que les couches PHY et MAC. De nombreux protocoles de niveau supérieur (réseau, application) ont été construits par-dessus pour créer des systèmes IoT complets.</p>
+        </div>
+
+        <table class="info-table" style="width:100%">
+            <tr><th>Protocole</th><th>Organisme</th><th>Usage principal</th><th>Particularités</th></tr>
+            <tr>
+                <td><strong>ZigBee</strong></td>
+                <td>ZigBee Alliance</td>
+                <td>Domotique, Smart Home</td>
+                <td>Très populaire mais propriétaire (pas gratuit). Définit des couches réseau et application complexes.</td>
+            </tr>
+            <tr>
+                <td><strong>Thread</strong></td>
+                <td>Thread Group</td>
+                <td>Smart Home (Apple, Google)</td>
+                <td>Peut aussi fonctionner sur Bluetooth et WiFi. Basé sur IPv6/6LoWPAN.</td>
+            </tr>
+            <tr>
+                <td><strong>6LoWPAN + RPL</strong></td>
+                <td>IETF</td>
+                <td>IoT générique, recherche</td>
+                <td>Gratuit et open source. IPv6 sur 802.15.4. Utilisé dans Contiki-NG.</td>
+            </tr>
+            <tr>
+                <td><strong>WirelessHART</strong></td>
+                <td>FieldComm Group</td>
+                <td>Automatisation industrielle</td>
+                <td>Réseau maillé industriel, haute fiabilité avec TDMA.</td>
+            </tr>
+            <tr>
+                <td><strong>ISA100.11a</strong></td>
+                <td>ISA</td>
+                <td>Automatisation industrielle</td>
+                <td>Standard IEC pour les réseaux de terrain industriels sans fil.</td>
+            </tr>
+            <tr>
+                <td><strong>MiWi</strong></td>
+                <td>Microchip</td>
+                <td>Smart Home, alarmes</td>
+                <td>Propriétaire Microchip. Moins de ressources que ZigBee (≈20 KB de code).</td>
+            </tr>
+        </table>
+
+        <div style="background:#fef3c7;border-radius:8px;padding:.8rem 1rem;margin-top:.8rem;font-weight:600;color:#92400e;font-size:.9rem;">💡 À retenir : IEEE 802.15.4 est un standard de bas niveau. Les applications IoT nécessitent des protocoles de niveau supérieur (réseau, transport, application) construits par-dessus.</div>
+    </div>
+
+    <!-- ===== SECTION : TSCH SCHEDULING ===== -->
+    <div class="section">
+        <h2>📅 10. Ordonnancement TSCH et multiplexage spatial</h2>
+
+        <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#3b82f6;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Comment est déterminé l'ordonnancement TSCH ?</div>
+            <p>Le standard 802.15.4e ne spécifie pas <em>comment</em> l'ordonnancement doit être calculé — il définit seulement les mécanismes pour le distribuer et l'appliquer. Plusieurs approches existent :</p>
+            <ul style="padding-left:1.2rem;line-height:1.8;margin-top:.5rem;">
+                <li><strong>Approche statique</strong> : l'ordonnancement est prédéterminé par l'opérateur réseau et programmé dans chaque nœud avant déploiement. Simple mais rigide.</li>
+                <li><strong>Approche centralisée</strong> : les nœuds envoient leurs demandes de communication à un ordonnanceur central (ex. le coordinateur PAN) qui calcule l'ordonnancement optimal et le distribue à tous.</li>
+                <li><strong>Approche décentralisée</strong> : les nœuds s'échangent leurs informations de demande et construisent l'ordonnancement collaborativement, sans entité centrale.</li>
+            </ul>
+        </div>
+
+        <div style="background:#f0fdf4;border-left:4px solid #0D9488;border-radius:0 10px 10px 0;padding:1.2rem 1.4rem;margin:1rem 0;">
+            <div style="display:inline-block;background:#0D9488;color:#fff;font-size:.75rem;font-weight:700;padding:.25rem .7rem;border-radius:20px;margin-bottom:.7rem;">📘 Multiplexage spatial dans TSCH</div>
+            <p>TSCH suppose qu'un appareil ne peut <strong>envoyer ou recevoir que sur un canal à la fois</strong>. Cependant, si deux paires d'appareils sont suffisamment éloignées l'une de l'autre, l'ordonnanceur peut planifier l'utilisation du <strong>même canal au même moment</strong> pour ces deux paires simultanément — sans interférence.</p>
+            <p style="margin-top:.6rem;">Cela nécessite que l'ordonnanceur connaisse la <strong>position approximative des nœuds</strong> pour garantir qu'ils ne s'interfèrent pas mutuellement. C'est une forme de multiplexage spatial (SDMA) intégré dans TSCH.</p>
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch6_mac_aleatoire.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="ch8_wifi.html">Chapitre suivant →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // Channel Canvas
+        const channelCanvas = document.getElementById('channelCanvas');
+        const channelCtx = channelCanvas.getContext('2d');
+
+        function drawChannels() {
+            channelCanvas.width = channelCanvas.offsetWidth;
+            const width = channelCanvas.width;
+            const height = channelCanvas.height;
+
+            channelCtx.fillStyle = '#f9fafb';
+            channelCtx.fillRect(0, 0, width, height);
+
+            const freqStart = 2400;
+            const freqEnd = 2485;
+            const freqRange = freqEnd - freqStart;
+            const freqPixels = width - 100;
+
+            // Draw frequency axis
+            channelCtx.strokeStyle = '#333';
+            channelCtx.lineWidth = 2;
+            channelCtx.beginPath();
+            channelCtx.moveTo(50, height - 80);
+            channelCtx.lineTo(width - 20, height - 80);
+            channelCtx.stroke();
+
+            channelCtx.fillStyle = '#333';
+            channelCtx.font = 'bold 12px Arial';
+            channelCtx.textAlign = 'center';
+            channelCtx.fillText('Fréquence (MHz)', width / 2, height - 20);
+
+            // Draw 802.15.4 channels (11-26, 2405-2480 MHz, 5 MHz apart)
+            channelCtx.fillStyle = '#3B82F6';
+            for (let ch = 11; ch <= 26; ch++) {
+                const freq = 2405 + (ch - 11) * 5;
+                const x = 50 + ((freq - freqStart) / freqRange) * freqPixels;
+                channelCtx.fillRect(x - 4, height - 150, 8, 80);
+
+                // Label
+                channelCtx.fillStyle = '#3B82F6';
+                channelCtx.font = '9px Arial';
+                channelCtx.textAlign = 'center';
+                channelCtx.fillText(ch.toString(), x, height - 60);
+            }
+
+            // Draw WiFi channels (1, 6, 11)
+            channelCtx.fillStyle = 'rgba(239, 68, 68, 0.7)';
+            const wifiChans = [
+                { num: 1, freq: 2412 },
+                { num: 6, freq: 2437 },
+                { num: 11, freq: 2462 }
+            ];
+
+            wifiChans.forEach(chan => {
+                const x = 50 + ((chan.freq - freqStart) / freqRange) * freqPixels;
+                channelCtx.fillRect(x - 20, height - 250, 40, 40);
+
+                channelCtx.fillStyle = '#EF4444';
+                channelCtx.font = 'bold 10px Arial';
+                channelCtx.textAlign = 'center';
+                channelCtx.fillText('WiFi ' + chan.num, x, height - 210);
+            });
+
+            // Legend
+            channelCtx.fillStyle = '#3B82F6';
+            channelCtx.fillRect(60, 20, 15, 15);
+            channelCtx.fillStyle = '#333';
+            channelCtx.font = '12px Arial';
+            channelCtx.textAlign = 'left';
+            channelCtx.fillText('802.15.4 canaux', 85, 32);
+
+            channelCtx.fillStyle = '#EF4444';
+            channelCtx.fillRect(280, 20, 15, 15);
+            channelCtx.fillStyle = '#333';
+            channelCtx.fillText('WiFi canaux', 305, 32);
+        }
+
+        drawChannels();
+
+        // Star and Mesh topologies
+        function drawStarTopology() {
+            const canvas = document.getElementById('starCanvas');
+            canvas.width = canvas.offsetWidth;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.fillStyle = '#f9fafb';
+            ctx.fillRect(0, 0, w, h);
+
+            // Coordinator in center
+            ctx.fillStyle = '#0D9488';
+            ctx.beginPath();
+            ctx.arc(w / 2, h / 2, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Coord', w / 2, h / 2);
+
+            // RFD devices around
+            const numRFD = 5;
+            for (let i = 0; i < numRFD; i++) {
+                const angle = (i / numRFD) * Math.PI * 2;
+                const x = w / 2 + 80 * Math.cos(angle);
+                const y = h / 2 + 80 * Math.sin(angle);
+
+                // Connection line
+                ctx.strokeStyle = '#d1d5db';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(w / 2, h / 2);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+
+                // Device
+                ctx.fillStyle = '#F59E0B';
+                ctx.fillRect(x - 15, y - 15, 30, 30);
+                ctx.fillStyle = 'white';
+                ctx.font = '8px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('RFD', x, y + 2);
+            }
+
+            ctx.fillStyle = '#666';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Star Topology', w / 2, h - 15);
+        }
+
+        function drawMeshTopology() {
+            const canvas = document.getElementById('meshCanvas');
+            canvas.width = canvas.offsetWidth;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.fillStyle = '#f9fafb';
+            ctx.fillRect(0, 0, w, h);
+
+            // Create random node positions
+            const nodes = [
+                { x: w / 2, y: h / 2, type: 'root' },
+                { x: w / 2 - 80, y: h / 2 - 60, type: 'ffd' },
+                { x: w / 2 + 80, y: h / 2 - 60, type: 'ffd' },
+                { x: w / 2 - 100, y: h / 2 + 80, type: 'ffd' },
+                { x: w / 2 + 100, y: h / 2 + 80, type: 'ffd' },
+                { x: w / 2, y: h / 2 - 120, type: 'ffd' }
+            ];
+
+            // Draw connections (every node connects to neighbors)
+            ctx.strokeStyle = '#d1d5db';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[j].x - nodes[i].x;
+                    const dy = nodes[j].y - nodes[i].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw nodes
+            nodes.forEach(node => {
+                if (node.type === 'root') {
+                    ctx.fillStyle = '#0D9488';
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 9px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('Root', node.x, node.y);
+                } else {
+                    ctx.fillStyle = '#10B981';
+                    ctx.fillRect(node.x - 15, node.y - 15, 30, 30);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '8px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('FFD', node.x, node.y + 2);
+                }
+            });
+
+            ctx.fillStyle = '#666';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Mesh Topology', w / 2, h - 15);
+        }
+
+        drawStarTopology();
+        drawMeshTopology();
+
+        // CSMA/CA 802.15.4 Animation
+        const csma802Canvas = document.getElementById('csma802Canvas');
+        const csma802Ctx = csma802Canvas.getContext('2d');
+        const csmaPlayBtn = document.getElementById('csmaPlayBtn');
+        const csmaResetBtn = document.getElementById('csmaResetBtn');
+
+        let csmaFrame = 0;
+        let csmaAnimating = false;
+
+        function drawCSMA802(frame) {
+            csma802Canvas.width = csma802Canvas.offsetWidth;
+            const width = csma802Canvas.width;
+            const height = csma802Canvas.height;
+
+            csma802Ctx.fillStyle = '#f9fafb';
+            csma802Ctx.fillRect(0, 0, width, height);
+
+            const y = 50;
+            const boxHeight = 200;
+
+            csma802Ctx.fillStyle = '#333';
+            csma802Ctx.font = 'bold 14px Arial';
+            csma802Ctx.fillText('Chronologie CSMA/CA 802.15.4:', 60, 30);
+
+            // Timeline
+            csma802Ctx.strokeStyle = '#333';
+            csma802Ctx.lineWidth = 2;
+            csma802Ctx.beginPath();
+            csma802Ctx.moveTo(60, y + boxHeight);
+            csma802Ctx.lineTo(width - 40, y + boxHeight);
+            csma802Ctx.stroke();
+
+            // Stages (10 phases total)
+            const stages = [
+                { x: 0.0, label: 'CCA 1', color: '#3B82F6' },
+                { x: 0.1, label: 'Backoff', color: '#F59E0B' },
+                { x: 0.2, label: 'CCA 2', color: '#3B82F6' },
+                { x: 0.3, label: 'TX', color: '#10B981' },
+                { x: 0.6, label: 'Wait', color: '#d1d5db' },
+                { x: 0.7, label: 'ACK', color: '#10B981' }
+            ];
+
+            const xStart = 60;
+            const xEnd = width - 40;
+            const xRange = xEnd - xStart;
+
+            stages.forEach((stage, idx) => {
+                const x = xStart + stage.x * xRange;
+                const nextX = idx < stages.length - 1 ? xStart + stages[idx + 1].x * xRange : xEnd;
+                const boxWidth = nextX - x;
+
+                // Phase box
+                csma802Ctx.fillStyle = stage.color;
+                csma802Ctx.fillRect(x, y, boxWidth - 2, boxHeight);
+
+                // Label
+                csma802Ctx.fillStyle = stage.color === '#d1d5db' ? '#666' : 'white';
+                csma802Ctx.font = 'bold 11px Arial';
+                csma802Ctx.textAlign = 'center';
+                csma802Ctx.textBaseline = 'middle';
+                csma802Ctx.fillText(stage.label, x + boxWidth / 2, y + boxHeight / 2);
+            });
+
+            // Current progress indicator
+            const progress = (frame % 100) / 100;
+            const currentX = xStart + progress * xRange;
+            csma802Ctx.fillStyle = '#EF4444';
+            csma802Ctx.fillRect(currentX - 2, y - 10, 4, boxHeight + 20);
+
+            // Status text
+            csma802Ctx.fillStyle = '#333';
+            csma802Ctx.font = '11px Arial';
+            csma802Ctx.textAlign = 'left';
+            csma802Ctx.fillText('Temps → ', 60, height - 30);
+            csma802Ctx.fillText('Progress: ' + Math.round(progress * 100) + '%', 200, height - 30);
+        }
+
+        csmaPlayBtn.addEventListener('click', () => {
+            if (csmaAnimating) return;
+            csmaAnimating = true;
+            csmaPlayBtn.disabled = true;
+            csmaResetBtn.disabled = false;
+
+            csmaFrame = 0;
+            const interval = setInterval(() => {
+                drawCSMA802(csmaFrame);
+                csmaFrame++;
+                if (csmaFrame >= 200) {
+                    clearInterval(interval);
+                    csmaAnimating = false;
+                    csmaPlayBtn.disabled = false;
+                }
+            }, 30);
+        });
+
+        csmaResetBtn.addEventListener('click', () => {
+            csmaFrame = 0;
+            csmaAnimating = false;
+            csmaPlayBtn.disabled = false;
+            csmaResetBtn.disabled = false;
+            drawCSMA802(0);
+        });
+
+        drawCSMA802(0);
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            drawChannels();
+            drawStarTopology();
+            drawMeshTopology();
+            drawCSMA802(csmaFrame);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.1 – Business Planning | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root { --navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:white;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom,var(--amber),var(--teal));}
+.header-inner{padding:32px 48px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:.82rem;color:#94a3b8;margin-bottom:10px;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+.chapter-badge{display:inline-block;background:linear-gradient(135deg,var(--teal),#0891b2);color:white;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+header h1{font-size:1.9rem;font-weight:800;margin-bottom:6px;}
+header p.subtitle{color:#94a3b8;font-size:.95rem;}
+.header-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.1);color:#e2e8f0;font-size:.8rem;padding:4px 12px;border-radius:20px;}
+nav{background:white;border-bottom:1px solid #e2e8f0;padding:12px 48px;}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;}
+.nav-link{padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--gray);transition:all .2s;}
+.nav-link:hover,.nav-link.active{background:var(--teal);color:white;}
+main{max-width:1100px;margin:0 auto;padding:36px 48px;}
+.section{background:white;border-radius:14px;box-shadow:0 2px 16px rgba(30,58,95,.07);padding:32px;margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.section-icon{font-size:1.6rem;}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--navy);}
+.section-subtitle{font-size:.85rem;color:var(--gray);margin-top:2px;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.explain-intro .badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.explain-intro p{font-size:.9rem;line-height:1.7;color:#451a03;}
+.analogy{background:#fef3c7;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88rem;color:#78350f;border-left:3px solid #f59e0b;}
+.retenir{background:#fffbeb;border:1.5px solid var(--amber);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:.88rem;font-weight:600;color:#92400e;}
+.math-block{background:#f0fdf4;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.math-block .badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.math-block .phrase{font-size:.9rem;color:#065f46;margin-bottom:12px;font-style:italic;}
+.formula-display{background:white;border-radius:10px;padding:18px;text-align:center;margin:14px 0;border:1.5px solid #d1fae5;overflow-x:auto;}
+.theory-box{background:#eff6ff;border-radius:10px;padding:18px 22px;margin:14px 0;border:1px solid #bfdbfe;}
+.theory-box h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.theory-box p{font-size:.88rem;line-height:1.65;color:#1e40af;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin:16px 0;}
+.icon-item{background:#f8fafc;border-radius:10px;padding:16px;text-align:center;border:1px solid #e2e8f0;}
+.icon-item .emoji{font-size:1.8rem;margin-bottom:8px;}
+.icon-item .label{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.icon-item .desc{font-size:.75rem;color:var(--gray);line-height:1.4;}
+.steps{margin:16px 0;}
+.step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;}
+.step-num{background:var(--navy);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;}
+.step-content h5{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.step-content p{font-size:.85rem;color:var(--gray);line-height:1.5;}
+.demo-box{background:#f8fafc;border-radius:12px;padding:24px;border:2px dashed #cbd5e1;margin-top:20px;}
+.demo-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.demo-controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.control-group label{display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:6px;}
+.control-group input[type=range]{width:100%;accent-color:var(--teal);}
+.control-value{font-size:1.1rem;font-weight:700;color:var(--teal);}
+.demo-result{background:white;border-radius:10px;padding:16px;border:1px solid #e2e8f0;}
+.result-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:.88rem;}
+.result-row:last-child{border-bottom:none;}
+.result-label{color:var(--gray);}
+.result-value{font-weight:700;color:var(--navy);}
+.result-highlight{color:var(--teal);font-size:1.05rem;}
+canvas{max-width:100%;}
+.btn{background:var(--teal);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;margin:4px;}
+.btn:hover{background:#0f766e;}
+.btn-secondary{background:#f1f5f9;color:var(--navy);}
+.btn-secondary:hover{background:#e2e8f0;}
+.quote{background:var(--navy);color:white;border-radius:12px;padding:20px 24px;margin:16px 0;font-style:italic;}
+.quote p{font-size:.95rem;line-height:1.6;margin-bottom:8px;}
+.quote cite{font-size:.8rem;color:var(--amber);font-style:normal;font-weight:600;}
+.nice-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.88rem;}
+.nice-table th{background:var(--navy);color:white;padding:10px 14px;text-align:left;}
+.nice-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0;}
+.nice-table tr:hover td{background:#f8fafc;}
+.cycle-visual{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin:20px 0;}
+.cycle-card{background:white;border-radius:12px;padding:20px;border-top:4px solid;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.cycle-card .q{font-size:1.5rem;font-weight:800;margin-bottom:8px;}
+.cycle-card h4{font-size:.95rem;font-weight:700;margin-bottom:6px;}
+.cycle-card p{font-size:.8rem;color:var(--gray);line-height:1.5;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:24px;font-size:.82rem;margin-top:40px;}
+footer span{color:var(--amber);}
+@media(max-width:700px){.header-inner,nav,main{padding-left:20px;padding-right:20px;} header h1{font-size:1.4rem;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 1</div>
+    <div class="chapter-badge">Chapitre 1</div>
+    <h1>Business Planning</h1>
+    <p class="subtitle">Du rêve au plan : comment structurer et valider une idée de business</p>
+    <div class="header-chips">
+      <span class="chip">📋 Business Plan</span>
+      <span class="chip">🔄 Cycle BM Design</span>
+      <span class="chip">🎯 R-W-W Screen</span>
+      <span class="chip">✅ Facteurs de succès</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#objectifs" class="nav-link active">Objectifs du BP</a>
+    <a href="#cycle" class="nav-link">Cycle de Design</a>
+    <a href="#rww" class="nav-link">R-W-W Screen</a>
+    <a href="#selling" class="nav-link">BP comme outil de vente</a>
+    <a href="#echecs" class="nav-link">Échecs fréquents</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : OBJECTIFS ========== -->
+<div class="section" id="objectifs">
+  <div class="section-header">
+    <span class="section-icon">📋</span>
+    <div>
+      <div class="section-title">Pourquoi écrire un Business Plan ?</div>
+      <div class="section-subtitle">Les 4 fonctions clés d'un business plan</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un Business Plan ?</div>
+    <p>Imagine que tu veux partir en voyage au bout du monde. Tu peux partir à l'improviste, mais tu risques de rater des vols, de manquer d'argent ou d'arriver dans un pays dont tu ne connais pas les règles. Le business plan, c'est ta carte routière détaillée avant de lancer une entreprise : ça t'oblige à réfléchir à tout ce qui peut mal se passer, et à préparer des solutions à l'avance.</p>
+    <div class="analogy">
+      🗺️ <strong>Analogie de Christophe Colomb :</strong> Colomb avait un "business plan" : convaincre les Rois d'Espagne d'investir dans son voyage vers les Indes. Sans ce plan, pas de financement. Sans financement, pas de caravelles. Sans caravelles, pas d'Amérique ! Le plan n'était pas parfait (il pensait atteindre l'Asie), mais il a permis de mobiliser les ressources nécessaires. <em>"If men define situations as real, they are real in their consequences"</em> — Thomas W.I. and D.S. Thomas (1928)
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">✅</div><div class="label">Valider</div><div class="desc">Tester et améliorer les hypothèses de ton projet avant de dépenser de l'argent</div></div>
+      <div class="icon-item"><div class="emoji">💼</div><div class="label">Convaincre</div><div class="desc">Persuader investisseurs, partenaires, banques de te faire confiance</div></div>
+      <div class="icon-item"><div class="emoji">👥</div><div class="label">Mobiliser</div><div class="desc">Aligner l'équipe interne sur une vision commune et des priorités claires</div></div>
+      <div class="icon-item"><div class="emoji">📊</div><div class="label">Documenter</div><div class="desc">Créer un référentiel pour mesurer les progrès et ajuster la trajectoire</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : <em>"If you fail to plan, you plan to fail"</em>. Le BP sert à valider, convaincre, mobiliser et documenter — c'est un outil vivant, pas un document figé. La <strong>planification</strong> importe plus que le <strong>plan</strong> lui-même.</div>
+  </div>
+
+  <div class="quote">
+    <p>"Plans are useless, but planning is indispensable."</p>
+    <cite>— Dwight D. Eisenhower</cite>
+  </div>
+  <div class="quote" style="background:var(--teal);">
+    <p>"If we have data, let's look at data. If all we have are opinions, let's go with mine."</p>
+    <cite>— Jim Barksdale, ancien CEO de Netscape</cite>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : CYCLE ========== -->
+<div class="section" id="cycle">
+  <div class="section-header">
+    <span class="section-icon">🔄</span>
+    <div>
+      <div class="section-title">Le Cycle de Design du Modèle d'Affaires</div>
+      <div class="section-subtitle">Les 4 questions fondamentales : WHY / WHAT / WHO / HOW MUCH $</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le Business Model Design Cycle ?</div>
+    <p>Un business plan réussi doit répondre à 4 grandes questions dans l'ordre. C'est comme construire une maison : tu ne commences pas par le papier peint si tu n'as pas encore la fondation ! Ces 4 questions forment un cycle itératif — on revient constamment en arrière pour raffiner les réponses.</p>
+    <div class="analogy">
+      🏠 <strong>Analogie :</strong> Netflix en 1997 voulait louer des DVDs par correspondance. WHY : le marché de la vidéo était de 10 milliards$/an. WHO : Reed Hastings et son équipe d'anciens de Pure Atria. WHAT : envoyer des DVDs par mail + subscription model. HOW MUCH $ : levée de 3M$ pour démarrer. En 10 ans, ils ont pivoté vers le streaming — le cycle continue !
+    </div>
+    <div class="retenir">💡 À retenir : Le cycle BM Design n'est pas linéaire — c'est un processus agile d'apprentissage et d'itération. <em>"All models are wrong, but some are useful"</em> (G. Box)</div>
+  </div>
+
+  <div class="cycle-visual">
+    <div class="cycle-card" style="border-color:#6366f1;">
+      <div class="q" style="color:#6366f1;">WHY</div>
+      <h4>Stratégie & Mission</h4>
+      <p>Pourquoi y a-t-il une opportunité ? Pourquoi sommes-nous les mieux placés pour la saisir ?</p>
+      <p style="margin-top:8px;font-size:.78rem;color:#6366f1;font-weight:600;">→ Analyse de marché, analyse concurrentielle</p>
+    </div>
+    <div class="cycle-card" style="border-color:var(--teal);">
+      <div class="q" style="color:var(--teal);">WHAT</div>
+      <h4>Business Model</h4>
+      <p>Que vendre à qui ? Quelles activités et ressources sont nécessaires pour délivrer cette offre ?</p>
+      <p style="margin-top:8px;font-size:.78rem;color:var(--teal);font-weight:600;">→ Value proposition, chaîne de valeur</p>
+    </div>
+    <div class="cycle-card" style="border-color:#f97316;">
+      <div class="q" style="color:#f97316;">WHO</div>
+      <h4>People</h4>
+      <p>Qui va le faire ? Quelle équipe, quels partenaires, quelle gouvernance pour exécuter le plan ?</p>
+      <p style="margin-top:8px;font-size:.78rem;color:#f97316;font-weight:600;">→ Équipe, partenaires, structure</p>
+    </div>
+    <div class="cycle-card" style="border-color:var(--amber);">
+      <div class="q" style="color:var(--amber);">$ ?</div>
+      <h4>Money</h4>
+      <p>Combien d'argent est en jeu ? Quels risques ? Quelle valorisation ? Comment financer ?</p>
+      <p style="margin-top:8px;font-size:.78rem;color:var(--amber);font-weight:600;">→ Financials, valorisation, risques</p>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📖 Les 3 rôles du Business Plan selon le contexte</h4>
+    <p>Un même document peut servir différemment selon l'audience : pour les <strong>Business Angels</strong>, il doit surtout <em>exciter</em> (storytelling fort). Pour les <strong>Venture Capitalists</strong>, il doit <em>convaincre</em> (données, métriques). Pour une <strong>banque</strong>, il doit <em>documenter et sécuriser</em> (bilans, garanties). Pour le <strong>management interne</strong>, il doit <em>mobiliser et formaliser</em>.</p>
+  </div>
+
+  <div class="theory-box" style="border-color:#f97316; background:#fff7ed; margin-top:14px;">
+    <h4>🔄 Le Business Plan comme hypothèse itérative — pas une prédiction ! (Gailly, 2018)</h4>
+    <p style="color:#9a3412;">Gailly insiste sur un point fondamental : un business plan est une <strong>collection d'hypothèses à tester</strong>, pas un document figé. À l'étape initiale, les projections financières sur 3-5 ans sont largement <em>fictives</em> — elles montrent que l'entrepreneur comprend la logique économique du projet, pas qu'il peut prédire l'avenir. La vraie valeur du plan réside dans le processus de réflexion : <em>"planning is everything, the plan is nothing"</em> (Eisenhower). L'approche "Lean Startup" (Ries, 2011) est la concrétisation de cette idée : construire, mesurer, apprendre — en boucle rapide. Le business plan est vivant, il évolue à chaque itération.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : R-W-W ========== -->
+<div class="section" id="rww">
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <div>
+      <div class="section-title">Le R-W-W Screen</div>
+      <div class="section-subtitle">Real – Win – Worth doing : tester la viabilité d'une idée en 3 questions</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le R-W-W Screen ?</div>
+    <p>Avant d'investir du temps et de l'argent dans une idée, pose-toi 3 questions simples mais brutales. C'est comme un filtre de café : seules les idées vraiment solides passent les 3 filtres. Ce framework vient de l'Harvard Business Review (Day, 2007).</p>
+    <div class="analogy">
+      ☕ <strong>Exemple des frites arc-en-ciel :</strong> Deux étudiants ont inventé une poudre pour colorer les frites de n'importe quelle couleur. R : Est-ce que le marché existe ? (Les restos gastronomiques veulent ça ?) → Incertain. W : Peuvent-ils gagner ? (Avantage compétitif ?) → Faible (facile à copier). WD : Ça vaut le coup ? (Taille de marché, profitabilité ?) → Très petit marché. → Résultat : le VC ne prend probablement pas le meeting.
+    </div>
+    <div class="retenir">💡 À retenir : R-W-W = Real (l'opportunité est réelle ?) + Win (peut-on gagner ?) + Worth (ça vaut la peine ?). Si un seul "NON", le projet doit être revu fondamentalement.</div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num" style="background:#10b981;">R</div>
+      <div class="step-content">
+        <h5>Is it REAL? — L'opportunité est-elle réelle ?</h5>
+        <p>Y a-t-il vraiment un marché ? Les clients ont-ils ce besoin ? Sont-ils prêts à payer ? Peut-on créer un produit/service qui répond à ce besoin ?</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#3b82f6;">W</div>
+      <div class="step-content">
+        <h5>Can we WIN? — Peut-on gagner ?</h5>
+        <p>A-t-on un avantage compétitif durable ? Peut-on battre les concurrents ? Notre produit est-il le meilleur pour ce marché ? Notre équipe est-elle compétente pour exécuter ?</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:var(--amber);">WD</div>
+      <div class="step-content">
+        <h5>Is it WORTH doing? — Ça vaut le coup ?</h5>
+        <p>La taille du marché est-elle suffisante ? La profitabilité attendue justifie-t-elle le risque ? L'opportunité s'aligne-t-elle avec notre stratégie ? Le ROI est-il attractif ?</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION 4 : BP OUTIL DE VENTE ========== -->
+<div class="section" id="selling">
+  <div class="section-header">
+    <span class="section-icon">💼</span>
+    <div>
+      <div class="section-title">Le BP comme Outil de Vente (Story Selling)</div>
+      <div class="section-subtitle">Adapter son pitch selon l'audience</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le Story Selling ?</div>
+    <p>Un business plan, c'est aussi un outil de persuasion. Les plans sont développés pour obtenir les ressources nécessaires — selon Van de Ven (2008), ils servent davantage de "véhicules de vente" que de scénarios réalistes. La clé : adapter son discours selon qui tu veux convaincre.</p>
+    <div class="analogy">
+      🎭 <strong>Analogie :</strong> Tu cherches 500k€ pour lancer ta start-up. Face à une Business Angel (ex-entrepreneur, 60 ans) : commence par l'histoire, le "why", tes valeurs, ta passion. Face à un VC (fonds de 200M€) : commence par le TAM (Total Addressable Market), le CAC vs LTV, la croissance des derniers 6 mois. Face à une banque : montre un bilan prévisionnel solide et des garanties. Même projet, discours totalement différent !
+    </div>
+    <div class="retenir">💡 À retenir : La recherche montre que les investisseurs préfèrent les pitches de fondateurs masculins présentés comme "attractifs" (Brooks et al., 2014) — un biais dont il faut être conscient. Prépare ton pitch pour ton audience spécifique.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th>Audience</th><th>Priorité</th><th>Ce qu'ils cherchent</th><th>Ton pitch</th></tr>
+    <tr><td>🌟 Business Angels</td><td>Exciter +++, Convaincre ++</td><td>Passion, potentiel de croissance, exit</td><td>Histoire forte, vision inspirante</td></tr>
+    <tr><td>💹 Venture Capitalists</td><td>Convaincre +++, Documenter ++</td><td>Métriques, scalabilité, exit potentiel</td><td>Données, TAM, traction, team</td></tr>
+    <tr><td>🏦 Banque</td><td>Documenter +++, Sécuriser +++</td><td>Garanties, cash-flows stables, remboursement</td><td>Bilans prévisionnels, ratios financiers</td></tr>
+    <tr><td>👔 Management interne</td><td>Mobiliser +++, Convaincre ++</td><td>Faisabilité, ressources, bénéfices pour l'org</td><td>Plan d'action concret, ROI interne</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 5 : ÉCHECS ========== -->
+<div class="section" id="echecs">
+  <div class="section-header">
+    <span class="section-icon">⚠️</span>
+    <div>
+      <div class="section-title">10 Raisons d'Échec des Start-ups</div>
+      <div class="section-subtitle">Et les facteurs de succès à maîtriser</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Pourquoi les start-ups échouent-elles ?</div>
+    <p>90% des start-ups échouent dans les 5 premières années. Pas parce qu'elles avaient une mauvaise technologie, mais souvent pour des raisons évitables. Connaître ces pièges à l'avance, c'est avoir une longueur d'avance sur les autres entrepreneurs.</p>
+    <div class="analogy">
+      🚗 <strong>Analogie :</strong> Imagine que tu construises une voiture de F1 ultra-rapide, mais que tu oublies de mettre du carburant (= financement insuffisant) et que tu ne saches pas où est l'arrivée (= pas de focus marché). La technologie ne suffit pas — l'exécution et le go-to-market sont aussi critiques que l'innovation.
+    </div>
+    <div class="retenir">💡 À retenir : La "planning fallacy" (biais cognitif) pousse les entrepreneurs à sous-estimer les délais et les coûts, et à surestimer les revenus. Sois systématiquement pessimiste dans tes projections financières !</div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-content"><h5>Manque de focus marché</h5><p>Essayer d'être tout pour tout le monde. Solution : segmenter clairement et choisir un beachhead market.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><h5>Produit incomplet ou indifférencié</h5><p>Vendre sur le prix seul ou sans avantage clair. Solution : définir une USP (Unique Selling Proposition) forte.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><h5>Mauvaise gestion des canaux de distribution</h5><p>Supposer qu'internet va tout résoudre. Solution : définir une stratégie de distribution et de vente concrète.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><h5>Ressources financières insuffisantes</h5><p>Sous-estimer les besoins en cash. Solution : multiplier par 2 tes estimations de coûts et diviser par 2 tes projections de revenus.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-content"><h5>Planning Fallacy</h5><p>"La tendance à croire que son propre projet se déroulera comme prévu, même en sachant que la plupart des projets similaires ont pris du retard." (Kahneman & Lovallo, 2003)</p></div></div>
+  </div>
+
+  <div class="theory-box">
+    <h4>✅ Facteurs de Succès (SAPPHO Project, 1974)</h4>
+    <p>La recherche académique identifie 5 facteurs critiques de succès en innovation :
+    <strong>1)</strong> Meilleure compréhension des besoins utilisateurs.
+    <strong>2)</strong> Utilisation de technologies et conseils extérieurs.
+    <strong>3)</strong> Implication de "champions" seniors dans le projet.
+    <strong>4)</strong> Attention au marketing et à la publicité.
+    <strong>5)</strong> Exécution efficace du développement.</p>
+  </div>
+
+  <div class="explain-intro" style="margin-top:16px;">
+    <div class="badge">🏆 L'équipe d'abord — insights clés du livre</div>
+    <p>Gailly souligne que dans les premières phases d'un projet d'innovation, <strong>l'ordre d'importance des éléments du business plan est contra-intuitif</strong> :</p>
+    <div class="analogy">
+      <strong>1️⃣ WHO (l'équipe) avant tout.</strong> Pour les investisseurs expérimentés, la qualité de l'équipe est le facteur #1 dans les décisions de financement early-stage. Une équipe exceptionnelle peut pivoter ; une mauvaise équipe gâchera même la meilleure idée.<br><br>
+      <strong>2️⃣ WHY (l'opportunité de marché).</strong> L'opportunité doit être réelle, importante, et le bon moment. Pas besoin d'un marché parfait — juste un marché <em>suffisamment grand</em> pour une première traction.<br><br>
+      <strong>3️⃣ WHAT (le business model).</strong> Les détails du modèle peuvent changer (et changeront !). Ce qui compte à ce stade, c'est la logique et la cohérence, pas la précision.<br><br>
+      <strong>4️⃣ HOW MUCH $ (les financiers).</strong> Les projections financières détaillées sont les dernières à fiabiliser — elles dépendent de la validation des trois premières dimensions.
+    </div>
+    <div class="retenir">💡 À retenir : Selon Gailly, "les bons investisseurs misent sur les chevaux ET les jockeys — mais surtout sur les jockeys." La technologie s'achète, la vision et l'exécution ne s'improvisent pas.</div>
+  </div>
+</div>
+
+<!-- ========== SECTION 6 : DÉMO INTERACTIVE ========== -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <span class="section-icon">🎮</span>
+    <div>
+      <div class="section-title">Démo Interactive — Évaluation R-W-W</div>
+      <div class="section-subtitle">Score ta propre idée de business avec le framework R-W-W</div>
+    </div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">🎯 Évaluateur R-W-W Screen</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:20px;">Évalue chaque dimension de 1 (faible) à 10 (fort) pour obtenir un score global R-W-W.</p>
+
+    <div class="demo-controls" style="grid-template-columns:1fr;">
+      <div style="margin-bottom:18px;">
+        <h4 style="color:#10b981;font-size:1rem;margin-bottom:14px;">🟢 R — Is it REAL? (L'opportunité est réelle ?)</h4>
+        <div class="control-group">
+          <label>Taille du marché : <span class="control-value" id="v_market">5</span>/10</label>
+          <input type="range" min="1" max="10" value="5" id="market" oninput="updateRWW()">
+        </div>
+        <div class="control-group">
+          <label>Besoin validé par des vrais clients : <span class="control-value" id="v_need">5</span>/10</label>
+          <input type="range" min="1" max="10" value="5" id="need" oninput="updateRWW()">
+        </div>
+      </div>
+      <div style="margin-bottom:18px;">
+        <h4 style="color:#3b82f6;font-size:1rem;margin-bottom:14px;">🔵 W — Can we WIN? (Peut-on gagner ?)</h4>
+        <div class="control-group">
+          <label>Avantage compétitif durable : <span class="control-value" id="v_adv">5</span>/10</label>
+          <input type="range" min="1" max="10" value="5" id="adv" oninput="updateRWW()">
+        </div>
+        <div class="control-group">
+          <label>Compétence de l'équipe : <span class="control-value" id="v_team">5</span>/10</label>
+          <input type="range" min="1" max="10" value="5" id="team" oninput="updateRWW()">
+        </div>
+      </div>
+      <div>
+        <h4 style="color:var(--amber);font-size:1rem;margin-bottom:14px;">🟡 WD — Worth doing? (Ça vaut le coup ?)</h4>
+        <div class="control-group">
+          <label>Profitabilité attendue : <span class="control-value" id="v_profit">5</span>/10</label>
+          <input type="range" min="1" max="10" value="5" id="profit" oninput="updateRWW()">
+        </div>
+        <div class="control-group">
+          <label>Alignement stratégique : <span class="control-value" id="v_strat">5</span>/10</label>
+          <input type="range" min="1" max="10" value="5" id="strat" oninput="updateRWW()">
+        </div>
+      </div>
+    </div>
+
+    <canvas id="rwwChart" style="max-height:300px;margin-bottom:20px;"></canvas>
+
+    <div class="demo-result">
+      <div class="result-row"><span class="result-label">🟢 Score R (Réalité)</span><span class="result-value" id="score_r">—</span></div>
+      <div class="result-row"><span class="result-label">🔵 Score W (Victoire possible)</span><span class="result-value" id="score_w">—</span></div>
+      <div class="result-row"><span class="result-label">🟡 Score WD (Valeur)</span><span class="result-value" id="score_wd">—</span></div>
+      <div class="result-row"><span class="result-label">⭐ Score Global R-W-W</span><span class="result-value result-highlight" id="score_total">—</span></div>
+      <div class="result-row"><span class="result-label">📊 Recommandation</span><span class="result-value" id="recommendation">—</span></div>
+    </div>
+    <button class="btn" onclick="resetRWW()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="ch0_introduction.html" style="color:var(--amber);">← Ch.0 Introduction</a> &nbsp;|&nbsp; <a href="ch2_opportunites.html" style="color:var(--amber);">Ch.2 Opportunités →</a></p>
+</footer>
+
+<script>
+let rwwChart = null;
+
+function updateRWW() {
+  const market = +document.getElementById('market').value;
+  const need = +document.getElementById('need').value;
+  const adv = +document.getElementById('adv').value;
+  const team = +document.getElementById('team').value;
+  const profit = +document.getElementById('profit').value;
+  const strat = +document.getElementById('strat').value;
+
+  document.getElementById('v_market').textContent = market;
+  document.getElementById('v_need').textContent = need;
+  document.getElementById('v_adv').textContent = adv;
+  document.getElementById('v_team').textContent = team;
+  document.getElementById('v_profit').textContent = profit;
+  document.getElementById('v_strat').textContent = strat;
+
+  const scoreR = ((market + need) / 2).toFixed(1);
+  const scoreW = ((adv + team) / 2).toFixed(1);
+  const scoreWD = ((profit + strat) / 2).toFixed(1);
+  const total = ((market + need + adv + team + profit + strat) / 6).toFixed(1);
+
+  document.getElementById('score_r').textContent = scoreR + ' / 10';
+  document.getElementById('score_w').textContent = scoreW + ' / 10';
+  document.getElementById('score_wd').textContent = scoreWD + ' / 10';
+  document.getElementById('score_total').textContent = total + ' / 10';
+
+  const t = parseFloat(total);
+  let rec = '';
+  if (t >= 8) rec = '🚀 Excellent ! Foncez, l\'opportunité est très solide.';
+  else if (t >= 6) rec = '✅ Bon potentiel, mais renforcez les dimensions faibles.';
+  else if (t >= 4) rec = '⚠️ Projet risqué. Revisez les hypothèses fondamentales.';
+  else rec = '❌ Trop risqué. Pivotez ou abandonnez ce projet.';
+  document.getElementById('recommendation').textContent = rec;
+
+  const ctx = document.getElementById('rwwChart').getContext('2d');
+  if (rwwChart) rwwChart.destroy();
+  rwwChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Taille marché', 'Besoin validé', 'Avantage compétitif', 'Compétence équipe', 'Profitabilité', 'Alignement strat.'],
+      datasets: [{
+        label: 'Score R-W-W',
+        data: [market, need, adv, team, profit, strat],
+        backgroundColor: 'rgba(13,148,136,0.15)',
+        borderColor: '#0D9488',
+        borderWidth: 2,
+        pointBackgroundColor: '#0D9488'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { r: { beginAtZero: true, max: 10, ticks: { stepSize: 2 } } },
+      plugins: { legend: { position: 'top' }, title: { display: true, text: 'Radar R-W-W Screen' } }
+    }
+  });
+}
+
+function resetRWW() {
+  ['market','need','adv','team','profit','strat'].forEach(id => document.getElementById(id).value = 5);
+  updateRWW();
+}
+
+window.addEventListener('load', updateRWW);
+</script>
+</body>
+</html>

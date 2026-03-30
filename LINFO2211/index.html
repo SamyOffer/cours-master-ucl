@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPL 2211 – Introduction to New Venture Management</title>
+<style>
+  :root {
+    --navy: #1E3A5F;
+    --teal: #0D9488;
+    --amber: #F59E0B;
+    --light: #EFF6FF;
+    --white: #FFFFFF;
+    --gray: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #1e293b; }
+
+  /* Header */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 8px;
+    background: linear-gradient(to bottom, var(--amber), var(--teal));
+  }
+  .header-inner {
+    padding: 40px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header-tag {
+    display: inline-block;
+    background: var(--amber);
+    color: var(--navy);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  header h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+  header p.subtitle { font-size: 1.05rem; color: #94a3b8; }
+  .header-meta { display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #cbd5e1; }
+  .meta-icon { font-size: 1.1rem; }
+
+  /* Progress banner */
+  .progress-banner {
+    background: linear-gradient(135deg, var(--teal) 0%, #0f766e 100%);
+    color: white;
+    padding: 16px 60px;
+  }
+  .progress-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .progress-text { font-size: 0.9rem; font-weight: 600; }
+  .progress-bar-container { flex: 1; min-width: 200px; background: rgba(255,255,255,0.3); border-radius: 20px; height: 8px; }
+  .progress-bar { width: 0%; background: var(--amber); border-radius: 20px; height: 8px; transition: width 0.5s; }
+  .progress-label { font-size: 0.85rem; font-weight: 700; }
+
+  /* Main */
+  main { max-width: 1200px; margin: 0 auto; padding: 40px 40px; }
+
+  /* Search */
+  .search-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 12px rgba(30,58,95,0.08);
+    margin-bottom: 36px;
+  }
+  .search-bar input {
+    border: none; outline: none; flex: 1; font-size: 1rem; color: #1e293b;
+  }
+  .search-icon { color: var(--gray); font-size: 1.2rem; }
+
+  /* Section title */
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .section-subtitle {
+    color: var(--gray);
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+  }
+
+  /* Grid chapitres */
+  .chapters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  /* Carte chapitre */
+  .chapter-card {
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(30,58,95,0.07);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1.5px solid transparent;
+    position: relative;
+  }
+  .chapter-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(30,58,95,0.14);
+    border-color: var(--teal);
+  }
+  .card-accent {
+    height: 6px;
+  }
+  .card-body { padding: 24px; flex: 1; }
+  .card-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .card-title { font-size: 1.15rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.3; }
+  .card-desc { font-size: 0.875rem; color: var(--gray); line-height: 1.6; margin-bottom: 16px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .tag {
+    background: var(--light);
+    color: var(--navy);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid #dbeafe;
+  }
+  .card-footer {
+    padding: 14px 24px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-topics { font-size: 0.8rem; color: var(--gray); }
+  .card-arrow {
+    width: 32px; height: 32px;
+    background: var(--teal);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  /* Exam card */
+  .exam-card {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 32px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 48px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    flex-wrap: wrap;
+  }
+  .exam-card:hover { opacity: 0.9; }
+  .exam-icon { font-size: 3rem; flex-shrink: 0; }
+  .exam-text h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
+  .exam-text p { font-size: 0.9rem; color: #94a3b8; }
+  .exam-btn {
+    margin-left: auto;
+    background: var(--amber);
+    color: var(--navy);
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  /* Stats */
+  .stats-row { display: flex; gap: 16px; margin-bottom: 48px; flex-wrap: wrap; }
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 28px;
+    flex: 1;
+    min-width: 140px;
+    box-shadow: 0 2px 12px rgba(30,58,95,0.06);
+    text-align: center;
+  }
+  .stat-number { font-size: 2rem; font-weight: 800; color: var(--teal); }
+  .stat-label { font-size: 0.8rem; color: var(--gray); font-weight: 600; margin-top: 4px; }
+
+  /* Footer */
+  footer {
+    background: var(--navy);
+    color: #94a3b8;
+    text-align: center;
+    padding: 28px;
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  footer span { color: var(--amber); font-weight: 600; }
+
+  /* Hidden during search */
+  .chapter-card.hidden { display: none; }
+
+  @media (max-width: 600px) {
+    .header-inner { padding: 28px 24px; }
+    header h1 { font-size: 1.5rem; }
+    main { padding: 24px 16px; }
+    .chapters-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">UCLouvain – LSM</div>
+    <h1>EPL 2211</h1>
+    <p class="subtitle">Introduction to New Venture Management – Site de révision interactif</p>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-icon">👤</span> Prof. Vincent Reuter & Benoît Gailly</div>
+      <div class="meta-item"><span class="meta-icon">🏛️</span> Louvain School of Management</div>
+      <div class="meta-item"><span class="meta-icon">📅</span> 2025–2026</div>
+    </div>
+  </div>
+</header>
+
+<div class="progress-banner">
+  <div class="progress-inner">
+    <span class="progress-text">📊 Progression globale</span>
+    <div class="progress-bar-container"><div class="progress-bar" id="globalProgress"></div></div>
+    <span class="progress-label" id="progressLabel">0 / 7 chapitres</span>
+  </div>
+</div>
+
+<main>
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-number">7</div><div class="stat-label">Chapitres</div></div>
+    <div class="stat-card"><div class="stat-number">39</div><div class="stat-label">Questions d'examen</div></div>
+    <div class="stat-card"><div class="stat-number">15+</div><div class="stat-label">Démos interactives</div></div>
+    <div class="stat-card"><div class="stat-number">∞</div><div class="stat-label">Bonne chance 🎓</div></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Chercher un chapitre ou un concept (Business Plan, Porter, VC…)" oninput="filterChapters()">
+  </div>
+
+  <div class="section-title">📚 Chapitres du cours</div>
+  <div class="section-subtitle">Clique sur un chapitre pour accéder aux explications, formules et démos interactives.</div>
+
+  <div class="chapters-grid" id="chaptersGrid">
+
+    <!-- Ch0 -->
+    <a href="ch0_introduction.html" class="chapter-card" data-keywords="introduction organisation business venture entrepreneur fondamentaux">
+      <div class="card-accent" style="background: linear-gradient(90deg, #6366f1, #8b5cf6);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: #6366f1;">Chapitre 0</div>
+        <div class="card-title">Introduction – New Venture Management</div>
+        <div class="card-desc">Les bases de l'entrepreneuriat : qu'est-ce qu'une organisation, une entreprise, un nouveau projet ? Les fondements du cours.</div>
+        <div class="card-tags">
+          <span class="tag">Organisation</span>
+          <span class="tag">Entrepreneur</span>
+          <span class="tag">Ressources</span>
+          <span class="tag">Création de valeur</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">4 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Ch1 -->
+    <a href="ch1_business_planning.html" class="chapter-card" data-keywords="business plan planning modele affaires canvas cycle success failure">
+      <div class="card-accent" style="background: linear-gradient(90deg, var(--teal), #0891b2);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: var(--teal);">Chapitre 1</div>
+        <div class="card-title">Business Planning</div>
+        <div class="card-desc">Comment rédiger un business plan efficace, le cycle de design d'un modèle d'affaires, et les principaux facteurs de succès et d'échec.</div>
+        <div class="card-tags">
+          <span class="tag">Business Plan</span>
+          <span class="tag">Canvas</span>
+          <span class="tag">Why/What/Who/$</span>
+          <span class="tag">R-W-W Screen</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">6 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Ch2 -->
+    <a href="ch2_opportunites.html" class="chapter-card" data-keywords="opportunites commerciales R&D VUCA innovation technologie brevets patents value gap">
+      <div class="card-accent" style="background: linear-gradient(90deg, #f59e0b, #ef4444);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: #f59e0b;">Chapitre 2</div>
+        <div class="card-title">Opportunités Commerciales</div>
+        <div class="card-desc">De la R&D aux opportunités business : monde VUCA, technology platforms, value gaps, sources d'innovation et propriété intellectuelle.</div>
+        <div class="card-tags">
+          <span class="tag">R&D</span>
+          <span class="tag">VUCA</span>
+          <span class="tag">Value Gap</span>
+          <span class="tag">Brevets</span>
+          <span class="tag">Innovation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">7 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Ch3 -->
+    <a href="ch3_positionnement.html" class="chapter-card" data-keywords="strategie positionnement Porter PESTEL SWOT concurrence avantages competitifs segmentation">
+      <div class="card-accent" style="background: linear-gradient(90deg, #10b981, #059669);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: #10b981;">Chapitre 3</div>
+        <div class="card-title">Stratégies de Positionnement</div>
+        <div class="card-desc">Drivers de la stratégie (REP), analyse de l'environnement (PESTEL, Porter 5 forces), avantages compétitifs et segmentation de marché.</div>
+        <div class="card-tags">
+          <span class="tag">Porter 5 Forces</span>
+          <span class="tag">PESTEL</span>
+          <span class="tag">SWOT</span>
+          <span class="tag">Segmentation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">8 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Ch4 -->
+    <a href="ch4_modeles_affaires.html" class="chapter-card" data-keywords="modeles affaires business model produit marche Ansoff value chain chaine valeur 4P">
+      <div class="card-accent" style="background: linear-gradient(90deg, #ec4899, #f43f5e);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: #ec4899;">Chapitre 4</div>
+        <div class="card-title">Modèles d'Affaires</div>
+        <div class="card-desc">Définir son business model : matrice Ansoff, proposition de valeur, chaîne de valeur, 4P, innovation de modèle d'affaires.</div>
+        <div class="card-tags">
+          <span class="tag">Ansoff Matrix</span>
+          <span class="tag">4P</span>
+          <span class="tag">Value Chain</span>
+          <span class="tag">Value Proposition</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">7 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Ch5 -->
+    <a href="ch5_organisations.html" class="chapter-card" data-keywords="organisations entrepreneurs equipe structure gouvernance open innovation ecosysteme">
+      <div class="card-accent" style="background: linear-gradient(90deg, #f97316, #ea580c);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: #f97316;">Chapitre 5</div>
+        <div class="card-title">Organisations</div>
+        <div class="card-desc">Les entrepreneurs, leurs caractéristiques et compétences, les équipes entrepreneuriales, les structures organisationnelles et l'open innovation.</div>
+        <div class="card-tags">
+          <span class="tag">Entrepreneur</span>
+          <span class="tag">Équipe</span>
+          <span class="tag">Gouvernance</span>
+          <span class="tag">Open Innovation</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">6 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Ch6 -->
+    <a href="ch6_financials.html" class="chapter-card" data-keywords="financials financier profit cashflow valorisation VC business angels financement ROI NPV">
+      <div class="card-accent" style="background: linear-gradient(90deg, var(--amber), #d97706);"></div>
+      <div class="card-body">
+        <div class="card-number" style="color: var(--amber);">Chapitre 6</div>
+        <div class="card-title">Financials</div>
+        <div class="card-desc">Métriques financières clés, profit vs cash-flow, méthodes de valorisation, sources de financement (Business Angels vs VCs).</div>
+        <div class="card-tags">
+          <span class="tag">Profit vs Cash</span>
+          <span class="tag">Valorisation</span>
+          <span class="tag">Business Angels</span>
+          <span class="tag">Venture Capital</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-topics">7 concepts clés</span>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Exam questions link -->
+  <a href="exam_questions.html" class="exam-card">
+    <div class="exam-icon">📝</div>
+    <div class="exam-text">
+      <h3>Questions d'Examen – EPL 2211</h3>
+      <p>39 questions couvrant tous les chapitres. Prépare-toi avec les vraies questions du cours.</p>
+    </div>
+    <div class="exam-btn">Réviser →</div>
+  </a>
+
+  <!-- Aide rapide -->
+  <div class="section-title">🧭 Comment utiliser ce site ?</div>
+  <div class="section-subtitle" style="margin-bottom:0;">
+    Chaque page chapitre contient : <strong style="color:var(--amber)">🟡 Explications simples</strong> avec analogies du quotidien →
+    <strong style="color:var(--teal)">🟢 Formules KaTeX</strong> avec décryptage des symboles →
+    <strong style="color:#3b82f6">🔵 Démos interactives</strong> avec sliders et graphiques temps réel.
+  </div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain · 2025–2026</p>
+  <p style="margin-top:6px; font-size:0.78rem;">Site de révision interactif — Prof. Vincent Reuter & Benoît Gailly</p>
+</footer>
+
+<script>
+  function filterChapters() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('.chapter-card').forEach(card => {
+      const keywords = card.getAttribute('data-keywords') || '';
+      const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+      const desc = card.querySelector('.card-desc')?.textContent.toLowerCase() || '';
+      const match = keywords.includes(query) || title.includes(query) || desc.includes(query);
+      card.classList.toggle('hidden', query.length > 0 && !match);
+    });
+  }
+
+  // Simulate progress from localStorage... but we can't use localStorage
+  // Instead, use a simple counter based on page visits via URL hash
+  // For demo, show a random progress
+  window.addEventListener('load', () => {
+    const n = 0; // no tracking without localStorage
+    document.getElementById('globalProgress').style.width = (n / 7 * 100) + '%';
+    document.getElementById('progressLabel').textContent = n + ' / 7 chapitres';
+  });
+</script>
+</body>
+</html>

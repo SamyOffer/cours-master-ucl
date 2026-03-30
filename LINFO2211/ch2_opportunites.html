@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.2 – Opportunités Commerciales | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:white;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom,var(--amber),var(--teal));}
+.header-inner{padding:32px 48px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:.82rem;color:#94a3b8;margin-bottom:10px;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+.chapter-badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:white;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+header h1{font-size:1.9rem;font-weight:800;margin-bottom:6px;}
+header p.subtitle{color:#94a3b8;font-size:.95rem;}
+.header-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.1);color:#e2e8f0;font-size:.8rem;padding:4px 12px;border-radius:20px;}
+nav{background:white;border-bottom:1px solid #e2e8f0;padding:12px 48px;}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;}
+.nav-link{padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--gray);transition:all .2s;}
+.nav-link:hover,.nav-link.active{background:var(--teal);color:white;}
+main{max-width:1100px;margin:0 auto;padding:36px 48px;}
+.section{background:white;border-radius:14px;box-shadow:0 2px 16px rgba(30,58,95,.07);padding:32px;margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.section-icon{font-size:1.6rem;}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--navy);}
+.section-subtitle{font-size:.85rem;color:var(--gray);margin-top:2px;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.explain-intro .badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.explain-intro p{font-size:.9rem;line-height:1.7;color:#451a03;}
+.analogy{background:#fef3c7;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88rem;color:#78350f;border-left:3px solid #f59e0b;}
+.retenir{background:#fffbeb;border:1.5px solid var(--amber);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:.88rem;font-weight:600;color:#92400e;}
+.math-block{background:#f0fdf4;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.math-block .badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.math-block .phrase{font-size:.9rem;color:#065f46;margin-bottom:12px;font-style:italic;}
+.formula-display{background:white;border-radius:10px;padding:18px;text-align:center;margin:14px 0;border:1.5px solid #d1fae5;overflow-x:auto;}
+.vars-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem;}
+.vars-table th{background:#d1fae5;color:#065f46;padding:8px 12px;text-align:left;}
+.vars-table td{padding:8px 12px;border-bottom:1px solid #e7fdf1;}
+.vars-table tr:last-child td{border-bottom:none;}
+.theory-box{background:#eff6ff;border-radius:10px;padding:18px 22px;margin:14px 0;border:1px solid #bfdbfe;}
+.theory-box h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.theory-box p{font-size:.88rem;line-height:1.65;color:#1e40af;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin:16px 0;}
+.icon-item{background:#f8fafc;border-radius:10px;padding:16px;text-align:center;border:1px solid #e2e8f0;}
+.icon-item .emoji{font-size:1.8rem;margin-bottom:8px;}
+.icon-item .label{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.icon-item .desc{font-size:.75rem;color:var(--gray);line-height:1.4;}
+.steps{margin:16px 0;}
+.step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;}
+.step-num{background:var(--navy);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;}
+.step-content h5{font-size:.9rem;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.step-content p{font-size:.85rem;color:var(--gray);line-height:1.5;}
+.demo-box{background:#f8fafc;border-radius:12px;padding:24px;border:2px dashed #cbd5e1;margin-top:20px;}
+.demo-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.demo-controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.control-group label{display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:6px;}
+.control-group input[type=range]{width:100%;accent-color:var(--teal);}
+.control-value{font-size:1.1rem;font-weight:700;color:var(--teal);}
+.demo-result{background:white;border-radius:10px;padding:16px;border:1px solid #e2e8f0;}
+.result-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:.88rem;}
+.result-row:last-child{border-bottom:none;}
+.result-label{color:var(--gray);}
+.result-value{font-weight:700;color:var(--navy);}
+.result-highlight{color:var(--teal);font-size:1.05rem;}
+canvas{max-width:100%;}
+.btn{background:var(--teal);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;margin:4px;}
+.btn:hover{background:#0f766e;}
+.btn-secondary{background:#f1f5f9;color:var(--navy);}
+.quote{background:var(--navy);color:white;border-radius:12px;padding:20px 24px;margin:16px 0;font-style:italic;}
+.quote p{font-size:.95rem;line-height:1.6;margin-bottom:8px;}
+.quote cite{font-size:.8rem;color:var(--amber);font-style:normal;font-weight:600;}
+.nice-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.88rem;}
+.nice-table th{background:var(--navy);color:white;padding:10px 14px;text-align:left;}
+.nice-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0;}
+.nice-table tr:hover td{background:#f8fafc;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0;}
+@media(max-width:700px){.header-inner,nav,main{padding-left:20px;padding-right:20px;} header h1{font-size:1.4rem;} .two-col{grid-template-columns:1fr;}}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:24px;font-size:.82rem;margin-top:40px;}
+footer span{color:var(--amber);}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 2</div>
+    <div class="chapter-badge">Chapitre 2</div>
+    <h1>Opportunités Commerciales</h1>
+    <p class="subtitle">De la R&D aux business opportunities : VUCA, technology platforms, innovation et brevets</p>
+    <div class="header-chips">
+      <span class="chip">🔬 R&D</span>
+      <span class="chip">🌪️ VUCA</span>
+      <span class="chip">💡 Value Gap</span>
+      <span class="chip">📜 Brevets</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#rd" class="nav-link active">R&D & Innovation</a>
+    <a href="#vuca" class="nav-link">Monde VUCA</a>
+    <a href="#tech-platform" class="nav-link">Technology Platforms</a>
+    <a href="#value-gap" class="nav-link">Value Gaps</a>
+    <a href="#user-centric" class="nav-link">Innovation user-centric</a>
+    <a href="#new-boxes" class="nav-link">Nouvelles boîtes</a>
+    <a href="#brevets" class="nav-link">Brevets & PI</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : R&D ========== -->
+<div class="section" id="rd">
+  <div class="section-header">
+    <span class="section-icon">🔬</span>
+    <div>
+      <div class="section-title">R&D et Innovation — De la Recherche au Business</div>
+      <div class="section-subtitle">Pourquoi la R&D seule ne suffit pas à créer de la valeur</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la R&D ?</div>
+    <p>La R&D (Recherche & Développement) c'est l'activité d'une organisation qui cherche à créer de nouvelles connaissances ou à améliorer ses produits/processus. Comme un chef cuisinier qui expérimente de nouvelles recettes dans sa cuisine — c'est de la R&D ! Mais avoir une bonne recette ne suffit pas : il faut aussi un restaurant, des clients, une marketing stratégie...</p>
+    <div class="analogy">
+      🧪 <strong>Exemple concret :</strong> Les chercheurs de Bell Labs ont inventé le transistor en 1947 (R&D fondamentale). Puis Texas Instruments et Fairchild Semiconductor ont développé les premiers circuits intégrés (R&D appliquée). Puis Intel a créé le premier microprocesseur commercial (développement). Puis Apple a mis ça dans un ordinateur personnel (produit). Puis Google a créé Android (business model). De la découverte initiale au business model → 60 ans et des dizaines d'entreprises différentes !
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">🔭</div><div class="label">Recherche fondamentale</div><div class="desc">Créer de nouvelles connaissances sans application directe</div></div>
+      <div class="icon-item"><div class="emoji">⚗️</div><div class="label">Recherche appliquée</div><div class="desc">Appliquer des connaissances à des problèmes spécifiques</div></div>
+      <div class="icon-item"><div class="emoji">🏭</div><div class="label">Développement</div><div class="desc">Transformer la recherche en produits commercialisables</div></div>
+      <div class="icon-item"><div class="emoji">💰</div><div class="label">Commercialisation</div><div class="desc">Amener le produit sur le marché et créer de la valeur</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : <em>"If we knew what we were doing, we would not call it research"</em> (Einstein). La R&D crée des options technologiques, mais le business model détermine si ces options créent de la valeur économique.</div>
+  </div>
+
+  <div class="math-block">
+    <div class="badge">📐 Définition UE de la R&D</div>
+    <p class="phrase">La R&D comprend 3 types d'activités selon la définition européenne :</p>
+    <div class="formula-display">
+      <p style="font-size:1rem;font-weight:600;color:var(--navy);">R&D = Recherche Fondamentale + Recherche Appliquée + Développement Expérimental</p>
+    </div>
+    <table class="vars-table">
+      <tr><th>Type</th><th>Définition</th><th>Exemple</th></tr>
+      <tr><td><strong>Fondamentale</strong></td><td>Acquisition de nouvelles connaissances sans application prévisible</td><td>Étude des propriétés des graphènes (UCLouvain)</td></tr>
+      <tr><td><strong>Appliquée</strong></td><td>Recherche dirigée vers des buts pratiques spécifiques</td><td>Nouveaux médicaments anti-cancer</td></tr>
+      <tr><td><strong>Développement expérimental</strong></td><td>Travaux basés sur des recherches existantes pour créer de nouveaux matériaux, produits ou dispositifs</td><td>Premier prototype d'un nouveau vaccin</td></tr>
+    </table>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h5>De la Recherche à l'Idée</h5>
+        <p>Les chercheurs publient des résultats. Des entrepreneurs ou intrapreneurs identifient les applications potentielles. <em>Technology push</em> : la technologie cherche un marché.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h5>Validation du besoin marché</h5>
+        <p>Interviewer des clients potentiels, étudier les "value gaps" existants. <em>Market pull</em> : le marché cherche une solution technologique.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h5>Développement du Business Model</h5>
+        <p>Une même technologie peut donner des business models très différents (ex : panneaux solaires à hydrogène → vente directe, leasing, service d'énergie, licensing…)</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h5>Commercialisation et Scale</h5>
+        <p>Financement, équipe commerciale, canaux de distribution, marketing. La majorité des start-ups échouent à cette étape — pas à la R&D !</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : VUCA ========== -->
+<div class="section" id="vuca">
+  <div class="section-header">
+    <span class="section-icon">🌪️</span>
+    <div>
+      <div class="section-title">Le Monde VUCA</div>
+      <div class="section-subtitle">Volatility – Uncertainty – Complexity – Ambiguity</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi le monde VUCA ?</div>
+    <p>On vit dans un monde qui change de plus en plus vite et de façon de moins en moins prévisible. Le concept VUCA (Volatilité, Incertitude, Complexité, Ambiguïté) décrit cet environnement. L'acronyme vient de l'armée américaine après la Guerre Froide — quand le monde bipolaire simple (USA vs URSS) a été remplacé par un monde multipolaire chaotique.</p>
+    <div class="analogy">
+      📱 <strong>Exemple :</strong> En 2000, Nokia était le leader mondial des téléphones (37% de parts de marché). En 2013, ils vendaient leur division mobile à Microsoft. Pourquoi ? Ils n'ont pas anticipé la révolution du smartphone. Le monde VUCA rend les prévisions à 5 ans quasi-impossibles — il faut être agile et pivoter rapidement.
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">⚡</div><div class="label">Volatility</div><div class="desc">Changements rapides et imprévisibles (ex: crise COVID, prix pétrole)</div></div>
+      <div class="icon-item"><div class="emoji">❓</div><div class="label">Uncertainty</div><div class="desc">Impossibilité de prédire les événements futurs (ex: élections, météo réglementaire)</div></div>
+      <div class="icon-item"><div class="emoji">🕸️</div><div class="label">Complexity</div><div class="desc">Multiples facteurs interdépendants (ex: supply chains globales)</div></div>
+      <div class="icon-item"><div class="emoji">🌫️</div><div class="label">Ambiguity</div><div class="desc">Signaux contradictoires, interprétations multiples (ex: "green transition")</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Dans un monde VUCA, l'agilité vaut mieux que la planification rigide. Les mégatendances (démographie, climat, technologie, géopolitique) créent des opportunités ET des menaces permanentes pour les entreprises.</div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📊 Les Mégatendances (vue européenne 1910–2030)</h4>
+    <p><strong>1910–1970 :</strong> Ère industrielle — croissance stable, planification à long terme possible, marchés nationaux.<br>
+    <strong>1970–2030 :</strong> Ère post-industrielle et numérique — globalisation, disruption technologique accélérée, climate change, vieillissement démographique, montée des inégalités. Ces mégatendances créent des opportunités (ex: cleantech, healthtech) et des menaces (ex: disruption des industries traditionnelles).</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : TECHNOLOGY PLATFORMS ========== -->
+<div class="section" id="tech-platform">
+  <div class="section-header">
+    <span class="section-icon">🏗️</span>
+    <div>
+      <div class="section-title">Technology Platforms</div>
+      <div class="section-subtitle">Un socle technologique, de multiples opportunités business</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi une Technology Platform ?</div>
+    <p>Une technology platform, c'est un ensemble de technologies/compétences de base qui peut générer de multiples produits et marchés différents. C'est comme un couteau suisse : une seule technologie de base, mais des dizaines d'applications différentes. 3M a développé la technologie des adhésifs → Post-its, ruban adhésif, écrans LCD, filtres médicaux... des centaines de produits différents à partir d'une seule plateforme !</p>
+    <div class="analogy">
+      🔬 <strong>Exemple DSM :</strong> DSM est une entreprise chimique néerlandaise qui a développé 7 plateformes technologiques (analytique, biologique, chimique, engineering, macromoléculaire, matériaux, nutritionnelle). À partir de ces plateformes, ils ont créé des produits allant des vitamines pour humains aux matériaux haute performance pour l'industrie automobile. La même plateforme "macromoléculaire" → fibres Dyneema (kevlar léger) ET revêtements anti-UV.
+    </div>
+    <div class="retenir">💡 À retenir : Une technology platform bien développée est un actif stratégique clé. Elle crée des barrières à l'entrée, permet de diversifier rapidement, et génère des économies d'échelle en R&D. <em>"One technology, many business models"</em>.</div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">🗺️ Visualisation : Une Technologie → Multiples Business Models</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:16px;">Exemple avec les panneaux solaires à hydrogène (Prof. J. Martens, KULeuven)</p>
+    <canvas id="techPlatformChart" style="max-height:320px;"></canvas>
+  </div>
+</div>
+
+<!-- ========== SECTION 4 : VALUE GAP ========== -->
+<div class="section" id="value-gap">
+  <div class="section-header">
+    <span class="section-icon">💡</span>
+    <div>
+      <div class="section-title">Les Value Gaps — Identifier les Opportunités</div>
+      <div class="section-subtitle">Comment trouver des espaces non exploités dans un marché</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un Value Gap ?</div>
+    <p>Un value gap, c'est un espace dans un marché où les besoins des clients ne sont pas satisfaits (ou mal satisfaits) par les solutions existantes. C'est comme trouver un trou dans un mur — une fois que tu l'as vu, tu comprends pourquoi il faut le combler. Airbnb a identifié le value gap entre "hôtels trop chers" et "couchsurfing peu pratique" → 2008, naissance d'une licorne de 75 milliards $.</p>
+    <div class="analogy">
+      🎯 <strong>Méthode :</strong> 2 approches complémentaires pour identifier les value gaps :
+      <strong>Technology push</strong> : "J'ai cette technologie, pour qui peut-elle être utile ?" (ex : les lasers → d'abord militaire, puis médecine, puis lecture CD, puis impression)
+      <strong>Market pull</strong> : "Ce client a ce problème, quelle technologie peut le résoudre ?" (ex : besoin de transport urbain propre → vélos électriques, trottinettes, voitures partagées)
+    </div>
+    <div class="retenir">💡 À retenir : Les meilleures opportunités sont à l'intersection d'une technologie émergente et d'un besoin insatisfait. La créativité consiste à "penser en dehors des boîtes" — remettre en question les hypothèses implicites de ton secteur.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="theory-box">
+      <h4>🔬 Technology Push</h4>
+      <p><strong>Principe :</strong> La technologie cherche un marché.<br>
+      <strong>Avantages :</strong> Innovation radicale possible, brevetable.<br>
+      <strong>Risques :</strong> Le marché n'existe peut-être pas encore (ex : Segway — excellente technologie, pas de marché grand public).<br>
+      <strong>Exemple :</strong> GPS militaire → navigation civile → Uber → Pokémon Go</p>
+    </div>
+    <div class="theory-box">
+      <h4>🎯 Market Pull</h4>
+      <p><strong>Principe :</strong> Le marché cherche une solution technologique.<br>
+      <strong>Avantages :</strong> Besoin validé, adoption plus rapide.<br>
+      <strong>Risques :</strong> Innovation souvent incrémentale, compétition forte (ex : amélioration d'iPhone).<br>
+      <strong>Exemple :</strong> Clients voulaient communiquer sans fil → Bluetooth, WiFi, 5G</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION 5 : INNOVATION USER-CENTRIC (Gailly) ========== -->
+<div class="section" id="user-centric">
+  <div class="section-header">
+    <span class="section-icon">👤</span>
+    <div>
+      <div class="section-title">Innovation User-Centric — Approches Terrain</div>
+      <div class="section-subtitle">Comment aller chercher les opportunités là où se trouvent les utilisateurs</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🔍 Découvrir les besoins cachés</div>
+    <p>Les utilisateurs ne savent pas toujours ce qu'ils veulent — ils font souvent confiance aux solutions existantes par habitude. Pour trouver les vrais value gaps, il faut <strong>observer les comportements réels</strong>, pas seulement poser des questions. Gailly distingue plusieurs approches complémentaires pour identifier les besoins non satisfaits via une démarche user-centric.</p>
+    <div class="analogy">
+      🎯 <strong>Exemple célèbre :</strong> Lorsque Ford a demandé à ses clients ce qu'ils voulaient, ils auraient répondu "un cheval plus rapide". La clé n'est pas de demander aux clients ce qu'ils veulent, mais d'observer ce qu'ils font, comment ils font, et pourquoi ils font — c'est l'ethnographie en action.
+    </div>
+    <div class="retenir">💡 À retenir : Les meilleures innovations viennent souvent d'une observation fine du comportement des utilisateurs en situation réelle — pas de focus groups ou d'enquêtes génériques.</div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num" style="background:#8b5cf6;">1</div>
+      <div class="step-content">
+        <h5>Lead Users (von Hippel, MIT)</h5>
+        <p>Les "lead users" sont des utilisateurs avancés qui expérimentent les solutions de demain <em>avant</em> que les entreprises les commercialisent. 3M a développé ses Post-it en partie grâce à des lead users. Apple étudie les "power users" pour concevoir ses prochaines fonctionnalités. Identifier ces utilisateurs pionniers permet d'anticiper les tendances.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#0891b2;">2</div>
+      <div class="step-content">
+        <h5>Ethnographie & Observation en contexte</h5>
+        <p>Observer les utilisateurs dans leur environnement naturel sans les perturber. IDEO, le cabinet de design thinking, envoie ses designers dans les hôpitaux pour observer comment les infirmiers travaillent réellement — pas comment ils décrivent leur travail. Résultat : des innovations hospitalières que des questionnaires n'auraient jamais révélées.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#059669;">3</div>
+      <div class="step-content">
+        <h5>Living Labs — Co-création en situation réelle</h5>
+        <p>Les Living Labs sont des environnements de test réels où des utilisateurs expérimentent de nouvelles solutions en conditions de vie authentiques. Plutôt qu'un laboratoire artificiel, on teste dans un vrai quartier, une vraie école ou un vrai hôpital. UCLouvain et d'autres universités participent à des réseaux européens de Living Labs (ENoLL). Avantage : données très réalistes, co-création avec les utilisateurs finals.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num" style="background:#b45309;">4</div>
+      <div class="step-content">
+        <h5>Corporate Venture Capital (CVC) — Intelligence technologique</h5>
+        <p>Les grandes entreprises investissent dans des start-ups non seulement pour le retour financier, mais surtout pour <strong>surveiller les technologies émergentes</strong> de l'intérieur. Google Ventures, Intel Capital, Samsung NEXT : ce sont des "antennes radar" stratégiques. Avantage : accès à des technologies disruptives avant la concurrence et possibilité d'acquisition si le potentiel se confirme. <em>(Gailly, 2018)</em></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📖 Sources d'intelligence technologique selon Gailly (2018)</h4>
+    <p>Pour identifier les opportunités d'innovation, une firme peut mobiliser plusieurs sources complémentaires : <strong>publications scientifiques et brevets</strong> (état de l'art technologique) ; <strong>conférences et foires sectorielles</strong> (signaux émergents) ; <strong>universités et spin-offs</strong> (R&D avancée) ; <strong>fournisseurs et partenaires</strong> (innovations de la supply chain) ; <strong>start-ups et CVC</strong> (disruptions potentielles) ; <strong>clients et utilisateurs finaux</strong> (besoins réels non satisfaits). La combinaison de ces sources constitue un système d'intelligence technologique robuste.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 5b : THINKING IN NEW BOXES (Gailly) ========== -->
+<div class="section" id="new-boxes">
+  <div class="section-header">
+    <span class="section-icon">🧩</span>
+    <div>
+      <div class="section-title">Penser en Nouvelles Boîtes — Créativité Structurée</div>
+      <div class="section-subtitle">Remettre en question les hypothèses implicites pour identifier des opportunités invisibles</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Pourquoi "penser en dehors des boîtes" ?</div>
+    <p>La créativité en innovation ne consiste pas à "penser en dehors de la boîte" (outside the box) — car tout le monde pense dans <em>une</em> boîte quelconque. La vraie question est : <strong>quelle boîte utilises-tu actuellement, et est-elle encore la bonne ?</strong> Gailly s'inspire de l'ouvrage "Think in New Boxes" (de Brabandere &amp; Iny) : l'innovation breakthrough vient du remplacement d'un ancien cadre mental par un nouveau.</p>
+    <div class="analogy">
+      🚗 <strong>Exemple :</strong> L'industrie automobile pensait dans la boîte "vendre des voitures". Uber a changé la boîte en "vendre des mobilités". Tesla a changé la boîte en "vendre des expériences technologiques roulantes". Didi (Chine) et Grab (Asie SE) ont adapté la boîte locale. Même marché, boîtes mentales totalement différentes → business models radicalement distincts.
+    </div>
+    <div class="retenir">💡 À retenir : Remettre en question les <strong>hypothèses implicites</strong> de son secteur est la source principale d'innovation radicale. Demande-toi : "Qu'est-ce que tout le monde dans mon secteur prend pour acquis… et si c'était faux ?"</div>
+  </div>
+
+  <div class="theory-box">
+    <h4>📖 Les "boîtes mentales" (modèles mentaux) comme sources d'innovation</h4>
+    <p>Gailly identifie les <strong>modèles mentaux</strong> — les cadres de référence implicites que nous utilisons pour interpréter le monde — comme à la fois des ressources (ils permettent d'agir efficacement) et des contraintes (ils limitent notre capacité à voir des alternatives). En innovation, les modèles mentaux dominants d'un secteur (ex : "les hôpitaux sont des lieux de soins") peuvent cacher des opportunités majeures (ex : "et si les hôpitaux devenaient des hubs de prévention et de bien-être ?"). L'analyse de la chaîne de valeur sectorielle, des jobs-to-be-done (Christensen) et des value gaps sont des outils pour identifier ces biais mentaux collectifs et les transformer en opportunités.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 6 : BREVETS ========== -->
+<div class="section" id="brevets">
+  <div class="section-header">
+    <span class="section-icon">📜</span>
+    <div>
+      <div class="section-title">Brevets et Propriété Intellectuelle</div>
+      <div class="section-subtitle">Protéger ses innovations — le brevet et ses alternatives</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un brevet ?</div>
+    <p>Un brevet, c'est un droit exclusif accordé par l'État qui te permet d'interdire à d'autres d'utiliser ton invention pendant une durée limitée (généralement 20 ans), en échange de la divulgation publique de ton invention. C'est un deal avec la société : tu partages tes connaissances (publication obligatoire), et en contrepartie tu obtiens le monopole temporaire pour les exploiter.</p>
+    <div class="analogy">
+      💊 <strong>Exemple concret :</strong> Pfizer a développé le Sildenafil (Viagra) pour traiter l'angine de poitrine → ils découvrent par accident son autre effet. Ils déposent un brevet en 1991. Pendant 20 ans, ils sont les seuls à vendre le Viagra → revenus de 1 milliard+$ par an. En 2013, le brevet expire → des dizaines de génériques arrivent à 5€ la boîte. Le brevet = monopole temporaire = incentive pour innover.
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">📜</div><div class="label">Brevet</div><div class="desc">Protection légale, 20 ans, divulgation obligatoire</div></div>
+      <div class="icon-item"><div class="emoji">🔒</div><div class="label">Secret commercial</div><div class="desc">Ex: recette Coca-Cola — protection illimitée si secret maintenu</div></div>
+      <div class="icon-item"><div class="emoji">™️</div><div class="label">Marque déposée</div><div class="desc">Protège le nom, le logo — protection renouvelable indéfiniment</div></div>
+      <div class="icon-item"><div class="emoji">©️</div><div class="label">Copyright</div><div class="desc">Protège les œuvres créatives — automatique, 70 ans après décès</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Le brevet n'est pas toujours la meilleure stratégie. Parfois le "first-mover advantage" ou le secret commercial (ex : Coca-Cola) ou la vitesse d'exécution valent mieux que breveter (ex : de nombreuses start-ups ne brevetent pas pour ne pas divulguer leurs innovations).</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th>Protection</th><th>Durée</th><th>Coût</th><th>Avantages</th><th>Inconvénients</th></tr>
+    <tr><td>📜 Brevet</td><td>20 ans</td><td>10-50k€</td><td>Monopole légal, licensing possible, signal qualité</td><td>Divulgation obligatoire, coût de défense élevé</td></tr>
+    <tr><td>🔒 Secret</td><td>∞ (si maintenu)</td><td>Faible</td><td>Protection illimitée, pas de divulgation</td><td>Vulnérable à l'espionnage industriel ou rétro-ingénierie</td></tr>
+    <tr><td>™️ Marque</td><td>∞ (renouvelable)</td><td>1-3k€</td><td>Valeur de marque, fidélité client</td><td>Ne protège pas la technologie</td></tr>
+    <tr><td>🚀 Speed</td><td>Avance temporaire</td><td>Investissement R&D</td><td>Flexibilité maximale</td><td>Imitation rapide dans les secteurs sans barrières</td></tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 6 : DÉMO INTERACTIVE ========== -->
+<div class="section" id="demo">
+  <div class="section-header">
+    <span class="section-icon">🎮</span>
+    <div>
+      <div class="section-title">Démo Interactive — Technology Adoption Lifecycle</div>
+      <div class="section-subtitle">Visualise la courbe d'adoption d'une nouvelle technologie (modèle de Moore)</div>
+    </div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">📈 Courbe d'adoption technologique</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:16px;">Paramétrise ta technologie et vois où tu te situes dans le cycle d'adoption de Geoffrey Moore.</p>
+    <div class="demo-controls">
+      <div class="control-group">
+        <label>🌱 Taille du marché total (k personnes) : <span class="control-value" id="v_tam">1000</span>k</label>
+        <input type="range" min="100" max="10000" step="100" value="1000" id="tam" oninput="updateAdoption()">
+      </div>
+      <div class="control-group">
+        <label>⏱️ Mois depuis lancement : <span class="control-value" id="v_month">18</span></label>
+        <input type="range" min="1" max="120" value="18" id="month" oninput="updateAdoption()">
+      </div>
+      <div class="control-group">
+        <label>🚀 Vitesse d'adoption (1=lent, 10=viral) : <span class="control-value" id="v_speed">5</span></label>
+        <input type="range" min="1" max="10" value="5" id="speed" oninput="updateAdoption()">
+      </div>
+    </div>
+    <canvas id="adoptionChart" style="max-height:280px;"></canvas>
+    <div class="demo-result" style="margin-top:16px;">
+      <div class="result-row"><span class="result-label">Phase actuelle</span><span class="result-value" id="r_phase">—</span></div>
+      <div class="result-row"><span class="result-label">Adopteurs actuels</span><span class="result-value" id="r_adopters">—</span></div>
+      <div class="result-row"><span class="result-label">% du marché atteint</span><span class="result-value result-highlight" id="r_pct">—</span></div>
+    </div>
+    <button class="btn" onclick="resetAdoption()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="ch1_business_planning.html" style="color:var(--amber);">← Ch.1 Business Planning</a> &nbsp;|&nbsp; <a href="ch3_positionnement.html" style="color:var(--amber);">Ch.3 Positionnement →</a></p>
+</footer>
+
+<script>
+// Technology platform chart
+window.addEventListener('load', () => {
+  const ctx1 = document.getElementById('techPlatformChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: ['Vente directe', 'Leasing énergie', 'Service clé-en-main', 'Licensing tech.', 'Joint venture', 'Carbon credits'],
+      datasets: [{
+        label: 'Potentiel de marché (indice)',
+        data: [85, 65, 70, 45, 55, 60],
+        backgroundColor: ['#0D9488','#f59e0b','#6366f1','#ef4444','#10b981','#3b82f6'],
+      },{
+        label: 'Complexité d\'implémentation (indice)',
+        data: [30, 55, 70, 40, 80, 50],
+        backgroundColor: ['rgba(13,148,136,.3)','rgba(245,158,11,.3)','rgba(99,102,241,.3)','rgba(239,68,68,.3)','rgba(16,185,129,.3)','rgba(59,130,246,.3)'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'Panneaux solaires H₂ : potentiel vs complexité par business model' },
+        legend: { position: 'top' }
+      },
+      scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score (0-100)' } } }
+    }
+  });
+});
+
+// Adoption lifecycle
+let adoptChart = null;
+
+function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+function updateAdoption() {
+  const tam = +document.getElementById('tam').value;
+  const month = +document.getElementById('month').value;
+  const speed = +document.getElementById('speed').value;
+
+  document.getElementById('v_tam').textContent = tam.toLocaleString();
+  document.getElementById('v_month').textContent = month;
+  document.getElementById('v_speed').textContent = speed;
+
+  const k = speed * 0.08;
+  const labels = [], values = [];
+  for (let m = 0; m <= 120; m += 2) {
+    labels.push(m + 'm');
+    const x = (m - 60 / speed) * k;
+    values.push(Math.round(tam * sigmoid(x) * 1000));
+  }
+
+  const currentIdx = Math.floor(month / 2);
+  const currentVal = values[Math.min(currentIdx, values.length - 1)];
+  const pct = (currentVal / (tam * 1000) * 100).toFixed(1);
+
+  let phase = '';
+  if (pct < 2.5) phase = '🌱 Innovateurs (Early adopters)';
+  else if (pct < 16) phase = '📡 Pionniers (Early adopters)';
+  else if (pct < 50) phase = '⚠️ Early majority (traverser le "chasm" !)';
+  else if (pct < 84) phase = '📈 Late majority (marché mainstream)';
+  else phase = '🏁 Retardataires (Laggards)';
+
+  document.getElementById('r_phase').textContent = phase;
+  document.getElementById('r_adopters').textContent = currentVal.toLocaleString() + ' personnes';
+  document.getElementById('r_pct').textContent = pct + '% du marché';
+
+  const ctx = document.getElementById('adoptionChart').getContext('2d');
+  if (adoptChart) adoptChart.destroy();
+  adoptChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Adopteurs cumulés',
+        data: values,
+        borderColor: '#0D9488',
+        backgroundColor: 'rgba(13,148,136,0.1)',
+        fill: true,
+        tension: 0.4
+      }, {
+        label: 'Position actuelle',
+        data: labels.map((_, i) => i === currentIdx ? values[i] : null),
+        pointRadius: 10,
+        pointBackgroundColor: '#f59e0b',
+        pointBorderColor: 'white',
+        pointBorderWidth: 3,
+        showLine: false,
+        type: 'scatter'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: { display: true, text: 'Technology Adoption Lifecycle (Courbe S)' }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Mois depuis lancement' } },
+        y: { title: { display: true, text: 'Adopteurs cumulés' } }
+      }
+    }
+  });
+}
+
+function resetAdoption() {
+  document.getElementById('tam').value = 1000;
+  document.getElementById('month').value = 18;
+  document.getElementById('speed').value = 5;
+  updateAdoption();
+}
+
+window.addEventListener('load', updateAdoption);
+</script>
+</body>
+</html>

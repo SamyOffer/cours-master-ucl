@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 6 — Graph Mining</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8FAFC;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid #0D9488;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box {
+            background: #EFF6FF;
+            border-left: 4px solid #1E3A5F;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1E3A5F;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #1E3A5F;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #0D9488;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .icon-card {
+            text-align: center;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .icon-card-emoji {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .icon-card-text {
+            font-weight: 600;
+            color: #1E3A5F;
+        }
+
+        .applications {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .app-card {
+            padding: 15px;
+            background: #F0FDF4;
+            border: 1px solid #0D9488;
+            border-radius: 8px;
+        }
+
+        .pending-math {
+            display: block;
+            margin: 15px 0;
+            padding: 15px;
+            background: #F0FDF4;
+            border-radius: 8px;
+        }
+
+        .demo-section {
+            background: #F1F5F9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #0D9488;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        button {
+            background: #0D9488;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0F766E;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #1E3A5F;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .comparison-container {
+            margin: 20px 0;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        footer {
+            background: #1E3A5F;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        footer .title {
+            color: #F59E0B;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        footer .subtitle {
+            color: #94A3B8;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <header style="background:#1E3A5F; padding:0; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+        <div style="display:flex; align-items:stretch">
+            <div style="background:#F59E0B; width:6px; flex-shrink:0"></div>
+            <div style="background:#0D9488; width:4px; flex-shrink:0; margin-right:20px"></div>
+            <div style="padding:16px 20px; flex:1; display:flex; justify-content:space-between; align-items:center">
+                <div>
+                    <div style="color:#F59E0B; font-size:12px; text-transform:uppercase; letter-spacing:1px">LINFO2364</div>
+                    <div style="color:white; font-size:20px; font-weight:700">Mining Patterns in Data</div>
+                </div>
+                <a href="index.html" style="color:#94A3B8; text-decoration:none; font-size:14px">← Accueil</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>📊 Chapitre 6 — Graph Mining</h1>
+
+        <!-- Section 1: C'est quoi un Graphe ? -->
+        <div class="section">
+            <h2>Section 1 : C'est quoi un Graphe ?</h2>
+
+            <div class="explain-intro">
+                <span class="badge">C'est quoi un graphe ?</span>
+                <p><strong>Analogie simple :</strong> Pense à une carte du métro : les stations sont des <strong>nœuds</strong>, les lignes sont des <strong>arêtes</strong>. Ou pense à tes amis sur les réseaux sociaux : toi et tes amis = nœuds, vos liens d'amitié = arêtes !</p>
+            </div>
+
+            <h3>Les composantes d'un graphe</h3>
+            <div class="icon-grid">
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🔵</div>
+                    <div class="icon-card-text">Sommets (Nœuds)</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🔗</div>
+                    <div class="icon-card-text">Arêtes</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🏷️</div>
+                    <div class="icon-card-text">Labels</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🔄</div>
+                    <div class="icon-card-text">Sous-graphes</div>
+                </div>
+            </div>
+
+            <h3>Applications concrètes</h3>
+            <div class="applications">
+                <div class="app-card">
+                    <strong>📱 Réseaux sociaux</strong><br>Amis, followers, connexions
+                </div>
+                <div class="app-card">
+                    <strong>🧪 Molécules chimiques</strong><br>Atomes et liaisons chimiques
+                </div>
+                <div class="app-card">
+                    <strong>🧬 Réseaux de protéines</strong><br>Interactions protéine-protéine
+                </div>
+                <div class="app-card">
+                    <strong>🌐 Web et XML</strong><br>Pages liées, structure document
+                </div>
+                <div class="app-card">
+                    <strong>🚇 Réseaux de transport</strong><br>Stations et lignes
+                </div>
+                <div class="app-card">
+                    <strong>🔐 Structures de données</strong><br>Arbres, DAGs, circuits
+                </div>
+            </div>
+
+            <h3>Définition mathématique</h3>
+            <div class="math-block">
+                <p><strong>Un graphe g est défini par :</strong></p>
+                <div class="pending-math" data-latex="V(g) = \{v_1, v_2, \ldots, v_n\} \text{ : ensemble des sommets}"></div>
+                <div class="pending-math" data-latex="E(g) \subseteq V(g) \times V(g) \text{ : ensemble des arêtes}"></div>
+                <div class="pending-math" data-latex="L_V : V(g) \to \text{Labels} \text{ : fonction d'étiquetage des sommets}"></div>
+                <div class="pending-math" data-latex="L_E : E(g) \to \text{Labels} \text{ : fonction d'étiquetage des arêtes}"></div>
+            </div>
+
+            <h3>Exemple : réseau d'interactions moléculaires</h3>
+            <canvas id="graphDemo1" width="600" height="300"></canvas>
+            <script>
+                function drawGraphExample() {
+                    const canvas = document.getElementById('graphDemo1');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    const width = canvas.width;
+                    const height = canvas.height;
+
+                    // Clear
+                    ctx.fillStyle = '#F8FAFC';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.strokeStyle = '#E2E8F0';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(0, 0, width, height);
+
+                    // Nodes positions
+                    const nodes = [
+                        {x: 100, y: 150, label: 'A', tag: 'drug', color: '#F59E0B'},
+                        {x: 300, y: 100, label: 'B', tag: 'protein', color: '#0D9488'},
+                        {x: 300, y: 200, label: 'C', tag: 'compound', color: '#1E3A5F'}
+                    ];
+
+                    // Draw edges first
+                    ctx.strokeStyle = '#CBD5E1';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([]);
+
+                    // A-B
+                    ctx.beginPath();
+                    ctx.moveTo(nodes[0].x, nodes[0].y);
+                    ctx.lineTo(nodes[1].x, nodes[1].y);
+                    ctx.stroke();
+
+                    // B-C
+                    ctx.beginPath();
+                    ctx.moveTo(nodes[1].x, nodes[1].y);
+                    ctx.lineTo(nodes[2].x, nodes[2].y);
+                    ctx.stroke();
+
+                    // Draw edge labels
+                    ctx.fillStyle = '#64748B';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('binds', 200, 120);
+                    ctx.fillText('interacts', 320, 150);
+
+                    // Draw nodes
+                    nodes.forEach(node => {
+                        ctx.fillStyle = node.color;
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 25, 0, 2 * Math.PI);
+                        ctx.fill();
+
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 16px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(node.label, node.x, node.y);
+
+                        ctx.fillStyle = '#64748B';
+                        ctx.font = '11px sans-serif';
+                        ctx.fillText(node.tag, node.x, node.y + 40);
+                    });
+                }
+
+                window.addEventListener('load', drawGraphExample);
+            </script>
+        </div>
+
+        <!-- Section 2: Sous-graphe et Isomorphisme -->
+        <div class="section">
+            <h2>Section 2 : Sous-graphe et Isomorphisme</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Pattern dans les graphes</span>
+                <p><strong>Analogie :</strong> Trouver un pattern dans un graphe, c'est comme chercher si un puzzle de 3 pièces rentre dans un puzzle de 1000 pièces.</p>
+            </div>
+
+            <h3>Sous-graphe isomorphe</h3>
+            <div class="theory-box">
+                <p><strong>Définition :</strong> Un graphe g' est un sous-graphe isomorphe de g s'il existe une bijection f: V(g') → V(g) telle que :</p>
+                <div class="pending-math" data-latex="L_V(v) = L_V(f(v)) \text{ pour tout } v \in V(g')"></div>
+                <div class="pending-math" data-latex="(u,v) \in E(g') \Rightarrow (f(u),f(v)) \in E(g) \text{ avec le même label}"></div>
+            </div>
+
+            <h3>Support d'un sous-graphe</h3>
+            <div class="math-block">
+                <p><strong>Le support mesure la fréquence d'un pattern :</strong></p>
+                <div class="pending-math" data-latex="\text{support}(g') = |\{g \in D \;|\; g' \text{ est isomorphe à un sous-graphe de } g\}|"></div>
+            </div>
+
+            <div class="theory-box">
+                <h3>⚠️ Le grand défi</h3>
+                <p>Le problème du <strong>sous-graphe isomorphe est NP-complet</strong> ! C'est beaucoup plus difficile que la correspondance d'itemsets (qui est polynomial).</p>
+                <p>Cela signifie qu'il n'existe pas d'algorithme connu pour le résoudre rapidement en général. Nous devons utiliser des heuristiques et des prunings.</p>
+            </div>
+        </div>
+
+        <!-- Section 3: Approche Apriori -->
+        <div class="section">
+            <h2>Section 3 : Approche Apriori pour les Graphes (AGM/FSG)</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Apriori sur les graphes</span>
+                <p><strong>Idée clé :</strong> L'idée d'Apriori s'applique aussi aux graphes : si un sous-graphe est infrequent, tout sur-graphe qui le contient est aussi infrequent !</p>
+            </div>
+
+            <h3>Propriété Apriori pour les graphes</h3>
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{Si } g' \text{ n'est pas fréquent, alors tous les sur-graphes de } g' \text{ ne sont pas fréquents}"></div>
+            </div>
+
+            <h3>Deux approches classiques</h3>
+            <div class="theory-box">
+                <h4>1. AGM (Adjacency Matrix)</h4>
+                <p>Génère les candidats en fusionnant les graphes sommet par sommet. Plus simple à implémenter mais moins efficace.</p>
+
+                <h4>2. FSG (Frequent Subgraph)</h4>
+                <p>Génère les candidats en ajoutant des arêtes une par une. Meilleure performance en pratique.</p>
+            </div>
+
+            <h3>Étapes de l'algorithme</h3>
+            <ol>
+                <li>Trouver les sous-graphes fréquents à 1 nœud (L₁)</li>
+                <li>Trouver les sous-graphes fréquents à 1 arête (L₂)</li>
+                <li>Générer les candidats à k+1 à partir des k-sous-graphes fréquents</li>
+                <li>Élaguer les candidats infrequents</li>
+                <li>Répéter jusqu'à ce qu'aucun candidat ne soit fréquent</li>
+            </ol>
+
+            <div class="theory-box">
+                <h3>🔑 Problème clé : forme canonique</h3>
+                <p>Un même graphe peut avoir de nombreuses représentations différentes. Nous avons besoin d'une <strong>forme canonique</strong> pour éviter de générer le même graphe plusieurs fois.</p>
+                <p>Exemple : A-B-C peut être écrit (A,B,C) ou (C,B,A) — même graphe, deux écritures !</p>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 1 : Visualisation de Graphes et Support</h3>
+            <div class="demo-section">
+                <p><strong>Cliquez sur un pattern pour voir quels graphes le contiennent :</strong></p>
+                <canvas id="demoGraphs" width="700" height="400"></canvas>
+                <div style="margin-top: 15px;">
+                    <button onclick="selectPattern(1)">Pattern 1: {A-B}</button>
+                    <button onclick="selectPattern(2)">Pattern 2: {A-B-C}</button>
+                    <button onclick="selectPattern(3)">Pattern 3: {Triangle A-B-C}</button>
+                </div>
+                <div id="demoInfo" style="margin-top: 15px; padding: 10px; background: #EFF6FF; border-radius: 8px;"></div>
+            </div>
+
+            <script>
+                let selectedPattern = 1;
+                const patterns = {
+                    1: {name: '{A-B}', support: 4},
+                    2: {name: '{A-B-C}', support: 2},
+                    3: {name: '{A-B-C triangle}', support: 1}
+                };
+
+                function drawDemoGraphs() {
+                    const canvas = document.getElementById('demoGraphs');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.fillStyle = '#F8FAFC';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const databases = [
+                        {x: 50, y: 50, nodes: [{x: 30, y: 30, label: 'A'}, {x: 80, y: 30, label: 'B'}, {x: 55, y: 70, label: 'C'}], edges: [[0,1], [1,2]], highlight: selectedPattern === 1},
+                        {x: 200, y: 50, nodes: [{x: 30, y: 30, label: 'A'}, {x: 80, y: 30, label: 'B'}, {x: 55, y: 70, label: 'C'}], edges: [[0,1], [1,2]], highlight: selectedPattern === 1},
+                        {x: 350, y: 50, nodes: [{x: 30, y: 30, label: 'A'}, {x: 80, y: 30, label: 'B'}, {x: 55, y: 70, label: 'C'}], edges: [[0,1], [1,2], [0,2]], highlight: selectedPattern === 2 || selectedPattern === 3},
+                        {x: 500, y: 50, nodes: [{x: 30, y: 30, label: 'A'}, {x: 80, y: 30, label: 'B'}], edges: [[0,1]], highlight: selectedPattern === 1}
+                    ];
+
+                    databases.forEach((db, idx) => {
+                        // Border
+                        ctx.strokeStyle = db.highlight ? '#F59E0B' : '#CBD5E1';
+                        ctx.lineWidth = db.highlight ? 3 : 1;
+                        ctx.strokeRect(db.x - 20, db.y - 20, 120, 120);
+
+                        // Draw edges
+                        ctx.strokeStyle = '#94A3B8';
+                        ctx.lineWidth = 2;
+                        db.edges.forEach(edge => {
+                            const from = db.nodes[edge[0]];
+                            const to = db.nodes[edge[1]];
+                            ctx.beginPath();
+                            ctx.moveTo(db.x + from.x, db.y + from.y);
+                            ctx.lineTo(db.x + to.x, db.y + to.y);
+                            ctx.stroke();
+                        });
+
+                        // Draw nodes
+                        db.nodes.forEach(node => {
+                            ctx.fillStyle = '#0D9488';
+                            ctx.beginPath();
+                            ctx.arc(db.x + node.x, db.y + node.y, 15, 0, 2 * Math.PI);
+                            ctx.fill();
+
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 12px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(node.label, db.x + node.x, db.y + node.y);
+                        });
+
+                        // Label
+                        ctx.fillStyle = '#64748B';
+                        ctx.font = '12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('DB' + (idx + 1), db.x + 40, db.y + 110);
+                    });
+
+                    // Legend
+                    ctx.fillStyle = '#1E3A5F';
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Sélectionnez un pattern :', 50, 200);
+                }
+
+                function selectPattern(p) {
+                    selectedPattern = p;
+                    drawDemoGraphs();
+                    const info = document.getElementById('demoInfo');
+                    if (info) {
+                        info.innerHTML = `<strong>Pattern sélectionné :</strong> ${patterns[p].name}<br><strong>Support :</strong> ${patterns[p].support} graphes<br><strong>Confidence :</strong> ${((patterns[p].support / 4) * 100).toFixed(1)}%`;
+                    }
+                }
+
+                window.addEventListener('load', function() {
+                    drawDemoGraphs();
+                    selectPattern(1);
+                });
+            </script>
+        </div>
+
+        <!-- Section 4: gSpan -->
+        <div class="section">
+            <h2>Section 4 : gSpan — Pattern-Growth pour les Graphes</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Pattern-growth</span>
+                <p><strong>Idée :</strong> gSpan est comme PrefixSpan mais pour les graphes : au lieu d'ajouter des items à une séquence, on ajoute des arêtes à un graphe !</p>
+            </div>
+
+            <h3>Innovations clés de gSpan</h3>
+            <div class="theory-box">
+                <h4>1. DFS Code</h4>
+                <p>Une représentation canonique des graphes utilisant un parcours en profondeur (DFS).</p>
+
+                <h4>2. Rightmost Extension</h4>
+                <p>On n'ajoute des arêtes que sur le chemin le plus à droite de l'arbre DFS. Cela garantit que chaque graphe est généré exactement une seule fois !</p>
+
+                <h4>3. Ordre lexicographique</h4>
+                <p>Définir un ordre < sur les codes DFS pour éviter les doublons.</p>
+            </div>
+
+            <h3>Représentation DFS Code</h3>
+            <div class="math-block">
+                <p><strong>Une arête dans le DFS code :</strong></p>
+                <div class="pending-math" data-latex="\text{Edge} = (\text{from\_node}, \text{to\_node}, L(\text{from}), L(\text{edge}), L(\text{to}))"></div>
+                <p style="margin-top: 15px;"><strong>DFS Code :</strong> liste ordonnée des arêtes dans l'ordre du parcours DFS</p>
+            </div>
+
+            <h3>Règle de Rightmost Extension</h3>
+            <div class="theory-box">
+                <p>Pour étendre un pattern, nous pouvons seulement ajouter :</p>
+                <ul>
+                    <li>Une arête vers l'arrière (backward edge) du nœud le plus à droite vers un ancêtre antérieur</li>
+                    <li>Une arête vers l'avant (forward edge) d'un nœud sur le chemin le plus à droite</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Pourquoi ?</strong> Cela garantit que chaque graphe est généré exactement une fois !</p>
+            </div>
+
+            <h3>Étapes de l'algorithme gSpan</h3>
+            <ol>
+                <li>Commencer par toutes les arêtes uniques fréquentes</li>
+                <li>Pour chaque pattern fréquent p, l'étendre en utilisant la règle rightmost</li>
+                <li>Vérifier si l'extension est canonique (minimale lexicographiquement)</li>
+                <li>Si canonique ET fréquente : ajouter aux résultats et récurser</li>
+            </ol>
+
+            <h3>DÉMO INTERACTIVE 2 : DFS Code Explorer</h3>
+            <div class="demo-section">
+                <p><strong>Cliquez sur "Calculer le DFS Code" pour visualiser le parcours DFS étape par étape</strong></p>
+                <canvas id="dfsCanvas" width="700" height="300"></canvas>
+                <button onclick="animateDFS()">Calculer le DFS Code</button>
+                <div id="dfsTable" style="margin-top: 15px;"></div>
+            </div>
+
+            <script>
+                function drawDFSGraph() {
+                    const canvas = document.getElementById('dfsCanvas');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.fillStyle = '#F8FAFC';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    const nodes = [
+                        {x: 100, y: 150, label: '0'},
+                        {x: 200, y: 100, label: '1'},
+                        {x: 200, y: 200, label: '2'},
+                        {x: 300, y: 150, label: '3'}
+                    ];
+
+                    // Draw edges
+                    ctx.strokeStyle = '#CBD5E1';
+                    ctx.lineWidth = 2;
+                    const edges = [[0,1], [1,2], [2,0], [1,3]];
+                    edges.forEach(e => {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[e[0]].x, nodes[e[0]].y);
+                        ctx.lineTo(nodes[e[1]].x, nodes[e[1]].y);
+                        ctx.stroke();
+                    });
+
+                    // Draw nodes
+                    nodes.forEach((node, idx) => {
+                        ctx.fillStyle = '#0D9488';
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI);
+                        ctx.fill();
+
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 14px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(node.label, node.x, node.y);
+                    });
+                }
+
+                function animateDFS() {
+                    drawDFSGraph();
+                    const tableDiv = document.getElementById('dfsTable');
+                    const tableHTML = `
+                        <table>
+                            <tr>
+                                <th>Étape</th>
+                                <th>De</th>
+                                <th>À</th>
+                                <th>L(De)</th>
+                                <th>L(Arête)</th>
+                                <th>L(À)</th>
+                                <th>Type</th>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>1</td>
+                                <td>A</td>
+                                <td>a</td>
+                                <td>B</td>
+                                <td>Forward</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>B</td>
+                                <td>b</td>
+                                <td>C</td>
+                                <td>Forward</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>2</td>
+                                <td>0</td>
+                                <td>C</td>
+                                <td>c</td>
+                                <td>A</td>
+                                <td>Backward</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>1</td>
+                                <td>3</td>
+                                <td>B</td>
+                                <td>d</td>
+                                <td>D</td>
+                                <td>Forward</td>
+                            </tr>
+                        </table>
+                    `;
+                    tableDiv.innerHTML = tableHTML;
+                }
+
+                window.addEventListener('load', drawDFSGraph);
+            </script>
+        </div>
+
+        <!-- Section 5: Comparaison -->
+        <div class="section">
+            <h2>Section 5 : Comparaison des Approches</h2>
+
+            <h3>Performance en fonction du support minimum</h3>
+            <div class="comparison-container">
+                <canvas id="comparisonChart" width="600" height="300"></canvas>
+            </div>
+
+            <h3>Tableau comparatif</h3>
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>AGM/FSG (Apriori)</th>
+                    <th>gSpan (Pattern-Growth)</th>
+                </tr>
+                <tr>
+                    <td><strong>Génération des candidats</strong></td>
+                    <td>Fusion sommet/arête par sommet/arête</td>
+                    <td>Extension rightmost sur le chemin DFS</td>
+                </tr>
+                <tr>
+                    <td><strong>Élimination des doublons</strong></td>
+                    <td>Isomorphisme graphe complet</td>
+                    <td>Code DFS canonique (lexicographique)</td>
+                </tr>
+                <tr>
+                    <td><strong>Complexité théorique</strong></td>
+                    <td>Exponentielle (nombreux candidats)</td>
+                    <td>Exponentielle (mais meilleure en pratique)</td>
+                </tr>
+                <tr>
+                    <td><strong>Mémoire</strong></td>
+                    <td>Élevée (stocke tous les candidats)</td>
+                    <td>Modérée (exploration en profondeur)</td>
+                </tr>
+                <tr>
+                    <td><strong>Facilité d'implémentation</strong></td>
+                    <td>Modérée</td>
+                    <td>Plus complexe (gestion DFS codes)</td>
+                </tr>
+            </table>
+
+            <script>
+                window.addEventListener('load', function() {
+                    const ctx = document.getElementById('comparisonChart');
+                    if (!ctx) return;
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['0.9', '0.7', '0.5', '0.3', '0.1'],
+                            datasets: [
+                                {
+                                    label: 'Apriori-based (FSG)',
+                                    data: [5, 12, 45, 120, 450],
+                                    borderColor: '#F59E0B',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                    tension: 0.3
+                                },
+                                {
+                                    label: 'Pattern-growth (gSpan)',
+                                    data: [4, 9, 28, 75, 280],
+                                    borderColor: '#0D9488',
+                                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                                    tension: 0.3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {position: 'top'},
+                                title: {display: true, text: 'Temps d\'exécution (ms) vs Support minimum'}
+                            },
+                            scales: {
+                                y: {
+                                    title: {display: true, text: 'Temps (ms)'},
+                                    beginAtZero: true
+                                },
+                                x: {
+                                    title: {display: true, text: 'Support minimum'}
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        </div>
+
+        <!-- Section 6: Applications -->
+        <div class="section">
+            <h2>Section 6 : Applications et Variantes</h2>
+
+            <h3>Domaines d'application</h3>
+            <div class="applications">
+                <div class="app-card">
+                    <strong>🧪 Bioinformatique</strong><br>
+                    Trouver des sous-structures communes dans les protéines
+                </div>
+                <div class="app-card">
+                    <strong>💊 Chimie informatique</strong><br>
+                    Identifier des pharmacophores (sous-structures actives)
+                </div>
+                <div class="app-card">
+                    <strong>🌐 Analyse Web</strong><br>
+                    Patterns dans les graphes de liens (PageRank-like)
+                </div>
+                <div class="app-card">
+                    <strong>📱 Réseaux sociaux</strong><br>
+                    Communautés, patterns d'influence, anomalies
+                </div>
+                <div class="app-card">
+                    <strong>🔧 Bases de données XML</strong><br>
+                    Requêtes et schémas structurels
+                </div>
+                <div class="app-card">
+                    <strong>🎮 Cybersécurité</strong><br>
+                    Patterns d'attaque dans les graphes de trafic réseau
+                </div>
+            </div>
+
+            <h3>Variantes importantes</h3>
+            <div class="theory-box">
+                <h4>Mining dans un seul graphe volumineux</h4>
+                <p>Au lieu d'une base de données de petits graphes, nous avons UN très gros graphe (ex: le Web).</p>
+
+                <h4>Subgraph mining discriminatif</h4>
+                <p>Trouver les sous-graphes qui distinguent bien les deux classes. Utile pour la classification basée sur les graphes.</p>
+
+                <h4>Subgraph mining contraint</h4>
+                <p>Imposer des contraintes sur les patterns (ex: "seulement les cycles", "seulement les arbres").</p>
+
+                <h4>Approximate subgraph mining</h4>
+                <p>Permettre les petites différences (inexact matching) pour être plus robuste au bruit.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="subtitle">Hélène Verhaeghe, UCLouvain, 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                try {
+                    katex.render(el.dataset.latex, el, {displayMode: true, throwOnError: false});
+                } catch(e) {
+                    el.textContent = el.dataset.latex;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

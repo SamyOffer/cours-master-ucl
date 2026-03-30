@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.4 — Discriminants Linéaires</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#fff;--gray:#64748B;--dark:#1E293B;--green:#059669;--red:#DC2626;--purple:#7C3AED}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--light);color:var(--dark)}
+  nav{background:var(--navy);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem}
+  nav a{color:#94A3B8;text-decoration:none;font-size:.9rem} nav a:hover{color:#fff}
+  nav span{color:#fff;font-weight:700}
+  header{background:var(--navy);padding:2rem 2rem 1.5rem;border-left:8px solid var(--purple)}
+  header h1{color:#fff;font-size:2rem;margin-bottom:.3rem}
+  header p{color:#94A3B8;font-size:.95rem}
+  main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+  .section{background:var(--white);border-radius:12px;padding:1.75rem;margin-bottom:2rem;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+  .section h2{color:var(--navy);font-size:1.3rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+  .section p.intro{color:var(--gray);font-size:.9rem;margin-bottom:1.25rem;line-height:1.7}
+  .tag{background:var(--purple);color:#fff;font-size:.7rem;padding:.15rem .5rem;border-radius:999px;font-weight:700}
+  .formula-box{background:#F3E8FF;border:1px solid #C4B5FD;border-radius:8px;padding:1rem 1.25rem;margin:.75rem 0;font-family:monospace;font-size:.93rem;color:var(--dark)}
+  .formula-box .label{font-size:.75rem;font-weight:700;color:var(--purple);text-transform:uppercase;margin-bottom:.3rem;font-family:'Segoe UI',sans-serif}
+  .controls{display:flex;flex-wrap:wrap;gap:1.5rem;margin:1rem 0}
+  .ctrl{display:flex;flex-direction:column;gap:.3rem;min-width:200px}
+  .ctrl label{font-size:.85rem;font-weight:600;color:var(--navy)}
+  .ctrl input[type=range]{width:100%;accent-color:var(--purple);cursor:pointer}
+  .ctrl .val{font-size:.9rem;font-weight:700;color:var(--purple)}
+  canvas{max-height:350px}
+  .note{background:#FEF3C7;border-left:4px solid var(--amber);padding:.75rem 1rem;border-radius:0 8px 8px 0;font-size:.88rem;color:var(--dark);margin:.75rem 0;line-height:1.6}
+  .btn{background:var(--purple);color:#fff;border:none;padding:.5rem 1.25rem;border-radius:8px;cursor:pointer;font-weight:700;margin-right:.5rem}
+  .btn:disabled{background:var(--gray);cursor:not-allowed}
+  .btn-teal{background:var(--teal)}
+  .metrics{display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0}
+  .metric{flex:1;min-width:130px;background:var(--light);border-radius:8px;padding:.75rem 1rem;text-align:center}
+  .metric .n{font-size:1.4rem;font-weight:800}
+  .metric .l{font-size:.78rem;color:var(--gray)}
+  .log-box{background:var(--dark);color:#A7F3D0;font-family:monospace;font-size:.78rem;border-radius:8px;padding:1rem;height:150px;overflow-y:auto;margin:.75rem 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr}}
+
+  /* ===== MATH BLOCK PANELS (KaTeX enhanced) ===== */
+  .math-block{background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1.5px solid #6EE7B7;border-left:4px solid #0D9488;border-radius:12px;padding:1.25rem 1.4rem;margin:.5rem 0 1.25rem;}
+  .math-phrase{font-size:.87rem;color:#064E3B;font-style:italic;margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px dashed #A7F3D0;line-height:1.5;}
+  .math-phrase strong{color:#0D9488;font-style:normal;}
+  .math-eq{text-align:center;padding:.6rem .5rem;margin:.5rem 0;overflow-x:auto;background:rgba(255,255,255,.7);border-radius:8px;}
+  .math-eq .katex-display{margin:.3rem 0;}
+  .math-vars-wrap{margin:.75rem 0;}
+  .math-vars-title{font-size:.72rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.35rem;}
+  .math-vars-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .math-vars-table td{padding:.28rem .4rem;border-bottom:1px solid #D1FAE5;vertical-align:top;}
+  .math-vars-table td:first-child{white-space:nowrap;padding-right:.75rem;min-width:70px;font-weight:600;color:#065F46;}
+  .math-vars-table tr:last-child td{border-bottom:none;}
+  .math-vars-table .katex{font-size:.85em;}
+  .math-example{background:#FFFBEB;border-radius:7px;padding:.6rem .85rem;margin-top:.65rem;border-left:3px solid #F59E0B;}
+  .math-example .ex-title{font-size:.72rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;}
+  .math-example p{font-size:.82rem;color:#78350F;line-height:1.65;margin:0;}
+  /* hide original formula-box once math-block is present */
+  .formula-box.enhanced{display:none!important;}
+  .formula-display.enhanced{display:none!important;}
+  
+  /* ===== BEGINNER EXPLANATION BLOCKS ===== */
+  .explain-intro{background:linear-gradient(135deg,#FFFBEB 0%,#FFF7ED 100%);border:1.5px solid #FCD34D;border-left:5px solid #F59E0B;border-radius:0 14px 14px 0;padding:1.3rem 1.5rem;margin:0 0 1.5rem;}
+  .ei-badge{display:inline-flex;align-items:center;gap:.35rem;background:#F59E0B;color:white;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding:.22rem .7rem;border-radius:999px;margin-bottom:.7rem;}
+  .explain-intro p{font-size:.91rem;color:#78350F;line-height:1.82;margin:.45rem 0;}
+  .explain-intro p strong{color:#92400E;font-weight:700;}
+  .explain-intro p em{color:#B45309;font-style:italic;}
+  .explain-analogy{background:white;border-radius:10px;padding:.9rem 1.15rem;margin:.9rem 0;font-size:.88rem;line-height:1.82;border:1.5px solid #FDE68A;color:#78350F;}
+  .explain-analogy .an-title{font-size:.72rem;font-weight:800;color:#D97706;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem;display:block;}
+  .explain-visual{display:flex;gap:.5rem;flex-wrap:wrap;margin:.85rem 0;}
+  .ev-item{background:white;border-radius:10px;padding:.6rem .85rem;font-size:.82rem;color:#78350F;border:1.5px solid #FDE68A;text-align:center;flex:1;min-width:110px;}
+  .ev-item .ev-emoji{font-size:1.5rem;display:block;margin-bottom:.25rem;}
+  .ev-item .ev-label{font-weight:700;color:#92400E;font-size:.8rem;display:block;margin-bottom:.15rem;}
+  .explain-steps{list-style:none;padding:0;margin:.7rem 0;}
+  .explain-steps li{padding:.35rem 0 .35rem 1.5rem;position:relative;font-size:.88rem;color:#78350F;line-height:1.7;border-bottom:1px dashed #FDE68A;}
+  .explain-steps li:last-child{border-bottom:none;}
+  .explain-steps li::before{content:"→";position:absolute;left:0;color:#F59E0B;font-weight:700;}
+  .explain-key{background:#FEF3C7;border-radius:8px;padding:.65rem .95rem;margin-top:.8rem;font-size:.86rem;color:#92400E;font-weight:600;line-height:1.65;border-left:3px solid #F59E0B;}
+  .explain-key::before{content:"💡 À retenir : ";}
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+</head>
+<body>
+<nav><a href="index.html">← Accueil</a><span>Chapitre 4 — Discriminants Linéaires</span></nav>
+<header>
+  <h1>📐 Discriminants Linéaires</h1>
+  <p>Perceptron, LMS/Widrow-Hoff, Descente de Gradient</p>
+</header>
+<main>
+
+<!-- SECTION 1: PERCEPTRON ANIMATION -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> Algorithme Perceptron — Animation pas à pas</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Le neurone artificiel le plus simple</div>
+  <p>Le perceptron est <strong>le plus simple des classifieurs</strong>. Il simule le fonctionnement d'un neurone : il reçoit des signaux (les features xᵢ), les pondère (les poids wᵢ), les additionne, et si la somme dépasse un seuil → il s'active (prédit +1), sinon il reste silencieux (prédit -1).</p>
+  <p>Ce qui est remarquable, c'est la règle d'apprentissage : le perceptron <strong>ne se met à jour que quand il commet une erreur</strong>. Et il le fait toujours dans la bonne direction — en poussant les poids vers la solution correcte.</p>
+  <div class="explain-analogy">
+    <span class="an-title">🎯 Imagines une balance à deux plateaux</span>
+    Tu dois décider si un fruit est une pomme ou une orange selon son poids et sa couleur.<br><br>
+    • <strong>Poids w = [0.5, 0.3]</strong>, biais b = -50. Entrée : [180g, 70% rouge].<br>
+    • Score = 0.5×180 + 0.3×70 − 50 = 90 + 21 − 50 = <strong>61 &gt; 0</strong> → prédit Pomme (+1) ✅<br><br>
+    Si c'est vraiment une pomme : rien à faire.<br>
+    Si c'est une orange : w ← w + η×(−1)×x. Les poids diminuent, le modèle apprend !<br><br>
+    🔁 On répète pour chaque exemple, plusieurs epochs, jusqu'à convergence.
+  </div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">📥</span><span class="ev-label">Entrées (x)</span>Features : taille, poids, couleur...</div>
+    <div class="ev-item"><span class="ev-emoji">⚖️</span><span class="ev-label">Poids (w)</span>L'importance de chaque feature — ce qui est appris.</div>
+    <div class="ev-item"><span class="ev-emoji">➕</span><span class="ev-label">Somme w·x + b</span>Le score : positif ou négatif ?</div>
+    <div class="ev-item"><span class="ev-emoji">🎯</span><span class="ev-label">Décision</span>signe(w·x+b) = +1 ou −1</div>
+  </div>
+  <ul class="explain-steps">
+    <li>1. Initialise les poids w à zéro (ou aléatoirement).</li>
+    <li>2. Pour chaque exemple (xˢ, yˢ) : si y·(w·x) ≤ 0 (erreur) → w ← w + η·y·x</li>
+    <li>3. Répète jusqu'à convergence (ou nombre max d'epochs).</li>
+    <li>⚠️ <strong>Limitation :</strong> converge seulement si les données sont linéairement séparables !</li>
+  </ul>
+  <div class="explain-key">Le perceptron est la brique de base des réseaux de neurones modernes ! Un réseau de neurones, c'est des milliers de perceptrons empilés en couches. Clique sur le canvas pour ajouter des points et lancer l'animation !</div>
+</div>
+
+  <p class="intro">Le Perceptron apprend une frontière de décision linéaire en mettant à jour les poids quand un exemple est mal classé. Ajoute des points, puis lance l'apprentissage !</p>
+
+  <div class="formula-box">
+    <div class="label">Règle de mise à jour Perceptron</div>
+    Si y^s(w^T x^s) ≤ 0  (mal classé) :   w ← w + η · y^s · x^s
+    <br>Critère : J(w) = -Σ_{x∈Xerr} y^s (w^T x^s)
+  </div>
+  <div class="pending-math" data-phrase="Le perceptron met à jour ses poids uniquement quand il commet une erreur, en poussant le vecteur de poids vers la direction correcte." data-latex="\text{Si }y^s(w^\top x^s)\leq 0\;\;[\text{erreur}]\quad\Rightarrow\quad w \leftarrow w + \eta\,y^s\,x^s" data-vars='[{"sym": "w", "desc": "Vecteur de poids du classifieur (ce qui est appris)"}, {"sym": "x^s", "desc": "Exemple d&apos;entraînement s (vecteur de features)"}, {"sym": "y^s", "desc": "Étiquette de xˢ — vaut +1 ou -1 (classif. binaire)"}, {"sym": "\\eta", "desc": "Taux d&apos;apprentissage (learning rate) — contrôle la vitesse de mise à jour"}, {"sym": "w^\\top x^s", "desc": "Score du classifieur pour l&apos;exemple s (produit scalaire)"}, {"sym": "y^s(w^\\top x^s)\\leq 0", "desc": "Condition d&apos;erreur : signe prédit ≠ signe réel"}]' data-example="w=[1,0], xˢ=[2,3], yˢ=-1. Score = 1×2+0×3 = 2 > 0, mais yˢ=-1 → ERREUR. Mise à jour : w ← [1,0] + 0.1×(-1)×[2,3] = [1-0.2, 0-0.3] = [0.8, -0.3]. Maintenant score = 0.8×2+(-0.3)×3 = 1.6-0.9 = 0.7 > 0 → encore faux ! On continue..."></div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin:.75rem 0;align-items:center">
+    <button class="btn" id="addPosBtn" onclick="addMode='pos'" style="background:var(--teal)">+ Ajouter classe + (teal)</button>
+    <button class="btn" id="addNegBtn" onclick="addMode='neg'" style="background:var(--red)">+ Ajouter classe - (rouge)</button>
+    <button class="btn btn-teal" onclick="startPerceptron()">▶ Lancer Perceptron</button>
+    <button class="btn" onclick="stepPerceptron()" id="stepBtn" disabled>⏭ Étape suivante</button>
+    <button class="btn" onclick="resetPerceptron()" style="background:var(--gray)">↺ Reset</button>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:.5rem">
+    <div class="ctrl" style="min-width:150px">
+      <label>Taux d'apprentissage η : <span class="val" id="etaVal">0.1</span></label>
+      <input type="range" id="eta" min="0.01" max="1" step="0.01" value="0.1">
+    </div>
+    <div style="font-size:.85rem;color:var(--gray)">Clic sur le canvas pour ajouter des points</div>
+  </div>
+
+  <canvas id="perceptronCanvas" width="600" height="350" style="width:100%;border-radius:8px;background:var(--light);cursor:crosshair;max-height:350px"></canvas>
+
+  <div class="metrics">
+    <div class="metric"><div class="n" id="percEpoch" style="color:var(--purple)">0</div><div class="l">Époque</div></div>
+    <div class="metric"><div class="n" id="percErrors" style="color:var(--red)">0</div><div class="l">Erreurs</div></div>
+    <div class="metric"><div class="n" id="percW" style="color:var(--navy);font-size:.9rem">—</div><div class="l">Poids w</div></div>
+    <div class="metric"><div class="n" id="percStatus" style="font-size:.9rem">En attente</div><div class="l">Statut</div></div>
+  </div>
+
+  <div class="log-box" id="percLog">Ajoute des points (+/-) et lance l'algorithme...</div>
+
+  <div class="note">💡 Le Perceptron <strong>converge toujours</strong> si les données sont linéairement séparables. Dans le cas contraire, il boucle indéfiniment.</div>
+</div>
+
+<!-- SECTION 2: LMS/GRADIENT DESCENT -->
+<div class="section">
+  <h2><span class="tag">Interactif</span> LMS / Widrow-Hoff — Descente de Gradient</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">🧒 Descendre dans la vallée à tâtons</div>
+  <p>Imagine que tu es perdu dans les montagnes par une nuit sans lune. Pour rejoindre la vallée (le minimum d'erreur), tu n'as qu'une seule stratégie : <strong>à chaque pas, avance dans la direction qui descend le plus.</strong> C'est la <em>descente de gradient</em> !</p>
+  <p>LMS (Least Mean Squares, aussi appelé Widrow-Hoff) est une règle d'apprentissage qui minimise l'erreur quadratique en suivant exactement ce principe. Contrairement au perceptron, <strong>il se met à jour même quand il ne fait pas d'erreur</strong> — proportionnellement à l'amplitude de l'erreur.</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Perceptron vs LMS — quelle différence ?</span>🔔 <strong>Perceptron :</strong><br>• Se met à jour SEULEMENT si erreur binaire (mauvais signe)<br>• Mise à jour toujours de même amplitude : η·y·x<br>• Converge seulement si données linéairement séparables<br><br>📉 <strong>LMS :</strong><br>• Se met à jour TOUJOURS, proportionnellement à l'erreur numérique<br>• Mise à jour : η·(y−ŷ)·x — plus l'erreur est grande, plus le pas est grand<br>• Converge vers la solution des moindres carrés même si données non séparables !<br><br>🏆 LMS est équivalent à maximiser la vraisemblance sous bruit gaussien (voir Ch.7 !)</div>
+  <div class="explain-visual">
+    <div class="ev-item"><span class="ev-emoji">⛰️</span><span class="ev-label">Paysage d'erreur</span>J(w) = erreur quadratique. On veut le minimum.</div>
+    <div class="ev-item"><span class="ev-emoji">📉</span><span class="ev-label">Gradient</span>La pente — dit dans quelle direction l'erreur monte.</div>
+    <div class="ev-item"><span class="ev-emoji">👣</span><span class="ev-label">Pas de gradient</span>w ← w - η×gradient. On descend la pente.</div>
+    <div class="ev-item"><span class="ev-emoji">🎯</span><span class="ev-label">Minimum</span>La solution optimale w* = (XᵀX)⁻¹Xᵀy</div>
+  </div>
+  <div class="explain-key">LMS et la solution analytique convergent vers le MÊME résultat. LMS est utile quand les données sont trop nombreuses pour inverser la matrice. La solution analytique est exacte mais coûteuse pour de grandes matrices.</div>
+</div>
+
+  <p class="intro">Contrairement au Perceptron (qui ne se met à jour que sur les erreurs binaires), LMS se met à jour sur <strong>tous</strong> les exemples avec une erreur continue.</p>
+
+  <div class="grid2">
+    <div>
+      <div class="formula-box"><div class="label">Critère MSE</div>J(w) = (1/2) Σₛ (y^s - w^T x^s)²</div>
+  <div class="pending-math" data-phrase="LMS (Least Mean Squares) minimise la somme des carrés des erreurs et met à jour les poids proportionnellement à chaque erreur de prédiction." data-latex="J(w) = \frac{1}{2}\sum_s\bigl(y^s - w^\top x^s\bigr)^2, \qquad \nabla_w J = -\sum_s\bigl(y^s - w^\top x^s\bigr)x^s" data-latex2="w \leftarrow w + \eta\,\underbrace{(y^s - w^\top x^s)}_{\text{erreur de prédiction}}\,x^s" data-vars='[{"sym": "J(w)", "desc": "Critère MSE (erreur quadratique) — à minimiser"}, {"sym": "y^s", "desc": "Vraie valeur (label) de l&apos;exemple s"}, {"sym": "w^\\top x^s", "desc": "Prédiction actuelle du modèle pour l&apos;exemple s"}, {"sym": "y^s - w^\\top x^s", "desc": "Résidu (erreur de prédiction) — grand si le modèle est loin de la vérité"}, {"sym": "\\eta", "desc": "Taux d&apos;apprentissage — contrôle la taille du pas de gradient"}, {"sym": "\\nabla_w J", "desc": "Gradient du critère par rapport à w — direction de la montée"}]' data-example="w=1.5, xˢ=2, yˢ=5. Prédiction : 1.5×2=3. Erreur : 5-3=2. Mise à jour : w ← 1.5 + 0.1×2×2 = 1.5+0.4 = 1.9. Nouvelle prédiction : 1.9×2=3.8. Erreur réduite à 1.2 !"></div>
+      <div class="formula-box"><div class="label">Gradient</div>∇J(w) = -Σₛ (y^s - w^T x^s) · x^s</div>
+  <div class="pending-math" data-phrase="Le gradient du critère MSE indique la direction de montée la plus forte ; la descente de gradient fait le pas inverse pour réduire l'erreur." data-latex="\nabla_w J(w) = -\sum_s \bigl(y^s - w^\top x^s\bigr)\,x^s" data-latex2="w_\mathrm{new} \leftarrow w - \eta\,\nabla_w J = w + \eta\sum_s(y^s-w^\top x^s)x^s \quad\text{(batch)}" data-vars='[{"sym": "\\nabla_w J", "desc": "Gradient du critère J par rapport à w — vecteur D-dimensionnel"}, {"sym": "y^s - w^\\top x^s", "desc": "Résidu de l&apos;exemple s : positif si on prédit trop bas, négatif sinon"}, {"sym": "\\eta", "desc": "Taux d&apos;apprentissage (pas de gradient) — trop grand : diverge, trop petit : lent"}, {"sym": "\\text{batch vs. SGD}", "desc": "Batch : calcule le gradient sur tous les exemples. SGD : un exemple à la fois (plus rapide)"}]' data-example="w=[0], exemples: (x=1,y=2), (x=2,y=3). Gradient = -[(2-0)·1 + (3-0)·2] = -8. Mise à jour w ← 0 - 0.1×(-8) = 0.8. Prédictions : 0.8, 1.6. Erreurs: 1.2, 1.4. Encore du chemin !"></div>
+      <div class="formula-box"><div class="label">Mise à jour (online SGD)</div>w ← w + η · (y^s - w^T x^s) · x^s</div>
+    </div>
+    <div>
+      <div class="formula-box" style="background:#DCFCE7;border-color:#86EFAC"><div class="label" style="color:var(--green)">Solution analytique</div>w* = (X^T X)^{-1} X^T y    (Moindres Carrés)</div>
+  <div class="pending-math" data-phrase="La solution analytique des moindres carrés donne directement le vecteur de poids optimal en une seule opération matricielle, sans itérations." data-latex="w^* = (X^\top X)^{-1}X^\top y" data-vars='[{"sym": "w^*", "desc": "Vecteur de poids optimal (solution exacte des moindres carrés)"}, {"sym": "X", "desc": "Matrice de design : N lignes (exemples) × D colonnes (features)"}, {"sym": "y", "desc": "Vecteur des vraies étiquettes (N valeurs)"}, {"sym": "X^\\top X", "desc": "Matrice de Gram (D×D) — doit être inversible (features non redondantes)"}, {"sym": "(X^\\top X)^{-1}", "desc": "Pseudo-inverse — peut être instable si features corrélées → utiliser Ridge"}]' data-example="X=[[1,1],[1,2],[1,3]] (biais + feature), y=[2,4,5]. XᵀX = [[3,6],[6,14]], Xᵀy = [11,23]. Résoudre le système → w* ≈ [0.33, 1.5]. Modèle : ŷ = 0.33 + 1.5·x. Optimal en une seule opération !"></div>
+      <div class="note">LMS converge vers la solution des moindres carrés — identique à maximiser la vraisemblance sous bruit gaussien (Ch.7).</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Taux d'apprentissage η : <span class="val" id="lmsEtaVal">0.05</span></label>
+      <input type="range" id="lmsEta" min="0.001" max="0.2" step="0.001" value="0.05">
+    </div>
+    <div class="ctrl">
+      <label>Nombre d'itérations : <span class="val" id="lmsIterVal">100</span></label>
+      <input type="range" id="lmsIter" min="10" max="500" step="10" value="100">
+    </div>
+    <div style="display:flex;align-items:flex-end">
+      <button class="btn btn-teal" onclick="runLMS()">▶ Lancer LMS</button>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div><canvas id="lmsDataChart" style="max-height:280px"></canvas></div>
+    <div><canvas id="lmsLossChart" style="max-height:280px"></canvas></div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="n" id="lmsFinalW" style="color:var(--purple);font-size:.9rem">—</div><div class="l">w final (LMS)</div></div>
+    <div class="metric"><div class="n" id="lmsOptW" style="color:var(--teal);font-size:.9rem">—</div><div class="l">w optimal (analytique)</div></div>
+    <div class="metric"><div class="n" id="lmsMSE" style="color:var(--red)">—</div><div class="l">MSE final</div></div>
+  </div>
+</div>
+
+<!-- SECTION 3: COMPARISON -->
+<div class="section">
+  <h2><span class="tag">Concept</span> Perceptron vs LMS — Comparaison</h2>
+
+<div class="explain-intro">
+  <div class="ei-badge">📊 Quand utiliser quoi ?</div>
+  <p>Tu as maintenant vu deux algorithmes pour les classifieurs linéaires. Voici comment choisir entre les deux :</p>
+  <div class="explain-analogy"><span class="an-title">🎯 Résumé de la comparaison</span>🔔 <strong>Perceptron</strong> → Simple, rapide, mais limité aux données linéairement séparables. Historiquement important (Rosenblatt, 1958). La brique de base des réseaux de neurones.<br><br>📉 <strong>LMS / Widrow-Hoff</strong> → Minimise l'erreur quadratique continue. Converge même sur des données non séparables. Équivalent à la régression linéaire. Utilisé dans le traitement du signal (ADSL, WiFi !) et en deep learning (descente de gradient stochastique = SGD).<br><br>🚀 <strong>Dans la vraie vie :</strong> ni l'un ni l'autre n'est utilisé seul — on préfère les SVMs (Ch.5) ou les réseaux de neurones. Mais comprendre ces deux algos simples est <em>essentiel</em> pour comprendre tous les algos modernes !</div>
+  <div class="explain-key">Tout le deep learning moderne (GPT, Vision Transformers...) est basé sur la descente de gradient (SGD) — exactement le principe de LMS. Vous venez d'apprendre le cœur de l'IA moderne !</div>
+</div>
+
+  <div class="grid2">
+    <div style="border:2px solid var(--purple);border-radius:8px;padding:1rem">
+      <div style="font-weight:700;color:var(--purple);font-size:1.05rem;margin-bottom:.5rem">🔵 Algorithme Perceptron</div>
+      <div style="font-size:.85rem;line-height:2;color:var(--dark)">
+        <div>✓ Ne se met à jour que sur les erreurs binaires</div>
+        <div>✓ Convergence garantie si données lin. séparables</div>
+        <div>✓ Boucle si non-séparable</div>
+        <div>✓ Critère : J = -Σ y^s(w^T x^s) sur erreurs</div>
+        <div>✓ Solution : vecteur des exemples support</div>
+      </div>
+    </div>
+    <div style="border:2px solid var(--teal);border-radius:8px;padding:1rem">
+      <div style="font-weight:700;color:var(--teal);font-size:1.05rem;margin-bottom:.5rem">🟢 Règle LMS / Widrow-Hoff</div>
+      <div style="font-size:.85rem;line-height:2;color:var(--dark)">
+        <div>✓ Se met à jour sur TOUS les exemples</div>
+        <div>✓ Convergence même si non-séparable</div>
+        <div>✓ Minimise MSE (erreur continue)</div>
+        <div>✓ Critère : J = (1/2)Σ(y^s - w^T x^s)²</div>
+        <div>✓ Solution : identique aux moindres carrés</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ======================== PERCEPTRON ========================
+let addMode='pos', percPoints=[], percW=[0,0,0], percRunning=false, percInterval=null;
+let percEpochCount=0, percCanvas=null, percCtx=null;
+
+function initCanvas(){
+  percCanvas=document.getElementById('perceptronCanvas');
+  percCtx=percCanvas.getContext('2d');
+  percCanvas.addEventListener('click',e=>{
+    const r=percCanvas.getBoundingClientRect();
+    const sx=percCanvas.width/r.width, sy=percCanvas.height/r.height;
+    const cx=(e.clientX-r.left)*sx, cy=(e.clientY-r.top)*sy;
+    const nx=(cx/percCanvas.width)*2-1, ny=-((cy/percCanvas.height)*2-1);
+    percPoints.push({x:nx,y:ny,c:addMode==='pos'?1:-1});
+    drawPerceptron();
+  });
+  drawPerceptron();
+}
+function drawPerceptron(){
+  const C=percCtx, W=percCanvas.width, H=percCanvas.height;
+  C.clearRect(0,0,W,H);
+  C.fillStyle='#EFF6FF'; C.fillRect(0,0,W,H);
+  // Grid
+  C.strokeStyle='#CBD5E1'; C.lineWidth=1;
+  for(let i=0;i<=10;i++){
+    const x=(i/10)*W; C.beginPath();C.moveTo(x,0);C.lineTo(x,H);C.stroke();
+    const y=(i/10)*H; C.beginPath();C.moveTo(0,y);C.lineTo(W,y);C.stroke();
+  }
+  // Axes
+  C.strokeStyle='#94A3B8'; C.lineWidth=2;
+  C.beginPath();C.moveTo(0,H/2);C.lineTo(W,H/2);C.stroke();
+  C.beginPath();C.moveTo(W/2,0);C.lineTo(W/2,H);C.stroke();
+
+  function toCanv(x,y){return{cx:(x+1)/2*W,cy:(1-(y+1)/2)*H}}
+
+  // Decision boundary w[0]+w[1]*x+w[2]*y=0 → y=(-w[0]-w[1]*x)/w[2]
+  if(Math.abs(percW[2])>0.001){
+    C.strokeStyle='#1E3A5F'; C.lineWidth=3;
+    C.beginPath();
+    const x1=-1,y1=(-percW[0]-percW[1]*x1)/percW[2];
+    const x2=1,y2=(-percW[0]-percW[1]*x2)/percW[2];
+    const p1=toCanv(x1,y1),p2=toCanv(x2,y2);
+    C.moveTo(p1.cx,p1.cy);C.lineTo(p2.cx,p2.cy);C.stroke();
+  }
+  // Points
+  percPoints.forEach(p=>{
+    const{cx,cy}=toCanv(p.x,p.y);
+    C.beginPath();
+    if(p.c===1){C.fillStyle='#0D9488';C.arc(cx,cy,8,0,Math.PI*2);}
+    else{C.fillStyle='#DC2626';C.moveTo(cx-8,cy-8);C.lineTo(cx+8,cy+8);C.moveTo(cx+8,cy-8);C.lineTo(cx-8,cy+8);}
+    if(p.c===1)C.fill(); else C.stroke();
+    C.strokeStyle=p.c===1?'#065F46':'#991B1B'; C.lineWidth=2; C.stroke();
+  });
+  // Weight vector
+  if(Math.abs(percW[1])>0.001||Math.abs(percW[2])>0.001){
+    const norm=Math.sqrt(percW[1]**2+percW[2]**2)*3;
+    const wx=percW[1]/norm, wy=percW[2]/norm;
+    const origin=toCanv(0,0);
+    C.strokeStyle='#F59E0B'; C.lineWidth=2.5; C.fillStyle='#F59E0B';
+    C.beginPath();C.moveTo(origin.cx,origin.cy);
+    C.lineTo(origin.cx+wx*W/2,origin.cy-wy*H/2);C.stroke();
+  }
+}
+function startPerceptron(){
+  if(percPoints.length<4){document.getElementById('percLog').textContent='Ajoute au moins 4 points (+/-) !';return;}
+  percW=[Math.random()*.2-.1,Math.random()*.2-.1,Math.random()*.2-.1];
+  percEpochCount=0;
+  document.getElementById('stepBtn').disabled=false;
+  document.getElementById('percLog').textContent='Perceptron initialisé. w = ['+percW.map(v=>v.toFixed(3)).join(', ')+']';
+  drawPerceptron(); updatePercMetrics();
+}
+function stepPerceptron(){
+  const eta=+document.getElementById('eta').value;
+  let errors=0;
+  percEpochCount++;
+  percPoints.forEach(p=>{
+    const pred=percW[0]+percW[1]*p.x+percW[2]*p.y;
+    if(p.c*pred<=0){
+      errors++;
+      percW[0]+=eta*p.c; percW[1]+=eta*p.c*p.x; percW[2]+=eta*p.c*p.y;
+    }
+  });
+  const logEl=document.getElementById('percLog');
+  logEl.textContent+='\nÉpoque '+percEpochCount+' — '+errors+' erreurs — w=['+percW.map(v=>v.toFixed(3)).join(', ')+']';
+  logEl.scrollTop=logEl.scrollHeight;
+  drawPerceptron(); updatePercMetrics();
+  if(errors===0){document.getElementById('percStatus').textContent='✅ Convergé';document.getElementById('percStatus').style.color='var(--green)';document.getElementById('stepBtn').disabled=true;}
+}
+function updatePercMetrics(){
+  document.getElementById('percEpoch').textContent=percEpochCount;
+  const errors=percPoints.filter(p=>p.c*(percW[0]+percW[1]*p.x+percW[2]*p.y)<=0).length;
+  document.getElementById('percErrors').textContent=errors;
+  document.getElementById('percW').textContent='['+percW.map(v=>v.toFixed(2)).join(', ')+']';
+  if(percEpochCount===0) document.getElementById('percStatus').textContent='En attente';
+  else if(errors>0){document.getElementById('percStatus').textContent='En cours…';document.getElementById('percStatus').style.color='var(--amber)';}
+}
+function resetPerceptron(){
+  percPoints=[]; percW=[0,0,0]; percEpochCount=0;
+  document.getElementById('stepBtn').disabled=true;
+  document.getElementById('percLog').textContent='Reset. Ajoute des points et relance !';
+  document.getElementById('percEpoch').textContent='0';
+  document.getElementById('percErrors').textContent='0';
+  document.getElementById('percStatus').textContent='En attente';
+  drawPerceptron();
+}
+document.getElementById('eta').addEventListener('input',()=>{document.getElementById('etaVal').textContent=(+document.getElementById('eta').value).toFixed(2)});
+
+// ======================== LMS ========================
+let lmsDataChart, lmsLossChart;
+const lmsData=[];
+for(let i=0;i<20;i++){
+  const x=Math.random()*4-2;
+  lmsData.push({x,y:1.5*x+0.5+(Math.random()-.5)*1.5});
+}
+
+function initLMSCharts(){
+  lmsDataChart=new Chart(document.getElementById('lmsDataChart').getContext('2d'),{
+    type:'scatter',
+    data:{datasets:[
+      {label:'Données',data:lmsData.map(d=>({x:d.x,y:d.y})),backgroundColor:'rgba(13,148,136,.7)',pointRadius:6},
+      {label:'LMS',data:[],type:'line',borderColor:'#7C3AED',borderWidth:2.5,pointRadius:0,fill:false},
+      {label:'Analytique (optimal)',data:[],type:'line',borderColor:'#F59E0B',borderWidth:2,pointRadius:0,borderDash:[5,3],fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},
+      scales:{x:{title:{display:true,text:'x'},min:-2.5,max:2.5},y:{title:{display:true,text:'y'}}}}
+  });
+  lmsLossChart=new Chart(document.getElementById('lmsLossChart').getContext('2d'),{
+    type:'line',
+    data:{datasets:[{label:'MSE (LMS)',data:[],borderColor:'#7C3AED',borderWidth:2,pointRadius:0,fill:false}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},
+      scales:{x:{title:{display:true,text:'Itération'}},y:{title:{display:true,text:'MSE'},min:0}}}
+  });
+}
+function runLMS(){
+  const eta=+document.getElementById('lmsEta').value;
+  const iters=+document.getElementById('lmsIter').value;
+  let w0=0,w1=0;
+  const losses=[];
+  for(let it=0;it<iters;it++){
+    // Stochastic gradient descent
+    const idx=Math.floor(Math.random()*lmsData.length);
+    const d=lmsData[idx], pred=w0+w1*d.x, err=d.y-pred;
+    w0+=eta*err; w1+=eta*err*d.x;
+    if(it%5===0){
+      const mse=lmsData.reduce((s,d)=>s+(d.y-w0-w1*d.x)**2,0)/lmsData.length;
+      losses.push({x:it,y:mse});
+    }
+  }
+  // Analytical solution
+  const n=lmsData.length, sx=lmsData.reduce((s,d)=>s+d.x,0), sy=lmsData.reduce((s,d)=>s+d.y,0);
+  const sxx=lmsData.reduce((s,d)=>s+d.x**2,0), sxy=lmsData.reduce((s,d)=>s+d.x*d.y,0);
+  const w1opt=(n*sxy-sx*sy)/(n*sxx-sx**2), w0opt=(sy-w1opt*sx)/n;
+  const xs=[-2.5,2.5];
+  lmsDataChart.data.datasets[1].data=xs.map(x=>({x,y:w0+w1*x}));
+  lmsDataChart.data.datasets[2].data=xs.map(x=>({x,y:w0opt+w1opt*x}));
+  lmsDataChart.update('none');
+  lmsLossChart.data.datasets[0].data=losses;
+  lmsLossChart.update('none');
+  const mse=lmsData.reduce((s,d)=>s+(d.y-w0-w1*d.x)**2,0)/lmsData.length;
+  document.getElementById('lmsFinalW').textContent=`[${w0.toFixed(3)}, ${w1.toFixed(3)}]`;
+  document.getElementById('lmsOptW').textContent=`[${w0opt.toFixed(3)}, ${w1opt.toFixed(3)}]`;
+  document.getElementById('lmsMSE').textContent=mse.toFixed(4);
+}
+document.getElementById('lmsEta').addEventListener('input',()=>{document.getElementById('lmsEtaVal').textContent=(+document.getElementById('lmsEta').value).toFixed(3)});
+document.getElementById('lmsIter').addEventListener('input',()=>{document.getElementById('lmsIterVal').textContent=document.getElementById('lmsIter').value});
+
+initCanvas();
+initLMSCharts();
+runLMS();
+</script>
+
+<script>
+(function waitForKatex(tries){
+  if(tries<=0) return;
+  if(typeof katex==='undefined'){setTimeout(()=>waitForKatex(tries-1),150);return;}
+  
+  function rk(latex,display){
+    try{return katex.renderToString(latex,{displayMode:!!display,throwOnError:false});}
+    catch(e){return '<code>'+latex+'</code>';}
+  }
+  
+  document.querySelectorAll('.pending-math').forEach(function(pm){
+    const phrase  = pm.dataset.phrase  || '';
+    const latex   = pm.dataset.latex   || '';
+    const latex2  = pm.dataset.latex2  || '';
+    const example = pm.dataset.example || '';
+    let vars = [];
+    try{ vars = JSON.parse(pm.dataset.vars || '[]'); } catch(e){}
+    
+    let varsRows = vars.map(v=>
+      '<tr><td>'+rk(v.sym)+'</td><td>'+v.desc+'</td></tr>'
+    ).join('');
+    
+    let html = '<div class="math-block">';
+    if(phrase) html += '<div class="math-phrase">📌 <em><strong>En une phrase :</strong> '+phrase+'</em></div>';
+    if(latex)  html += '<div class="math-eq">'+rk(latex,true)+'</div>';
+    if(latex2) html += '<div class="math-eq">'+rk(latex2,true)+'</div>';
+    if(vars.length){
+      html += '<div class="math-vars-wrap"><div class="math-vars-title">🔤 Décryptage des symboles :</div>';
+      html += '<table class="math-vars-table">'+varsRows+'</table></div>';
+    }
+    if(example) html += '<div class="math-example"><div class="ex-title">💡 Exemple concret :</div><p>'+example+'</p></div>';
+    html += '</div>';
+    
+    pm.outerHTML = html;
+  });
+  
+  // mark enhanced formula-boxes
+  document.querySelectorAll('.formula-box,.formula-display').forEach(function(fb){
+    if(fb.nextElementSibling && fb.nextElementSibling.classList && fb.nextElementSibling.classList.contains('math-block')){
+      fb.classList.add('enhanced');
+    }
+  });
+  
+})(30);
+</script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch.3 – Positionnement Stratégique | EPL 2211</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1E3A5F;--teal:#0D9488;--amber:#F59E0B;--light:#EFF6FF;--white:#FFFFFF;--gray:#64748B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--light);color:#1e293b;}
+header{background:var(--navy);color:white;position:relative;overflow:hidden;}
+header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom,var(--amber),var(--teal));}
+.header-inner{padding:32px 48px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:.82rem;color:#94a3b8;margin-bottom:10px;}
+.breadcrumb a{color:var(--amber);text-decoration:none;}
+.chapter-badge{display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:white;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+header h1{font-size:1.9rem;font-weight:800;margin-bottom:6px;}
+header p.subtitle{color:#94a3b8;font-size:.95rem;}
+.header-chips{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.chip{background:rgba(255,255,255,.1);color:#e2e8f0;font-size:.8rem;padding:4px 12px;border-radius:20px;}
+nav{background:white;border-bottom:1px solid #e2e8f0;padding:12px 48px;}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;}
+.nav-link{padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--gray);transition:all .2s;}
+.nav-link:hover,.nav-link.active{background:var(--teal);color:white;}
+main{max-width:1100px;margin:0 auto;padding:36px 48px;}
+.section{background:white;border-radius:14px;box-shadow:0 2px 16px rgba(30,58,95,.07);padding:32px;margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.section-icon{font-size:1.6rem;}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--navy);}
+.section-subtitle{font-size:.85rem;color:var(--gray);margin-top:2px;}
+.explain-intro{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:20px 24px;margin-bottom:20px;}
+.explain-intro .badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber);color:white;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:10px;}
+.explain-intro p{font-size:.9rem;line-height:1.7;color:#451a03;}
+.analogy{background:#fef3c7;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:.88rem;color:#78350f;border-left:3px solid #f59e0b;}
+.retenir{background:#fffbeb;border:1.5px solid var(--amber);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:.88rem;font-weight:600;color:#92400e;}
+.theory-box{background:#eff6ff;border-radius:10px;padding:18px 22px;margin:14px 0;border:1px solid #bfdbfe;}
+.theory-box h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.theory-box p{font-size:.88rem;line-height:1.65;color:#1e40af;}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin:16px 0;}
+.icon-item{background:#f8fafc;border-radius:10px;padding:16px;text-align:center;border:1px solid #e2e8f0;}
+.icon-item .emoji{font-size:1.8rem;margin-bottom:8px;}
+.icon-item .label{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.icon-item .desc{font-size:.75rem;color:var(--gray);line-height:1.4;}
+.demo-box{background:#f8fafc;border-radius:12px;padding:24px;border:2px dashed #cbd5e1;margin-top:20px;}
+.demo-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.demo-controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px;}
+.control-group label{display:block;font-size:.82rem;font-weight:600;color:var(--gray);margin-bottom:6px;}
+.control-group input[type=range]{width:100%;accent-color:var(--teal);}
+.control-value{font-size:1.1rem;font-weight:700;color:var(--teal);}
+.btn{background:var(--teal);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;margin:4px;}
+.btn:hover{background:#0f766e;}
+.btn-secondary{background:#f1f5f9;color:var(--navy);}
+canvas{max-width:100%;}
+.nice-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.88rem;}
+.nice-table th{background:var(--navy);color:white;padding:10px 14px;text-align:left;}
+.nice-table td{padding:9px 14px;border-bottom:1px solid #e2e8f0;}
+.nice-table tr:hover td{background:#f8fafc;}
+/* Porter forces grid */
+.porter-grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:12px;margin:20px 0;}
+.porter-center{grid-column:2;grid-row:2;background:var(--navy);color:white;border-radius:12px;padding:16px;text-align:center;}
+.porter-cell{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;}
+.porter-cell h5{font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.porter-cell p{font-size:.78rem;color:var(--gray);line-height:1.4;}
+.porter-cell input[type=range]{width:100%;accent-color:var(--teal);margin-top:6px;}
+.force-score{font-weight:700;font-size:1rem;}
+.pestel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0;}
+.pestel-card{border-radius:10px;padding:16px;border:1.5px solid transparent;}
+footer{background:var(--navy);color:#94a3b8;text-align:center;padding:24px;font-size:.82rem;margin-top:40px;}
+footer span{color:var(--amber);}
+@media(max-width:700px){
+  .header-inner,nav,main{padding-left:20px;padding-right:20px;}
+  header h1{font-size:1.4rem;}
+  .porter-grid{grid-template-columns:1fr;grid-template-rows:auto;}
+  .porter-center{grid-column:1;grid-row:1;}
+  .pestel-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="breadcrumb"><a href="index.html">🏠 Accueil</a> › Chapitre 3</div>
+    <div class="chapter-badge">Chapitre 3</div>
+    <h1>Stratégies de Positionnement</h1>
+    <p class="subtitle">REP drivers, Porter 5 Forces, PESTEL, avantages compétitifs et segmentation</p>
+    <div class="header-chips">
+      <span class="chip">⚔️ Porter 5 Forces</span>
+      <span class="chip">🌍 PESTEL</span>
+      <span class="chip">🔑 Avantages compétitifs</span>
+      <span class="chip">🎯 Segmentation</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#drivers" class="nav-link active">Drivers stratégie (REP)</a>
+    <a href="#porter" class="nav-link">Porter 5 Forces</a>
+    <a href="#pestel" class="nav-link">PESTEL</a>
+    <a href="#avantages" class="nav-link">Avantages compétitifs</a>
+    <a href="#disruption" class="nav-link">Disruption & Blue Ocean</a>
+    <a href="#segmentation" class="nav-link">Segmentation</a>
+    <a href="#demo" class="nav-link">Démo interactive</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ========== SECTION 1 : DRIVERS ========== -->
+<div class="section" id="drivers">
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <div>
+      <div class="section-title">Les Drivers de la Stratégie (REP)</div>
+      <div class="section-subtitle">Resources – Environment – Purpose : les 3 piliers qui façonnent toute stratégie</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la stratégie d'une entreprise ?</div>
+    <p>La stratégie, c'est la façon dont une entreprise décide de se différencier de ses concurrents pour créer plus de valeur. C'est comme choisir où jouer aux échecs : sur quel terrain jouer, avec quelles pièces, et quel est ton objectif final ? Une bonne stratégie répond à : "Pourquoi les clients nous choisissent-ils plutôt que nos concurrents ?"</p>
+    <div class="analogy">
+      🏦 <strong>Exemple Mastercard :</strong> REP en action.
+      <strong>Resources :</strong> base de 200M+ cartes, réseau mondial, données de transactions, réputation.
+      <strong>Environment :</strong> industries avec frictions de paiement (transport, divertissement, parkings), nouvelles technologies (biométrie).
+      <strong>Purpose :</strong> "Être la première technologie de paiement mondiale — pas seulement une carte bancaire."
+      → Stratégie : intégrer Mastercard dans tous les nouveaux flux de paiement digitaux.
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">💎</div><div class="label">Resources (R)</div><div class="desc">Ce que tu as : actifs, compétences, brevets, marque, réseau</div></div>
+      <div class="icon-item"><div class="emoji">🌍</div><div class="label">Environment (E)</div><div class="desc">Le monde extérieur : marché, concurrents, tendances, réglementation</div></div>
+      <div class="icon-item"><div class="emoji">🎯</div><div class="label">Purpose (P)</div><div class="desc">Pourquoi tu existes : mission, vision, valeurs, stakeholders</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : La stratégie est à l'intersection de ce que tu <strong>peux faire</strong> (R), de ce que le marché <strong>demande</strong> (E) et de ce que tu <strong>veux faire</strong> (P). Négliger une de ces 3 dimensions = stratégie fragile.</div>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 : PORTER ========== -->
+<div class="section" id="porter">
+  <div class="section-header">
+    <span class="section-icon">⚔️</span>
+    <div>
+      <div class="section-title">Porter's 5 Forces</div>
+      <div class="section-subtitle">Analyser l'attractivité d'un secteur en 5 forces concurrentielles</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi Porter's 5 Forces ?</div>
+    <p>Imagine que tu veux ouvrir un restaurant. Avant de te lancer, tu dois comprendre l'environnement dans lequel tu vas évoluer : il y a beaucoup d'autres restaurants ? Les fournisseurs (grossistes) ont-ils du pouvoir sur toi ? Les clients sont-ils fidèles ou zappeurs ? C'est exactement ce que Porter's 5 Forces t'aide à analyser pour n'importe quel secteur.</p>
+    <div class="analogy">
+      ✈️ <strong>Exemple du secteur aérien :</strong>
+      1) Rivalité intense (Ryanair, easyJet, Air France se font une guerre des prix). 2) Pouvoir fournisseurs élevé (Boeing et Airbus ont un duopole sur les avions). 3) Pouvoir clients moyen (les voyageurs comparent les prix mais changent peu de compagnie pour la fidélité). 4) Menace nouveaux entrants faible (licences, capital, slots aéroport = barrières énormes). 5) Substituts croissants (TGV, visioconférence). → Secteur globalement peu attractif → marges faibles.
+    </div>
+    <div class="retenir">💡 À retenir : Plus les 5 forces sont intenses, moins le secteur est attractif (faibles marges). La stratégie consiste à se positionner de façon à réduire l'impact de ces forces (ex : créer un avantage de coût, différencier, verrouiller les clients).</div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">⚔️ Démo Interactive — Analyse Porter de ton secteur</div>
+    <p style="font-size:.88rem;color:var(--gray);margin-bottom:16px;">Évalue chaque force de 1 (faible = favorable) à 10 (forte = défavorable) pour ton secteur.</p>
+    <div class="porter-grid">
+      <!-- Top: Entrants potentiels -->
+      <div></div>
+      <div class="porter-cell" style="grid-column:2;grid-row:1;">
+        <h5>🆕 Menace nouveaux entrants</h5>
+        <p>Barrières à l'entrée (capital, brevets, réglementations)</p>
+        <input type="range" min="1" max="10" value="5" id="f_entrants" oninput="updatePorter()">
+        <div>Score : <span class="force-score" id="s_entrants" style="color:var(--teal);">5</span>/10</div>
+      </div>
+      <div></div>
+      <!-- Middle: Left, Center, Right -->
+      <div class="porter-cell" style="grid-column:1;grid-row:2;">
+        <h5>🤝 Pouvoir des fournisseurs</h5>
+        <p>Concentration, switching costs, absence d'alternatives</p>
+        <input type="range" min="1" max="10" value="5" id="f_suppliers" oninput="updatePorter()">
+        <div>Score : <span class="force-score" id="s_suppliers" style="color:var(--teal);">5</span>/10</div>
+      </div>
+      <div class="porter-center" style="grid-column:2;grid-row:2;">
+        <div style="font-size:1.3rem;font-weight:800;margin-bottom:6px;">⚔️</div>
+        <div style="font-size:.9rem;font-weight:700;">Rivalité concurrentielle</div>
+        <input type="range" min="1" max="10" value="5" id="f_rivalry" oninput="updatePorter()" style="width:100%;accent-color:var(--amber);margin:8px 0;">
+        <div style="color:var(--amber);font-size:1.3rem;font-weight:800;" id="s_rivalry">5</div>
+        <div style="font-size:.75rem;color:#94a3b8;margin-top:4px;" id="attraction_label">Secteur moyennement attractif</div>
+      </div>
+      <div class="porter-cell" style="grid-column:3;grid-row:2;">
+        <h5>💰 Pouvoir des clients</h5>
+        <p>Concentration, prix sensitifs, facilité de substitution</p>
+        <input type="range" min="1" max="10" value="5" id="f_buyers" oninput="updatePorter()">
+        <div>Score : <span class="force-score" id="s_buyers" style="color:var(--teal);">5</span>/10</div>
+      </div>
+      <!-- Bottom: Substituts -->
+      <div></div>
+      <div class="porter-cell" style="grid-column:2;grid-row:3;">
+        <h5>🔄 Menace des substituts</h5>
+        <p>Alternatives qui répondent au même besoin</p>
+        <input type="range" min="1" max="10" value="5" id="f_subs" oninput="updatePorter()">
+        <div>Score : <span class="force-score" id="s_subs" style="color:var(--teal);">5</span>/10</div>
+      </div>
+      <div></div>
+    </div>
+    <canvas id="porterChart" style="max-height:300px;"></canvas>
+    <button class="btn btn-secondary" onclick="resetPorter()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 : PESTEL ========== -->
+<div class="section" id="pestel">
+  <div class="section-header">
+    <span class="section-icon">🌍</span>
+    <div>
+      <div class="section-title">Analyse PESTEL</div>
+      <div class="section-subtitle">Macro-environnement : Political – Economic – Social – Technological – Environmental – Legal</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi PESTEL ?</div>
+    <p>PESTEL, c'est une checklist pour scanner l'environnement macro-économique d'une entreprise. C'est comme vérifier la météo, le trafic, et la santé de ton véhicule avant un long voyage — tu ne peux pas contrôler ces facteurs, mais tu dois les anticiper. Une start-up fintech en 2022 doit surveiller : la régulation BCE (P), les taux d'intérêt élevés (E), l'adoption du mobile banking (S), l'IA et la blockchain (T), les exigences ESG (En), et RGPD (L).</p>
+    <div class="retenir">💡 À retenir : PESTEL sert à identifier les OPPORTUNITÉS (ex : nouvelle réglementation favorable) et MENACES (ex : disruption technologique) de l'environnement macro. À combiner avec Porter (méso) et l'analyse interne (micro) pour une vue SWOT complète.</div>
+  </div>
+
+  <div class="pestel-grid">
+    <div class="pestel-card" style="background:#fef2f2;border-color:#fca5a5;">
+      <div style="font-size:1.5rem;margin-bottom:8px;">🏛️</div>
+      <strong style="color:#991b1b;">Political</strong>
+      <p style="font-size:.8rem;color:#7f1d1d;margin-top:6px;">Stabilité politique, régulations commerciales, taxes, politique industrielle, relations internationales.</p>
+      <p style="font-size:.78rem;color:#991b1b;margin-top:4px;"><em>Ex : Brexit → délocalisations ; Biden IRA → boost cleantech US</em></p>
+    </div>
+    <div class="pestel-card" style="background:#fff7ed;border-color:#fdba74;">
+      <div style="font-size:1.5rem;margin-bottom:8px;">💹</div>
+      <strong style="color:#9a3412;">Economic</strong>
+      <p style="font-size:.8rem;color:#7c2d12;margin-top:6px;">Croissance PIB, inflation, taux d'intérêt, chômage, pouvoir d'achat, taux de change.</p>
+      <p style="font-size:.78rem;color:#9a3412;margin-top:4px;"><em>Ex : taux BCE à 4% → coût du crédit pour start-ups x3</em></p>
+    </div>
+    <div class="pestel-card" style="background:#fefce8;border-color:#fde047;">
+      <div style="font-size:1.5rem;margin-bottom:8px;">👥</div>
+      <strong style="color:#713f12;">Social</strong>
+      <p style="font-size:.8rem;color:#78350f;margin-top:6px;">Démographie, culture, style de vie, éducation, mobilité sociale, attentes des consommateurs.</p>
+      <p style="font-size:.78rem;color:#713f12;margin-top:4px;"><em>Ex : vieillissement → boom marché santé personnes âgées</em></p>
+    </div>
+    <div class="pestel-card" style="background:#f0fdf4;border-color:#86efac;">
+      <div style="font-size:1.5rem;margin-bottom:8px;">💻</div>
+      <strong style="color:#14532d;">Technological</strong>
+      <p style="font-size:.8rem;color:#166534;margin-top:6px;">R&D, automatisation, IA, digitalisation, cybersécurité, adoption technologique.</p>
+      <p style="font-size:.78rem;color:#14532d;margin-top:4px;"><em>Ex : ChatGPT → disrupte les métiers du conseil, de la rédaction</em></p>
+    </div>
+    <div class="pestel-card" style="background:#eff6ff;border-color:#93c5fd;">
+      <div style="font-size:1.5rem;margin-bottom:8px;">🌿</div>
+      <strong style="color:#1e3a8a;">Environmental</strong>
+      <p style="font-size:.8rem;color:#1e40af;margin-top:6px;">Changement climatique, régulations émissions, ressources naturelles, économie circulaire.</p>
+      <p style="font-size:.78rem;color:#1e3a8a;margin-top:4px;"><em>Ex : Taxe carbone → avantage compétitif pour les firmes propres</em></p>
+    </div>
+    <div class="pestel-card" style="background:#fdf4ff;border-color:#d8b4fe;">
+      <div style="font-size:1.5rem;margin-bottom:8px;">⚖️</div>
+      <strong style="color:#581c87;">Legal</strong>
+      <p style="font-size:.8rem;color:#6b21a8;margin-top:6px;">Droit du travail, propriété intellectuelle, protection données (RGPD), réglementation sectorielle.</p>
+      <p style="font-size:.78rem;color:#581c87;margin-top:4px;"><em>Ex : RGPD → avantage pour les firmes tech européennes vs GAFA</em></p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SECTION 4 : AVANTAGES COMPÉTITIFS ========== -->
+<div class="section" id="avantages">
+  <div class="section-header">
+    <span class="section-icon">🏆</span>
+    <div>
+      <div class="section-title">Sources d'Avantages Compétitifs</div>
+      <div class="section-subtitle">Pourquoi et comment se différencier durablement</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi un avantage compétitif ?</div>
+    <p>Un avantage compétitif, c'est ce qui te permet de créer plus de valeur que tes concurrents — soit en faisant la même chose moins cher, soit en faisant quelque chose que les autres ne peuvent pas faire. C'est la raison fondamentale pour laquelle un client te choisit plutôt qu'un concurrent.</p>
+    <div class="analogy">
+      ☕ <strong>Exemple Starbucks vs café classique :</strong>
+      Un café classique vend du café à 1,50€. Starbucks vend du café à 5€. Comment ? Grâce à 3 avantages compétitifs : <strong>1) Expérience</strong> (atmosphère, "troisième lieu"), <strong>2) Personnalisation</strong> (ton prénom, ton latte personnalisé), <strong>3) Programme de fidélité</strong> (Starbucks Rewards = lock-in client). Résultat : les clients payent 3x plus et ne changent pas de marque !
+    </div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="emoji">💰</div><div class="label">Coût</div><div class="desc">Produire moins cher grâce aux économies d'échelle, automatisation (ex: ALDI)</div></div>
+      <div class="icon-item"><div class="emoji">✨</div><div class="label">Différenciation</div><div class="desc">Offrir quelque chose d'unique que les clients valorisent (ex: Apple)</div></div>
+      <div class="icon-item"><div class="emoji">🎯</div><div class="label">Focus/Niche</div><div class="desc">Se concentrer sur un segment spécifique mieux servi (ex: Rolls-Royce)</div></div>
+      <div class="icon-item"><div class="emoji">🔒</div><div class="label">Lock-in</div><div class="desc">Rendre le switching coûteux pour les clients (ex: Adobe Creative Suite)</div></div>
+    </div>
+    <div class="retenir">💡 À retenir : Porter distingue 2 avantages compétitifs génériques : la <strong>domination par les coûts</strong> (vendre moins cher) et la <strong>différenciation</strong> (vendre mieux). La combinaison des deux sans focus clair mène au "stuck in the middle" — la pire position stratégique.</div>
+  </div>
+
+  <table class="nice-table">
+    <tr><th>Stratégie</th><th>Comment</th><th>Exemple</th><th>Risque</th></tr>
+    <tr><td>📉 Domination par les coûts</td><td>Économies d'échelle, automatisation, processus optimisés</td><td>Ryanair, Amazon, Walmart</td><td>Guerre des prix interminable, marges faibles</td></tr>
+    <tr><td>💎 Différenciation</td><td>Design, marque, technologie, service premium</td><td>Apple, Tesla, LVMH</td><td>Imitation par les concurrents</td></tr>
+    <tr><td>🎯 Focus coût</td><td>Niche + optimisation des coûts sur ce segment</td><td>Primark (mode pas chère)</td><td>Niche peut disparaître</td></tr>
+    <tr><td>🎯 Focus différenciation</td><td>Niche + offre premium sur ce segment</td><td>Ferrari, Hermès</td><td>Marché limité en taille</td></tr>
+  </table>
+
+  <div class="theory-box" style="margin-top:14px;">
+    <h4>⚡ Capacités dynamiques — "apprendre à apprendre" (Teece et al., 1997 ; Gailly, 2018)</h4>
+    <p>Au-delà des avantages compétitifs statiques (coût, différenciation), Gailly souligne l'importance des <strong>capacités dynamiques</strong> : la capacité d'une firme à intégrer, construire et reconfigurer ses compétences en réponse aux changements rapides de l'environnement. Ce n'est pas seulement "ce qu'on sait faire aujourd'hui" qui compte, mais "notre capacité à apprendre de nouvelles choses demain". Apple n'a pas simplement différencié ses produits — elle a développé la capacité d'innover radicalement à chaque cycle. Cette méta-compétence est difficile à imiter car elle est ancrée dans la culture, les processus et les personnes de la firme.</p>
+  </div>
+</div>
+
+<!-- ========== SECTION 4b : DISRUPTION & BLUE OCEAN (Gailly) ========== -->
+<div class="section" id="disruption">
+  <div class="section-header">
+    <span class="section-icon">🌊</span>
+    <div>
+      <div class="section-title">Innovation Disruptive & Blue Ocean Strategy</div>
+      <div class="section-subtitle">Créer de nouveaux espaces concurrentiels plutôt que de se battre sur les marchés existants</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 Disruption vs Blue Ocean</div>
+    <p>Deux grandes théories expliquent comment des entreprises parviennent à créer de nouvelles règles du jeu plutôt que de se battre à l'intérieur des règles existantes. L'innovation disruptive (Christensen) explique comment des entrants attaquent les marchés en partant d'un segment bas de gamme. La Blue Ocean Strategy (Kim & Mauborgne) explique comment créer un espace de marché totalement nouveau sans concurrence directe.</p>
+    <div class="analogy">
+      🎵 <strong>Exemple combiné :</strong> iTunes de Apple était une disruption de l'industrie musicale — il a d'abord servi les clients "suffisamment satisfaits" par quelques titres à 0,99$ plutôt que des albums entiers. Spotify a ensuite créé un Blue Ocean en inventant un nouveau modèle (streaming par abonnement) qui ne concurrençait plus directement iTunes mais offrait une courbe de valeur entièrement différente.
+    </div>
+    <div class="retenir">💡 À retenir : Les entreprises qui cherchent à "battre la concurrence" restent dans les "red oceans" (eaux rouges de sang). Celles qui cherchent à "rendre la concurrence hors de propos" créent des "blue oceans" — de nouveaux espaces de marché où elles définissent les règles.</div>
+  </div>
+
+  <h3 style="color:var(--navy);margin:20px 0 12px;font-size:1.05rem;">🔴 Innovation Disruptive (Clayton Christensen, HBS)</h3>
+  <div class="theory-box">
+    <h4>📖 Théorie de la disruption</h4>
+    <p>Christensen observe que les leaders de marché échouent non pas par incompétence, mais parce qu'ils écoutent <em>trop bien</em> leurs meilleurs clients. Les innovations disruptives arrivent par le bas : elles offrent d'abord une performance inférieure aux yeux des clients existants, mais à un coût bien moindre. Progressivement, elles améliorent leurs performances et <strong>délogent les leaders en place</strong>. Exemples : disques durs miniatures (Seagate vs startups), Netflix vs Blockbuster, smartphone vs Nokia, cloud vs serveurs physiques. La leçon pour les managers : <em>surveiller le bas du marché, pas seulement les concurrents directs.</em> <em>(Gailly, 2018 ; Christensen, 1997)</em></p>
+  </div>
+
+  <h3 style="color:var(--navy);margin:20px 0 12px;font-size:1.05rem;">🔵 Blue Ocean Strategy (Kim & Mauborgne, INSEAD)</h3>
+  <div class="theory-box">
+    <h4>📖 Nouvelles courbes de valeur</h4>
+    <p>Kim et Mauborgne proposent le <strong>Canevas Stratégique</strong> : une représentation visuelle des facteurs concurrentiels d'un secteur et de comment chaque acteur se positionne sur ces facteurs. La Blue Ocean Strategy consiste à créer une <strong>nouvelle courbe de valeur</strong> en appliquant le cadre ERRC : <strong>Éliminer</strong> les facteurs pris pour acquis, <strong>Réduire</strong> les facteurs sous-valorisés, <strong>Renforcer</strong> les facteurs over-looked, <strong>Créer</strong> de nouveaux facteurs jamais offerts. Exemple du Cirque du Soleil : éliminé les animaux et les vedettes (coûts), réduit le risque physique, renforcé le storytelling et l'art, créé une expérience théâtrale → nouveau marché, pas de concurrence directe. <em>(Gailly, 2018)</em></p>
+  </div>
+
+  <h3 style="color:var(--navy);margin:20px 0 12px;font-size:1.05rem;">⚡ First-Mover vs Fast-Follower</h3>
+  <table class="nice-table">
+    <tr><th>Avantage</th><th>First-Mover</th><th>Fast-Follower</th></tr>
+    <tr>
+      <td>📌 Principe</td>
+      <td>Être le premier sur un marché pour capturer les ressources clés, créer des standards et bénéficier de l'effet d'apprentissage</td>
+      <td>Laisser le pionnier éduquer le marché, puis entrer avec une offre améliorée en évitant ses erreurs</td>
+    </tr>
+    <tr>
+      <td>✅ Avantages</td>
+      <td>Notoriété, loyauté précoce, brevets, partenariats exclusifs, standard de marché (ex: Amazon, Uber, Google)</td>
+      <td>Coûts de R&D plus faibles, apprentissage des erreurs du pioneer, technologie améliorée (ex: Facebook vs MySpace, Google vs Yahoo)</td>
+    </tr>
+    <tr>
+      <td>⚠️ Risques</td>
+      <td>Marché pas encore mature, coûts d'éducation élevés, technologie insuffisamment développée</td>
+      <td>Difficulté à différencier si le first-mover a verrouillé les clients et créé des switching costs élevés</td>
+    </tr>
+    <tr>
+      <td>💡 Leçon</td>
+      <td colspan="2">L'avantage du first-mover n'est pas automatique — il dépend de la capacité à créer des barrières durables (brevets, réseau, habitudes). Gailly note que dans de nombreux secteurs, le vrai succès revient aux <em>fast-followers</em> capables d'exécuter mieux. <em>(Gailly, 2018)</em></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========== SECTION 5 : SEGMENTATION ========== -->
+<div class="section" id="segmentation">
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <div>
+      <div class="section-title">Segmentation de Marché</div>
+      <div class="section-subtitle">Identifier les besoins et mesurer la taille du marché (TAM-SAM-SOM)</div>
+    </div>
+  </div>
+
+  <div class="explain-intro">
+    <div class="badge">🧒 C'est quoi la segmentation ?</div>
+    <p>La segmentation, c'est diviser un grand marché hétérogène en groupes homogènes de clients qui ont les mêmes besoins et comportements d'achat. Pourquoi ? Parce que tu ne peux pas faire plaisir à tout le monde avec le même produit. Un médecin a des besoins très différents d'un lycéen pour acheter un smartphone — même si les deux "achètent des smartphones".</p>
+    <div class="analogy">
+      📱 <strong>Exemple concret :</strong> Le marché des téléphones mobiles au début des années 2000 semblait homogène. Nokia l'a segmenté en : jeunes (coloration, musique), professionals (email, agenda), seniors (gros boutons, simplicité), pays émergents (durabilité, batterie longue). Chaque segment a des besoins différents → produits différents → prix différents.
+    </div>
+    <div class="retenir">💡 À retenir : TAM (Total Addressable Market) = le marché total théorique. SAM (Serviceable Addressable Market) = la partie que tu pourrais théoriquement adresser. SOM (Serviceable Obtainable Market) = la part de marché réaliste à 3-5 ans. Les investisseurs veulent un grand TAM (>1 milliard $) et un SOM crédible.</div>
+  </div>
+
+  <div class="demo-box">
+    <div class="demo-title">📊 Calculateur TAM-SAM-SOM</div>
+    <div class="demo-controls">
+      <div class="control-group">
+        <label>🌍 Taille population cible (M) : <span class="control-value" id="v_pop">500</span>M</label>
+        <input type="range" min="1" max="8000" step="10" value="500" id="pop" oninput="updateTAM()">
+      </div>
+      <div class="control-group">
+        <label>💰 Revenu moyen/client/an (€) : <span class="control-value" id="v_rev">200</span>€</label>
+        <input type="range" min="1" max="10000" step="10" value="200" id="rev" oninput="updateTAM()">
+      </div>
+      <div class="control-group">
+        <label>🎯 % marché adressable (SAM) : <span class="control-value" id="v_sam">30</span>%</label>
+        <input type="range" min="1" max="100" value="30" id="sam_pct" oninput="updateTAM()">
+      </div>
+      <div class="control-group">
+        <label>🚀 % part de marché visée (SOM) : <span class="control-value" id="v_som">5</span>%</label>
+        <input type="range" min="0.1" max="50" step="0.1" value="5" id="som_pct" oninput="updateTAM()">
+      </div>
+    </div>
+    <canvas id="tamChart" style="max-height:280px;"></canvas>
+    <div id="tam_results" style="margin-top:16px;background:white;border-radius:10px;padding:16px;border:1px solid #e2e8f0;font-size:.9rem;"></div>
+    <button class="btn btn-secondary" onclick="resetTAM()" style="margin-top:12px;">🔄 Réinitialiser</button>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p>EPL 2211 – Introduction to New Venture Management · <span>Louvain School of Management</span> · UCLouvain</p>
+  <p style="margin-top:6px;"><a href="ch2_opportunites.html" style="color:var(--amber);">← Ch.2 Opportunités</a> &nbsp;|&nbsp; <a href="ch4_modeles_affaires.html" style="color:var(--amber);">Ch.4 Modèles d'affaires →</a></p>
+</footer>
+
+<script>
+// ============ PORTER ============
+let porterChart = null;
+function updatePorter() {
+  const forces = {
+    entrants: +document.getElementById('f_entrants').value,
+    suppliers: +document.getElementById('f_suppliers').value,
+    rivalry: +document.getElementById('f_rivalry').value,
+    buyers: +document.getElementById('f_buyers').value,
+    subs: +document.getElementById('f_subs').value
+  };
+  Object.entries(forces).forEach(([k,v]) => {
+    document.getElementById('s_'+k).textContent = v;
+  });
+  const avg = Object.values(forces).reduce((a,b)=>a+b,0)/5;
+  let label = '';
+  if (avg <= 3) label = '🌟 Secteur très attractif (faibles forces)';
+  else if (avg <= 5) label = '⚠️ Secteur moyennement attractif';
+  else if (avg <= 7) label = '⛔ Secteur peu attractif (forces élevées)';
+  else label = '💀 Secteur très difficile (forces intenses)';
+  document.getElementById('attraction_label').textContent = label;
+
+  const ctx = document.getElementById('porterChart').getContext('2d');
+  if (porterChart) porterChart.destroy();
+  porterChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Nouveaux entrants','Pouvoir fournisseurs','Rivalité','Pouvoir clients','Substituts'],
+      datasets: [{
+        label: 'Intensité des forces (1=faible, 10=forte)',
+        data: [forces.entrants, forces.suppliers, forces.rivalry, forces.buyers, forces.subs],
+        backgroundColor: 'rgba(239,68,68,0.15)',
+        borderColor: '#ef4444',
+        borderWidth: 2,
+        pointBackgroundColor: '#ef4444'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { r: { beginAtZero: true, max: 10, ticks: { stepSize: 2 } } },
+      plugins: { title: { display: true, text: 'Porter 5 Forces — Attractivité du secteur' } }
+    }
+  });
+}
+function resetPorter() {
+  ['f_entrants','f_suppliers','f_rivalry','f_buyers','f_subs'].forEach(id=>document.getElementById(id).value=5);
+  updatePorter();
+}
+
+// ============ TAM-SAM-SOM ============
+let tamChart = null;
+function updateTAM() {
+  const pop = +document.getElementById('pop').value;
+  const rev = +document.getElementById('rev').value;
+  const samPct = +document.getElementById('sam_pct').value;
+  const somPct = +document.getElementById('som_pct').value;
+
+  document.getElementById('v_pop').textContent = pop.toLocaleString();
+  document.getElementById('v_rev').textContent = rev.toLocaleString();
+  document.getElementById('v_sam').textContent = samPct;
+  document.getElementById('v_som').textContent = somPct;
+
+  const tam = pop * 1e6 * rev;
+  const sam = tam * samPct / 100;
+  const som = sam * somPct / 100;
+
+  function fmtBillion(v) {
+    if (v >= 1e9) return (v/1e9).toFixed(1) + ' Md€';
+    if (v >= 1e6) return (v/1e6).toFixed(0) + ' M€';
+    return v.toFixed(0) + ' €';
+  }
+
+  document.getElementById('tam_results').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div style="text-align:center;padding:12px;background:#dbeafe;border-radius:10px;">
+        <div style="font-size:.75rem;font-weight:700;color:#1e40af;margin-bottom:4px;">TAM</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#1d4ed8;">${fmtBillion(tam)}</div>
+        <div style="font-size:.72rem;color:#3b82f6;">Marché total théorique</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#d1fae5;border-radius:10px;">
+        <div style="font-size:.75rem;font-weight:700;color:#065f46;margin-bottom:4px;">SAM</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#059669;">${fmtBillion(sam)}</div>
+        <div style="font-size:.72rem;color:#10b981;">Marché adressable (${samPct}% TAM)</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#fef3c7;border-radius:10px;">
+        <div style="font-size:.75rem;font-weight:700;color:#92400e;margin-bottom:4px;">SOM</div>
+        <div style="font-size:1.3rem;font-weight:800;color:#d97706;">${fmtBillion(som)}</div>
+        <div style="font-size:.72rem;color:#f59e0b;">Part visée (${somPct}% SAM)</div>
+      </div>
+    </div>
+  `;
+
+  const ctx = document.getElementById('tamChart').getContext('2d');
+  if (tamChart) tamChart.destroy();
+  tamChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['SOM (objectif)', 'SAM restant', 'TAM non adressable'],
+      datasets: [{
+        data: [som, sam-som, tam-sam],
+        backgroundColor: ['#f59e0b','#10b981','#3b82f6'],
+        borderWidth: 2,
+        borderColor: 'white'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'TAM / SAM / SOM — Segmentation du marché' },
+        legend: { position: 'right' }
+      }
+    }
+  });
+}
+function resetTAM() {
+  document.getElementById('pop').value = 500;
+  document.getElementById('rev').value = 200;
+  document.getElementById('sam_pct').value = 30;
+  document.getElementById('som_pct').value = 5;
+  updateTAM();
+}
+
+window.addEventListener('load', () => { updatePorter(); updateTAM(); });
+</script>
+</body>
+</html>

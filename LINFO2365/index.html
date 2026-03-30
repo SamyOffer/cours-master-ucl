@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programmation par Contraintes — MiniCP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+  :root {
+    --navy: #1E3A5F;
+    --teal: #0D9488;
+    --amber: #F59E0B;
+    --light: #EFF6FF;
+    --white: #FFFFFF;
+    --gray: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: #1e293b; }
+
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 0;
+    border-bottom: 5px solid var(--amber);
+    position: relative;
+    overflow: hidden;
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+  .header-stripe {
+    width: 10px;
+    background: var(--amber);
+    align-self: stretch;
+    flex-shrink: 0;
+  }
+  .header-stripe2 {
+    width: 6px;
+    background: var(--teal);
+    align-self: stretch;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+  .header-content { padding: 32px 40px; }
+  .header-content h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
+  .header-content p { color: #93c5fd; margin-top: 8px; font-size: 1.05rem; }
+  .header-badge {
+    margin-top: 12px;
+    display: inline-block;
+    background: var(--amber);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+
+  .intro-block {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(30,58,95,0.07);
+    padding: 32px;
+    margin-bottom: 40px;
+    border-left: 5px solid var(--amber);
+  }
+  .intro-block h2 { color: var(--navy); font-size: 1.3rem; margin-bottom: 12px; }
+  .intro-block p { color: var(--gray); line-height: 1.7; }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--teal);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chapters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  .chapter-card {
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(30,58,95,0.08);
+    padding: 0;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.18s, box-shadow 0.18s;
+    border: 1.5px solid #e2e8f0;
+  }
+  .chapter-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(30,58,95,0.15);
+    border-color: var(--teal);
+  }
+  .card-top {
+    background: var(--navy);
+    padding: 18px 22px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .card-number {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--amber);
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-title { color: white; font-weight: 700; font-size: 1rem; line-height: 1.3; }
+  .card-body { padding: 16px 22px 20px; }
+  .card-desc { color: var(--gray); font-size: 0.88rem; line-height: 1.6; margin-bottom: 14px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    background: var(--light);
+    color: var(--teal);
+    border: 1px solid var(--teal);
+    border-radius: 20px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    padding: 2px 10px;
+  }
+  .card-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 10px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--gray);
+  }
+  .card-arrow { color: var(--teal); font-weight: 700; }
+
+  .concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+  .concept-item {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 1px 6px rgba(30,58,95,0.05);
+  }
+  .concept-item .icon { font-size: 2rem; margin-bottom: 8px; }
+  .concept-item h4 { font-size: 0.9rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .concept-item p { font-size: 0.78rem; color: var(--gray); }
+
+  footer {
+    background: var(--navy);
+    color: #93c5fd;
+    text-align: center;
+    padding: 24px;
+    font-size: 0.88rem;
+    margin-top: 40px;
+  }
+  footer strong { color: white; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <h1>🧩 Programmation par Contraintes</h1>
+      <p>Site de révision interactif — MiniCP</p>
+      <span class="header-badge">7 chapitres • Cours complet</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="intro-block">
+    <h2>🎯 Bienvenue sur ton site de révision !</h2>
+    <p>
+      Ce site couvre l'ensemble du cours de <strong>Programmation par Contraintes (CP)</strong> basé sur <strong>MiniCP</strong>.
+      Chaque chapitre contient des <strong>explications progressives</strong> (du lycée jusqu'au niveau avancé),
+      des <strong>formules mathématiques</strong> rendues proprement, et des <strong>démos interactives</strong> pour comprendre
+      les algorithmes en les voyant en action. Clique sur un chapitre pour commencer !
+    </p>
+  </div>
+
+  <div class="section-title">📚 Chapitres du cours</div>
+
+  <div class="chapters-grid">
+
+    <a class="chapter-card" href="ch1_intro_cp.html">
+      <div class="card-top">
+        <div class="card-number">1</div>
+        <div class="card-title">Introduction à la Programmation par Contraintes</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Qu'est-ce que CP ? Le problème des N-Reines, la recherche DFS, le filtrage, et la construction de TinyCSP.</p>
+        <div class="card-tags">
+          <span class="tag">CSP</span>
+          <span class="tag">DFS</span>
+          <span class="tag">N-Reines</span>
+          <span class="tag">Filtrage</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>📖 Concepts fondamentaux</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="chapter-card" href="ch2_minicp_arch.html">
+      <div class="card-top">
+        <div class="card-number">2</div>
+        <div class="card-title">Architecture de MiniCP</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Domaines (Sparse Set), variables, contraintes, propagation, et l'algorithme de fixpoint.</p>
+        <div class="card-tags">
+          <span class="tag">Sparse Set</span>
+          <span class="tag">StateInt</span>
+          <span class="tag">Fixpoint</span>
+          <span class="tag">Backtrack</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>🔧 Architecture logicielle</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="chapter-card" href="ch3_sum_element.html">
+      <div class="card-top">
+        <div class="card-number">3</div>
+        <div class="card-title">Contraintes Sum & Element</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Implémentation de Sum (avec Sparse Set pour les variables fixées/non-fixées) et de la contrainte Element1D.</p>
+        <div class="card-tags">
+          <span class="tag">Sum</span>
+          <span class="tag">Element</span>
+          <span class="tag">Propagation</span>
+          <span class="tag">Sparse Set</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>➕ Contraintes arithmétiques</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="chapter-card" href="ch4_table_constraints.html">
+      <div class="card-top">
+        <div class="card-number">4</div>
+        <div class="card-title">Contraintes de Table</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Modéliser des relations extensionnelles avec des tables de tuples. Algorithme CT (Compact Table) et filtrage.</p>
+        <div class="card-tags">
+          <span class="tag">Table CT</span>
+          <span class="tag">Tuples</span>
+          <span class="tag">BitSet</span>
+          <span class="tag">Filtrage</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>📋 Relations extensionnelles</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="chapter-card" href="ch5_alldifferent.html">
+      <div class="card-top">
+        <div class="card-number">5</div>
+        <div class="card-title">La Contrainte AllDifferent</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Décomposition binaire, Forward Checking, cohérence de domaine via les couplages maximaux et les SCC (théorème de Berge).</p>
+        <div class="card-tags">
+          <span class="tag">AllDiff</span>
+          <span class="tag">Matching</span>
+          <span class="tag">Berge</span>
+          <span class="tag">SCC</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>🔵 Contrainte globale phare</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="chapter-card" href="ch6_circuit_optim_lns.html">
+      <div class="card-top">
+        <div class="card-number">6</div>
+        <div class="card-title">Circuit, Optimisation & LNS</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">Contrainte Circuit (TSP), Branch-and-Bound pour les COP, et Large Neighborhood Search pour trouver de bonnes solutions vite.</p>
+        <div class="card-tags">
+          <span class="tag">Circuit</span>
+          <span class="tag">TSP</span>
+          <span class="tag">B&B</span>
+          <span class="tag">LNS</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>🗺️ Optimisation combinatoire</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="chapter-card" href="ch7_cumulative.html">
+      <div class="card-top">
+        <div class="card-number">7</div>
+        <div class="card-title">Ordonnancement Cumulatif</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">La contrainte Cumulative : décomposition, profil obligatoire, filtrage TimeTable en O(n²), et LNS pour l'ordonnancement.</p>
+        <div class="card-tags">
+          <span class="tag">Cumulative</span>
+          <span class="tag">TimeTable</span>
+          <span class="tag">Profil</span>
+          <span class="tag">RCPSP</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span>📅 Scheduling avancé</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="section-title">🧠 Concepts clés du cours</div>
+  <div class="concepts-grid">
+    <div class="concept-item">
+      <div class="icon">🔢</div>
+      <h4>Variables & Domaines</h4>
+      <p>Représentation des possibles comme ensembles d'entiers</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">📏</div>
+      <h4>Contraintes</h4>
+      <p>Règles qui éliminent des valeurs impossibles</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">🌳</div>
+      <h4>Recherche DFS</h4>
+      <p>Exploration d'un arbre de décision avec retour arrière</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">✂️</div>
+      <h4>Propagation</h4>
+      <p>Filtrage automatique des valeurs inconsistantes</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">⚡</div>
+      <h4>Sparse Set</h4>
+      <p>Structure O(1) pour gérer les domaines avec backtrack</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">🎯</div>
+      <h4>Contraintes Globales</h4>
+      <p>AllDifferent, Circuit, Cumulative — filtrage fort</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">📈</div>
+      <h4>Branch & Bound</h4>
+      <p>Optimisation par recherche avec borne sur l'objectif</p>
+    </div>
+    <div class="concept-item">
+      <div class="icon">🔄</div>
+      <h4>LNS</h4>
+      <p>Large Neighborhood Search : Fix + Relax + Restart</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Site de révision interactif
+</footer>
+
+</body>
+</html>

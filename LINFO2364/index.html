@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINFO2364 - Mining Patterns in Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+            --white: #FFFFFF;
+            --gray: #64748B;
+            --text-dark: #1F2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--navy);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .header-stripe {
+            width: 6px;
+            background: var(--amber);
+            flex-shrink: 0;
+        }
+
+        .header-stripe-teal {
+            width: 4px;
+            background: var(--teal);
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .header-content {
+            padding: 16px 20px;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title div:first-child {
+            color: var(--amber);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-title div:last-child {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--amber);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #2D5A8C 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(30, 58, 95, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #E0E7FF;
+            margin: 10px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .hero .professor {
+            font-size: 16px;
+            margin-top: 30px;
+            color: var(--amber);
+            font-weight: 600;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 50px 0 30px 0;
+        }
+
+        .section-header h2 {
+            color: var(--navy);
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), transparent);
+            margin-left: 20px;
+        }
+
+        .about-section {
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            margin: 30px 0;
+            line-height: 1.8;
+        }
+
+        .about-section p {
+            font-size: 16px;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .chapters-grid {
+            display: grid;
+            gap: 25px;
+            margin: 30px 0;
+            grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+        }
+
+        .chapter-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chapter-card:hover {
+            box-shadow: 0 12px 32px rgba(30, 58, 95, 0.15);
+            transform: translateY(-5px);
+            border-left-color: var(--teal);
+        }
+
+        .chapter-badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            width: fit-content;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chapter-card h3 {
+            color: var(--navy);
+            font-size: 22px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .chapter-card p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 18px;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .chapter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background: #F3F4F6;
+            color: var(--gray);
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .chapter-button {
+            background: var(--teal);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .chapter-button:hover {
+            background: #0F766E;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .timeline-section {
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            background: var(--teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        .timeline-content h4 {
+            color: var(--navy);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content p {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            width: 2px;
+            height: 30px;
+            background: var(--teal);
+            margin-left: 0;
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: auto;
+        }
+
+        footer .footer-title {
+            color: var(--amber);
+            font-weight: 700;
+        }
+
+        footer .footer-info {
+            color: #94A3B8;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 50px 20px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .section-header h2 {
+                font-size: 24px;
+            }
+
+            .about-section {
+                padding: 25px;
+            }
+
+            .timeline-item {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <div class="header-stripe"></div>
+            <div class="header-stripe-teal"></div>
+            <div class="header-content">
+                <div class="header-title">
+                    <div>LINFO2364</div>
+                    <div>Mining Patterns in Data</div>
+                </div>
+                <nav>
+                    <a href="#about">À propos</a>
+                    <a href="#chapters">Chapitres</a>
+                    <a href="#roadmap">Plan du cours</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Mining Patterns in Data</h1>
+            <p>Découvrez les techniques fondamentales pour extraire et analyser les patterns cachés dans vos données</p>
+            <div class="professor">
+                <strong>Prof. Hélène Verhaeghe</strong> · UCLouvain · 2025-26 Q2
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="section-header">
+                <h2>À propos du cours</h2>
+            </div>
+            <article class="about-section">
+                <p>
+                    <strong>Le data mining</strong> est une science fascinante qui consiste à découvrir des patterns intéressants,
+                    des modèles et d'autres formes de connaissance dans de vastes ensembles de données. Imaginez que vous travaillez
+                    dans un supermarché et que vous avez accès à un million de tickets de caisse. Le data mining vous permettrait
+                    de découvrir des patterns comme : "Les clients qui achètent du beurre achètent aussi du pain" ou "Les ventes de
+                    glace augmentent lors des journées chaudes".
+                </p>
+                <p>
+                    Dans ce cours, nous explorons les techniques essentielles pour identifier ces patterns cachés, analyser leur
+                    pertinence et les utiliser pour prendre des décisions intelligentes. Du mining de patterns fréquents à la
+                    classification en passant par le graph mining, vous maîtriserez les algorithmes qui font fonctionner les systèmes
+                    de recommandation, les analyses de fraude et les insights métier modernes.
+                </p>
+                <p>
+                    Le data mining combine mathématiques, informatique et expertise du domaine pour transformer des données brutes
+                    en connaissance actionable. C'est la clé pour débloquer la valeur cachée dans vos données.
+                </p>
+            </article>
+        </section>
+
+        <section id="chapters">
+            <div class="section-header">
+                <h2>Chapitres du cours</h2>
+            </div>
+
+            <div class="chapters-grid">
+                <!-- Chapter 1 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 1</span>
+                    <h3>Introduction</h3>
+                    <p>Fondamentaux du data mining. Types de données, types d'analyses et défis du cours pour bien démarrer.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">Types de données</span>
+                        <span class="tag">Défis</span>
+                    </div>
+                    <a href="ch1_introduction.html" class="chapter-button">Commencer →</a>
+                </article>
+
+                <!-- Chapter 2 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 2</span>
+                    <h3>Frequent Itemset Mining — Bases</h3>
+                    <p>Découvrez les algorithmes fondamentaux pour trouver les patterns fréquents dans les données transactionnelles.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">Apriori</span>
+                        <span class="tag">FP-Growth</span>
+                        <span class="tag">Associations</span>
+                    </div>
+                    <a href="ch2_frequent_itemsets.html" class="chapter-button">Commencer →</a>
+                </article>
+
+                <!-- Chapter 3 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 3</span>
+                    <h3>Patterns Intéressants & Autres Types</h3>
+                    <p>Au-delà de la fréquence : mesures de corrélation, patterns fermés et maximaux, patterns rares.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">Lift</span>
+                        <span class="tag">Chi-Carré</span>
+                        <span class="tag">Patterns fermés</span>
+                    </div>
+                    <a href="ch3_interesting_patterns.html" class="chapter-button">Commencer →</a>
+                </article>
+
+                <!-- Chapter 4 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 4</span>
+                    <h3>Patterns Compressés & Contraintes</h3>
+                    <p>Optimisation avec contraintes. Patterns maximaux, fermés et programmation par contraintes.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">CP</span>
+                        <span class="tag">Optimisation</span>
+                        <span class="tag">Contraintes</span>
+                    </div>
+                    <a href="ch4_compressed_constraints.html" class="chapter-button">Commencer →</a>
+                </article>
+
+                <!-- Chapter 5 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 5</span>
+                    <h3>Sequence Mining</h3>
+                    <p>Analyser l'ordre des événements. GSP, SPADE, PrefixSpan et patterns séquentiels contraints.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">Séquences</span>
+                        <span class="tag">GSP</span>
+                        <span class="tag">Temps</span>
+                    </div>
+                    <a href="ch5_sequence_mining.html" class="chapter-button">Commencer →</a>
+                </article>
+
+                <!-- Chapter 6 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 6</span>
+                    <h3>Graph Mining</h3>
+                    <p>Extraction de sous-graphes fréquents. Approches Apriori et pattern-growth, algorithme gSpan.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">Graphes</span>
+                        <span class="tag">gSpan</span>
+                        <span class="tag">Réseaux</span>
+                    </div>
+                    <a href="ch6_graph_mining.html" class="chapter-button">Commencer →</a>
+                </article>
+
+                <!-- Chapter 7 -->
+                <article class="chapter-card">
+                    <span class="chapter-badge">Chapitre 7</span>
+                    <h3>Classification</h3>
+                    <p>Prédiction et classification. Classifieurs, arbres de décision, règles et classification associative.</p>
+                    <div class="chapter-tags">
+                        <span class="tag">Prédiction</span>
+                        <span class="tag">Arbres</span>
+                        <span class="tag">Règles</span>
+                    </div>
+                    <a href="ch7_classification.html" class="chapter-button">Commencer →</a>
+                </article>
+            </div>
+        </section>
+
+        <section id="roadmap" class="timeline-section">
+            <div class="section-header">
+                <h2>Plan du cours</h2>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot">1</div>
+                    <div class="timeline-content">
+                        <h4>Fondamentaux & Types de données</h4>
+                        <p>Comprendre ce qu'est le data mining, les types de données et les défis de ce domaine fascinant.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">2</div>
+                    <div class="timeline-content">
+                        <h4>Frequent Itemset Mining</h4>
+                        <p>Les algorithmes classiques Apriori, FP-Growth et ECLAT pour découvrir les patterns fréquents.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">3</div>
+                    <div class="timeline-content">
+                        <h4>Patterns Intéressants</h4>
+                        <p>Aller au-delà de la fréquence avec des mesures de corrélation et des types de patterns spécialisés.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">4</div>
+                    <div class="timeline-content">
+                        <h4>Optimisation & Contraintes</h4>
+                        <p>Techniques avancées de compression et d'optimisation avec programmation par contraintes.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">5</div>
+                    <div class="timeline-content">
+                        <h4>Sequence Mining</h4>
+                        <p>Analyser des séquences et des patterns temporels avec les algorithmes modernes.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">6</div>
+                    <div class="timeline-content">
+                        <h4>Graph Mining</h4>
+                        <p>Extraire des sous-graphes fréquents dans les réseaux et les structures complexes.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">7</div>
+                    <div class="timeline-content">
+                        <h4>Classification & Prédiction</h4>
+                        <p>Utiliser les patterns pour faire des prédictions et construire des classifieurs performants.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="footer-info">Prof. Hélène Verhaeghe · UCLouvain · 2025-26 Q2</div>
+    </footer>
+</body>
+</html>
