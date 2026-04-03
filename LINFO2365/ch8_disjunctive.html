@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 8 — Ordonnancement Disjonctif</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; }
+  .math-block table { border-collapse:collapse; width:100%; margin:12px 0; font-size:0.88rem; }
+  .math-block table th { background:#d1fae5; color:#065f46; padding:6px 12px; text-align:left; }
+  .math-block table td { padding:6px 12px; border-bottom:1px solid #d1fae5; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .theory-box code { background:#dbeafe; padding:2px 6px; border-radius:4px; font-size:0.88em; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  .controls { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:16px; align-items:flex-start; }
+  .control-group { display:flex; flex-direction:column; gap:4px; min-width:120px; }
+  .control-group label { font-size:0.82rem; font-weight:600; color:var(--gray); }
+  .control-group input[type=range] { accent-color:var(--teal); }
+  .control-group .val { font-weight:700; color:var(--teal); }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .btn-amber { background:var(--amber); color:var(--navy); }
+  .btn-amber:hover { background:#d97706; }
+  pre { background:#1e293b; color:#e2e8f0; border-radius:10px; padding:18px 20px; overflow-x:auto; font-size:0.82rem; line-height:1.6; margin:12px 0; }
+  code { font-family:'Courier New',monospace; }
+  .algo-box { background:#f1f5f9; border-left:4px solid var(--navy); border-radius:8px; padding:16px 20px; margin:12px 0; font-family:monospace; font-size:0.85rem; line-height:1.7; color:#1e293b; }
+  .tag-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .tag { background:var(--light); color:var(--teal); border:1px solid var(--teal); border-radius:20px; font-size:0.73rem; font-weight:600; padding:2px 10px; }
+  .complexity-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:0.88rem; }
+  .complexity-table th { background:var(--navy); color:white; padding:8px 14px; text-align:left; }
+  .complexity-table td { padding:8px 14px; border-bottom:1px solid #e2e8f0; }
+  .complexity-table tr:nth-child(even) td { background:#f8fafc; }
+  canvas { max-width:100%; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+  .alert { background:#fef2f2; border-left:5px solid #ef4444; border-radius:10px; padding:16px 20px; margin-bottom:16px; color:#7f1d1d; }
+  .alert strong { color:#991b1b; }
+  .success { background:#f0fdf4; border-left:5px solid #22c55e; border-radius:10px; padding:16px 20px; margin-bottom:16px; color:#14532d; }
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 8 — Ordonnancement Disjonctif</h1>
+      <p>Contrainte Disjunctive, Θ-Tree, Overload Checking et Detectable Precedences</p>
+      <span class="chapter-badge">Chapitre 8 / 9</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- INTRO JOB SHOP -->
+<div class="section">
+  <h2>🔧 Le Problème de Job Shop</h2>
+  <div class="explain-intro">
+    <span class="badge">🧒 C'est quoi le Job Shop ?</span>
+    <p>Le <strong>Job Shop</strong> est un problème d'ordonnancement classique : plusieurs jobs doivent être traités par plusieurs machines, dans un ordre précis. Chaque machine ne peut traiter qu'<strong>un seul job à la fois</strong> (ressource disjonctive, capacité 1).</p>
+    <p><strong>Exemple :</strong> Une usine avec 3 machines M1, M2, M3, et 3 jobs. Job 1 nécessite M1 puis M2 puis M3 dans cet ordre, avec des contraintes de précédence entre tâches d'un même job.</p>
+    <div class="retenir">💡 La contrainte Disjunctive est un cas particulier de Cumulative avec toutes les demandes rᵢ = 1 et une capacité C = 1.</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">🏭</div><h4>Activités</h4><p>Chaque tâche a un début s[i], durée d[i], fin e[i] = s[i]+d[i]</p></div>
+    <div class="icon-item"><div class="icon">🔴</div><h4>Ressource unaire</h4><p>Une machine = une ressource de capacité 1 (une tâche à la fois)</p></div>
+    <div class="icon-item"><div class="icon">➡️</div><h4>Précédences</h4><p>Les tâches d'un même job doivent s'exécuter dans l'ordre imposé</p></div>
+    <div class="icon-item"><div class="icon">🎯</div><h4>Makespan</h4><p>Objectif : minimiser la durée totale = maximum des dates de fin</p></div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Modèle MiniCP du Job Shop</span>
+    <p class="phrase">Chaque machine reçoit une contrainte Disjunctive sur ses activités :</p>
+    <pre><code>// Variables de début et de fin pour chaque tâche
+IntVar[][] start = new IntVar[nJobs][nMachines];
+IntVar[][] end   = new IntVar[nJobs][nMachines];
+
+// Contraintes de précédence entre tâches d'un même job
+for (int i = 0; i &lt; nJobs; i++)
+  for (int j = 1; j &lt; nMachines; j++)
+    cp.post(lessOrEqual(end[i][j-1], start[i][j]));
+
+// Contrainte disjonctive sur chaque machine
+for (int m = 0; m &lt; nMachines; m++) {
+  IntVar[] start_m = collect(start, m);
+  int[]    dur_m   = collect(duration, m);
+  cp.post(new Disjunctive(start_m, dur_m));
+}
+
+// Objectif = minimiser le makespan
+IntVar makespan = maximum(endLast);
+cp.minimize(makespan);</code></pre>
+  </div>
+</div>
+
+<!-- DECOMPOSITION BINAIRE -->
+<div class="section">
+  <h2>🔀 Décomposition Binaire</h2>
+  <div class="explain-intro">
+    <span class="badge">🧩 Idée de base</span>
+    <p>Pour un ensemble T de n activités non-chevauchantes, on peut imposer que pour toute paire (i,j) avec i &lt; j, soit i se termine avant j, soit j se termine avant i :</p>
+    <p><strong>∀ i, j ∈ T avec i &lt; j : bᵢⱼ ≠ bⱼᵢ</strong></p>
+    <p>où bᵢⱼ est une variable booléenne réifiée : bᵢⱼ = 1 signifie "i finit avant que j commence".</p>
+    <div class="retenir">⚠️ La décomposition binaire avec contraintes réifiées est <strong>au moins aussi forte</strong> que le filtrage TimeTable du Cumulatif, mais elle génère O(n²) contraintes.</div>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Pourquoi la décomposition binaire peut être plus forte ?</strong></p>
+    <p>Exemple : si l'activité A n'a pas de partie obligatoire, le filtrage TimeTable ne peut pas pousser le début de B. Mais la décomposition binaire peut détecter que A ≪ B est forcé.</p>
+    <p><strong>Recherche sur les variables de booléens :</strong> On peut brancher sur les variables bᵢⱼ (l'ordre entre chaque paire) plutôt que sur les dates de début. Cela fixe d'abord l'ordonnancement sur chaque machine, puis les dates de début.</p>
+  </div>
+
+  <div class="demo-box">
+    <h3>🔍 Deux stratégies de recherche pour le Job Shop</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div style="background:#eff6ff;border-radius:8px;padding:16px;">
+        <h4 style="color:var(--navy);margin-bottom:8px;">Stratégie 1 : Fixer les dates de début</h4>
+        <p style="font-size:0.85rem;color:var(--gray);line-height:1.6;">On choisit une activité non fixée (ex. B), on branche sur une valeur de son début. Plus direct, mais peut conduire à beaucoup de retours arrière.</p>
+      </div>
+      <div style="background:#f0fdf4;border-radius:8px;padding:16px;">
+        <h4 style="color:#065f46;margin-bottom:8px;">Stratégie 2 : Fixer l'ordre (recommandée)</h4>
+        <p style="font-size:0.85rem;color:var(--gray);line-height:1.6;">On branche sur les variables bᵢⱼ. Une fois l'ordre total fixé sur chaque machine, le makespan minimum est calculable directement (toujours faisable).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EARLIEST COMPLETION TIME -->
+<div class="section">
+  <h2>⏱️ Earliest Completion Time (ECT)</h2>
+  <div class="explain-intro">
+    <span class="badge">🎯 Notion clé</span>
+    <p>Pour un ensemble Ω d'activités non-chevauchantes, on définit :</p>
+    <p>• <strong>estΩ</strong> = min{estⱼ | j ∈ Ω} = plus tôt début possible de l'ensemble</p>
+    <p>• <strong>lctΩ</strong> = max{lctⱼ | j ∈ Ω} = plus tard fin possible de l'ensemble</p>
+    <p>• <strong>dΩ</strong> = Σⱼ dⱼ = durée totale de l'ensemble</p>
+    <p>• <strong>ectΩ</strong> = borne inférieure sur la date de fin au plus tôt de l'ensemble</p>
+    <div class="retenir">💡 Si A, B, C, D doivent tous précéder E, alors E ne peut pas commencer avant ect({A,B,C,D}). Cette propriété permet de filtrer le début de E !</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Calcul de ECT en O(n log n)</span>
+    <p class="phrase">Borne inférieure sur l'ECT d'un ensemble Ω :</p>
+    <div style="text-align:center;margin:16px 0;font-size:1.1rem;color:#065f46;">
+      ectΩ<sup>LB</sup> = max{ estΩ' + dΩ' | Ω' ⊆ Ω }
+    </div>
+    <p class="phrase">Algorithme glouton (tri par est, puis greedy) :</p>
+    <div class="algo-box">
+ComputeECTLowerBound(T) {<br>
+&nbsp;&nbsp;T_sorted ← sortAZ(T, sortKey = est)  // O(n log n)<br>
+&nbsp;&nbsp;ect = -∞<br>
+&nbsp;&nbsp;for i ← T_sorted {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ect ← max(estᵢ + dᵢ, ect + dᵢ)<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;return ect<br>
+}
+    </div>
+    <p style="color:#065f46;margin-top:8px;">📌 Calculer ECT pour tous les sous-ensembles en O(n²) serait trop coûteux → on utilise la structure <strong>Θ-Tree</strong> pour le faire en O(n log n).</p>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Complexité NP-difficile !</strong></p>
+    <p>Le calcul exact de l'ECT pour des activités avec fenêtres de temps est NP-difficile (réduction depuis le problème 3-Partition). La borne inférieure vue ci-dessus est donc cruciale : elle est calculable en O(n log n) tout en restant utile pour le filtrage.</p>
+  </div>
+</div>
+
+<!-- THETA-TREE -->
+<div class="section">
+  <h2>🌲 Structure Θ-Tree</h2>
+  <div class="explain-intro">
+    <span class="badge">🔢 Structure de données avancée</span>
+    <p>Le <strong>Θ-Tree</strong> est un arbre binaire équilibré permettant de calculer efficacement l'ECT d'un ensemble d'activités et ses sous-ensembles imbriqués.</p>
+    <p>C'est un <strong>arbre binaire équilibré</strong> dont les feuilles correspondent aux activités (triées par est), et dont les nœuds internes maintiennent des valeurs Δ et ect intermédiaires.</p>
+    <div class="retenir">💡 La racine du Θ-Tree contient directement l'ECT de l'ensemble complet des activités insérées !</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">⚡ Complexités du Θ-Tree</span>
+    <table>
+      <tr><th>Opération</th><th>Complexité</th><th>Description</th></tr>
+      <tr><td><code>init({1..n})</code></td><td>O(n log n)</td><td>Initialiser un Θ-Tree vide pour n activités</td></tr>
+      <tr><td><code>insert(i)</code></td><td>O(log n)</td><td>Insérer l'activité i dans le Θ-Tree</td></tr>
+      <tr><td><code>remove(i)</code></td><td>O(log n)</td><td>Retirer l'activité i (set Δᵢ=0, ectᵢ=−∞)</td></tr>
+      <tr><td><code>ect</code></td><td>O(1)</td><td>Lire l'ECT de l'ensemble courant (à la racine)</td></tr>
+    </table>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Pourquoi a-t-on besoin du Θ-Tree ?</strong></p>
+    <p>Pour les algorithmes de filtrage (Overload Checking, Detectable Precedences, Not-Last), on doit calculer l'ECT de <em>nombreux sous-ensembles imbriqués</em> d'activités. Sans Θ-Tree, chaque calcul prend O(n log n), donc l'algorithme total prendrait O(n² log n). Avec le Θ-Tree et son insertion/suppression en O(log n), l'algorithme complet s'exécute en <strong>O(n log n)</strong>.</p>
+    <p>Chaque nœud interne du Θ-Tree stocke :</p>
+    <p>• <strong>Δ</strong> = durée totale des activités dans le sous-arbre</p>
+    <p>• <strong>ect</strong> = ECT de l'ensemble des activités dans le sous-arbre</p>
+    <p>Ces valeurs se mettent à jour en remontant vers la racine après chaque insertion/suppression.</p>
+  </div>
+</div>
+
+<!-- OVERLOAD CHECKING -->
+<div class="section">
+  <h2>🚨 Overload Checking (Vérification de surcharge)</h2>
+  <div class="explain-intro">
+    <span class="badge">✅ Règle de faisabilité</span>
+    <p>L'<strong>Overload Checking</strong> est une règle de faisabilité : si un sous-ensemble d'activités ne peut pas toutes s'exécuter dans leurs fenêtres de temps, on détecte un échec.</p>
+    <p><strong>Règle :</strong> ∀ Ω ⊆ T : (estΩ + dΩ > lctΩ) → ÉCHEC</p>
+    <p>Si les activités d'un sous-ensemble Ω ont une durée totale qui dépasse leur fenêtre de temps commune, c'est infaisable !</p>
+    <div class="retenir">⚠️ Cette règle n'est <strong>pas capturée</strong> par la décomposition binaire seule — elle nécessite une vue globale de l'ensemble des activités.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">⚡ Algorithme efficace en O(n log n)</span>
+    <p class="phrase">Reformulation : au lieu de tester tous les 2ⁿ sous-ensembles, on utilise les "Left Cuts" :</p>
+    <p style="color:#065f46;margin-bottom:8px;">LCut(T,j) = { i | i ∈ T &amp; lctᵢ ≤ lctⱼ }</p>
+    <p style="color:#065f46;margin-bottom:8px;">La condition se reformule en : ∀ j ∈ T : ectLCut(T,j) > lctⱼ → ÉCHEC</p>
+    <div class="algo-box">
+OverloadCheckEfficient(T={1..n}) {<br>
+&nbsp;&nbsp;T ← sortAZ([1..n], sortKey = lct)  // O(n log n)<br>
+&nbsp;&nbsp;Θ ← Θ-Tree.init({1..n})             // O(n log n)<br>
+&nbsp;&nbsp;for (j ← T) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Θ.insert(j)                      // O(log n) — invariant: Θ contient LCut(T,j)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if (Θ.ect > lctⱼ) {             // O(1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw InconsistencyException  // ÉCHEC !<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}
+    </div>
+    <p style="color:#065f46;margin-top:8px;"><strong>Complexité totale : O(n log n)</strong> — on trie une fois, puis on fait n insertions et n vérifications.</p>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Intuition :</strong> On trie les activités par lct croissant. En insérant les activités une par une, on construit progressivement LCut(T,j) de façon incrémentale. Le Θ-Tree nous donne ect de l'ensemble courant en O(1). Si ect > lctⱼ, c'est un surcharge : fail !</p>
+  </div>
+</div>
+
+<!-- DETECTABLE PRECEDENCES -->
+<div class="section">
+  <h2>🔗 Detectable Precedences (Précédences Détectables)</h2>
+  <div class="explain-intro">
+    <span class="badge">🧩 Règle de filtrage</span>
+    <p>Les <strong>Detectable Precedences</strong> sont une règle de filtrage : si on peut déduire que certaines activités <em>doivent</em> précéder l'activité i (parce qu'elles ne peuvent pas se placer après), on peut pousser le début de i.</p>
+    <p>Une précédence j ≪ i est <strong>détectable</strong> si :</p>
+    <p style="text-align:center;font-weight:700;color:#78350f;">estᵢ + dᵢ > lctⱼ − dⱼ &nbsp;(c.-à-d. ectᵢ > lstⱼ)</p>
+    <p>Autrement dit : j ne peut pas commencer après que i se termine, donc j doit précéder i.</p>
+    <div class="retenir">💡 Filtrage : pour chaque i ∈ T, on pousse estᵢ ← max(estᵢ, ectDPrec(T,i)) où DPrec(T,i) est l'ensemble des activités détectées comme devant précéder i.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">⚡ Algorithme en O(n log n)</span>
+    <p class="phrase">On trie les activités par ect croissant pour avoir des ensembles DPrec imbriqués :</p>
+    <div class="algo-box">
+DetectablePrecedence(T={1..n}) {<br>
+&nbsp;&nbsp;Tlst ← sortAZ([1..n], sortKey = lct−d)   // O(n log n)<br>
+&nbsp;&nbsp;Tect ← sortAZ([1..n], sortKey = est+d)   // O(n log n)<br>
+&nbsp;&nbsp;ite ← iterator(Tlst)<br>
+&nbsp;&nbsp;j ← ite.next()  // candidat précédant i<br>
+&nbsp;&nbsp;Θ ← Θ-Tree.init({1..n})                   // O(n log n)<br>
+&nbsp;&nbsp;for (i ← Tect) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;while (estᵢ + dᵢ > lctⱼ − dⱼ) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Θ.insert(j)                           // O(log n)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (ite.hasNext()) j ← ite.next()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else break<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;// Θ contient DPrec'(T,i) incluant i<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Θ.remove(i)  // O(log n)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;est'ᵢ ← max(estᵢ, Θ.ect)                // O(1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Θ.insert(i)  // O(log n)<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;estᵢ ← est'ᵢ, ∀i ∈ T  // mise à jour simultanée<br>
+}
+    </div>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Pourquoi les ensembles DPrec sont-ils imbriqués ?</strong></p>
+    <p>En triant les activités i par ordre croissant de estᵢ + dᵢ (= ectᵢ), les ensembles DPrec'(T,i) forment une séquence croissante : DPrec'(T,1) ⊆ DPrec'(T,2) ⊆ … ⊆ DPrec'(T,n). Cela permet d'insérer les activités dans le Θ-Tree de façon <em>incrémentale</em> sans jamais avoir à tout reconstruire.</p>
+  </div>
+</div>
+
+<!-- NOT-LAST -->
+<div class="section">
+  <h2>🚫 Not-Last (Règle "Pas en Dernier")</h2>
+  <div class="explain-intro">
+    <span class="badge">🔄 Règle symétrique</span>
+    <p>La règle <strong>Not-Last</strong> est le symétrique des Detectable Precedences : si un ensemble Ω d'activités ne peut pas toutes se placer <em>après</em> i (car elles rempliraient le temps disponible), alors i ne peut pas être la <em>dernière</em> activité.</p>
+    <p><strong>Règle (NL) :</strong> ∀ Ω ⊂ T non-vide, ∀ i ∈ T\Ω :</p>
+    <p style="text-align:center;font-weight:700;color:#78350f;">estΩ + dΩ > lctᵢ − dᵢ → lctᵢ ← min(lctᵢ, max{lctⱼ − dⱼ | j ∈ Ω})</p>
+    <div class="retenir">💡 On filtre la date de fin au plus tard de i (on la réduit). La règle relaxée NL' est équivalente au fixpoint : ectNLSet(T,i) > lctᵢ − dᵢ → lctᵢ ← max{lctⱼ − dⱼ | j ∈ NLSet(T,i)}</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 NLSet et imbrication</span>
+    <p class="phrase">NLSet(T,i) = { j | j ∈ T\{i} &amp; lctⱼ − dⱼ &lt; lctᵢ }</p>
+    <p style="color:#065f46;margin-bottom:8px;">En triant les activités i par lct croissant, les ensembles NLSet'(T,i) sont imbriqués → on peut utiliser un Θ-Tree de façon incrémentale.</p>
+    <p style="color:#065f46;">Complexité totale de l'algorithme Not-Last : <strong>O(n log n)</strong></p>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">🔍</div><h4>Overload Check</h4><p>Vérifie la faisabilité globale — détecte si c'est impossible</p></div>
+    <div class="icon-item"><div class="icon">➡️</div><h4>Det. Precedences</h4><p>Pousse estᵢ vers le haut — filtre le début au plus tôt</p></div>
+    <div class="icon-item"><div class="icon">⬅️</div><h4>Not-Last</h4><p>Pousse lctᵢ vers le bas — filtre la fin au plus tard</p></div>
+    <div class="icon-item"><div class="icon">🌲</div><h4>Θ-Tree</h4><p>Structure de données commune — O(log n) par opération</p></div>
+  </div>
+
+  <div class="demo-box">
+    <h3>📊 Démo Interactive — Overload Checking</h3>
+    <p style="color:var(--gray);font-size:0.88rem;margin-bottom:16px;">Crée des activités et vérifie si elles peuvent toutes s'exécuter dans leurs fenêtres de temps.</p>
+    <div class="controls">
+      <div class="control-group">
+        <label>Nombre d'activités</label>
+        <input type="range" min="2" max="6" value="3" id="nAct" oninput="updateDemo()">
+        <span class="val" id="nActVal">3</span>
+      </div>
+    </div>
+    <div id="actTable"></div>
+    <button class="btn" style="margin-top:12px;" onclick="checkOverload()">🔍 Vérifier Overload</button>
+    <div id="overloadResult" style="margin-top:12px;"></div>
+    <canvas id="ganttCanvas" height="120" style="margin-top:16px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;"></canvas>
+  </div>
+</div>
+
+<!-- RECAP -->
+<div class="section">
+  <h2>📋 Récapitulatif — Filtrage Disjonctif</h2>
+  <div class="theory-box">
+    <p><strong>Les 3 règles de filtrage pour Disjunctive, toutes en O(n log n) via Θ-Tree :</strong></p>
+    <p>1. <strong>Overload Checking</strong> : détecte l'infaisabilité si ectLCut(T,j) > lctⱼ pour un j quelconque.</p>
+    <p>2. <strong>Detectable Precedences</strong> : filtre estᵢ (borne inférieure) en utilisant DPrec(T,i).</p>
+    <p>3. <strong>Not-Last</strong> : filtre lctᵢ (borne supérieure) en utilisant NLSet(T,i).</p>
+  </div>
+  <div class="tag-row">
+    <span class="tag">Job Shop</span>
+    <span class="tag">Disjunctive</span>
+    <span class="tag">Θ-Tree</span>
+    <span class="tag">Overload Check</span>
+    <span class="tag">Det. Precedences</span>
+    <span class="tag">Not-Last</span>
+    <span class="tag">O(n log n)</span>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 8 : Ordonnancement Disjonctif
+</footer>
+
+<script>
+// Demo overload checking
+function updateDemo() {
+  const n = parseInt(document.getElementById('nAct').value);
+  document.getElementById('nActVal').textContent = n;
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:8px;">';
+  html += '<tr style="background:var(--navy);color:white;"><th style="padding:8px;">Activité</th><th style="padding:8px;">est (début ≥)</th><th style="padding:8px;">lct (fin ≤)</th><th style="padding:8px;">Durée d</th></tr>';
+  const defaults = [[0,13,5],[0,14,6],[2,15,5],[0,10,3],[3,12,4],[1,11,3]];
+  for (let i = 0; i < n; i++) {
+    const d = defaults[i] || [0, 20, 4];
+    html += `<tr style="border-bottom:1px solid #e2e8f0;">
+      <td style="padding:8px;font-weight:700;color:var(--navy);">${String.fromCharCode(65+i)}</td>
+      <td style="padding:8px;"><input type="number" id="est${i}" value="${d[0]}" min="0" max="30" style="width:60px;padding:4px;border:1px solid #e2e8f0;border-radius:4px;"></td>
+      <td style="padding:8px;"><input type="number" id="lct${i}" value="${d[1]}" min="1" max="40" style="width:60px;padding:4px;border:1px solid #e2e8f0;border-radius:4px;"></td>
+      <td style="padding:8px;"><input type="number" id="dur${i}" value="${d[2]}" min="1" max="15" style="width:60px;padding:4px;border:1px solid #e2e8f0;border-radius:4px;"></td>
+    </tr>`;
+  }
+  html += '</table>';
+  document.getElementById('actTable').innerHTML = html;
+  document.getElementById('overloadResult').innerHTML = '';
+  drawGantt();
+}
+
+function checkOverload() {
+  const n = parseInt(document.getElementById('nAct').value);
+  const acts = [];
+  for (let i = 0; i < n; i++) {
+    acts.push({
+      name: String.fromCharCode(65+i),
+      est: parseInt(document.getElementById('est'+i).value),
+      lct: parseInt(document.getElementById('lct'+i).value),
+      d:   parseInt(document.getElementById('dur'+i).value)
+    });
+  }
+  // Sort by lct
+  const sorted = [...acts].sort((a,b) => a.lct - b.lct);
+  let fail = false, failMsg = '';
+  // Simple overload check: for each j, check ect of {i | lct_i <= lct_j}
+  for (let j = 0; j < sorted.length; j++) {
+    const lctj = sorted[j].lct;
+    const subset = acts.filter(a => a.lct <= lctj);
+    // Compute ECT lower bound
+    const subSorted = [...subset].sort((a,b) => a.est - b.est);
+    let ect = -Infinity;
+    for (const a of subSorted) ect = Math.max(a.est + a.d, ect + a.d);
+    if (ect > lctj) {
+      fail = true;
+      const names = subset.map(a=>a.name).join(',');
+      failMsg = `<div class="alert"><strong>❌ Overload détecté !</strong> Le sous-ensemble {${names}} a ect=${ect} > lct${sorted[j].name}=${lctj}. Impossible de planifier !</div>`;
+      break;
+    }
+  }
+  if (!fail) {
+    failMsg = '<div class="success"><strong>✅ Pas d\'overload !</strong> Toutes les Left Cuts sont faisables. La contrainte n\'est pas violée par cette règle.</div>';
+  }
+  document.getElementById('overloadResult').innerHTML = failMsg;
+  drawGantt();
+}
+
+function drawGantt() {
+  const n = parseInt(document.getElementById('nAct').value);
+  const canvas = document.getElementById('ganttCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 600;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const acts = [];
+  let maxT = 0;
+  for (let i = 0; i < n; i++) {
+    const est = parseInt(document.getElementById('est'+i)?.value || 0);
+    const lct = parseInt(document.getElementById('lct'+i)?.value || 20);
+    const d   = parseInt(document.getElementById('dur'+i)?.value || 4);
+    acts.push({name: String.fromCharCode(65+i), est, lct, d});
+    maxT = Math.max(maxT, lct);
+  }
+
+  const margin = 40, rowH = 22, colors = ['#0D9488','#F59E0B','#1E3A5F','#ef4444','#8b5cf6','#06b6d4'];
+  const W = canvas.width - margin - 10, H = canvas.height;
+  const scale = W / (maxT + 1);
+
+  acts.forEach((a, i) => {
+    const y = 10 + i * rowH;
+    // Window
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillRect(margin + a.est * scale, y, (a.lct - a.est) * scale, rowH - 4);
+    // Duration bar
+    ctx.fillStyle = colors[i % colors.length] + 'cc';
+    ctx.fillRect(margin + a.est * scale, y, a.d * scale, rowH - 4);
+    // Label
+    ctx.fillStyle = '#1e293b';
+    ctx.font = '11px Segoe UI';
+    ctx.fillText(a.name, 4, y + 14);
+  });
+
+  // Time axis
+  ctx.fillStyle = '#64748b';
+  ctx.font = '10px Segoe UI';
+  for (let t = 0; t <= maxT; t += Math.max(1, Math.floor(maxT/10))) {
+    ctx.fillText(t, margin + t * scale - 3, H - 5);
+  }
+}
+
+window.onload = () => { updateDemo(); };
+window.onresize = drawGantt;
+
+// KaTeX auto-render
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+});
+</script>
+</body>
+</html>

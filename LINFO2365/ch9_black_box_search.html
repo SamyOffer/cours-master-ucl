@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre 9 — Recherche Black-Box</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+  :root { --navy:#1E3A5F; --teal:#0D9488; --amber:#F59E0B; --light:#EFF6FF; --white:#FFFFFF; --gray:#64748B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:#1e293b; }
+  header { background:var(--navy); color:white; border-bottom:5px solid var(--amber); }
+  .header-inner { display:flex; align-items:center; }
+  .header-stripe { width:10px; background:var(--amber); align-self:stretch; flex-shrink:0; }
+  .header-stripe2 { width:6px; background:var(--teal); align-self:stretch; flex-shrink:0; margin-left:4px; }
+  .header-content { padding:24px 36px; }
+  .breadcrumb { font-size:0.85rem; color:#93c5fd; margin-bottom:8px; }
+  .breadcrumb a { color:#93c5fd; text-decoration:none; }
+  .breadcrumb a:hover { color:white; }
+  .header-content h1 { font-size:1.9rem; font-weight:800; }
+  .header-content p { color:#93c5fd; margin-top:6px; }
+  .chapter-badge { display:inline-block; background:var(--amber); color:var(--navy); font-weight:700; font-size:0.78rem; padding:3px 12px; border-radius:20px; margin-top:10px; }
+  main { max-width:960px; margin:0 auto; padding:36px 24px; }
+  .section { background:var(--white); border-radius:14px; box-shadow:0 2px 12px rgba(30,58,95,0.07); padding:32px; margin-bottom:28px; }
+  .section h2 { color:var(--navy); font-size:1.35rem; font-weight:700; margin-bottom:18px; padding-bottom:10px; border-bottom:2px solid var(--light); }
+  .explain-intro { background:#fffbeb; border-left:5px solid var(--amber); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .explain-intro .badge { display:inline-block; background:var(--amber); color:#92400e; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .explain-intro p { color:#78350f; line-height:1.7; margin-bottom:8px; }
+  .explain-intro .retenir { background:#fef3c7; border-radius:8px; padding:12px 16px; margin-top:12px; font-weight:600; color:#92400e; }
+  .math-block { background:#f0fdf4; border-left:5px solid var(--teal); border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .math-block .badge { display:inline-block; background:var(--teal); color:white; font-weight:700; font-size:0.75rem; padding:2px 10px; border-radius:12px; margin-bottom:10px; }
+  .math-block .phrase { color:#065f46; font-style:italic; margin-bottom:12px; }
+  .theory-box { background:#eff6ff; border-left:5px solid var(--navy); border-radius:10px; padding:18px 22px; margin-bottom:16px; }
+  .theory-box p { color:#1e3a5f; line-height:1.7; margin-bottom:6px; }
+  .icon-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; margin:16px 0; }
+  .icon-item { background:white; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; text-align:center; }
+  .icon-item .icon { font-size:2rem; margin-bottom:8px; }
+  .icon-item h4 { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .icon-item p { font-size:0.78rem; color:var(--gray); }
+  .steps { counter-reset:step; list-style:none; padding:0; margin:14px 0; }
+  .steps li { counter-increment:step; display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .steps li::before { content:counter(step); background:var(--teal); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .steps li p { color:#334155; line-height:1.6; }
+  .demo-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:24px; margin-top:16px; }
+  .demo-box h3 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:16px; }
+  pre { background:#1e293b; color:#e2e8f0; border-radius:10px; padding:18px 20px; overflow-x:auto; font-size:0.82rem; line-height:1.6; margin:12px 0; }
+  code { font-family:'Courier New',monospace; }
+  .algo-box { background:#f1f5f9; border-left:4px solid var(--navy); border-radius:8px; padding:16px 20px; margin:12px 0; font-family:monospace; font-size:0.85rem; line-height:1.7; color:#1e293b; }
+  .tag-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .tag { background:var(--light); color:var(--teal); border:1px solid var(--teal); border-radius:20px; font-size:0.73rem; font-weight:600; padding:2px 10px; }
+  .heuristic-card { background:white; border:1.5px solid #e2e8f0; border-radius:12px; padding:20px; margin-bottom:14px; }
+  .heuristic-card h4 { color:var(--navy); font-size:1rem; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .heuristic-card p { color:var(--gray); font-size:0.88rem; line-height:1.6; margin-bottom:6px; }
+  .heuristic-card .formula { background:#f0fdf4; border-radius:6px; padding:10px 14px; font-family:monospace; font-size:0.85rem; color:#065f46; margin-top:8px; }
+  .btn { background:var(--teal); color:white; border:none; border-radius:8px; padding:8px 18px; font-weight:600; cursor:pointer; font-size:0.88rem; transition:background 0.15s; }
+  .btn:hover { background:#0f766e; }
+  .comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
+  .cmp-box { border-radius:10px; padding:16px; }
+  .cmp-box h4 { font-size:0.9rem; font-weight:700; margin-bottom:8px; }
+  .cmp-box p { font-size:0.83rem; line-height:1.6; }
+  canvas { max-width:100%; }
+  footer { background:var(--navy); color:#93c5fd; text-align:center; padding:20px; font-size:0.85rem; margin-top:40px; }
+  footer strong { color:white; }
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+<header>
+  <div class="header-inner">
+    <div class="header-stripe"></div>
+    <div class="header-stripe2"></div>
+    <div class="header-content">
+      <div class="breadcrumb"><a href="index.html">← Retour à l'accueil</a></div>
+      <h1>Chapitre 9 — Recherche Black-Box</h1>
+      <p>Heuristiques de sélection de variables et valeurs, Discrepancy Search, Restarts</p>
+      <span class="chapter-badge">Chapitre 9 / 9</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- MOTIVATION -->
+<div class="section">
+  <h2>🎯 Motivation : Recherche Automatique</h2>
+  <div class="explain-intro">
+    <span class="badge">💡 Vision</span>
+    <p>Un programme CP = <strong>Modèle + Recherche</strong>. La vision (depuis ~2004) est que le solveur CP devrait être assez intelligent pour <em>apprendre</em> ou <em>sélectionner automatiquement</em> une bonne stratégie de recherche, sans que le programmeur ait à tout spécifier à la main.</p>
+    <p>C'est l'approche <strong>Black-Box</strong> : on donne le modèle au solveur, et c'est lui qui choisit comment brancher, dans quel ordre, avec quelle heuristique.</p>
+    <div class="retenir">💡 Le branchement = 2 étapes : (1) sélection de variable, (2) sélection de valeur + méthode de partition. Les deux ont un impact majeur sur la taille de l'arbre de recherche !</div>
+  </div>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">📊</div><h4>Taille de l'arbre</h4><p>La variable choisie influence la profondeur et la largeur</p></div>
+    <div class="icon-item"><div class="icon">📍</div><h4>Localisation solutions</h4><p>La valeur choisie détermine où les solutions se trouvent</p></div>
+    <div class="icon-item"><div class="icon">⚡</div><h4>Qualité de solution</h4><p>Pour COP, le premier nœud feuille atteint affecte le B&B</p></div>
+    <div class="icon-item"><div class="icon">🧠</div><h4>Apprentissage</h4><p>Certaines heuristiques "apprennent" pendant la recherche</p></div>
+  </div>
+</div>
+
+<!-- HEURISTIQUES DE VALEUR -->
+<div class="section">
+  <h2>🔢 Heuristiques de Sélection de Valeur</h2>
+  <div class="explain-intro">
+    <span class="badge">🎯 Pourquoi la valeur compte ?</span>
+    <p>Pour les problèmes d'<strong>optimisation (COP)</strong>, la première solution trouvée (côté gauche de l'arbre) est cruciale : elle fixe la borne pour le Branch-and-Bound. Une bonne valeur initiale = une meilleure borne = plus d'élagage = recherche plus rapide.</p>
+    <div class="retenir">💡 Pour la satisfaction (CSP), la sélection de valeur influence où les solutions se trouvent dans l'arbre. Pour l'optimisation, elle influence directement la qualité de la première solution trouvée.</div>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>🏆 BIVS — Bound-Impact Value Selector</h4>
+    <p>Pour chaque valeur possible de la variable sélectionnée, on calcule la borne inférieure de l'objectif après avoir fixé la variable à cette valeur. On choisit la valeur qui donne la <strong>plus petite borne inférieure</strong> (pour une minimisation).</p>
+    <p><strong>Algorithme :</strong> Pour chaque valeur v ∈ D(x) : sauvegarder l'état → fixer x=v → propagation → mesurer min(O) → restaurer l'état. Choisir le v avec le plus petit min(O).</p>
+    <div class="formula">Complexité : O(|D(x)| × coût_propagation) — coûteux mais efficace pour trouver de bonnes premières solutions.</div>
+    <p style="margin-top:8px;font-style:italic;color:var(--gray);">Conseil : utiliser BIVS uniquement pour la <em>première</em> solution, puis passer à une heuristique plus simple.</p>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>💾 Phase Saving</h4>
+    <p>Mécanisme de mémorisation simple et efficace : si fixer x = v a réussi (n'a pas mené à un échec), on mémorise v comme "dernière valeur réussie" de x.</p>
+    <p>Au prochain branchement sur x, on <strong>essaie d'abord v</strong>. Si v n'est plus dans le domaine, on utilise l'heuristique par défaut.</p>
+    <div class="formula">
+// Phase Saving implémenté en MiniCP :<br>
+selectMin(q, qi -> qi.size() > 1, qi -> qi.size(), qi -> {<br>
+&nbsp;&nbsp;int v = qi.min(); // ou la valeur sauvegardée<br>
+&nbsp;&nbsp;return branch(() -> equal(qi, v), () -> notEqual(qi, v));<br>
+})
+    </div>
+  </div>
+</div>
+
+<!-- HEURISTIQUES DE VARIABLE -->
+<div class="section">
+  <h2>🔍 Heuristiques de Sélection de Variable (First-Fail)</h2>
+  <div class="explain-intro">
+    <span class="badge">🧩 Principe First-Fail</span>
+    <p>Le principe <strong>First-Fail</strong> : "pour réussir, essaie d'abord là où tu es le plus susceptible d'échouer". En sélectionnant la variable la plus contrainte en premier, on détecte les impasses le plus tôt possible, minimisant le travail inutile.</p>
+    <div class="retenir">💡 Si toutes les variables doivent être fixées, autant détecter les impossibilités tôt ! Un échec détecté tôt dans l'arbre économise tout le sous-arbre en dessous.</div>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>📏 Min-Dom (Domaine Minimum)</h4>
+    <p>Sélectionner la variable non fixée avec le <strong>plus petit domaine</strong>.</p>
+    <p>Intuition : si D(x1) = {1,2} et D(x2) = {1,…,100}, brancher sur x1 d'abord déclenche plus de propagation.</p>
+    <div class="formula">
+// MiniCP — N-Reines avec Min-Dom :<br>
+DFSearch search = makeDfs(cp, () -> {<br>
+&nbsp;&nbsp;IntVar qs = selectMin(q, qi -> qi.size() > 1, qi -> qi.size());<br>
+&nbsp;&nbsp;if (qs == null) return EMPTY;<br>
+&nbsp;&nbsp;int v = qs.min();<br>
+&nbsp;&nbsp;return branch(() -> equal(qs, v), () -> notEqual(qs, v));<br>
+});
+    </div>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>🕸️ Dom+Deg et Dom/Deg</h4>
+    <p><strong>Degré</strong> d'une variable x = nombre de contraintes impliquant x. Une variable avec un degré élevé, lorsqu'elle est fixée, déclenche plus de propagations vers les autres variables.</p>
+    <p>• <strong>Dom+Deg</strong> : Min-Dom, avec ties brisés par le degré (plus grand degré = priorité).</p>
+    <p>• <strong>Dom/Deg</strong> : Sélectionner la variable avec le plus petit ratio |D(x)| / deg(x).</p>
+    <div class="formula">Heuristique combinée : variables avec petit domaine ET nombreux voisins contraints ont la priorité.</div>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>⚖️ Dom/Wdeg (Weighted Degree)</h4>
+    <p><strong>Idée :</strong> introduire de l'apprentissage. Chaque fois qu'une contrainte génère un échec (violation détectée pendant la propagation), son <strong>poids</strong> est augmenté de +1.</p>
+    <p>• <strong>Wdeg(x)</strong> = somme des poids des contraintes impliquant x ET au moins une autre variable non fixée.</p>
+    <p>• <strong>Dom/Wdeg</strong> : sélectionner la variable avec le plus petit ratio |D(x)| / Wdeg(x).</p>
+    <div class="formula">Si une contrainte C a souvent échoué par le passé, ses variables ont un Wdeg élevé → elles seront sélectionnées en priorité.</div>
+    <p style="margin-top:8px;font-style:italic;color:var(--gray);">Faiblesse : la contrainte qui échoue n'est pas toujours "la seule coupable" — les cascades de propagation peuvent induire en erreur.</p>
+  </div>
+</div>
+
+<!-- IMPACT-BASED & ACTIVITY-BASED -->
+<div class="section">
+  <h2>📉 Recherche par Impact et par Activité</h2>
+
+  <div class="heuristic-card">
+    <h4>🎯 Impact-Based Search (IBS)</h4>
+    <p>Idée : sélectionner la décision de branchement qui réduit le <strong>moins</strong> l'espace de recherche estimé (on préfère les décisions qui "élaguent" peu, car cela signifie qu'elles sont plus susceptibles de mener à une solution).</p>
+    <p><strong>Définitions :</strong></p>
+    <p>• S(P) = ∏ₓ |D(x)| = estimation de la taille de l'arbre de recherche</p>
+    <p>• I(x=a) = 1 − S(P|ₓ₌ₐ) / S(P) = impact de fixer x=a (∈ [0,1], 1 = échec)</p>
+    <p>• Ī(x=a) = moyenne de I(x=a) observée sur les nœuds passés (avec facteur d'oubli possible)</p>
+    <div class="formula">
+Impact d'une variable : I(x) = Σ_{a ∈ D(x)} (1 − Ī(x=a))<br>
+Heuristique variable : sélectionner x avec minimum I(x)<br>
+Heuristique valeur : sélectionner a avec minimum Ī(x=a)<br>
+<br>
+Mise à jour avec oubli exponentiel (α ∈ [0,1]) :<br>
+Ī_k(x=a) = (1−α)·Ī_{k-1}(x=a) + α·I^k(x=a)
+    </div>
+    <p style="margin-top:8px;font-style:italic;color:var(--gray);">Initialisation : quelques "random dives" avant la recherche complète pour estimer les impacts initiaux.</p>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>📈 Activity-Based Search (ABS)</h4>
+    <p>Idée : tracer <strong>à quelle fréquence le domaine d'une variable est contracté</strong> lors de la recherche. Une variable dont le domaine est souvent réduit est un "nœud chaud" → la brancher tôt réduit la profondeur de l'arbre.</p>
+    <p>• A(x) = compteur d'activité de x, incrémenté à chaque contraction de D(x) pendant la propagation.</p>
+    <p>• Heuristique : sélectionner x avec le rapport |D(x)| / A(x) le plus petit (ou A(x) le plus grand).</p>
+    <div class="formula">Comme IBS, ABS est initialisé avec des dives aléatoires pour estimer les activités de base.</div>
+  </div>
+
+  <div class="comparison-grid">
+    <div class="cmp-box" style="background:#eff6ff;">
+      <h4 style="color:var(--navy);">✅ Avantages IBS/ABS</h4>
+      <p style="color:#1e3a5f;">• Apprentissage pendant la recherche<br>• Capture les corrélations entre variables<br>• Robuste sur des problèmes variés<br>• Indépendant du modèle</p>
+    </div>
+    <div class="cmp-box" style="background:#fef2f2;">
+      <h4 style="color:#991b1b;">⚠️ Inconvénients IBS/ABS</h4>
+      <p style="color:#7f1d1d;">• Coût d'initialisation élevé<br>• Impact peut être mal estimé<br>• Mémoire supplémentaire nécessaire<br>• Plus complexe à implémenter</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONFLICT-BASED -->
+<div class="section">
+  <h2>⚔️ Heuristiques Basées sur les Conflits</h2>
+
+  <div class="heuristic-card">
+    <h4>🔴 Last-Conflict Search</h4>
+    <p>Observation : si brancher sur la variable x a causé un échec récemment, elle est susceptible de causer un échec à nouveau (peu de choses ont changé). Donc, on lui donne la priorité.</p>
+    <div class="algo-box">
+nextVarToBranchOn(X) {<br>
+&nbsp;&nbsp;if (lastConflictVariable == null)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return fallBackHeuristic(X)<br>
+&nbsp;&nbsp;else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return lastConflictVariable  // la dernière variable à avoir échoué<br>
+}
+    </div>
+    <p style="margin-top:8px;">Quand brancher sur lastConflictVariable mène à succès (fixation réussie), on revient à l'heuristique de base.</p>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>⏱️ Conflict-Ordering Search (COS)</h4>
+    <p>Généralisation de Last-Conflict : chaque variable reçoit un <strong>timestamp</strong> correspondant au nœud d'échec le plus récent où elle a causé une défaillance.</p>
+    <p>• Un compteur global nConflicts est incrémenté à chaque nœud d'échec.</p>
+    <p>• stamp[x] = nConflicts au dernier nœud où brancher sur x a échoué.</p>
+    <p>• <strong>COS</strong> : sélectionner la variable non fixée avec le <strong>plus grand timestamp</strong>. Si aucune variable n'a encore causé d'échec, utiliser un heuristique de repli.</p>
+    <div class="formula">
+// COS en pseudo-code :<br>
+failed = { x ∈ X : stamp[x] > 0 &amp;&amp; |D(x)| > 1 }<br>
+if (failed est vide)<br>
+&nbsp;&nbsp;lastVar = varHeuristic.select()  // heuristique de repli<br>
+else<br>
+&nbsp;&nbsp;lastVar = argmax_{x ∈ failed} { stamp[x] }  // plus grand timestamp
+    </div>
+    <p style="margin-top:8px;">COS est particulièrement efficace quand un petit sous-ensemble de variables cause la plupart des conflits (ex. AllDifferent sur un sous-groupe).</p>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Exemple de l'utilité de COS :</strong></p>
+    <p>Pour un CSP avec variables x1,…,x8 où le sous-ensemble {x5,x6,x7,x8} cause un conflit AllDifferent : avec l'ordre statique [x1,…,x8], on explore un grand arbre avant de détecter le conflit. COS apprend rapidement à brancher d'abord sur x5,x6,x7,x8, réduisant dramatiquement l'arbre de recherche.</p>
+  </div>
+</div>
+
+<!-- DISCREPANCY SEARCH -->
+<div class="section">
+  <h2>🔀 Discrepancy Search (Recherche par Discordance)</h2>
+  <div class="explain-intro">
+    <span class="badge">🧭 Idée</span>
+    <p>La <strong>discordance</strong> = nombre de fois où on choisit la <em>mauvaise</em> branche (celle que l'heuristique ne recommande pas). Si on fait confiance à notre heuristique de valeur, les solutions de bonne qualité devraient être à faible discordance.</p>
+    <p><strong>Stratégie :</strong> explorer d'abord les nœuds avec discordance 0 (suivre toujours l'heuristique), puis discordance 1 (une "mauvaise" décision), puis 2, etc.</p>
+    <div class="retenir">💡 Ceci est un <em>search combinator</em> : il <strong>enveloppe</strong> n'importe quel branchement existant et réorganise l'ordre d'exploration sans changer le modèle.</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Implémentation avec LimitedDiscrepancy</span>
+    <p class="phrase">On utilise une boucle sur le niveau de discordance maximal autorisé :</p>
+    <pre><code>Objective obj = cp.minimize(totCost);
+
+for (int dL = 0; dL &lt; x.length; dL++) {
+    DFSearch dfs = makeDfs(cp, limitedDiscrepancy(firstFail(x), dL));
+    dfs.optimize(obj);
+}
+// dL=0 : suivre toujours l'heuristique (0 erreur)
+// dL=1 : au plus 1 "mauvaise" décision autorisée
+// dL=2 : au plus 2, etc.</code></pre>
+    <p style="color:#065f46;margin-top:8px;"><code>LimitedDiscrepancyBranching</code> est un wrapper : il filtre les alternatives qui dépasseraient maxD discordances.</p>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Quand utiliser Discrepancy Search ?</strong></p>
+    <p>• Quand on a une bonne heuristique de valeur (proche de la solution optimale).</p>
+    <p>• Quand les erreurs se produisent surtout en début d'arbre (nœuds peu profonds).</p>
+    <p>• En combinaison avec First-Fail pour la variable : on fait confiance à l'heuristique de valeur pour guider, FF pour éviter les échecs.</p>
+  </div>
+
+  <div class="demo-box">
+    <h3>🌳 Visualisation — Impact de l'heuristique de variable</h3>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:16px;">Comparez la taille de l'arbre selon l'heuristique choisie pour sélectionner la variable.</p>
+    <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="btn" onclick="simulateTree('random')">Variable aléatoire</button>
+      <button class="btn" onclick="simulateTree('mindom')">Min-Dom</button>
+      <button class="btn" onclick="simulateTree('cos')">COS/Last-Conflict</button>
+    </div>
+    <canvas id="treeCanvas" height="200"></canvas>
+    <div id="treeStats" style="margin-top:10px;font-size:0.85rem;color:var(--gray);"></div>
+  </div>
+</div>
+
+<!-- RESTARTS -->
+<div class="section">
+  <h2>🔄 Restarts et No-Goods</h2>
+  <div class="explain-intro">
+    <span class="badge">🔄 Stratégie de redémarrage</span>
+    <p>Deux observations justifient les restarts :</p>
+    <p>1. Les <strong>erreurs précoces</strong> (en début d'arbre) sont très coûteuses : il faut remonter tout en haut pour les corriger.</p>
+    <p>2. Les heuristiques avec apprentissage (IBS, ABS, Wdeg) <em>se comporteraient différemment depuis le début</em> si elles avaient déjà appris quelque chose.</p>
+    <div class="retenir">💡 Corollaire : recommencer la recherche depuis zéro, mais avec l'heuristique "plus sage" qui a appris de ses erreurs passées + une limite sur le nombre d'échecs (séquence de Luby).</div>
+  </div>
+
+  <div class="math-block">
+    <span class="badge">📐 Séquence de Luby</span>
+    <p class="phrase">La séquence de Luby définit les limites d'échecs avant chaque restart :</p>
+    <div style="text-align:center;font-size:1rem;color:#065f46;margin:16px 0;font-family:monospace;">
+      S = (1, 1, 2, 1, 1, 2, 4, 1, 1, 2, 1, 1, 2, 4, 8, 1, …)
+    </div>
+    <p style="color:#065f46;">Cette séquence est optimale pour les algorithmes Las Vegas. Elle garantit un speedup polynomial par rapport à la meilleure exécution unique.</p>
+  </div>
+
+  <div class="heuristic-card">
+    <h4>🚫 No-Goods (Pour ne pas re-explorer)</h4>
+    <p>Quand on redémarre, on risque de réexplorer les mêmes parties de l'arbre. Les <strong>no-goods</strong> permettent d'éviter ça :</p>
+    <p>Si la recherche a échoué avec les assignations x₂=2 ∧ x₁=6 ∧ x₅=2, on ajoute la contrainte :</p>
+    <div class="formula">x₂ ≠ 2 ∨ x₁ ≠ 6 ∨ x₅ ≠ 2  (no-good)</div>
+    <p style="margin-top:8px;">Ces no-goods s'accumulent au fil des restarts, empêchant de revisiter les mêmes sous-espaces. C'est une forme d'apprentissage entre redémarrages.</p>
+  </div>
+
+  <div class="theory-box">
+    <p><strong>Distributions Heavy-Tailed</strong></p>
+    <p>Les temps de résolution CP suivent souvent des distributions "à queue lourde" : certaines exécutions sont très courtes, d'autres très longues (les moments sont infinis !). En ajoutant de la <strong>randomisation</strong> dans les heuristiques et en faisant des restarts, on tire parti des courtes exécutions et on évite les longues — même sans apprentissage explicite.</p>
+  </div>
+</div>
+
+<!-- RECAP -->
+<div class="section">
+  <h2>📋 Récapitulatif — Heuristiques de Recherche</h2>
+
+  <div class="icon-grid">
+    <div class="icon-item"><div class="icon">📏</div><h4>Min-Dom</h4><p>Variable à plus petit domaine — simple et efficace</p></div>
+    <div class="icon-item"><div class="icon">⚖️</div><h4>Dom/Wdeg</h4><p>Ratio domaine/degré pondéré — apprend les contraintes difficiles</p></div>
+    <div class="icon-item"><div class="icon">📉</div><h4>IBS</h4><p>Impact estimé du filtrage — apprend l'effet de chaque décision</p></div>
+    <div class="icon-item"><div class="icon">📈</div><h4>ABS</h4><p>Activité de domaine — compte les contractions pendant la propagation</p></div>
+    <div class="icon-item"><div class="icon">⚔️</div><h4>COS</h4><p>Timestamp des conflits — donne priorité aux variables conflictuelles récentes</p></div>
+    <div class="icon-item"><div class="icon">🔀</div><h4>Discrepancy</h4><p>Explorer par niveau de confiance — idéal avec bonne heuristique de valeur</p></div>
+    <div class="icon-item"><div class="icon">🔄</div><h4>Restarts + Luby</h4><p>Repartir "plus sage" avec séquence optimale de limites</p></div>
+    <div class="icon-item"><div class="icon">🚫</div><h4>No-Goods</h4><p>Mémoriser les sous-espaces déjà explorés entre restarts</p></div>
+  </div>
+
+  <div class="tag-row">
+    <span class="tag">Black-Box Search</span>
+    <span class="tag">Min-Dom</span>
+    <span class="tag">Dom/Wdeg</span>
+    <span class="tag">Impact-Based</span>
+    <span class="tag">Activity-Based</span>
+    <span class="tag">Last-Conflict</span>
+    <span class="tag">COS</span>
+    <span class="tag">Discrepancy</span>
+    <span class="tag">Restarts</span>
+    <span class="tag">No-Goods</span>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <strong>Programmation par Contraintes — MiniCP</strong> &nbsp;|&nbsp; Chapitre 9 : Recherche Black-Box
+</footer>
+
+<script>
+// Tree simulation demo
+function simulateTree(mode) {
+  const canvas = document.getElementById('treeCanvas');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth || 700;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const W = canvas.width, H = canvas.height;
+  let nodes = 0, solutions = 0;
+
+  // Simulate a simple binary tree with different pruning rates
+  function draw(x, y, depth, maxDepth, branchFactor) {
+    if (depth > maxDepth) return 0;
+    nodes++;
+    const isLeaf = depth === maxDepth;
+    const isSolution = isLeaf && Math.random() < 0.3;
+    if (isSolution) solutions++;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, 2*Math.PI);
+    ctx.fillStyle = isSolution ? '#22c55e' : (isLeaf ? '#ef4444' : '#1E3A5F');
+    ctx.fill();
+
+    if (depth < maxDepth && Math.random() < branchFactor) {
+      const spread = W / (2 * (depth + 2));
+      const newY = y + 30;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - spread, newY);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      draw(x - spread, newY, depth + 1, maxDepth, branchFactor);
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + spread, newY);
+      ctx.stroke();
+      draw(x + spread, newY, depth + 1, maxDepth, branchFactor);
+    }
+    return nodes;
+  }
+
+  const configs = {
+    random:  { maxDepth: 5, branchFactor: 0.9, label: 'Variable aléatoire' },
+    mindom:  { maxDepth: 4, branchFactor: 0.75, label: 'Min-Dom' },
+    cos:     { maxDepth: 3, branchFactor: 0.65, label: 'COS/Last-Conflict' }
+  };
+
+  const cfg = configs[mode];
+  nodes = 0; solutions = 0;
+  draw(W/2, 20, 0, cfg.maxDepth, cfg.branchFactor);
+
+  document.getElementById('treeStats').innerHTML =
+    `<strong>${cfg.label}</strong> — Nœuds visités : <strong style="color:var(--navy);">${nodes}</strong>, Solutions trouvées : <strong style="color:#22c55e;">${solutions}</strong>`;
+}
+
+window.onload = () => {
+  if (document.getElementById('treeCanvas')) {
+    document.getElementById('treeCanvas').width = document.getElementById('treeCanvas').offsetWidth || 700;
+    simulateTree('mindom');
+  }
+};
+
+// KaTeX auto-render
+document.addEventListener("DOMContentLoaded", function() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+});
+</script>
+</body>
+</html>
