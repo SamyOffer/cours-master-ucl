@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 14 : LTE Interface Radio | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 14 : LTE - Interface Radio</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 14 : LTE — Interface Radio</h1>
+
+        <p>LTE (Long Term Evolution) représente une rupture radicale par rapport à UMTS. Nouvelle interface radio basée sur OFDMA/SC-FDMA, architecture entièrement IP. Ce chapitre détaille les aspects radio : architecture eNodeB, allocation de ressources, modulation adaptative, canaux physiques et protocoles MAC/RLC/PDCP.</p>
+
+        <!-- eNodeB et eUTRAN -->
+        <h2>1. eNodeB et eUTRAN</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Architecture radio LTE</div>
+            <p><strong>eNodeB</strong> ("evolved" NodeB) centralise les fonctions de GSM/UMTS : BSS (GSM) + NodeB + RNC (UMTS) fusionnées. Les eNodeBs communiquent directement entre eux via l'interface X2 (pas besoin de passerelle comme UMTS/RNC).</p>
+            <div class="analogy">
+                🏢 <strong>Analogie :</strong> UMTS avait une hiérarchie BTS → RNC → MSC. LTE aplatit : eNodeBs parlent directement entre eux (X2), et seulement au cœur réseau via S1. C'est plus rapide et flexible.
+            </div>
+        </div>
+
+        <h3>Fréquences LTE</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Bande LTE</th>
+                    <th>Fréquence</th>
+                    <th>Caractéristiques</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>LTE-800</strong></td>
+                    <td>791-862 MHz</td>
+                    <td>Anciennement TV numérique. Longue portée (jusqu'à 35 km en rural). Faible capacité.</td>
+                </tr>
+                <tr>
+                    <td><strong>LTE-900</strong></td>
+                    <td>880-960 MHz</td>
+                    <td>Réutilise spectre GSM quand GSM is sunset. Bon compromis portée/capacité.</td>
+                </tr>
+                <tr>
+                    <td><strong>LTE-1800</strong></td>
+                    <td>1710-1880 MHz</td>
+                    <td>Réutilise spectre GSM. Portée réduite (quelques km en ville). Bonne capacité.</td>
+                </tr>
+                <tr>
+                    <td><strong>LTE-2600</strong></td>
+                    <td>2500-2570 / 2620-2690 MHz</td>
+                    <td>Petites cellules, capacité très élevée. Portée courte (centaines de m). Villes denses.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <p><strong>Largeur de bande</strong> : LTE supporte 1.4 / 3 / 5 / 10 / 15 / 20 MHz par porteuse (vs 5 MHz fixe UMTS). Bandwidths plus flexibles = allocation spectre efficace.</p>
+        </div>
+
+        <!-- UE Categories -->
+        <h2>2. UE Categories (Capacités des terminaux)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Classification terminaux</div>
+            <p>Les mobiles LTE ont des capacités différentes. La norme 3GPP définit 5-6 catégories (R8-9), allant de Cat1 (entry-level) à Cat5/Cat6 (flagship).</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Débit DL</th>
+                    <th>Débit UL</th>
+                    <th>Modulation</th>
+                    <th>MIMO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Cat 1</strong></td>
+                    <td>10 Mbit/s</td>
+                    <td>5 Mbit/s</td>
+                    <td>QPSK</td>
+                    <td>1×1 (antenne unique)</td>
+                </tr>
+                <tr>
+                    <td><strong>Cat 2</strong></td>
+                    <td>50 Mbit/s</td>
+                    <td>25 Mbit/s</td>
+                    <td>QPSK + 16QAM</td>
+                    <td>2×2 MIMO (obligatoire)</td>
+                </tr>
+                <tr>
+                    <td><strong>Cat 3</strong></td>
+                    <td>100 Mbit/s</td>
+                    <td>50 Mbit/s</td>
+                    <td>QPSK + 16QAM</td>
+                    <td>2×2 MIMO</td>
+                </tr>
+                <tr>
+                    <td><strong>Cat 4</strong></td>
+                    <td>150 Mbit/s</td>
+                    <td>50 Mbit/s</td>
+                    <td>QPSK + 16QAM</td>
+                    <td>2×2 MIMO</td>
+                </tr>
+                <tr style="background:#ecfdf5;">
+                    <td style="background:#ecfdf5;"><strong>Cat 5</strong></td>
+                    <td style="background:#ecfdf5;">300 Mbit/s</td>
+                    <td style="background:#ecfdf5;">75 Mbit/s</td>
+                    <td style="background:#ecfdf5;">QPSK + 16QAM + 64QAM</td>
+                    <td style="background:#ecfdf5;">4×4 MIMO (obligatoire)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Resource Blocks -->
+        <h2>3. Resource Blocks (RB) et structure temporelle</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Granularité d'allocation</div>
+            <p>LTE divise la fréquence et le temps en <strong>Resource Blocks</strong> (RBs). Chaque eNodeB alloue des RBs aux UEs selon leurs besoins et qualité canal.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Structure RB</h3>
+            <ul>
+                <li><strong>Fréquence</strong> : 12 sous-porteuses de 15 kHz = 180 kHz par RB.</li>
+                <li><strong>Temps</strong> :
+                    <ul style="margin-top:0.3rem;">
+                        <li><strong>Slot</strong> = 0.5 ms = 7 OFDM symbols (Normal CP = Cyclic Prefix)</li>
+                        <li><strong>Subframe</strong> = 2 slots = 1 ms</li>
+                        <li><strong>Frame</strong> = 10 subframes = 10 ms</li>
+                    </ul>
+                </li>
+                <li><strong>1 Resource Block</strong> = 12 sous-porteuses × 0.5 ms (1 slot) = <strong>~180 kHz × 0.5 ms</strong>.</li>
+                <li><strong>Nombre RBs totaux</strong> : dépend de la largeur de bande (ex: 10 MHz = 50 RBs).</li>
+            </ul>
+        </div>
+
+        <!-- TDD vs FDD -->
+        <h2>4. TDD vs FDD</h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>FDD (Frequency Division Duplex)</th>
+                    <th>TDD (Time Division Duplex)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Fréquences</strong></td>
+                    <td>Uplink et Downlink sur fréquences séparées</td>
+                    <td>Même fréquence, UL et DL alternés dans le temps</td>
+                </tr>
+                <tr>
+                    <td><strong>Duplex gap</strong></td>
+                    <td>Duplexer RF isole TX et RX (coûteux)</td>
+                    <td>Commutation TX/RX rapide (plus simple)</td>
+                </tr>
+                <tr>
+                    <td><strong>Sensibilité timing</strong></td>
+                    <td>Moins sensible (UL/DL indépendants)</td>
+                    <td>Très sensible à la synchronisation TDD</td>
+                </tr>
+                <tr>
+                    <td><strong>Configurations</strong></td>
+                    <td>1 config par bande</td>
+                    <td>7 configurations TDD (configs 0-6) avec DL/UL/Special ratios</td>
+                </tr>
+                <tr>
+                    <td><strong>Usage</strong></td>
+                    <td>Europe, USA, Japon, Corée du Sud</td>
+                    <td>Chine (populaire), Inde</td>
+                </tr>
+                <tr>
+                    <td><strong>Asymétrie UL/DL</strong></td>
+                    <td>Fixe par spectre alloué</td>
+                    <td>Configurable (ex: 70% DL, 30% UL)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Configurations TDD (7 configurations)</h3>
+            <p>Chaque configuration définit la structuration d'une frame 10ms = 10 subframes :</p>
+            <ul>
+                <li><strong>Config 0</strong> : 6 DL + 4 UL + 1 Special (plus de UL)</li>
+                <li><strong>Config 2</strong> : 2 DL + 8 UL (beaucoup d'UL)</li>
+                <li><strong>Config 4</strong> : 7 DL + 2 UL + 1 Special (beaucoup de DL)</li>
+            </ul>
+            <p style="margin-top:0.5rem;">Le <strong>Special subframe</strong> contient DwPTS (Downlink Pilot Time Slot), Guard Period, UpPTS (Uplink Pilot). Permet transition DL→UL.</p>
+        </div>
+
+        <!-- OFDMA et SC-FDMA -->
+        <h2>5. Downlink : OFDMA</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Multiple access downlink</div>
+            <p><strong>OFDMA</strong> (Orthogonal Frequency Division Multiple Access) : chaque UE se voit allouer un sous-ensemble de sous-porteuses (12 par RB) sur la durée d'un slot.</p>
+            <div class="analogy">
+                📡 <strong>Analogie :</strong> OFDMA c'est comme des routes à plusieurs voies : chaque voiture (UE) a ses propres voies (sous-porteuses). Elles peuvent rouler en même temps sans se gêner.
+            </div>
+        </div>
+
+        <h2>6. Uplink : SC-FDMA</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Multiple access uplink</div>
+            <p><strong>SC-FDMA</strong> (Single Carrier FDMA) : pour l'uplink, les 12 sous-porteuses d'un RB assigné à un UE sont traitées comme <strong>une seule porteuse</strong> (avant FFT). Avantage : PAPR (Peak-to-Average Power Ratio) très réduit.</p>
+            <div class="analogy">
+                ⚡ <strong>Analogie :</strong> OFDMA en downlink = beaucoup de petits signaux = pics de puissance élevés. SC-FDMA = un gros signal = puissance plus lisse. Les téléphones mobiles ont des batteries limités → SC-FDMA en uplink économise l'énergie.
+            </div>
+        </div>
+
+        <table class="theory-box" style="background:white; border:1px solid #d1fae5; padding:0;">
+            <tbody style="background:#f0fdf4; display:block;">
+                <tr style="display:block; padding:1rem; border-bottom:1px solid #d1fae5;">
+                    <td style="display:block;">
+                        <strong>Comparaison OFDMA vs SC-FDMA</strong>
+                    </td>
+                </tr>
+                <tr style="display:block; padding:1rem; background:white;">
+                    <td style="display:block;">
+                        <ul style="margin:0; padding-left:1.5rem;">
+                            <li><strong>OFDMA (DL)</strong> : Débit élevé ✓, PAPR élevé (OK pour BS avec alimentation secteur) ✓</li>
+                            <li><strong>SC-FDMA (UL)</strong> : Débit moins élévé que OFDMA, PAPR bas ✓ (économe batterie), pas de support pour débits très élevés en UL (par rapport DL)</li>
+                            <li><strong>Résultat</strong> : DL 300 Mbit/s, UL 75 Mbit/s (Cat 5). Asymétrie volontaire.</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- AMC -->
+        <h2>7. Adaptive Modulation and Coding (AMC)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Modulation dynamique</div>
+            <p>L'eNodeB adapte la modulation et l'encodage selon la qualité du canal perçue.</p>
+        </div>
+
+        <h3>Procédure AMC</h3>
+
+        <div class="theory-box">
+            <ol style="line-height:2;">
+                <li><strong>eNodeB envoie reference signal</strong> (DMRS = Demodulation Reference Signal).</li>
+                <li><strong>UE mesure qualité canal</strong> : rapport signal/bruit, interférences, distortion de canal.</li>
+                <li><strong>UE envoie CQI (Channel Quality Indicator)</strong> : 4-bit index (0-15) indiquant la meilleure MCS possible.</li>
+                <li><strong>eNodeB choisit MCS (Modulation and Coding Scheme)</strong> basée sur CQI.</li>
+                <li><strong>eNodeB transmit data</strong> avec la modulation choisie.</li>
+            </ol>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>CQI</th>
+                    <th>Modulation</th>
+                    <th>Efficacité spectrale (bits/s/Hz)</th>
+                    <th>Conditions canal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0</td>
+                    <td>Hors limites</td>
+                    <td>0</td>
+                    <td>Canal trop mauvais</td>
+                </tr>
+                <tr>
+                    <td>1-6</td>
+                    <td>QPSK</td>
+                    <td>0.15-1.18</td>
+                    <td>Signal faible</td>
+                </tr>
+                <tr>
+                    <td>7-9</td>
+                    <td>16QAM</td>
+                    <td>1.91-3.32</td>
+                    <td>Signal moyen</td>
+                </tr>
+                <tr>
+                    <td>10-15</td>
+                    <td>64QAM</td>
+                    <td>4.52-5.55</td>
+                    <td>Signal fort</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Downlink scheduling -->
+        <h2>8. Downlink Scheduling et PDCCH</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Comment UE découvre ses données</div>
+            <p>L'eNodeB alloue les RBs et les transmet via PDCCH. L'UE doit d'abord synchroniser et lire PDCCH pour savoir où chercher ses données sur PDSCH.</p>
+        </div>
+
+        <h3>Synchronisation et MIB</h3>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>PSS (Primary Sync Signal)</strong> : 62 sous-porteuses centrales (une fois par 5 ms), toutes les frames, identifie eNodeB.</li>
+                <li><strong>SSS (Secondary Sync Signal)</strong> : adjacent à PSS, identifie groupe d'eNodeBs et SFN (System Frame Number).</li>
+                <li><strong>PBCH (Physical Broadcast Channel)</strong> : 4 symboles OFDM dans subframe 0, transmet MIB (Master Information Block).</li>
+            </ul>
+        </div>
+
+        <h3>MIB et SIBs</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Information</th>
+                    <th>Canal</th>
+                    <th>Contenu</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>MIB</strong></td>
+                    <td>PBCH</td>
+                    <td>Bandwidth (1.4-20 MHz), nombre antennes eNodeB, SFN, PHICH config, PCFICH config.</td>
+                </tr>
+                <tr>
+                    <td><strong>SIB1</strong></td>
+                    <td>PDSCH</td>
+                    <td>PLMN ID (MCC+MNC), Cell Access info (new UEs ok?), scheduling autres SIBs, TAC.</td>
+                </tr>
+                <tr>
+                    <td><strong>SIB2</strong></td>
+                    <td>PDSCH</td>
+                    <td>PRACH config, UL bandwidth, Paging DRX cycle, DL info.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>PDCCH : Downlink Control Information</h3>
+
+        <div class="theory-box">
+            <p>Avant de lire PDSCH, UE doit écouter <strong>PDCCH (Physical Downlink Control Channel)</strong> pour trouver sa DCI (Downlink Control Information) :</p>
+            <ul>
+                <li><strong>DCI Format</strong> : petite structure binaire (~40 bits) contenant allocation RBs, MCS, HARQ PID, etc.</li>
+                <li><strong>PDCCH mapping</strong> : UE génère "search space" (positions PDCCH à chercher) basée sur RNTI (Radio Network Temporary ID).</li>
+                <li><strong>Blind decoding</strong> : UE essaie de décoder 40 DCIs possibles. Quand elle trouve l'une avec son RNTI et CRC valide → c'est sa donnée.</li>
+            </ul>
+        </div>
+
+        <!-- Uplink scheduling -->
+        <h2>9. Uplink Resource Management</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Comment UE demande de l'espace</div>
+            <p>En downlink, eNodeB contrôle l'allocation. En uplink, l'UE doit demander et eNodeB lui alloue des ressources.</p>
+        </div>
+
+        <h3>Procédure uplink standard</h3>
+
+        <div class="theory-box">
+            <ol style="line-height:2;">
+                <li><strong>UE envoie Scheduling Request (SR)</strong> sur PUCCH (Physical Uplink Control Channel) : "J'ai des données à envoyer".</li>
+                <li><strong>eNodeB alloue PUSCH (Physical Uplink Shared Channel)</strong> via UL grant dans PDCCH.</li>
+                <li><strong>UE envoie data + DMRS (reference signal)</strong> sur PUSCH. Inclut aussi <strong>BSR (Buffer Status Report)</strong> : combien d'octets en attente.</li>
+                <li><strong>eNodeB mesure SRS (Sounding Reference Signal)</strong> si configuré (UE envoie signal sondes).</li>
+                <li><strong>eNodeB envoie ACK/NACK</strong> sur PHICH (Physical Hybrid ARQ Indicator Channel).</li>
+            </ol>
+        </div>
+
+        <h3>Canaux physiques uplink</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Canal</th>
+                    <th>Contenu</th>
+                    <th>Continu ?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PRACH</strong></td>
+                    <td>Random Access (accès initial). 64 séquences de Zadoff-Chu.</td>
+                    <td>Non (périodique)</td>
+                </tr>
+                <tr>
+                    <td><strong>PUCCH</strong></td>
+                    <td>Control : SR, CQI, ACK/NACK (feedback HARQ).</td>
+                    <td>Oui (quand connexion)</td>
+                </tr>
+                <tr>
+                    <td><strong>PUSCH</strong></td>
+                    <td>User data + DMRS + BSR.</td>
+                    <td>Selon grant UL</td>
+                </tr>
+                <tr>
+                    <td><strong>SRS</strong></td>
+                    <td>Sounding Reference Signal. eNodeB mesure canal UL.</td>
+                    <td>Non (périodique, configurable)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- HARQ -->
+        <h2>10. HARQ (Hybrid ARQ)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Retransmission intelligente</div>
+            <p>Au lieu de retransmettre tout le paquet, HARQ envoie des infos supplémentaires qui s'ajoutent aux données reçues précédemment (soft combining).</p>
+        </div>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>ACK</strong> : données reçues correctement, passer au paquet suivant.</li>
+                <li><strong>NACK</strong> : erreur détectée, retransmettre (avec différent puncturing).</li>
+                <li><strong>Soft combining</strong> : Le récepteur stocke la 1ère transmission. À la retransmission, il reçoit différentes bits, les ajoute ("soft" combine) → meilleure correction d'erreur.</li>
+                <li><strong>FDD downlink</strong> : jusqu'à 8 processus HARQ simultanés (en parallèle). TDD : 4 processus (moins de ressources).</li>
+            </ul>
+        </div>
+
+        <!-- Protocol Stack -->
+        <h2>11. LTE Protocol Stack</h2>
+
+        <div class="theory-box">
+            <p>De bas en haut :</p>
+            <ul>
+                <li><strong>PHY (Physical Layer)</strong> : Modulation OFDMA/SC-FDMA, DFT, FFT, encodage canal.</li>
+                <li><strong>MAC (Medium Access Control)</strong> : Ordonnancement RBs, multiplexing logiques canaux, HARQ.</li>
+                <li><strong>RLC (Radio Link Control)</strong> : Segmentation PDUs, correction erreurs, déduplication, contrôle flux.</li>
+                <li><strong>PDCP (Packet Data Convergence Protocol)</strong> : Chiffrement des données, compression en-têtes IP (ROHC).</li>
+                <li><strong>RRC (Radio Resource Control)</strong> : Configuration porteurs, transmission d'infos système, handover.</li>
+            </ul>
+        </div>
+
+        <!-- Bearers -->
+        <h2>12. Bearers (Tunnels QoS)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Tuyaux logiques avec propriétés QoS</div>
+            <p>Un bearer = un tunnel UE ↔ réseau avec propriétés garanties : débit min, délai max, perte, priorité.</p>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Type bearer</th>
+                    <th>Nombre</th>
+                    <th>Usage</th>
+                    <th>QCI exemple</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>SRB0/1/2</strong></td>
+                    <td>3</td>
+                    <td>Signaling Radio Bearers. Infos protocole (RRC, NAS).</td>
+                    <td>QCI 0 (control)</td>
+                </tr>
+                <tr>
+                    <td><strong>DRB</strong></td>
+                    <td>Plusieurs</td>
+                    <td>Data Radio Bearers. User data (voix, vidéo, applis).</td>
+                    <td>QCI 1-9</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>QCI (QoS Class Identifier)</h3>
+            <table class="symbols-table">
+                <thead>
+                    <tr>
+                        <th>QCI</th>
+                        <th>Type</th>
+                        <th>Usage</th>
+                        <th>Délai max</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>GBR</td>
+                        <td>Voix VoLTE</td>
+                        <td>100 ms</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>GBR</td>
+                        <td>Vidéo live streaming</td>
+                        <td>150 ms</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>GBR</td>
+                        <td>Vidéo bufferisée (Netflix)</td>
+                        <td>300 ms</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>GBR</td>
+                        <td>Jeux mobiles temps-réel</td>
+                        <td>50 ms</td>
+                    </tr>
+                    <tr>
+                        <td>5-9</td>
+                        <td>Non-GBR</td>
+                        <td>Web, email, données best-effort</td>
+                        <td>300-3000 ms</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- X2 et ICIC -->
+        <h2>13. X2 Interface et ICIC</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Communication eNodeB-to-eNodeB</div>
+            <p>Contrairement UMTS (RNC centralisé), les eNodeBs LTE parlent directement via <strong>X2</strong>, rapide et flexible.</p>
+        </div>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>X2-C (Control Plane)</strong> : Signalisation X2AP (X2 Application Protocol) sur SCTP. Handover, load balancing.</li>
+                <li><strong>X2-U (User Plane)</strong> : Données via GTP-U (même protocole GPRS!) sur UDP/IP.</li>
+            </ul>
+            <p style="margin-top:1rem;"><strong>ICIC (Inter-Cell Interference Coordination)</strong> :</p>
+            <ul>
+                <li>eNodeBs échangent mesures d'interférence via X2.</li>
+                <li><strong>UE report</strong> : UE mesure signal de cellules voisines → eNodeB sait si interférence forte.</li>
+                <li><strong>RNTP (Relative Narrowband Transmit Power)</strong> : eNodeB annonce sa puissance par RB. Voisins réduisent puissance sur ces RBs pour éviter collision.</li>
+            </ul>
+        </div>
+
+        <!-- LTE-A -->
+        <h2>14. LTE-Advanced (LTE-A / 4G+)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">4G amélioré</div>
+            <p>LTE-A = LTE R10+ avec nouvelles capacités. Complètement compatible LTE. Débit jusqu'à 1 Gbit/s vs 300 Mbit/s LTE R8-9.</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Caractéristique</th>
+                    <th>LTE (R8-9)</th>
+                    <th>LTE-A (R10+)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Carrier aggregation</strong></td>
+                    <td>1 porteuse 20 MHz max</td>
+                    <td>Jusqu'à 32 porteuses agrégées = 640 MHz total</td>
+                </tr>
+                <tr>
+                    <td><strong>Small cells (Pico/Femto)</strong></td>
+                    <td>-</td>
+                    <td>HetNet (Heterogeneous Networks) : macro + petites cellules denses</td>
+                </tr>
+                <tr>
+                    <td><strong>MIMO</strong></td>
+                    <td>Jusqu'à 4×4</td>
+                    <td>Jusqu'à 8×8 (massive MIMO)</td>
+                </tr>
+                <tr>
+                    <td><strong>Débit théorique</strong></td>
+                    <td>300 Mbit/s (Cat5, 2x2)</td>
+                    <td>1 Gbit/s (Cat17, 8x8, 32 carriers)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Summary -->
+        <h2>Résumé pour l'examen</h2>
+
+        <div class="retenir">
+            <strong>Points essentiels LTE radio :</strong>
+            <ul>
+                <li><strong>eNodeB</strong> : centralise BSS+RNC, X2 entre eNodeBs, S1 vers core réseau.</li>
+                <li><strong>Fréquences</strong> : LTE-800/900/1800/2600 MHz, 1.4-20 MHz bande passante.</li>
+                <li><strong>Resource Block</strong> : 12 sous-porteuses × 0.5 ms = 180 kHz × 0.5 ms.</li>
+                <li><strong>OFDMA downlink</strong> : HautsDebits, PAPR élevé (OK BS), modulation adaptative QPSK/16QAM/64QAM.</li>
+                <li><strong>SC-FDMA uplink</strong> : PAPR bas (économe batterie), débit UL < débit DL.</li>
+                <li><strong>AMC</strong> : UE → CQI (0-15), eNodeB choisit MCS. MCS adapté au canal.</li>
+                <li><strong>Scheduling</strong> : MAC choisi RBs pour chaque UE chaque ms. Priorité QoS (GBR vs Non-GBR).</li>
+                <li><strong>HARQ</strong> : Soft combining, jusqu'à 8 processus FDD. Efficace pour canaux variables.</li>
+                <li><strong>Bearers</strong> : SRB (signaling), DRB (data). QCI 1-4 pour real-time, 5-9 pour best-effort.</li>
+                <li><strong>LTE-A</strong> : Carrier aggregation (2-32 porteuses), Massive MIMO, débit 1 Gbit/s.</li>
+            </ul>
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch13_cellular.html">← Chapitre 13 : Réseaux Cellulaires</a>
+        <a href="index.html">↑ Accueil</a>
+        <a href="ch15_lte_mobility.html">Chapitre 15 : LTE - Mobilité →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+</body>
+</html>

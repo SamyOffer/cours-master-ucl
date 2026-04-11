@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 13 : Réseaux Cellulaires | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 13 : Réseaux Cellulaires</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 13 : Réseaux Cellulaires (GSM, GPRS, UMTS)</h1>
+
+        <p>Les réseaux cellulaires mobiles sont l'une des technologies les plus importantes du 20ème et 21ème siècle. Depuis le GSM (2G) jusqu'à la 5G, ils ont évolué pour offrir plus de débit, moins de latence et de meilleurs services. Ce chapitre couvre les générations 2G, 2.5G et 3G qui posent les fondations architecturales exploitées en LTE/4G.</p>
+
+        <!-- Générations -->
+        <h2>1. Générations de réseaux mobiles</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Historique des générations</div>
+            <p>Les normes cellulaires évoluent par générations. Chaque génération apporte des améliorations : débit, latence, efficacité énergétique, modulation, architecture.</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Génération</th>
+                    <th>Années</th>
+                    <th>Débit typique</th>
+                    <th>Latence</th>
+                    <th>Technologie radio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1G</strong></td>
+                    <td>1980-1990</td>
+                    <td>Voix analogique</td>
+                    <td>-</td>
+                    <td>Analogique</td>
+                </tr>
+                <tr>
+                    <td><strong>2G (GSM)</strong></td>
+                    <td>1991-2000</td>
+                    <td>9.6 kbit/s</td>
+                    <td>1-2 sec</td>
+                    <td>TDMA/FDMA, GMSK</td>
+                </tr>
+                <tr>
+                    <td><strong>2.5G (GPRS)</strong></td>
+                    <td>2000-2004</td>
+                    <td>85 kbit/s (typique)</td>
+                    <td>700 ms</td>
+                    <td>TDMA + paquets</td>
+                </tr>
+                <tr>
+                    <td><strong>2.75G (EDGE)</strong></td>
+                    <td>2004-2010</td>
+                    <td>236 kbit/s</td>
+                    <td>600 ms</td>
+                    <td>TDMA, 8-PSK</td>
+                </tr>
+                <tr>
+                    <td><strong>3G (UMTS)</strong></td>
+                    <td>2002-2010</td>
+                    <td>384 kbit/s</td>
+                    <td>200-300 ms</td>
+                    <td>WCDMA (CDMA large bande)</td>
+                </tr>
+                <tr>
+                    <td><strong>3.5G (HSPA)</strong></td>
+                    <td>2008-2015</td>
+                    <td>14.4 Mbit/s</td>
+                    <td>100 ms</td>
+                    <td>WCDMA + canaux rapides</td>
+                </tr>
+                <tr>
+                    <td><strong>3.75G (HSPA+)</strong></td>
+                    <td>2010-2018</td>
+                    <td>28 Mbit/s</td>
+                    <td>80 ms</td>
+                    <td>WCDMA + MIMO</td>
+                </tr>
+                <tr>
+                    <td><strong>4G (LTE)</strong></td>
+                    <td>2009-...</td>
+                    <td>300 Mbit/s (R8-9)</td>
+                    <td>5-20 ms</td>
+                    <td>OFDM (DL) / SC-FDMA (UL)</td>
+                </tr>
+                <tr>
+                    <td><strong>4G-A (LTE-A)</strong></td>
+                    <td>2014-...</td>
+                    <td>1 Gbit/s (R10+)</td>
+                    <td>5-10 ms</td>
+                    <td>OFDM avec carrier aggregation</td>
+                </tr>
+                <tr>
+                    <td><strong>5G (NR)</strong></td>
+                    <td>2019-...</td>
+                    <td>10 Gbit/s</td>
+                    <td>1 ms</td>
+                    <td>OFDM, massive MIMO, mmWave</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Définition technique : 3GPP Releases</h3>
+            <p>Les évolutions ne suivent pas exactement les "générations" marketing. La <strong>3GPP</strong> (3rd Generation Partnership Project) standardise les réseaux mobiles avec des "releases" (versions) :</p>
+            <ul>
+                <li><strong>Phase 1 & 2 (1991-1997)</strong> : GSM. Voix uniquement.</li>
+                <li><strong>Release 97-98 (1997-1999)</strong> : GPRS (données par paquet) et EDGE.</li>
+                <li><strong>Release 99 (1999)</strong> : UMTS (3G). Nouveau radio, architecture IMS.</li>
+                <li><strong>Release 4-7 (2001-2008)</strong> : HSPA et HSPA+ (extensions UMTS).</li>
+                <li><strong>Release 8-9 (2008-2011)</strong> : LTE. Architecture révolutionnaire IP-only.</li>
+                <li><strong>Release 10 (2011)</strong> : LTE-Advanced (4G). Carrier aggregation, hétéroréseau.</li>
+                <li><strong>Release 15+ (2018+)</strong> : 5G NR. Ondes millimétriques, latence ultra-basse.</li>
+            </ul>
+        </div>
+
+        <!-- 2G GSM -->
+        <h2>2. GSM (2G) — Global System for Mobile Communications</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Fondations du cellulaire mobile</div>
+            <p><strong>GSM</strong> : standardisé en 1983, déployé en 1991, reste la technologie la plus déployée au monde. Architecture TDMA/FDMA, transmission vocale numérique. Latence typique : 1-2 secondes pour un appel.</p>
+            <div class="analogy">
+                🔊 <strong>Analogie :</strong> GSM est comme un standard postal européen. On divise l'espace radio (fréquence) en canaux (FDMA = différents bureaux), chaque canal est divisé en temps (TDMA = différents jours/heures). Chaque téléphone a un créneau spécifique où il peut parler.
+            </div>
+        </div>
+
+        <h3>Architecture GSM : BSS et MSC</h3>
+
+        <div class="theory-box">
+            <p><strong>BSS (Base Station Subsystem)</strong> = tous les éléments radio :</p>
+            <ul>
+                <li><strong>BTS (Base Transceiver Station)</strong> : antennes + émetteur-récepteur. Couvre une "cellule" (rayon typique : 3-4 km en ville, jusqu'à 35 km en rural). Divisée en 2-3 secteurs.</li>
+                <li><strong>BSC (Base Station Controller)</strong> : gère 10-100 BTSs. Alloue les canaux, gère le handover (changement de BTS), signalisation.</li>
+            </ul>
+            <p style="margin-top:0.8rem;"><strong>NSS (Network Subsystem)</strong> = cœur du réseau :</p>
+            <ul>
+                <li><strong>MSC (Mobile Switching Center)</strong> : commutateur central, gère les appels entrants/sortants, connecte à PSTN (réseau fixe).</li>
+                <li><strong>G-MSC (Gateway MSC)</strong> : passerelle vers les réseaux externes.</li>
+                <li><strong>Bases de données</strong> : HLR, VLR, EIR (détaillés ci-après).</li>
+            </ul>
+        </div>
+
+        <h3>Fréquences et canaux GSM</h3>
+
+        <div class="math-block">
+            <p><strong>GSM-900 (Europe, Afrique)</strong> :</p>
+            <div class="formula">
+                <ul style="margin: 0;">
+                    <li>Downlink (BTS → MS) : 935.2–960 MHz = 124 porteuses</li>
+                    <li>Uplink (MS → BTS) : 890.2–915 MHz = 124 porteuses</li>
+                    <li>Espacement : 200 kHz par canal</li>
+                    <li>Nombre de canaux : 124</li>
+                </ul>
+            </div>
+            <p style="margin-top:1rem;"><strong>GSM-1800 (PCN, Asie)</strong> : 1710–1880 MHz, 374 canaux.</p>
+            <p style="margin-top:0.5rem;"><strong>TDMA sur chaque porteur</strong> : divisée en 8 timeslots (burst duration = 0.577 ms). 8 utilisateurs par fréquence = 124 × 8 = <strong>992 canaux physiques</strong> typiquement.</p>
+        </div>
+
+        <h3>Canaux logiques GSM</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Canal</th>
+                    <th>Type</th>
+                    <th>Fonction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>TCH</strong></td>
+                    <td>Dédié</td>
+                    <td>Traffic Channel = voix encodée. Bidirectionnel (half-duplex).</td>
+                </tr>
+                <tr>
+                    <td><strong>BCCH</strong></td>
+                    <td>Commun</td>
+                    <td>Broadcast Control Channel. BTS diffuse infos (identité, ARFCN). MS écoute même hors appel.</td>
+                </tr>
+                <tr>
+                    <td><strong>PCH</strong></td>
+                    <td>Commun</td>
+                    <td>Paging Channel. BTS signale "appel entrant" (MS écoute périodiquement pour réveiller).</td>
+                </tr>
+                <tr>
+                    <td><strong>RACH</strong></td>
+                    <td>Commun</td>
+                    <td>Random Access Channel. MS → BTS pour initier appel. Slotted ALOHA (collisions possibles).</td>
+                </tr>
+                <tr>
+                    <td><strong>AGCH</strong></td>
+                    <td>Commun</td>
+                    <td>Access Grant Channel. BTS alloue SDCCH en réponse à RACH.</td>
+                </tr>
+                <tr>
+                    <td><strong>SDCCH</strong></td>
+                    <td>Dédié</td>
+                    <td>Standalone Dedicated Control Channel. Signalisation (authentification, allocation TCH).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Procédure d'appel depuis MS (mobile)</h3>
+
+        <div class="theory-box">
+            <ol style="line-height:2;">
+                <li><strong>MS → RACH</strong> : Utilisateur appuie sur "appel". MS envoie "Channel Request" sur RACH (identification MS). Peut y avoir collision (Slotted ALOHA).</li>
+                <li><strong>BSC allocate SDCCH</strong> : Si succès, BSC reçoit RACH, alloue SDCCH (un timeslot dédié), envoie numéro du canal sur AGCH.</li>
+                <li><strong>MS → BSC (authentification)</strong> : MS se synchronise sur SDCCH, envoie "Paging Response" + IMSI/IMEI.</li>
+                <li><strong>MSC assign TCH</strong> : BSC transmet à MSC. MSC authentifie (RAND/SRES avec HLR), alloue TCH (voix).</li>
+                <li><strong>MS hears ring-back</strong> : TCH ouvert, MS entend tonalité d'appel, destination reçoit "paging" (si actif) sinon "pas de réponse".</li>
+            </ol>
+        </div>
+
+        <!-- 2.5G GPRS -->
+        <h2>3. GPRS (2.5G) et EDGE (2.75G) — Données par paquet</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Évolution vers les données</div>
+            <p><strong>GPRS</strong> (General Packet Radio Service) ajoute des canaux dédiés aux données (PDTCH), partageant les timeslots avec voix. <strong>EDGE</strong> utilise une meilleure modulation (8-PSK au lieu de GMSK) pour plus de débit.</p>
+            <div class="analogy">
+                📦 <strong>Analogie :</strong> Si GSM réserve entièrement une ligne pour une conversation, GPRS partage les canaux comme un bus : plusieurs petits paquets voyagent ensemble, plus efficace si les données ne sont pas constantes.
+            </div>
+        </div>
+
+        <h3>Améliorations GPRS</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>GSM</th>
+                    <th>GPRS</th>
+                    <th>EDGE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Débit</strong></td>
+                    <td>13 kbit/s (voix)</td>
+                    <td>~85 kbit/s (typique)</td>
+                    <td>236 kbit/s</td>
+                </tr>
+                <tr>
+                    <td><strong>Modulation</strong></td>
+                    <td>GMSK</td>
+                    <td>GMSK</td>
+                    <td>8-PSK</td>
+                </tr>
+                <tr>
+                    <td><strong>Canaux données</strong></td>
+                    <td>N/A</td>
+                    <td>PDTCH (paquet)</td>
+                    <td>PDTCH (paquet)</td>
+                </tr>
+                <tr>
+                    <td><strong>Latence</strong></td>
+                    <td>1-2 sec</td>
+                    <td>700 ms</td>
+                    <td>600 ms</td>
+                </tr>
+                <tr>
+                    <td><strong>Tarification</strong></td>
+                    <td>Durée appel</td>
+                    <td>Données (octets)</td>
+                    <td>Données (octets)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Architecture GPRS : cœur de réseau packet-switched</h3>
+
+        <div class="theory-box">
+            <p>GPRS introduit deux nouveaux nœuds réseau :</p>
+            <ul>
+                <li><strong>SGSN (Serving GPRS Support Node)</strong> : gère les sessions paquet des UEs actifs. Maintient la localité, sécurité. Equivalent GSM du BSC.</li>
+                <li><strong>GGSN (Gateway GPRS Support Node)</strong> : passerelle vers Internet. Alloue adresses IP, tunnel les paquets.</li>
+            </ul>
+            <p style="margin-top:0.8rem;">Le cœur réseau GSM (MSC/G-MSC) reste pour la voix. GPRS utilise un <strong>cœur packet-switched</strong> parallèle :</p>
+            <p style="font-family: monospace; background:#ecfdf5; padding:1rem; border-radius:4px; margin-top:0.5rem;">
+                UE ← [PDTCH/Radio] → BTS ← [SGSN] → [GGSN] → [Internet]
+            </p>
+            <p style="margin-top:0.8rem;"><strong>Tunneling :</strong> Les paquets UE → SGSN sont encapsulés avec GTP-U (GPRS Tunneling Protocol) sur UDP vers GGSN. GGSN les décapsule et les transmet à Internet avec l'IP allouée.</p>
+        </div>
+
+        <!-- 3G UMTS -->
+        <h2>4. UMTS (3G) — Universal Mobile Telecommunications System</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Nouvelle interface radio</div>
+            <p><strong>UMTS</strong> (Universal Mobile Telecommunications System) est une rupture par rapport à GSM. Nouvelle technologie radio : <strong>CDMA</strong> (Code Division Multiple Access). Latence améliorée (200-300 ms). Débit jusqu'à 384 kbit/s.</p>
+            <div class="analogy">
+                📡 <strong>Analogie :</strong> Si GSM divise par fréquence et temps (FDMA/TDMA), UMTS utilise CDMA : tous les utilisateurs partagent la même fréquence et même temps, mais chacun a un <strong>code unique</strong> (chip sequence) qui permet au récepteur de les démêler.
+            </div>
+        </div>
+
+        <h3>UMTS Radio Interface</h3>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>Bande passante</strong> : 5 MHz par porteuse (vs 200 kHz GSM = 25x plus grand).</li>
+                <li><strong>Débit chip</strong> : 3.84 MChips/s (constant, déterminé par la norme).</li>
+                <li><strong>Spreading Factor (SF)</strong> : longueur du code (64, 128, 256...). Plus la voix/data est lente, plus long le SF.</li>
+                <li><strong>FDD vs TDD</strong> :
+                    <ul style="margin-top:0.3rem;">
+                        <li><strong>FDD (Frequency Division Duplex)</strong> : Uplink et Downlink sur fréquences séparées. Uplink BPSK, Downlink QPSK.</li>
+                        <li><strong>TDD (Time Division Duplex)</strong> : Même fréquence, UL/DL alternés dans le temps (15 timeslots = 10 ms).</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <h3>UMTS Stack protocolaire</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Couche</th>
+                    <th>Fonction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>RLC</strong> (Radio Link Control)</td>
+                    <td>Segmentation en PDUs, correction erreurs, déduplication.</td>
+                </tr>
+                <tr>
+                    <td><strong>PDCP</strong> (Packet Data Convergence)</td>
+                    <td>Compression headers IP/TCP, chiffrement.</td>
+                </tr>
+                <tr>
+                    <td><strong>RRC</strong> (Radio Resource Control)</td>
+                    <td>Configuration connexion, diffusion infos système.</td>
+                </tr>
+                <tr>
+                    <td><strong>MAC</strong> (Medium Access Control)</td>
+                    <td>Ordonnancement, HARQ.</td>
+                </tr>
+                <tr>
+                    <td><strong>PHY</strong> (Physical Layer)</td>
+                    <td>Modulation, désétalement CDMA.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Canaux UMTS : logiques, transport et physiques</h3>
+
+        <div class="theory-box">
+            <p>UMTS divise les canaux en 3 niveaux :</p>
+            <ul>
+                <li><strong>Logical channels</strong> (haut niveau) : DTCH (trafic), DCCH (contrôle), BCCH, PCH, RACH, etc.</li>
+                <li><strong>Transport channels</strong> (intermédiaire) : DCH (dedicated), FACH (forward, partagé), RACH (accès aléatoire).</li>
+                <li><strong>Physical channels</strong> (bas niveau) : codes CDMA assignés à chaque transport channel.</li>
+            </ul>
+            <p style="margin-top:0.8rem;">Exemple : DTCH (logique voix) → DCH (transport dédié) → P-DPCH + HS-DPCCH (canaux physiques).</p>
+        </div>
+
+        <!-- HSPA et résumé -->
+        <h2>5. HSPA (3.5G/3.75G) — Extension haute vitesse UMTS</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Améliorations progressives</div>
+            <p><strong>HSPA</strong> (High Speed Packet Access) et <strong>HSPA+</strong> améliorent UMTS en utilisant des canaux rapides et MIMO (2×2 ou 4×4 antennes).</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Technologie</th>
+                    <th>Débit DL</th>
+                    <th>Débit UL</th>
+                    <th>Latence</th>
+                    <th>Antennes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>UMTS</strong></td>
+                    <td>384 kbit/s</td>
+                    <td>384 kbit/s</td>
+                    <td>200-300 ms</td>
+                    <td>1x1</td>
+                </tr>
+                <tr>
+                    <td><strong>HSPA</strong></td>
+                    <td>14.4 Mbit/s</td>
+                    <td>5.76 Mbit/s</td>
+                    <td>100 ms</td>
+                    <td>2x2 optionnel</td>
+                </tr>
+                <tr>
+                    <td><strong>HSPA+</strong></td>
+                    <td>28 Mbit/s</td>
+                    <td>11 Mbit/s</td>
+                    <td>80 ms</td>
+                    <td>2x2 ou 4x4 MIMO</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Conclusion -->
+        <h2>Résumé pour l'examen</h2>
+
+        <div class="retenir">
+            <strong>Points clés GSM/GPRS/UMTS :</strong>
+            <ul>
+                <li><strong>GSM (2G)</strong> : TDMA/FDMA, 124 fréquences × 8 timeslots, BSS+MSC, HLR/VLR pour roaming.</li>
+                <li><strong>GPRS (2.5G)</strong> : Ajoute données packet-switched (SGSN/GGSN), 85 kbit/s typique, latence 700 ms.</li>
+                <li><strong>EDGE (2.75G)</strong> : Modulation 8-PSK au lieu GMSK, 236 kbit/s, latence 600 ms.</li>
+                <li><strong>UMTS (3G)</strong> : Rupture architecturale ! CDMA (3.84 MChip/s), 5 MHz porteuse, 384 kbit/s, latence 200-300 ms. FDD vs TDD.</li>
+                <li><strong>HSPA/HSPA+ (3.5/3.75G)</strong> : Extensions UMTS, jusqu'à 28 Mbit/s, MIMO, latence 80-100 ms.</li>
+                <li><strong>3GPP Releases</strong> : Phase 1/2 (GSM), R97-98 (GPRS/EDGE), R99 (UMTS), R4-7 (HSPA), R8-10 (LTE), R15+ (5G).</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Fondations pour LTE/4G</h3>
+            <p>Tous ces systèmes (GSM/GPRS/UMTS/HSPA) posent les bases :</p>
+            <ul>
+                <li><strong>Architecture HSS</strong> (UMTS) → remplacée par HSS en LTE.</li>
+                <li><strong>MME (Mobility Management Entity)</strong> en LTE reprend les fonctions de MSC/SGSN.</li>
+                <li><strong>Cœur IP-only</strong> : GSM/GPRS mixait circuit et packet. LTE ≈ IP-uniquement.</li>
+                <li><strong>HARQ et scheduling</strong> : concepts nés en HSPA, perfectionnés en LTE.</li>
+                <li><strong>Roaming international</strong> : mécanismes SS7 GSM → S1AP en LTE.</li>
+            </ul>
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch12_lora.html">← Chapitre 12 : LoRa & LoRaWAN</a>
+        <a href="index.html">↑ Accueil</a>
+        <a href="ch14_lte_radio.html">Chapitre 14 : LTE - Interface Radio →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+</body>
+</html>

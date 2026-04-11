@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 15 : LTE Mobilité | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 15 : LTE - Mobilité et Gestion de Réseau</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 15 : LTE — Mobilité et Gestion de Réseau</h1>
+
+        <p>Maintenant que nous comprenons l'interface radio LTE, ce chapitre couvre comment gérer la mobilité (handover, paging, optimisation énergie DRX) et la signalisation réseau pour que les UEs restent connectés et localisés. C'est l'infrastructure "intelligente" derrière LTE.</p>
+
+        <!-- MIB and SIBs -->
+        <h2>1. MIB et System Information Blocks (SIBs)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Infos minimales</div>
+            <p>Avant tout appel/données, UE doit lire MIB et SIBs pour apprendre la configuration cellule.</p>
+        </div>
+
+        <h3>MIB (Master Information Block)</h3>
+
+        <div class="theory-box">
+            <p>Transmis sur PBCH (Physical Broadcast Channel) périodiquement (tous les 80 ms). <strong>Première info lue</strong> après synchronisation :</p>
+            <ul>
+                <li>Largeur bande DL (1.4 / 3 / 5 / 10 / 15 / 20 MHz)</li>
+                <li>Nombre antennes eNodeB (1 / 2 / 4)</li>
+                <li>SFN (System Frame Number) : repère temporel</li>
+                <li>PHICH config : décide structure PHICH (ACK/NACK uplink)</li>
+                <li>PCFICH config : nombre symboles PDCCH (décide taille zone contrôle)</li>
+            </ul>
+            <p style="margin-top:0.8rem;">Taille MIB : <strong>10 bits = très compact</strong> (contraste avec HTTP 700+ bytes !).</p>
+        </div>
+
+        <h3>SIBs (System Information Blocks)</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>SIB</th>
+                    <th>Périodicité</th>
+                    <th>Contenu clé</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>SIB1</strong></td>
+                    <td>80 ms</td>
+                    <td>PLMN identity (MCC+MNC), Cell access info, Scheduling autres SIBs, <strong>Tracking Area Code</strong>.</td>
+                </tr>
+                <tr>
+                    <td><strong>SIB2</strong></td>
+                    <td>160 ms</td>
+                    <td>PRACH config (accès aléatoire), UL fréquence/bandwidth, <strong>Paging DRX cycle</strong>, infos downlink.</td>
+                </tr>
+                <tr>
+                    <td><strong>SIB3-13</strong></td>
+                    <td>Configurable</td>
+                    <td>Cellules voisines (handover), CSFB (circuit-switched fallback), WLAN, etc.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Tracking Areas -->
+        <h2>2. Tracking Areas (TA) et TAI</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Localité granulaire</div>
+            <p>GSM/UMTS utilisaient LAC (Location Area Code). LTE utilise <strong>Tracking Area</strong> : une TA regroupe plusieurs cellules voisines.</p>
+            <div class="analogy">
+                🗺️ <strong>Analogie :</strong> Si chaque ville était une cellule, plusieurs villes formeraient un "pays" (TA). MME sait l'UE est "dans ce pays" sans connaître la ville exacte. Quand UE bouge vers autre pays : mise à jour (coûte signalisation), mais rare.
+            </div>
+        </div>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>TAC (Tracking Area Code)</strong> : ID local dans le réseau. 16 bits.</li>
+                <li><strong>TAI (Tracking Area Identifier)</strong> : Global = PLMN ID (MCC + MNC) + TAC. Utilisé pour roaming international.</li>
+                <li><strong>Typical size</strong> : 1 TA = 5-50 cellules (dépend densité), zone quelques km².</li>
+            </ul>
+        </div>
+
+        <!-- MME -->
+        <h2>3. MME (Mobility Management Entity)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Cerveau du cœur réseau</div>
+            <p>Le <strong>MME</strong> (Mobility Management Entity) remplace l'MSC de GSM. C'est le cerveau du cœur réseau LTE pour la mobilité et la sécurité.</p>
+        </div>
+
+        <h3>Responsabilités MME</h3>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>Localisation UE</strong> : Sait quelle TA (et donc quelle eNodeB) a chaque UE.</li>
+                <li><strong>Authentification + Sécurité</strong> : Dialogue avec HSS pour authentifier UE (RAND/SRES), configurer chiffrement NAS.</li>
+                <li><strong>Gestion sessions</strong> : Crée/modifie/supprime GTP tunnels pour bearers vers SGW (Serving Gateway).</li>
+                <li><strong>Handover</strong> : Si X2 insuffisant (eNodeBs lointains), MME coordonne handover.</li>
+                <li><strong>Paging</strong> : Quand appel entrant → MME page UE sur toutes eNodeBs de la TA.</li>
+                <li><strong>Redondance</strong> : Plusieurs MMEs → GUMMEI (Global Unique MME ID) = PLMN ID + MMEGI (group) + MMEC (code).</li>
+            </ul>
+        </div>
+
+        <h3>Identités UE</h3>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Identité</th>
+                    <th>Quand utilisée</th>
+                    <th>Validité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>IMSI</strong></td>
+                    <td>Première connexion au réseau. Stockée sur SIM.</td>
+                    <td>Permanente (international)</td>
+                </tr>
+                <tr>
+                    <td><strong>GUTI</strong></td>
+                    <td>Après authentification. Envoyé chiffré.</td>
+                    <td>Valide dans MME/groupe MMEs</td>
+                </tr>
+                <tr>
+                    <td><strong>s-TMSI</strong></td>
+                    <td>Raccourci : MMEC + M-TMSI. Utilisé localement.</td>
+                    <td>Valide dans groupe MMEs</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <p><strong>Pourquoi plusieurs identités ?</strong> Protection vie privée. IMSI envoyé en clair risque qu'attaquant sache numéro = appelable. GUTI chiffré => protection. Changement GUTI périodiquement = empêche tracking simple.</p>
+        </div>
+
+        <!-- Paging -->
+        <h2>4. Paging — Rester localisé et économe</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Réveille-matin du téléphone</div>
+            <p><strong>Active UE</strong> : MME connaît la cell exacte → push direct. <strong>Idle UE</strong> (endormi) : MME sait seulement la TA → paging sur toutes cells de la TA.</p>
+        </div>
+
+        <h3>Paging quand appel entrant</h3>
+
+        <div class="theory-box">
+            <ol style="line-height:2;">
+                <li><strong>Appel arrive → MSC/HSS</strong> : Appel VoLTE pour UE. Network contacte MME : "Page cet UE".</li>
+                <li><strong>MME envoie Paging Request</strong> → toutes eNodeBs de la TA (sur S1-MME).</li>
+                <li><strong>eNodeBs diffusent sur PCH (Paging Channel)</strong> : "UE X, répondez !".</li>
+                <li><strong>UE en RRC Idle réveille</strong> : Tous les N×100ms (typiquement N=128 → toutes les 12.8 sec), UE réveille et écoute PDCCH.</li>
+                <li><strong>UE détecte son I-RNTI</strong> : PDCCH contient "paging" pour lui → UE se réveille complètement.</li>
+                <li><strong>UE envoie Paging Response</strong> sur PRACH → BSS → MSC. Connexion établie.</li>
+            </ol>
+        </div>
+
+        <!-- DRX -->
+        <h2>5. DRX (Discontinuous Reception) — Mode économie d'énergie</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Sommeil intelligent</div>
+            <p><strong>DRX</strong> : Au lieu d'écouter 24/7, UE dort et se réveille périodiquement. Économise batterie drastiquement.</p>
+            <div class="analogy">
+                🔋 <strong>Analogie :</strong> Sans DRX = téléphone toujours en écouteur. Avec DRX = dormir, se réveiller toutes les 12 secondes, vérifier si message. Batterie dure 10x plus longtemps.
+            </div>
+        </div>
+
+        <h3>C-DRX (Connected Mode DRX)</h3>
+
+        <div class="theory-box">
+            <p>UE en connexion RRC, mais données intermittentes :</p>
+            <ul>
+                <li><strong>Awake mode</strong> : Écoute PDCCH chaque sous-frame (activité détectée).</li>
+                <li><strong>Inactivity Timer expires</strong> (ex: 1 sec sans data) → Short DRX.</li>
+                <li><strong>Short DRX Cycle</strong> : ~20 ms sleep, se réveille tous les 20 ms (configurable). Acceptable pour réactivité.</li>
+                <li><strong>Short DRX Timer expires</strong> (ex: 5 sec en short DRX) → Long DRX.</li>
+                <li><strong>Long DRX Cycle</strong> : Très long sleep (ex: 2.56 s), se réveille tous les 2.56 s. Batterie excellent.</li>
+            </ul>
+            <p style="margin-top:0.8rem;"><strong>Paramètres</strong> : Envoyés par eNodeB via RRC dans ConnectionReconfiguration/ConnectionSetup sur DCCH.</p>
+        </div>
+
+        <h3>DRX Idle Mode</h3>
+
+        <div class="theory-box">
+            <p>UE en RRC Idle (pas de data) :</p>
+            <ul>
+                <li><strong>RRC Inactivity Timer</strong> : Après X ms sans données, eNodeB envoie RRC Release → UE va en Idle.</li>
+                <li><strong>Paging DRX Cycle</strong> : Très long (ex: 2.56 s). UE écoute toutes les 2.56 s pour appels entrants.</li>
+                <li><strong>Paramètres</strong> : defaultPagingCycle dans SIB2.</li>
+            </ul>
+        </div>
+
+        <h3>DRX Timing Advance</h3>
+
+        <div class="analogy" style="margin-top:1rem;">
+            ⏱️ <strong>Timing critère</strong> : UE doit se réveiller EXACTEMENT au moment où eNodeB envoie paging. Décalage = rate la paging = perte d'appel. RTC (Real Time Clock) du téléphone doit être précis. Dérive RTC ≤ 100 ppm = ok.
+        </div>
+
+        <!-- System Info Broadcast -->
+        <h2>6. Information System Broadcast (continuité)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Configuration cellule</div>
+            <p>MIB+SIB1+SIB2 sont <strong>obligatoires</strong>. Autres SIBs optionnels mais annoncés dans SIB1.</p>
+        </div>
+
+        <h3>Stratégie de transmission</h3>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>MIB</strong> : PBCH, tous les 80 ms, très fiable (4 répétitions).</li>
+                <li><strong>SIB1</strong> : PDSCH, tous les 80 ms, SIB1 change rarement (configuration basique).</li>
+                <li><strong>SIB2</strong> : PDSCH, tous les 160 ms. Contient PRACH/paging/UL config.</li>
+                <li><strong>Autres SIBs</strong> : Scheduled as needed. Ex: SIB3 (neighbor cells) pour handover.</li>
+            </ul>
+            <p style="margin-top:0.8rem;"><strong>Avantage</strong> : UE peut démarrer rapide (lire MIB + SIB1 + SIB2 = ~320 ms). Pas besoin attendre tous les SIBs si unnecessary.</p>
+        </div>
+
+        <!-- S1-AP -->
+        <h2>7. S1-AP — Signalisation eNodeB ↔ MME</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Protocole contrôle réseau</div>
+            <p><strong>S1-AP</strong> (S1 Application Protocol) : signalisation entre eNodeB et MME sur S1-MME interface.</p>
+        </div>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>Transport</strong> : SCTP (Stream Control Transmission Protocol, orienté message fiable).</li>
+                <li><strong>Usages majeurs</strong> :
+                    <ul style="margin-top:0.3rem;">
+                        <li>Initial UE Message : UE → eNodeB → S1-AP → MME (attach request, context setup).</li>
+                        <li>Authentication : MME ↔ HSS via DIAMETER, puis MME → eNodeB setup sécurité.</li>
+                        <li>Downlink NAS Transport : NAS PDUs (conteneur haut niveau) transportés via S1-AP.</li>
+                        <li>Paging : MME → eNodeB : "page cet UE".</li>
+                        <li>Handover : eNodeB A → MME → eNodeB B (coordination).</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <h3>NAS (Non-Access Stratum)</h3>
+
+        <div class="theory-box">
+            <p><strong>NAS</strong> = protocole haut niveau entre UE et MME (non radio). Contient :</p>
+            <ul>
+                <li><strong>Mobility management</strong> : Attach, detach, TA update, authentication.</li>
+                <li><strong>Session management</strong> : PDN connectivity requests (allocate IP), bearer setup.</li>
+                <li><strong>Signaling</strong> : Chiffré et intégré au RRC (transporté sur SRBs radio).</li>
+            </ul>
+            <p style="margin-top:0.5rem;">Distinction importante : <strong>RAS (Access Stratum)</strong> = radio (RRC/MAC/PHY). <strong>NAS</strong> = signalisation réseau haut niveau (non radio).</p>
+        </div>
+
+        <!-- Handover -->
+        <h2>8. Handover (Mobilité cellule-à-cellule)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Rester connecté en mouvement</div>
+            <p>Quand UE bougé d'une cellule à une autre, LTE doit switcher vers la meilleure cellule sans casser la connexion.</p>
+        </div>
+
+        <h3>Handover X2</h3>
+
+        <div class="theory-box">
+            <p>Scénario : eNodeB A, UE se rapproche de eNodeB B :</p>
+            <ol style="line-height:2;">
+                <li><strong>eNodeB A mesure signal voisin</strong> : UE envoie measurement report (cellule B devient meilleure).</li>
+                <li><strong>eNodeB A → eNodeB B (X2 interface)</strong> : Handover request. B prépare ressources.</li>
+                <li><strong>eNodeB B alloue RBs</strong>, prépare C-RNTI (Cell RNTI), envoie ACK à A.</li>
+                <li><strong>eNodeB A → UE</strong> : Handover command (RRC) + "switch to eNodeB B, new C-RNTI".</li>
+                <li><strong>UE synchronise sur eNodeB B</strong>, envoie Handover Confirm sur PRACH.</li>
+                <li><strong>eNodeB B → MME (S1-AP)</strong> : Path switch request (change tunnels de A à B).</li>
+                <li><strong>eNodeB A transfère data en vol</strong> à B (X2-U), puis se déconnecte.</li>
+            </ol>
+        </div>
+
+        <!-- Measurement and Reporting -->
+        <h2>9. Measurement et Reporting — Décisions handover</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Mécanisme décision</div>
+            <p>UE mesure signaux et rapporte à eNodeB. eNodeB décide de handover sur base rapports.</p>
+        </div>
+
+        <h3>Mesures UE</h3>
+
+        <div class="theory-box">
+            <ul>
+                <li><strong>Serving cell RSRP (Reference Signal Received Power)</strong> : Force signal reçue. Typiquement -75 à -140 dBm (+ fort = meilleur).</li>
+                <li><strong>Neighbor cell RSRP</strong> : UE peut mesurer jusqu'à 8 voisins (SIB3 liste candidates).</li>
+                <li><strong>RSRQ (Reference Signal Received Quality)</strong> : Force + interférence = qualité vraie.</li>
+                <li><strong>Measurement Report</strong> : UE envoie périodiquement (configurable, ex: tous les 100 ms). Contient RSRP/RSRQ cellule serving + voisins.</li>
+            </ul>
+        </div>
+
+        <h3>Trigger handover</h3>
+
+        <div class="theory-box">
+            <p>eNodeB décide handover via <strong>hysteresis + timing</strong> :</p>
+            <ul>
+                <li><strong>Hysteresis</strong> : Ex, basculer si voisin RSRP > serving RSRP + 3 dB (évite ping-pong).</li>
+                <li><strong>Time-to-Trigger</strong> : Ex, 256 ms = condition doit tenir 256 ms avant handover (smooth variations).</li>
+                <li><strong>Paramètres NAS</strong> : Hysteresis, TTT, measurement bandwidth envoyés via RRC.</li>
+            </ul>
+        </div>
+
+        <!-- Roaming -->
+        <h2>10. Roaming International et SSS7 vs S1-AP</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Quand UE va à l'étranger</div>
+            <p>UE détecte PLMN étranger, s'attache à réseau local. Cœur réseau doit trouver HLR "home" dans pays origine.</p>
+        </div>
+
+        <div class="theory-box">
+            <p><strong>Architecture roaming</strong> :</p>
+            <ul>
+                <li>UE en France, home HSS en Belgique.</li>
+                <li>UE s'attache au réseau France.</li>
+                <li>eNodeB France → MME France → G-MME France.</li>
+                <li>G-MME France → S6a interface (DIAMETER) → HSS Belgique (home).</li>
+                <li>HSS Belgique authentifie UE France, retourne profil.</li>
+                <li>Signalisation revient à MME France, qui établit session.</li>
+            </ul>
+            <p style="margin-top:0.8rem;"><strong>S6a vs SS7</strong> : GSM utilisait SS7 (Signaling System #7, protocol télécom classique). LTE utilise DIAMETER sur S6a (plus moderne, basé IP). Mais roaming SS7/S6a backwards compatible.</p>
+        </div>
+
+        <!-- Conclusion -->
+        <h2>Résumé pour l'examen</h2>
+
+        <div class="retenir">
+            <strong>Points-clés mobilité et réseau LTE :</strong>
+            <ul>
+                <li><strong>MIB</strong> : Lue en 1er, PBCH, 10 bits. Contient bandwidth, antennes, SFN, PHICH/PCFICH config.</li>
+                <li><strong>SIBs</strong> : SIB1 (PLMN/TAC), SIB2 (PRACH/DRX/UL), SIB3+ (voisins, autres configs).</li>
+                <li><strong>Tracking Area</strong> : Groupe cellules. TAC local, TAI global (+ PLMN). UE sait TA quand détection paging.</li>
+                <li><strong>MME</strong> : Cœur mobilité. Auth (HSS), gestion sessions (SGW), paging, handover. Redondance = GUMMEI.</li>
+                <li><strong>Identités UE</strong> : IMSI (permanent), GUTI (session chiffré), s-TMSI (local). Privé.</li>
+                <li><strong>Paging</strong> : Active UE localisée à cell. Idle UE localisée à TA. Tous les N×100ms réveil, écoute PDCCH.</li>
+                <li><strong>DRX</strong> : C-DRX (connected) = short/long cycles. Idle mode = paging DRX. Économie batterie majeure.</li>
+                <li><strong>S1-AP</strong> : Signalisation eNodeB ↔ MME. NAS transporté. SCTP, fiable.</li>
+                <li><strong>Handover X2</strong> : eNodeB A → eNodeB B (direct via X2), rapide, sans MME si possible. Mesure + hysteresis + TTT.</li>
+                <li><strong>Measurement Report</strong> : UE → eNodeB (RSRP, RSRQ). Décision handover. SIB3 liste voisins.</li>
+                <li><strong>Roaming</strong> : HSS home distant. S6a (DIAMETER) pour auth internationale. Architecture SSS7 hérité.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Fluxes clés à retenir</h3>
+            <ul>
+                <li><strong>Attach initial</strong> : UE PRACH → eNodeB S1-AP InitialUEMessage (+ NAS Attach Request) → MME authentifie (HSS) → alloue GUMMEI/GUTI → SGW alloue IP → Data + signaling bearers setup.</li>
+                <li><strong>Appel entrant</strong> : Réseau → G-MME → MME (trouve TA) → eNodeBs paging PCH → UE en Idle réveille (PDCCH) → répond PRACH → connexion RRC → signaling volte (SIB2 contient PRACH config).</li>
+                <li><strong>Handover en mouvement</strong> : eNodeB A reçoit measurement report → détecte voisin meilleur → X2 handover request → eNodeB B prépare → UE RRC command → UE synchro B → handover confirm → X2-U data forward → S1-AP path switch.</li>
+            </ul>
+        </div>
+
+        <div class="retenir" style="margin-top:2rem;">
+            <strong>Résumé ultime pour l'examen lundi :</strong> LTE = rupture (OFDMA+SC-FDMA, IP-only, eNodeB applaini). Interface radio chapitre 14. Mobilité/réseau chapitre 15 = MME cerveau + S1-AP signalisation + DRX économie + handover X2 rapide. GSM/GPRS/UMTS anciens mais posent fondations (HLR→HSS, TDMA→OFDMA, SGSN→SGSN remplacée par SGW). Comprendre architecture = maîtriser LTE.
+        </div>
+    </div>
+
+    <nav class="navigation">
+        <a href="ch14_lte_radio.html">← Chapitre 14 : LTE - Interface Radio</a>
+        <a href="index.html">↑ Accueil</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+</body>
+</html>

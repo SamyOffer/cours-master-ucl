@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 12 : LoRa & LoRaWAN | LINFO2146</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0D9488;
+            --amber: #F59E0B;
+            --light: #EFF6FF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9fafb;
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: #fbbf24;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--navy);
+            margin: 2rem 0 1rem 0;
+            font-size: 2em;
+            border-bottom: 3px solid var(--amber);
+            padding-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin: 1.8rem 0 1rem 0;
+            font-size: 1.6em;
+        }
+
+        h3 {
+            color: var(--navy);
+            margin: 1.3rem 0 0.8rem 0;
+            font-size: 1.2em;
+        }
+
+        .explain-intro {
+            background: #fffbeb;
+            border-left: 4px solid var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--amber);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy {
+            background: white;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--amber);
+            font-style: italic;
+            color: #555;
+        }
+
+        .math-block {
+            background: #f0fdf4;
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .formula {
+            background: white;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #d1fae5;
+        }
+
+        .symbols-table th, .symbols-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .symbols-table th {
+            background: #ecfdf5;
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table th {
+            background: var(--navy);
+            color: white;
+            font-weight: bold;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .retenir {
+            background: #f9a825;
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .theory-box {
+            background: #f0fdf4;
+            border-left: 3px solid var(--teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .pending-math {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        nav.navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 3rem 0 2rem 0;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        nav.navigation a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav.navigation a:hover {
+            background: var(--light);
+            color: var(--navy);
+        }
+
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .demo-box {
+            background: white;
+            border: 2px solid var(--light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .demo-box h3 {
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .control-group {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--navy);
+            min-width: 150px;
+        }
+
+        .control-group input[type="number"],
+        .control-group select {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+    <header>
+        <div class="breadcrumb">← <a href="index.html">Accueil</a> / Chapitre 12 : LoRa & LoRaWAN</div>
+    </header>
+
+    <div class="container">
+        <h1>Chapitre 12 : LoRa & LoRaWAN</h1>
+
+        <p>LoRa et LoRaWAN répondent à un besoin critique : les communications longue portée et basse consommation pour l'IoT. Alors que les technologies courte portée (802.15.4, WiFi) ne dépassent pas 100m et les réseaux mobiles (UMTS, LTE) consomment énormément d'énergie et sont coûteux, LoRa propose une alternative révolutionnaire.</p>
+
+        <!-- 1. Introduction LoRa -->
+        <h2>1. Pourquoi LoRa ? Le vide technologique</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Contexte</div>
+            <p>En 2010-2015, il existait un vide dans le paysage des technologies IoT : aucune solution n'était vraiment adaptée pour des capteurs longue portée (km), basse consommation (années de batterie), et à bas coût.</p>
+            <div class="analogy">
+                🌍 <strong>Analogie :</strong> 802.15.4 et WiFi, c'est comme avoir un téléphone qui fonctionne bien dans la maison (100m max), mais dès qu'on sort de chez soi, plus rien. UMTS/LTE, c'est comme avoir un téléphone satellite très puissant, mais il décharge la batterie en quelques heures et coûte très cher. LoRa, c'est le bon équilibre : une portée de km avec une batterie qui tient des années.
+            </div>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Technologie</th>
+                    <th>Portée</th>
+                    <th>Consommation</th>
+                    <th>Coût</th>
+                    <th>Cas d'usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>802.15.4 (ZigBee)</td>
+                    <td>100 m</td>
+                    <td>Très basse</td>
+                    <td>Bas</td>
+                    <td>Domotique courte portée</td>
+                </tr>
+                <tr>
+                    <td>WiFi</td>
+                    <td>100 m</td>
+                    <td>Moyenne-haute</td>
+                    <td>Bas</td>
+                    <td>Streaming, données hautes vitesses</td>
+                </tr>
+                <tr>
+                    <td>GSM</td>
+                    <td>35 km</td>
+                    <td>Haute</td>
+                    <td>Moyen-élevé</td>
+                    <td>Voix téléphonique (en phase de retrait)</td>
+                </tr>
+                <tr>
+                    <td>UMTS/LTE</td>
+                    <td>5-50 km</td>
+                    <td>Très haute</td>
+                    <td>Élevé</td>
+                    <td>Données mobiles haut débit</td>
+                </tr>
+                <tr>
+                    <td><strong>LoRa</strong></td>
+                    <td><strong>10+ km</strong></td>
+                    <td><strong>Très basse</strong></td>
+                    <td><strong>Bas</strong></td>
+                    <td><strong>IoT longue portée basse puissance</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="retenir">
+            ✅ LoRa comble le vide : longue portée, très basse consommation, bas coût. Parfait pour les réseaux de capteurs distribués qui doivent fonctionner 5-10 ans sur batterie.
+        </div>
+
+        <!-- 2. LoRa vs LoRaWAN -->
+        <h2>2. LoRa ≠ LoRaWAN : Couche physique vs Couche MAC</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Distinction cruciale</div>
+            <p>Attention : LoRa et LoRaWAN ne sont <strong>pas la même chose</strong>. LoRa est la couche physique propriétaire de Semtech. LoRaWAN est la couche MAC (Medium Access Control) définie par l'Alliance LoRa (open standard).</p>
+            <div class="analogy">
+                📡 <strong>Analogie :</strong> LoRa, c'est le "langage radio" — comment dire les choses sur les ondes. LoRaWAN, c'est la "grammaire et les règles" — qui peut parler, quand, comment on organise la communication. Vous ne pouvez parler que si vous connaissez le langage (LoRa), mais pour que tout le monde se comprenne, il faut aussi les règles (LoRaWAN).
+            </div>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>LoRa (Couche PHY)</th>
+                    <th>LoRaWAN (Couche MAC)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Spécification</td>
+                    <td>Propriétaire Semtech (documents limités)</td>
+                    <td>Open standard (LoRa Alliance, v1.0+)</td>
+                </tr>
+                <tr>
+                    <td>Modulation</td>
+                    <td>Chirp Spread Spectrum (CSS)</td>
+                    <td>Utilise LoRa pour transporter les frames</td>
+                </tr>
+                <tr>
+                    <td>Responsabilité</td>
+                    <td>Transmission radio, portée, décodage</td>
+                    <td>Accès au médium, authentification, gestion des appareils</td>
+                </tr>
+                <tr>
+                    <td>Exemple</td>
+                    <td>Puce SX1276 (transceiver)</td>
+                    <td>Protocole complet avec serveurs réseau et application</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 3. Architecture LoRaWAN -->
+        <h2>3. Architecture typique d'un réseau LoRaWAN</h2>
+
+        <div class="demo-box">
+            <h3>Flux de données</h3>
+            <p><code style="display:block; margin-top:0.5rem;">Appareil IoT → Passerelle (Gateway) → Serveur Réseau → Serveur Application → Vos services</code></p>
+            <ul style="margin-left: 1.5rem; margin-top: 1rem;">
+                <li><strong>Appareil IoT (End Device) :</strong> Capteur/actionneur avec puce LoRa (ex: Arduino avec SX1276). Envoie ses données vers une ou plusieurs passerelles.</li>
+                <li><strong>Passerelle (Gateway) :</strong> Reçoit les signaux LoRa de tous les appareils à proximité, les retransmet au serveur réseau via TCP/IP (WiFi, Ethernet, 4G).</li>
+                <li><strong>Serveur Réseau :</strong> Gère les connexions, authentification, déduplication des messages (car plusieurs gateways reçoivent le même message), ordonnancement des réponses.</li>
+                <li><strong>Serveur Application :</strong> Reçoit les données décryptées (LoRaWAN déchiffre avec la clé de l'application), exécute la logique métier.</li>
+            </ul>
+        </div>
+
+        <!-- 4. Couverture LoRa -->
+        <h2>4. Couverture et bandes de fréquence</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Portée remarquable</div>
+            <p>LoRa offre une portée impressionnante : dans les conditions idéales (ligne de vue), plusieurs kilomètres. Même en environnement urbain, une seule gateway peut couvrir toute une ville de taille moyenne.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Exemple réel : LLN (LoRa Lowlands Network) à UCLouvain</h3>
+            <p>Une seule gateway située sur le toit du bâtiment Reaumur couvre aisément la région de Louvain-la-Neuve et ses alentours — plusieurs kilomètres carrés. Cela montre la puissance de la technologie.</p>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Région</th>
+                    <th>Bande de fréquence</th>
+                    <th>Canaux</th>
+                    <th>Remarques</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Europe (UE)</td>
+                    <td>863-870 MHz</td>
+                    <td>10 × 125 kHz</td>
+                    <td>Largeur de bande par défaut</td>
+                </tr>
+                <tr>
+                    <td>USA</td>
+                    <td>902-928 MHz</td>
+                    <td>64 × 125 kHz</td>
+                    <td>Plus de canaux</td>
+                </tr>
+                <tr>
+                    <td>Asie</td>
+                    <td>923-925 MHz</td>
+                    <td>Varie</td>
+                    <td>Régions réglementaires différentes</td>
+                </tr>
+                <tr>
+                    <td>2.4 GHz (ISM)</td>
+                    <td>2400-2500 MHz</td>
+                    <td>Largeur variable</td>
+                    <td>Bande libre, mais portée réduite</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>UE : Division détaillée (863-870 MHz)</h3>
+            <p>Les 7 MHz sont divisés en canaux de 125 kHz :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Canaux 0-2 : 863.0, 863.5, 864.0 MHz</li>
+                <li>Canaux 3-5 : 864.5, 865.0, 865.5 MHz</li>
+                <li>Canaux 6-8 : 866.0, 866.5, 867.0 MHz</li>
+                <li>Canal 9 : 867.5 MHz</li>
+            </ul>
+        </div>
+
+        <!-- 5. Modulation LoRa (Chirp Spread Spectrum) -->
+        <h2>5. Modulation LoRa : Chirp Spread Spectrum (CSS)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Technologie clé</div>
+            <p>La "sauce secrète" de LoRa est son système de modulation : <strong>Chirp Spread Spectrum (CSS)</strong>. C'est ce qui permet la portée longue, la robustesse face aux interférences, et l'orthogonalité entre les spreading factors.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Qu'est-ce qu'un Chirp ?</h3>
+            <p>Un <strong>chirp</strong> est un signal dont la fréquence varie linéairement avec le temps. Imaginez une sirène qui monte (up chirp) ou descend (down chirp) graduellement.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Up chirp :</strong> Fréquence augmente linéairement dans le temps. Ex: 863 MHz → 863.125 MHz.</li>
+                <li><strong>Down chirp :</strong> Fréquence diminue linéairement.</li>
+                <li><strong>Avantage :</strong> Résistant aux interférences bruit blanc. Même si le signal est faible (peu de puissance), les chirps sont reconnaissables.</li>
+            </ul>
+        </div>
+
+        <div class="analogy">
+            🎵 <strong>Analogie musicale :</strong> Si vous fredonnez une note qui monte progressivement (do→ré→mi→...), même si vous chantez doucement, quelqu'un qui vous écoute reconnaîtra la montée. Un son constant qui est faible, vous ne l'entendrez peut-être pas. Le chirp, c'est pareil — la "progression" le rend robuste.
+        </div>
+
+        <div class="theory-box">
+            <h3>Spreading Factor (SF) : Le grand levier</h3>
+            <p>LoRa utilise des <strong>Spreading Factors</strong> de SF5 à SF12. Chaque SF divise un symbole en plusieurs chips (pulses de fréquence rapides).</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>SF5 :</strong> 32 chips par symbole. Rapide (haut débit), portée courte.</li>
+                <li><strong>SF12 :</strong> 4096 chips par symbole. Très lent (bas débit), portée maximale.</li>
+                <li><strong>Règle :</strong> SF+1 → symbole 2× plus long, débit 2× plus lent, portée 2-3× meilleure.</li>
+            </ul>
+            <p style="margin-top: 0.8rem;"><strong>Propriété magique :</strong> Les SFs sont presque orthogonaux — un récepteur accordé à SF7 peut ignorer les signaux SF8, SF9, etc. qui arrivent sur le même canal/fréquence au même moment. Cela permet multiplexer plusieurs appareils !</p>
+        </div>
+
+        <div class="demo-box">
+            <h3>📊 Démo : Impacte du SF sur le débit</h3>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Spreading Factor :</label>
+                    <select id="sfValue" onchange="updateSFDemo()">
+                        <option value="5">SF5</option>
+                        <option value="6">SF6</option>
+                        <option value="7" selected>SF7</option>
+                        <option value="8">SF8</option>
+                        <option value="9">SF9</option>
+                        <option value="10">SF10</option>
+                        <option value="11">SF11</option>
+                        <option value="12">SF12</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Bande passante :</label>
+                    <select id="bwValue" onchange="updateSFDemo()">
+                        <option value="125" selected>125 kHz</option>
+                        <option value="250">250 kHz</option>
+                        <option value="500">500 kHz</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Coding Rate :</label>
+                    <select id="crValue" onchange="updateSFDemo()">
+                        <option value="0.8" selected>4:5 (0.8)</option>
+                        <option value="0.75">4:6 (0.75)</option>
+                        <option value="0.667">4:7 (0.667)</option>
+                        <option value="0.625">4:8 (0.625)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="sfResults" style="margin-top: 1.5rem; padding: 1rem; background: #f0fdf4; border-left: 3px solid var(--teal); border-radius: 4px;">
+                <p><strong>Débit binaire :</strong> <span id="bitRateResult">—</span> bit/s</p>
+                <p style="margin-top: 0.5rem;"><strong>Durée d'un symbole :</strong> <span id="symbolTimeResult">—</span> ms</p>
+                <p style="margin-top: 0.5rem;"><strong>Portée relative :</strong> <span id="rangeEstimate">—</span></p>
+            </div>
+        </div>
+
+        <!-- 6. Bits par symbole et calcul de débit -->
+        <h2>6. Bits dans un symbole et calcul de débit</h2>
+
+        <div class="math-block">
+            <h3>Formules fondamentales</h3>
+            <div class="formula">
+                <div style="margin: 0.5rem 0;"><strong>Bits par symbole :</strong></div>
+                <div class="pending-math" data-latex="\text{Bits per Symbol} = \text{SF}"></div>
+            </div>
+            <div class="formula">
+                <div style="margin: 0.5rem 0;"><strong>Taux de symboles :</strong></div>
+                <div class="pending-math" data-latex="\text{Symbol Rate} = \frac{\text{Bandwidth}}{2^{\text{SF}}} \text{ (symboles/s)}"></div>
+            </div>
+            <div class="formula">
+                <div style="margin: 0.5rem 0;"><strong>Débit binaire :</strong></div>
+                <div class="pending-math" data-latex="\text{Bit Rate} = \text{SF} \times \text{Coding Rate} \times \text{Symbol Rate}"></div>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>Exemple concret 1 : SF7, 125 kHz, CR 4:5</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Bits par symbole : 7</li>
+                <li>Taux de symboles : 125,000 / 2^7 = 125,000 / 128 = <strong>976.6 symboles/s</strong></li>
+                <li>Coding Rate : 4:5 = 0.8</li>
+                <li>Débit : 7 × 0.8 × 976.6 = <strong>5,467 bit/s ≈ 5.5 kbit/s</strong></li>
+            </ul>
+        </div>
+
+        <div class="demo-box">
+            <h3>Exemple concret 2 : SF12, 125 kHz, CR 4:5</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Bits par symbole : 12</li>
+                <li>Taux de symboles : 125,000 / 2^12 = 125,000 / 4,096 = <strong>30.5 symboles/s</strong></li>
+                <li>Coding Rate : 4:5 = 0.8</li>
+                <li>Débit : 12 × 0.8 × 30.5 = <strong>292.8 bit/s ≈ 0.29 kbit/s</strong></li>
+            </ul>
+        </div>
+
+        <div class="retenir">
+            ✅ SF7 @ 125 kHz ≈ 5.5 kbit/s | SF12 @ 125 kHz ≈ 0.3 kbit/s. Le SF divise le débit par deux à chaque incrément, mais augmente la portée et la robustesse.
+        </div>
+
+        <!-- 7. LoRaWAN MAC et structure des frames -->
+        <h2>7. LoRaWAN : Couche MAC et structure des frames</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Spécification ouverte</div>
+            <p>LoRaWAN est défini par la LoRa Alliance (Semtech, Orange, Proximus, etc.). C'est une spécification ouverte (version 1.0.x, 1.1.x) qui structure comment les appareils et gateways communiquent.</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DevEUI</td>
+                    <td>64-bit identifiant unique de l'appareil (IEEE MAC format)</td>
+                </tr>
+                <tr>
+                    <td>AppEUI / JoinEUI</td>
+                    <td>64-bit identifiant de l'application / du serveur de jointure</td>
+                </tr>
+                <tr>
+                    <td>DevAddr</td>
+                    <td>32-bit adresse assignée après activation (unique dans le réseau)</td>
+                </tr>
+                <tr>
+                    <td>Data Rates (DR)</td>
+                    <td>DR0 (SF12, 125 kHz) à DR7 (FSK 50 kbit/s). Seuls DR0-DR6 utilisent LoRa ; DR7 = FSK modulé</td>
+                </tr>
+                <tr>
+                    <td>Frame Counter</td>
+                    <td>Compteur 32-bit (ou 16-bit en v1.0) pour éviter les rejeux</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Structure d'une frame LoRaWAN</h3>
+            <p>Une frame LoRaWAN montante (device → réseau) :</p>
+            <code style="display:block; margin:0.5rem 0; padding:0.5rem; background:#f3f4f6;">
+MHDR | DevAddr | FCtrl | FCnt | Opts | Port | Payload | MIC
+ 1B  |   4B    |  1B   | 2/4B |  ?   |  1B  |  ≤ N B  | 4B
+            </code>
+            <ul style="margin-left: 1.5rem; margin-top: 0.8rem;">
+                <li><strong>MHDR (1B) :</strong> Type de message (Join Request, Unconfirmed Data, Confirmed Data, Downlink, etc.)</li>
+                <li><strong>DevAddr (4B) :</strong> Adresse de l'appareil (assignée lors de l'activation)</li>
+                <li><strong>FCtrl (1B) :</strong> Options (ACK, Class bits, FPending, etc.)</li>
+                <li><strong>FCnt (2-4B) :</strong> Compteur de frames (protection anti-rejeux)</li>
+                <li><strong>Opts (variable) :</strong> Commandes MAC (ne pas confondre avec MQTT)</li>
+                <li><strong>Port (1B) :</strong> Numéro de port applicatif (0=MAC, 1-223=application, 224-255=réservé)</li>
+                <li><strong>Payload (0-242B) :</strong> Données applicatives (déchiffrées avec AppSKey)</li>
+                <li><strong>MIC (4B) :</strong> Message Integrity Code (AES-128 avec NwSKey)</li>
+            </ul>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Data Rate (DR)</th>
+                    <th>Modulation</th>
+                    <th>Débit nominal</th>
+                    <th>Taille payload max (UE)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DR0</td>
+                    <td>LoRa SF12, 125 kHz</td>
+                    <td>250 bit/s</td>
+                    <td>51 B</td>
+                </tr>
+                <tr>
+                    <td>DR1</td>
+                    <td>LoRa SF11, 125 kHz</td>
+                    <td>440 bit/s</td>
+                    <td>51 B</td>
+                </tr>
+                <tr>
+                    <td>DR2</td>
+                    <td>LoRa SF10, 125 kHz</td>
+                    <td>980 bit/s</td>
+                    <td>51 B</td>
+                </tr>
+                <tr>
+                    <td>DR3</td>
+                    <td>LoRa SF9, 125 kHz</td>
+                    <td>1760 bit/s</td>
+                    <td>115 B</td>
+                </tr>
+                <tr>
+                    <td>DR4</td>
+                    <td>LoRa SF8, 125 kHz</td>
+                    <td>3125 bit/s</td>
+                    <td>242 B</td>
+                </tr>
+                <tr>
+                    <td>DR5</td>
+                    <td>LoRa SF7, 125 kHz</td>
+                    <td>5470 bit/s</td>
+                    <td>242 B</td>
+                </tr>
+                <tr>
+                    <td>DR6</td>
+                    <td>LoRa SF7, 250 kHz</td>
+                    <td>11000 bit/s</td>
+                    <td>242 B</td>
+                </tr>
+                <tr>
+                    <td>DR7</td>
+                    <td>FSK 50 kbit/s</td>
+                    <td>50000 bit/s</td>
+                    <td>242 B</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 8. Accès au médium et ALOHA -->
+        <h2>8. Accès au médium : ALOHA et retransmissions</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Protocole simple</div>
+            <p>LoRaWAN n'utilise pas de CSMA/CA complexe (comme WiFi). À la place, il utilise <strong>ALOHA</strong> : les appareils envoient simplement leurs données, et le serveur gère les collisions et retransmissions.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>ALOHA : Accès aléatoire simple</h3>
+            <p>Un appareil peut envoyer à tout moment (pas d'écoute du canal avant transmission). Si deux appareils envoient exactement au même moment sur le même canal → collision, les deux messages sont perdus. Le serveur détecte l'absence de réponse et demande une retransmission.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Mode Confirmed :</strong> L'appareil attend un ACK du serveur. S'il ne le reçoit pas dans la fenêtre RX2, il retransmet après délai aléatoire.</li>
+                <li><strong>Mode Unconfirmed :</strong> L'appareil envoie une fois et oublie. Pas de retransmission.</li>
+                <li><strong>Avantage :</strong> Très simple, peu d'énergie (pas d'écoute). La fiabilité est déléguée au serveur.</li>
+                <li><strong>Inconvénient :</strong> Pas garantie de livraison (c'est au serveur application de gérer). Si le réseau est encombré, perte de messages.</li>
+            </ul>
+        </div>
+
+        <!-- 9. Classes d'appareils LoRaWAN -->
+        <h2>9. Classes d'appareils LoRaWAN (A, B, C)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Trois modèles</div>
+            <p>LoRaWAN définit trois classes d'appareils, chacune avec un modèle de réception différent. Le choix dépend du cas d'usage : peut-on garder le réseau toujours actif ou doit-il dormir pour économiser l'énergie ?</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Classe A : Tous les appareils doivent la supporter</h3>
+            <p><strong>Comportement :</strong> L'appareil envoie à tout moment. Après chaque transmission, il ouvre 2 fenêtres de réception :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>RX1 :</strong> 1-5 secondes après transmission. Même canal et débit que l'uplink.</li>
+                <li><strong>RX2 :</strong> 2 secondes après RX1 fermeture (ou après RX1). Canal et DR préconfigurés, généralement SF12 @ 869.525 MHz (UE).</li>
+            </ul>
+            <p style="margin-top: 0.8rem;"><strong>Propriété clé :</strong> Le serveur peut UNIQUEMENT envoyer une réponse (downlink) dans ces fenêtres. En dehors, impossible.</p>
+            <p style="margin-top: 0.5rem;"><strong>Cas d'usage :</strong> Capteurs qui envoient rarement (quelques fois par jour) → dorment 99% du temps → batterie dure des années.</p>
+            <p style="margin-top: 0.5rem;"><strong>Exemple durée de vie :</strong> Capteur envoie 1× par jour, 50 bytes, SF7 @ 125 kHz ≈ 46 ms par transmission. Avec deux RX windows → énergie négligeable. Batterie AA → 5-10 ans.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Classe B : Écoute programmée (Beacon)</h3>
+            <p><strong>Amélioration par rapport à A :</strong> L'appareil écoute périodiquement un beacon (signal de synchronisation envoyé par le serveur), qui définit des "ping slots" où il peut recevoir des messages du serveur.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Période beacon :</strong> Par défaut 128 secondes.</li>
+                <li><strong>Ping slots :</strong> 4096 par période. Durée par slot : (128 - 2.12 - 3) / 4096 ≈ 30 ms.</li>
+                <li><strong>Avantage :</strong> Le serveur peut atteindre l'appareil à des moments prévisibles (sans attendre qu'il envoie).</li>
+                <li><strong>Inconvénient :</strong> L'appareil doit écouter toutes les 128/4096 ≈ 31 ms → consommation plus élevée.</li>
+            </ul>
+            <p style="margin-top: 0.8rem;"><strong>Cas d'usage :</strong> Appareils nécessitant une latence modérée (lampadaires qu'on peut éteindre à distance, etc.). Batterie : quelques mois à 1 an.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Classe C : Réception continue (mais alternée)</h3>
+            <p><strong>Comportement :</strong> Après chaque transmission, l'appareil ouvre RX1 et RX2. Entre deux transmissions, il garde le RX2 toujours ouvert (ou les deux canaux alternativement).</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Propriété :</strong> Quasiment latence zéro. Le serveur peut envoyer un downlink presque instantanément.</li>
+                <li><strong>Inconvénient :</strong> Récepteur allumé presque tout le temps → très consommateur d'énergie.</li>
+                <li><strong>Cas d'usage :</strong> Appareils sur secteur (pas de batterie) : lampadaires intelligents, routeurs, serveurs LoRa.</li>
+            </ul>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Classe</th>
+                    <th>Latence downlink</th>
+                    <th>Consommation</th>
+                    <th>Durée batterie</th>
+                    <th>Cas d'usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>A</strong></td>
+                    <td>1-5 + 1 sec (après uplink)</td>
+                    <td>Très basse</td>
+                    <td>5-10 ans</td>
+                    <td>Capteurs qui envoient rarement</td>
+                </tr>
+                <tr>
+                    <td><strong>B</strong></td>
+                    <td>≤ 128 sec (programmé)</td>
+                    <td>Basse-modérée</td>
+                    <td>6-12 mois</td>
+                    <td>Appareils avec latence tolérée</td>
+                </tr>
+                <tr>
+                    <td><strong>C</strong></td>
+                    <td>Quasi-immédiate</td>
+                    <td>Haute (secteur)</td>
+                    <td>—</td>
+                    <td>Appareils sur secteur</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 10. Temps en l'air (Time on Air) -->
+        <h2>10. Temps en l'air (Time on Air)</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Limitation importante</div>
+            <p>Chaque transmission occupe le canal pendant un certain temps. En Europe, la réglementation limite l'utilisation à 1% du temps (ou moins selon la bande). Cela limite le nombre de messages/jour.</p>
+        </div>
+
+        <div class="math-block">
+            <h3>Calcul du Time on Air</h3>
+            <p>Le Time on Air dépend du SF, de la largeur de bande, du CR, et de la taille du payload.</p>
+            <div style="background: white; padding: 1rem; border-radius: 4px; margin: 0.8rem 0;">
+                <p><strong>Formule approximative :</strong></p>
+                <code style="display:block; margin:0.5rem 0;">
+ToA ≈ (Nombre de symboles) × (Durée d'un symbole)
+Durée d'un symbole = 2^SF / Bandwidth
+                </code>
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h3>Exemples concrets</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>SF7, 125 kHz, CR 4:5, 1 byte payload :</strong> ToA ≈ 46.3 ms</li>
+                <li><strong>SF12, 125 kHz, CR 4:5, 1 byte payload :</strong> ToA ≈ 1155.1 ms (plus d'1 seconde !)</li>
+                <li><strong>SF12, 125 kHz, CR 4:5, 20 byte payload :</strong> ToA ≈ 2400+ ms</li>
+            </ul>
+            <p style="margin-top: 1rem;"><strong>Implication :</strong> Avec un duty cycle 1% en UE, un appareil peut envoyer :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>SF7 @ 20 bytes : ~51 messages/jour (86,400 s × 1% / 46 ms)</li>
+                <li>SF12 @ 20 bytes : ~2 messages/jour</li>
+            </ul>
+        </div>
+
+        <!-- 11. Réglementation duty cycle UE -->
+        <h2>11. Réglementation Duty Cycle en Europe</h2>
+
+        <div class="theory-box">
+            <p>L'UE divise la bande 863-870 MHz en sous-bandes avec des restrictions duty cycle différentes :</p>
+        </div>
+
+        <table class="symbols-table">
+            <thead>
+                <tr>
+                    <th>Sous-bande</th>
+                    <th>Fréquence</th>
+                    <th>Duty Cycle max</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>K</td>
+                    <td>863.0-865.0 MHz</td>
+                    <td>0.1%</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>865.0-868.0 MHz</td>
+                    <td>1%</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>868.0-868.6 MHz</td>
+                    <td>1%</td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>868.7-869.2 MHz</td>
+                    <td>0.1%</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>869.4-869.65 MHz</td>
+                    <td>10%</td>
+                    <td>(Bande "libre")</td>
+                </tr>
+                <tr>
+                    <td>Q</td>
+                    <td>869.7-870.0 MHz</td>
+                    <td>1%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="retenir">
+            ✅ Respecter le duty cycle est obligatoire. Les devices et gateways doivent compter leur temps d'émission et interrompre si le seuil est atteint.
+        </div>
+
+        <!-- 12. Gateway LoRa -->
+        <h2>12. Passerelles (Gateways) LoRaWAN</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Point central</div>
+            <p>Une gateway LoRa est un équipement intermédiaire qui reçoit les signaux LoRa de tous les appareils et les retransmet au serveur réseau via IP (WiFi, Ethernet, 4G).</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Appareil LoRa (End Device)</th>
+                    <th>Gateway LoRa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Transceiver</td>
+                    <td>SX1276, SX1272 (1 canal)</td>
+                    <td>SX1302, SX1308 (multicanal, jusqu'à 10 ch simultanés)</td>
+                </tr>
+                <tr>
+                    <td>Puissance TX</td>
+                    <td>+14 dBm typical</td>
+                    <td>+27 dBm typical</td>
+                </tr>
+                <tr>
+                    <td>Réception</td>
+                    <td>Un message à la fois</td>
+                    <td>Plusieurs messages simultanés sur différents canaux/SFs</td>
+                </tr>
+                <tr>
+                    <td>Coût</td>
+                    <td>€5-20 (module)</td>
+                    <td>€100-500+ (équipement complet)</td>
+                </tr>
+                <tr>
+                    <td>Déploiement</td>
+                    <td>Intégré dans capteurs/appareils</td>
+                    <td>Installé en hauteur (toit, mât) pour couvrir une région</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Capacité d'une gateway</h3>
+            <p>Une gateway moderne (SX1302) peut traiter environ :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Réception simultanée : ~10 canaux × SF12 (worst case).</li>
+                <li>Débit de messages : Typiquement ~50,000 messages/jour avec payload moyen 20 bytes (sous duty cycle 1%).</li>
+                <li>Dans des conditions optimales : jusqu'à 700,000 messages/jour.</li>
+            </ul>
+        </div>
+
+        <!-- 13. Déduplication et Frame Counter -->
+        <h2>13. Déduplication et prévention des rejeux</h2>
+
+        <div class="theory-box">
+            <h3>Déduplication par le serveur réseau</h3>
+            <p>Comme plusieurs gateways reçoivent le même message (si l'appareil est à la limite de la portée de plusieurs gateways), le serveur réseau déduplique en utilisant :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Frame Counter :</strong> Chaque message a un compteur croissant. Si un message arrive deux fois avec le même compteur → doublon → ignorer.</li>
+                <li><strong>RSSI + timestamp :</strong> Si deux messages avec le même compteur arrivent à des moments différents ou avec des forces de signal différentes → le meilleur est gardé.</li>
+                <li><strong>Prévention des rejeux :</strong> Si le compteur n'a pas augmenté depuis la dernière réception → message de rejeu → rejeter.</li>
+            </ul>
+        </div>
+
+        <!-- 14. Sécurité LoRaWAN -->
+        <h2>14. Sécurité LoRaWAN : Clés et chiffrement</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Authentification et confidentialité</div>
+            <p>LoRaWAN utilise AES-128 pour l'authentification et le chiffrement. Deux clés sont impliquées :</p>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Clé</th>
+                    <th>Taille</th>
+                    <th>Utilisée par</th>
+                    <th>Fonction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>NwSKey</strong> (Network Session Key)</td>
+                    <td>128 bits</td>
+                    <td>Appareil + Serveur réseau</td>
+                    <td>Calcule le MIC (Message Integrity Code). Protège contre les modifications.</td>
+                </tr>
+                <tr>
+                    <td><strong>AppSKey</strong> (Application Session Key)</td>
+                    <td>128 bits</td>
+                    <td>Appareil + Serveur application</td>
+                    <td>Chiffre/déchiffre le payload applicatif (AES-128-CTR).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="theory-box">
+            <h3>Séparation des responsabilités</h3>
+            <p>C'est une architecture intéressante :</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Serveur réseau :</strong> Reçoit le message avec MIC. Peut vérifier que le message n'a pas été modifié (avec NwSKey), mais <strong>ne peut pas lire le payload</strong> (chiffré avec AppSKey).</li>
+                <li><strong>Serveur application :</strong> Reçoit le payload déchiffré. Il ne connaît pas NwSKey (donc ne peut pas vérifier le MIC lui-même), mais c'est le serveur réseau qui l'a garanti.</li>
+            </ul>
+        </div>
+
+        <!-- 15. Activation : OTAA vs ABP -->
+        <h2>15. Activation des appareils : OTAA et ABP</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Deux approches</div>
+            <p>Avant de pouvoir communiquer, un appareil doit être "activé" : il faut que le réseau lui assigne une adresse (DevAddr) et des clés de session.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>OTAA (Over-The-Air Activation)</h3>
+            <p><strong>Principe :</strong> L'appareil demande son activation via un "Join Request".</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Avant :</strong> L'appareil a DevEUI, AppEUI, AppKey (stockés en usine ou en manufacture).</li>
+                <li><strong>Join Request :</strong> Message signé avec AppKey contenant DevEUI + AppEUI + DevNonce (aléatoire).</li>
+                <li><strong>Join Accept :</strong> Le serveur répond avec JoinNonce (aléatoire), assignant : DevAddr, NwSKey, AppSKey.</li>
+                <li><strong>Après :</strong> L'appareil connaît ses clés de session et peut communiquer.</li>
+            </ul>
+            <p style="margin-top: 0.8rem;"><strong>Avantage :</strong> AppKey jamais transmis en clair. Sécurisé. Idéal pour les appareils vendus en masse (chacun a sa clé).</p>
+            <p style="margin-top: 0.5rem;"><strong>Note v1.0.4+ :</strong> Depuis v1.0.4, il y a aussi NwkKey (clé réseau séparé) et un "Join Server" dédié.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>ABP (Activation By Personalization)</h3>
+            <p><strong>Principe :</strong> Les clés sont préconfigurées manuellement sur l'appareil avant déploiement.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>L'administrateur réseau configure : DevAddr, NwSKey, AppSKey directement sur l'appareil (via UART, configuration file, etc.).</li>
+                <li>L'appareil envoie des messages immédiatement, sans Join Request.</li>
+                <li><strong>Avantage :</strong> Plus rapide, pas besoin de serveur Join. Simple pour prototypage.</li>
+                <li><strong>Inconvénient :</strong> Si on change de réseau (ex: Proximus → The Things Network), faut reconfigurer tous les appareils. Clés moins sécurisées (partagées, potentiellement vue par plusieurs personnes).</li>
+            </ul>
+        </div>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>OTAA</th>
+                    <th>ABP</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Configuration préalable</td>
+                    <td>DevEUI, AppEUI, AppKey</td>
+                    <td>DevAddr, NwSKey, AppSKey</td>
+                </tr>
+                <tr>
+                    <td>Join process</td>
+                    <td>Dynamique (chaque démarrage)</td>
+                    <td>Aucun (clés directement utilisées)</td>
+                </tr>
+                <tr>
+                    <td>Sécurité</td>
+                    <td>Haute (AppKey jamais transmis)</td>
+                    <td>Plus faible (clés préfixées, moins flexibles)</td>
+                </tr>
+                <tr>
+                    <td>Portabilité</td>
+                    <td>Haute (changement de réseau facile)</td>
+                    <td>Faible (reconfiguration nécessaire)</td>
+                </tr>
+                <tr>
+                    <td>Cas d'usage</td>
+                    <td>Production, multi-réseau</td>
+                    <td>Prototypage, réseau unique</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 16. Construire un réseau LoRaWAN -->
+        <h2>16. Construire un réseau LoRaWAN</h2>
+
+        <div class="explain-intro">
+            <div class="badge">Options pratiques</div>
+            <p>Vous avez plusieurs options pour déployer LoRaWAN : acheter du matériel, rejoindre un réseau existant, ou utiliser un service commercial.</p>
+        </div>
+
+        <div class="theory-box">
+            <h3>Option 1 : Infrastructure privée</h3>
+            <p>Acheter une gateway (ex: Kerlink, Semtech, Huawei) + serveur réseau (ChirpStack, The Things Stack privé).</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Coût :</strong> Gateway €200-1000+, serveur peut être un Raspberry Pi.</li>
+                <li><strong>Avantage :</strong> Entièrement contrôlé, aucune dépendance externe.</li>
+                <li><strong>Inconvénient :</strong> Vous gérez tout (mises à jour, sécurité, disponibilité).</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Option 2 : The Things Network (TTN) - Gratuit</h3>
+            <p><strong>TTN</strong> est un réseau LoRaWAN public et gratuit, soutenu par The Things Industries et des bénévoles.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Coût :</strong> Gratuit ! (Fair use policy : 30 sec/jour/device, payload limité).</li>
+                <li><strong>Avantage :</strong> Infrastructure mutualisée. Pas de maintenance. Idéal pour prototypage et petits projets.</li>
+                <li><strong>Inconvénient :</strong> Vous dépendez de bénévoles. Limite 30 sec/jour/device. Pas de garantie SLA.</li>
+            </ul>
+        </div>
+
+        <div class="theory-box">
+            <h3>Option 3 : Services commerciaux</h3>
+            <p>Orange, Proximus (Belgique), KPN (Pays-Bas), etc. offrent des services LoRaWAN gérés.</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Proximus (Belgique) :</strong>
+                    <ul style="margin-left: 1.5rem;">
+                        <li>Plan "Heavy" : ~€1/appareil/mois.</li>
+                        <li>Plan "Light" : €0.50 + coût par message.</li>
+                    </ul>
+                </li>
+                <li><strong>Avantage :</strong> SLA garanti, infrastructure nationale, support professionnel.</li>
+                <li><strong>Inconvénient :</strong> Coûteux pour beaucoup d'appareils (mais rentable à grande échelle).</li>
+            </ul>
+        </div>
+
+        <!-- Résumé pour l'examen -->
+        <h2>Résumé pour l'examen</h2>
+
+        <div class="retenir">
+            <h3 style="color: white; margin-top: 0;">Concepts clés à retenir</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.8rem; color: white;">
+                <li><strong>LoRa PHY :</strong> Modulation Chirp Spread Spectrum. SF5-SF12. Plus SF = plus loin mais plus lent.</li>
+                <li><strong>LoRaWAN MAC :</strong> Spécification ouverte. DevEUI, AppEUI, DevAddr. Frames avec header + payload + MIC.</li>
+                <li><strong>Débit :</strong> SF7 @ 125 kHz ≈ 5.5 kbit/s. SF12 ≈ 0.3 kbit/s. Calculez avec la formule : Bit Rate = SF × CR × (BW / 2^SF).</li>
+                <li><strong>Classes :</strong> A = tous les devices, dormir 99% du temps. B = beacon + ping slots. C = réception continue (secteur).</li>
+                <li><strong>Duty cycle UE :</strong> 1% max (ou 0.1% selon la bande). Limite le nombre de messages/jour.</li>
+                <li><strong>Sécurité :</strong> NwSKey (MIC) + AppSKey (chiffrement payload). OTAA = dynamique, sûr. ABP = statique, plus simple.</li>
+                <li><strong>Gateway :</strong> Reçoit tous les appareils, déduplique via frame counter, retransmet au serveur réseau via IP.</li>
+                <li><strong>Cas d'usage real :</strong> Smart meters, capteurs agricoles, suivi d'actifs, monitoring environnemental.</li>
+            </ul>
+        </div>
+
+        <div class="retenir">
+            <h3 style="color: white; margin-top: 0;">Formules importantes</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.8rem; color: white;">
+                <li><strong>Symbol Rate :</strong> BW / 2^SF (symboles/s)</li>
+                <li><strong>Bit Rate :</strong> SF × CR × Symbol Rate</li>
+                <li><strong>Durée symbole :</strong> 1 / Symbol Rate (ms)</li>
+                <li><strong>Time on Air :</strong> ~(Preamble + Header + Payload) × Durée symbole</li>
+                <li><strong>Fair use TTN :</strong> 30 sec/jour/device = 30,000 ms</li>
+            </ul>
+        </div>
+
+        <div class="retenir">
+            <h3 style="color: white; margin-top: 0;">Pièges courants à l'examen</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.8rem; color: white;">
+                <li>Confondre LoRa (PHY) avec LoRaWAN (MAC). Les deux sont nécessaires.</li>
+                <li>Oublier que SF+1 = 2× plus long, donc 2× plus lent en débit, mais 2-3× meilleur en portée.</li>
+                <li>Penser que les appareils peuvent recevoir n'importe quand. Non ! Classe A = seulement RX1/RX2 après uplink.</li>
+                <li>Ignorer le duty cycle. Les appareils doivent rester dans les limites légales.</li>
+                <li>Confondre NwSKey (serveur réseau) et AppSKey (serveur application). Deux clés différentes, deux serveurs différents.</li>
+                <li>Croire que OTAA est gratuit. Joindre consomme du Time on Air aussi !</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <nav class="navigation">
+        <a href="ch11_mqtt_coap.html">← Chapitre précédent</a>
+        <a href="quiz.html" style="background:#f59e0b;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none;">🎯 Quiz</a>
+        <a href="ch13_cellular.html">Chapitre suivant →</a>
+    </nav>
+
+    <footer>
+        LINFO2146 - Mobile and Embedded Computing / Prof. Ramin Sadre · UCLouvain
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+
+    <script>
+        // Render KaTeX formulas
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                const latex = el.getAttribute('data-latex');
+                if (latex && window.katex) {
+                    el.innerHTML = katex.renderToString(latex, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                }
+            });
+        });
+
+        // SF Demo calculator
+        function updateSFDemo() {
+            const sf = parseInt(document.getElementById('sfValue').value);
+            const bw = parseInt(document.getElementById('bwValue').value);
+            const cr = parseFloat(document.getElementById('crValue').value);
+
+            // Symbol rate = BW / 2^SF
+            const symbolRate = bw / Math.pow(2, sf);
+
+            // Bit rate = SF × CR × Symbol Rate
+            const bitRate = sf * cr * symbolRate;
+
+            // Symbol duration (ms)
+            const symbolDuration = (Math.pow(2, sf) / bw) * 1000;
+
+            // Range estimate (very rough)
+            let range;
+            if (sf <= 7) range = "Courte (< 5 km)";
+            else if (sf <= 9) range = "Moyenne (5-10 km)";
+            else if (sf <= 11) range = "Longue (10-20 km)";
+            else range = "Très longue (20+ km)";
+
+            document.getElementById('bitRateResult').textContent = bitRate.toFixed(1) + ' bit/s';
+            document.getElementById('symbolTimeResult').textContent = symbolDuration.toFixed(2) + ' ms';
+            document.getElementById('rangeEstimate').textContent = range;
+        }
+
+        updateSFDemo();
+    </script>
+
+</body>
+</html>
