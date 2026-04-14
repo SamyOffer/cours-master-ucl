@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 10 — Détection d'Anomalies (Outlier Detection)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8FAFC;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid #0D9488;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box {
+            background: #EFF6FF;
+            border-left: 4px solid #1E3A5F;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1E3A5F;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #1E3A5F;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #0D9488;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #1E3A5F;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .icon-card {
+            text-align: center;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .icon-card-emoji {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .icon-card-text {
+            font-weight: 600;
+            color: #1E3A5F;
+        }
+
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .example-card {
+            padding: 15px;
+            background: #F0FDF4;
+            border: 1px solid #0D9488;
+            border-radius: 8px;
+        }
+
+        .pending-math {
+            display: block;
+            margin: 15px 0;
+            padding: 15px;
+            background: #F0FDF4;
+            border-radius: 8px;
+        }
+
+        .demo-section {
+            background: #F1F5F9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #0D9488;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: block;
+        }
+
+        button {
+            background: #0D9488;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0F766E;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #1E3A5F;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-card {
+            padding: 15px;
+            background: #EFF6FF;
+            border: 1px solid #1E3A5F;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            color: #0D9488;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            color: #94A3B8;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: #0D9488;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-group {
+            margin: 15px 0;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+        }
+
+        .slider-label {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        footer {
+            background: #1E3A5F;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        footer .title {
+            color: #F59E0B;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        footer .subtitle {
+            color: #94A3B8;
+            font-size: 0.95em;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+
+        .nav-button {
+            background: #1E3A5F;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .nav-button:hover {
+            background: #0D9488;
+        }
+
+        .nav-button:disabled, .nav-button.disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: #E2E8F0;
+            color: #1E3A5F;
+            border: 2px solid #CBD5E1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            background: #0D9488;
+            color: white;
+            border-color: #0D9488;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:9999;background:#1E3A5F;border-bottom:3px solid #F59E0B;padding:.55rem 1.25rem;display:flex;align-items:center;gap:1rem;font-family:'Segoe UI',system-ui,sans-serif;"><a href="../index.html" style="color:#fff;text-decoration:none;font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);padding:.3rem .85rem;border-radius:999px;" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">← Tous les cours</a><span style="color:#94A3B8;font-size:.82rem;">Cours Master UCL</span></div>
+    <header style="background:#1E3A5F; padding:0; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+        <div style="display:flex; align-items:stretch">
+            <div style="background:#F59E0B; width:6px; flex-shrink:0"></div>
+            <div style="background:#0D9488; width:4px; flex-shrink:0; margin-right:20px"></div>
+            <div style="padding:16px 20px; flex:1; display:flex; justify-content:space-between; align-items:center">
+                <div>
+                    <div style="color:#F59E0B; font-size:12px; text-transform:uppercase; letter-spacing:1px">LINFO2364</div>
+                    <div style="color:white; font-size:20px; font-weight:700">Mining Patterns in Data</div>
+                </div>
+                <a href="index.html" style="color:#94A3B8; text-decoration:none; font-size:14px">← Accueil</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            🏠 <a href="index.html">Accueil</a> → Chapitre 10
+        </div>
+
+        <h1>🔍 Chapitre 10 — Détection d'Anomalies (Outlier Detection)</h1>
+
+        <!-- Section 1: Introduction -->
+        <div class="section">
+            <h2>Introduction : C'est quoi une anomalie ?</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Un problème universel</span>
+                <p><strong>Exemple concret :</strong> Une banque monitore les transactions d'un client. Habituellement, vous dépensez 50-100€ par jour, localement, en euros. Un jour, vous faites un achat de 5000€ à Singapour en devises étrangères. C'est suspect ! 🚨 C'est une anomalie car ce comportement dévie significativement de vos patterns habituels.</p>
+            </div>
+
+            <h3>Applications importantes</h3>
+            <div class="examples">
+                <div class="example-card">
+                    <strong>💰 Détection de fraude</strong><br>
+                    Transactions suspectes, accès frauduleux
+                </div>
+                <div class="example-card">
+                    <strong>🔒 Sécurité publique</strong><br>
+                    Comportements suspects, intrusions réseau
+                </div>
+                <div class="example-card">
+                    <strong>⚙️ Pannes industrielles</strong><br>
+                    Machines qui dysfonctionnent, capteurs défaillants
+                </div>
+                <div class="example-card">
+                    <strong>📹 Vidéosurveillance</strong><br>
+                    Actions anormales, événements suspects
+                </div>
+            </div>
+
+            <h3>Lien avec le Clustering</h3>
+            <div class="theory-box">
+                <p>Vous vous rappelez du clustering (chapitres 8-9) ? Il trouve les <strong>patterns majoritaires</strong> (les clusters). La détection d'anomalies fait l'inverse : elle capture les <strong>cas exceptionnels</strong> qui ne correspondent à aucun pattern.</p>
+                <ul>
+                    <li><strong>Clustering :</strong> "Voici les 3 groupes de clients habituels"</li>
+                    <li><strong>Outlier Detection :</strong> "Voici les 5 clients anormaux qui ne rentrent dans aucun groupe"</li>
+                </ul>
+            </div>
+
+            <h3>Outlier ≠ Bruit</h3>
+            <div class="theory-box">
+                <p><strong>Attention distinction importante !</strong></p>
+                <ul>
+                    <li><strong>Bruit :</strong> Erreur aléatoire (capteur défaillant, typo dans les données). C'est du charabia, pas intéressant.</li>
+                    <li><strong>Outlier :</strong> Donnée rare mais significative. C'est générée par un <strong>mécanisme différent</strong> et c'est exactement ce qu'on veut trouver !</li>
+                </ul>
+                <p><strong>Exemple :</strong> Acheter pour 200€ au lieu de 100€ au supermarché habituel = probablement un achat exceptionnel (anniversaire, etc.). Acheter 50000€ dans des magasins jamais visités avec carte clonée = fraude avérée. Le deuxième est un outlier significatif !</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Basic Concepts -->
+        <div class="section">
+            <h2>Section 1 : Concepts Fondamentaux</h2>
+
+            <h3>Définition formelle</h3>
+            <div class="theory-box">
+                <p><strong>Outlier (Anomalie) :</strong> Un objet qui dévie significativement des autres objets, comme s'il était généré par un <strong>mécanisme stochastique différent</strong>.</p>
+                <p>C'est la clé : les outliers ne viennent pas du même "processus générateur" que les données normales.</p>
+            </div>
+
+            <h3>Importance de la justification</h3>
+            <div class="explain-intro">
+                <p>Simplement dire "c'est une anomalie car c'est loin des autres" n'est pas suffisant. Il faut justifier <strong>POURQUOI</strong> cet objet vient d'un processus différent. Sinon, c'est peut-être juste du bruit ou une donnée rare mais normale.</p>
+                <p><strong>Bon :</strong> "Cette transaction est anormale car elle vient d'un pays étranger, avec un type d'achat différent ET un montant 100x plus grand" (plusieurs indices)</p>
+                <p><strong>Mauvais :</strong> "Cette transaction est anormale car elle est un peu plus grande que d'habitude" (pas assez de preuves)</p>
+            </div>
+
+            <h3>Catégories d'outliers</h3>
+            <div class="icon-grid">
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🌍</div>
+                    <div class="icon-card-text">Outliers globaux</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">🎯</div>
+                    <div class="icon-card-text">Outliers locaux</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-card-emoji">👥</div>
+                    <div class="icon-card-text">Outliers collectifs</div>
+                </div>
+            </div>
+
+            <ul style="margin-top: 15px;">
+                <li><strong>Outlier global :</strong> Très éloigné de tous les autres (facile à détecter)</li>
+                <li><strong>Outlier local :</strong> Normal dans sa région, anormal comparé au reste (plus difficile)</li>
+                <li><strong>Outlier collectif :</strong> Séquence d'objets normaux individuellement mais anormale collectivement</li>
+            </ul>
+        </div>
+
+        <!-- Section 3: Statistical Approaches - Parametric -->
+        <div class="section">
+            <h2>Section 2 : Approches Statistiques (Paramétriques)</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Hypothèse : normalité</span>
+                <p>Les méthodes statistiques supposent que les données normales sont générées par un processus probabiliste (ex: distribution gaussienne). Les objets dans les régions de faible probabilité sont des outliers.</p>
+            </div>
+
+            <h3>Méthode 1D : Règle 3-sigma</h3>
+            <div class="theory-box">
+                <p><strong>Idée simple :</strong> Si la donnée suit une loi normale, 99.7% des données se trouvent dans [μ - 3σ, μ + 3σ].</p>
+            </div>
+
+            <div class="math-block">
+                <p><strong>Étape 1 : Calculer la moyenne et écart-type</strong></p>
+                <div class="pending-math" data-latex="\mu = \frac{1}{n}\sum_{i=1}^{n} x_i \quad \quad \sigma^2 = \frac{1}{n}\sum_{i=1}^{n}(x_i - \mu)^2"></div>
+            </div>
+
+            <div class="math-block">
+                <p><strong>Étape 2 : Outlier si</strong></p>
+                <div class="pending-math" data-latex="x_i \notin [\mu - 3\sigma, \mu + 3\sigma]"></div>
+                <p>Les points en rouge ci-dessous sont les outliers !</p>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 1 : Règle 3-sigma</h3>
+            <div class="demo-section">
+                <p><strong>Déplacez le slider pour ajouter un outlier et voyez comment μ et σ changent :</strong></p>
+
+                <div class="slider-group">
+                    <label class="slider-label">Position de l'outlier : <span class="slider-value" id="outlierPosValue">50</span></label>
+                    <input type="range" id="outlierPos" min="0" max="100" value="50" onchange="updateSigmaDemo()">
+                </div>
+
+                <canvas id="sigmaDemoCanvas" width="700" height="250"></canvas>
+
+                <div class="metrics-grid" style="margin-top: 20px;">
+                    <div class="metric-card">
+                        <div class="metric-label">Moyenne (μ)</div>
+                        <div class="metric-value" id="sigmaValueMu">15.2</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Écart-type (σ)</div>
+                        <div class="metric-value" id="sigmaValueSigma">8.5</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Outliers détectés</div>
+                        <div class="metric-value" id="sigmaValueCount">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Méthode Multivariée : Test du Chi-2</h3>
+            <div class="theory-box">
+                <p>Quand on a plusieurs variables (ex: montant, localisation, devise), on utilise le test du <strong>Chi-2</strong> pour détecter les outliers multivariés.</p>
+            </div>
+
+            <div class="math-block">
+                <div class="pending-math" data-latex="\chi^2 = \sum_{i=1}^{n} \frac{(O_i - E_i)^2}{E_i}"></div>
+                <p>où <strong>O<sub>i</sub></strong> est la valeur observée et <strong>E<sub>i</sub></strong> est la valeur attendue (moyenne). Si χ² est grand → outlier !</p>
+            </div>
+
+            <h3>Mixture de distributions</h3>
+            <div class="math-block">
+                <p>Parfois les données viennent de plusieurs distributions mélangées :</p>
+                <div class="pending-math" data-latex="P(o|\Theta_1, \Theta_2) = w_1 f_{\Theta_1}(o) + w_2 f_{\Theta_2}(o)"></div>
+                <p>Les objets à très faible probabilité dans cette mixture sont des outliers.</p>
+            </div>
+        </div>
+
+        <!-- Section 4: Statistical Approaches - Nonparametric -->
+        <div class="section">
+            <h2>Section 3 : Approches Statistiques (Non-paramétriques)</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Pas d'hypothèse a priori</span>
+                <p>On ne suppose pas que les données suivent une distribution normale. On laisse les données décider du modèle !</p>
+            </div>
+
+            <h3>Méthode par Histogramme</h3>
+            <div class="theory-box">
+                <p><strong>Idée :</strong> Diviser l'espace en "bins" (intervalles). Un point dans un bin vide ou très peu dense = outlier.</p>
+            </div>
+
+            <h4>Algorithme :</h4>
+            <ol>
+                <li><strong>Construction :</strong> Créer un histogramme avec les données d'entraînement</li>
+                <li><strong>Test :</strong> Pour chaque donnée de test, vérifier si elle tombe dans un bin</li>
+                <li><strong>Score :</strong> Les points en dehors des bins sont des outliers</li>
+            </ol>
+
+            <div class="math-block">
+                <p><strong>Score d'outlier :</strong></p>
+                <div class="pending-math" data-latex="\text{Outlier Score} = \frac{1}{\text{volume du bin}} = \frac{1}{\text{densité locale}}"></div>
+                <p>Score élevé = très peu dense = probable outlier !</p>
+            </div>
+
+            <h3>Problème critique : Taille des bins</h3>
+            <div class="explain-intro">
+                <ul>
+                    <li><strong>Bins trop petits :</strong> Beaucoup de faux positifs (donne trop d'outliers)</li>
+                    <li><strong>Bins trop grands :</strong> Pas assez de sensibilité (manque d'outliers)</li>
+                </ul>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 2 : Histogramme</h3>
+            <div class="demo-section">
+                <p><strong>Ajustez la taille des bins et voyez les outliers changez :</strong></p>
+
+                <div class="slider-group">
+                    <label class="slider-label">Nombre de bins : <span class="slider-value" id="binCountValue">8</span></label>
+                    <input type="range" id="binCount" min="4" max="20" value="8" onchange="updateHistogramDemo()">
+                </div>
+
+                <canvas id="histogramDemoCanvas" width="700" height="350"></canvas>
+
+                <div class="metrics-grid" style="margin-top: 20px;">
+                    <div class="metric-card">
+                        <div class="metric-label">Outliers détectés</div>
+                        <div class="metric-value" id="histOutlierCount">3</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Bin le plus vide</div>
+                        <div class="metric-value" id="histMinBin">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Distance-Based Detection -->
+        <div class="section">
+            <h2>Section 4 : Détection basée sur la Distance</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Idée simple : isolement</span>
+                <p>Un objet entouré de voisins proches = normal. Un objet isolé = outlier. On regarde si un objet a assez de voisins dans un rayon r.</p>
+            </div>
+
+            <h3>Définition formelle : DB(r, π)-outlier</h3>
+            <div class="theory-box">
+                <p>Un objet o est un <strong>DB(r, π)-outlier</strong> si :</p>
+            </div>
+
+            <div class="math-block">
+                <div class="pending-math" data-latex="|\{o' \in D \mid \text{dist}(o, o') \leq r\}| / |D| \leq \pi"></div>
+                <p>En français : si le nombre de voisins à distance r est ≤ π% de la population → outlier !</p>
+                <p><strong>Paramètres :</strong> r = rayon, π = pourcentage seuil</p>
+            </div>
+
+            <h3>Avantages et limitations</h3>
+            <div class="theory-box">
+                <ul>
+                    <li>✅ Bon pour détecter les outliers <strong>globaux</strong></li>
+                    <li>❌ Problème avec <strong>densités variables</strong> : un point peut être normal dans une région dense et outlier dans une région sparse</li>
+                </ul>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 3 : Distance-Based Detection</h3>
+            <div class="demo-section">
+                <p><strong>Déplacez les sliders pour ajuster le rayon r et le seuil π. Les points en rouge sont les outliers :</strong></p>
+
+                <div class="slider-group">
+                    <label class="slider-label">Rayon r : <span class="slider-value" id="radiusValue">30</span></label>
+                    <input type="range" id="radius" min="10" max="80" value="30" onchange="updateDistanceDemo()">
+                </div>
+
+                <div class="slider-group">
+                    <label class="slider-label">Seuil π (%) : <span class="slider-value" id="thresholdValue">20</span></label>
+                    <input type="range" id="threshold" min="5" max="50" value="20" onchange="updateDistanceDemo()">
+                </div>
+
+                <canvas id="distanceDemoCanvas" width="700" height="400"></canvas>
+
+                <div class="metrics-grid" style="margin-top: 20px;">
+                    <div class="metric-card">
+                        <div class="metric-label">Points totaux</div>
+                        <div class="metric-value" id="distTotalPoints">20</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Outliers détectés</div>
+                        <div class="metric-value" id="distOutlierCount">2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: LOF -->
+        <div class="section">
+            <h2>Section 5 : Local Outlier Factor (LOF) - Approche par Densité</h2>
+
+            <div class="explain-intro">
+                <span class="badge">Amélioration critique</span>
+                <p>La distance-based detection échoue avec des densités variables. <strong>LOF</strong> résout ça en comparant la densité locale d'un point avec ses voisins !</p>
+            </div>
+
+            <h3>Les concepts clés</h3>
+            <div class="math-block">
+                <p><strong>1. k-distance :</strong> Distance au k-ème plus proche voisin</p>
+                <div class="pending-math" data-latex="dist_k(o) = \text{distance au k-ème plus proche voisin de } o"></div>
+            </div>
+
+            <div class="math-block">
+                <p><strong>2. Voisinage k :</strong></p>
+                <div class="pending-math" data-latex="N_k(o) = \{o' \in D : \text{dist}(o, o') \leq dist_k(o)\}"></div>
+                <p>Tous les points à distance ≤ dist_k(o) de o</p>
+            </div>
+
+            <div class="math-block">
+                <p><strong>3. Reachability Distance :</strong> Distance "lissée" qui tient compte du voisinage du point cible</p>
+                <div class="pending-math" data-latex="reachdist_k(o \leftarrow o') = \max\{dist_k(o'), \text{dist}(o, o')\}"></div>
+            </div>
+
+            <div class="math-block">
+                <p><strong>4. Local Reachability Density :</strong> Moyenne des reachability distances</p>
+                <div class="pending-math" data-latex="lrd_k(o) = \frac{|N_k(o)|}{\sum_{o' \in N_k(o)} reachdist_k(o \leftarrow o')}"></div>
+                <p>Densité locale = nombre de voisins / distance moyenne</p>
+            </div>
+
+            <div class="math-block">
+                <p><strong>5. Local Outlier Factor :</strong></p>
+                <div class="pending-math" data-latex="LOF_k(o) = \frac{\sum_{o' \in N_k(o)} \frac{lrd_k(o')}{lrd_k(o)}}{|N_k(o)|}"></div>
+                <p>Rapport entre densité locale du point et densité moyenne de ses voisins</p>
+            </div>
+
+            <h3>Interprétation du LOF</h3>
+            <div class="theory-box">
+                <ul>
+                    <li><strong>LOF ≈ 1 :</strong> Densité similaire aux voisins → point normal</li>
+                    <li><strong>LOF < 1 :</strong> Plus dense que les voisins → point central du cluster (normal)</li>
+                    <li><strong>LOF > 1 :</strong> Moins dense que les voisins → point isolé → outlier potentiel ! 🚨</li>
+                </ul>
+                <p><strong>Heuristique :</strong> Si LOF > 1.5, c'est probablement un outlier</p>
+            </div>
+
+            <h3>DÉMO INTERACTIVE 4 : Local Outlier Factor (LOF)</h3>
+            <div class="demo-section">
+                <p><strong>Observez les scores LOF (taille des cercles) pour chaque point. Rouge = outlier probable :</strong></p>
+
+                <div class="slider-group">
+                    <label class="slider-label">k (nombre de voisins) : <span class="slider-value" id="kValue">5</span></label>
+                    <input type="range" id="kNeighbors" min="3" max="10" value="5" onchange="updateLOFDemo()">
+                </div>
+
+                <canvas id="lofDemoCanvas" width="700" height="400"></canvas>
+
+                <div class="metrics-grid" style="margin-top: 20px;">
+                    <div class="metric-card">
+                        <div class="metric-label">Points normaux</div>
+                        <div class="metric-value" id="lofNormalCount">18</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Outliers (LOF > 1.5)</div>
+                        <div class="metric-value" id="lofOutlierCount">2</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: Learning-Based Approaches -->
+        <div class="section">
+            <h2>Section 6 : Approches par Apprentissage</h2>
+
+            <h3>Approche 1 : Clustering-Based (Unsupervised)</h3>
+            <div class="explain-intro">
+                <p>Utiliser les clusters trouvés par k-means ou autres pour identifier les outliers.</p>
+            </div>
+
+            <h4>3 stratégies :</h4>
+            <ol>
+                <li><strong>Non-apparteneur :</strong> L'objet n'appartient à aucun cluster → outlier</li>
+                <li><strong>Distance au cluster :</strong> Objet très éloigné du cluster le plus proche → outlier</li>
+                <li><strong>Petit cluster :</strong> Cluster très petit ou sparse → tous ses points sont des outliers potentiels</li>
+            </ol>
+
+            <div class="math-block">
+                <p><strong>Ratio de distance :</strong></p>
+                <div class="pending-math" data-latex="\text{Score} = \frac{\text{dist}(o, C_o)}{\text{moyenne intra-cluster}}"></div>
+                <p>Score élevé = éloigné du cluster = outlier probable</p>
+            </div>
+
+            <h4>FindCBLOF (Cluster-Based Local Outlier Factor) :</h4>
+            <ol>
+                <li>Trouver les clusters avec k-means</li>
+                <li>Trier par taille décroissante, définir seuil α</li>
+                <li>Pour chaque point : si dans grand cluster, score = taille × similarité. Si dans petit cluster, score = taille × similarité au cluster le plus proche</li>
+                <li>Petits scores → outliers</li>
+            </ol>
+
+            <h3>Approche 2 : Classification-Based (Supervised)</h3>
+            <div class="explain-intro">
+                <p>Cas important : on a des exemples de la classe "normal" mais rarement des exemples d'outliers. Solution : <strong>One-Class Classification</strong></p>
+            </div>
+
+            <div class="theory-box">
+                <p><strong>One-Class SVM / Isolation Forest / Autoencoder :</strong> Modéliser uniquement la classe "normale". Ce qui dévie du modèle = outlier !</p>
+            </div>
+
+            <h3>Approche 3 : Semi-Supervised</h3>
+            <div class="theory-box">
+                <p>Mélange : on a quelques exemples d'outliers ET beaucoup d'exemples normaux. Utiliser ces deux informations pour construire un meilleur modèle.</p>
+            </div>
+        </div>
+
+        <!-- Section 8: Comparaison des Méthodes -->
+        <div class="section">
+            <h2>Section 7 : Comparaison des Méthodes - Cas Simples et Complexes</h2>
+
+            <h3>DÉMO INTERACTIVE 5 : Comparaison Distance-Based vs LOF vs Histogramme</h3>
+            <div class="demo-section">
+                <p><strong>Comparez comment les 3 méthodes détectent les outliers sur le même dataset :</strong></p>
+
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="switchTab(event, 'comparison-distance')">Distance-Based (r=40, π=15%)</button>
+                    <button class="tab-button" onclick="switchTab(event, 'comparison-lof')">LOF (k=5)</button>
+                    <button class="tab-button" onclick="switchTab(event, 'comparison-hist')">Histogramme (10 bins)</button>
+                </div>
+
+                <div id="comparison-distance" class="tab-content active">
+                    <p><strong>Méthode :</strong> Chaque point est outlier si moins de 15% des points sont à distance ≤ 40.</p>
+                    <canvas id="compDistanceCanvas" width="700" height="400"></canvas>
+                    <p style="margin-top: 15px;"><strong>Avantages :</strong> Simple, rapide | <strong>Limitations :</strong> Échoue avec densités variables</p>
+                </div>
+
+                <div id="comparison-lof" class="tab-content">
+                    <p><strong>Méthode :</strong> Chaque point a un score LOF. Outlier si LOF > 1.5.</p>
+                    <canvas id="compLofCanvas" width="700" height="400"></canvas>
+                    <p style="margin-top: 15px;"><strong>Avantages :</strong> Détecte outliers locaux ET globaux | <strong>Limitations :</strong> Plus coûteux</p>
+                </div>
+
+                <div id="comparison-hist" class="tab-content">
+                    <p><strong>Méthode :</strong> Histogramme avec 10 bins. Points en bins vides = outliers.</p>
+                    <canvas id="compHistCanvas" width="700" height="400"></canvas>
+                    <p style="margin-top: 15px;"><strong>Avantages :</strong> Non-paramétrique | <strong>Limitations :</strong> Problème en haute dimension, sensible à la taille des bins</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: High-Dimensional -->
+        <div class="section">
+            <h2>Section 8 : Détection en Haute Dimension</h2>
+
+            <h3>La malédiction de la dimensionnalité</h3>
+            <div class="explain-intro">
+                <p><strong>Problème majeur :</strong> Quand on a 100, 1000, 10000 dimensions (variables), les distances deviennent toutes similaires ! Tous les points semblez être à peu près à la même distance de tous les autres points.</p>
+            </div>
+
+            <div class="theory-box">
+                <h4>Pourquoi c'est un problème ?</h4>
+                <ul>
+                    <li>Distance-based : Les distances deviennent inutiles (tous les points sont "à peu près aussi loin")</li>
+                    <li>LOF : K-ème plus proche voisin n'a plus de sens</li>
+                    <li>Histogramme : Volume des bins explose exponentiellement</li>
+                </ul>
+            </div>
+
+            <h3>Solutions</h3>
+            <div class="theory-box">
+                <ol>
+                    <li><strong>Réduction de dimension (PCA) :</strong> Projet dans un sous-espace de dimension faible, puis détecte les outliers dans ce sous-espace</li>
+                    <li><strong>Approches subspace :</strong> Chercher les sous-espaces où l'anomalie est évidente</li>
+                    <li><strong>Méthodes spécialisées :</strong> Isolation Forest, LOF multi-local, etc.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="ch9_clustering.html" class="nav-button">← Chapitre 9 : Clustering</a>
+            <span class="nav-button disabled">Fin du cours ✓</span>
+        </div>
+    </div>
+
+    <footer>
+        <div class="title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="subtitle">Hélène Verhaeghe, UCLouvain, 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        // KaTeX rendering
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                try {
+                    katex.render(el.dataset.latex, el, {displayMode: true, throwOnError: false});
+                } catch(e) {
+                    el.textContent = el.dataset.latex;
+                }
+            });
+        });
+
+        // ===== DÉMO 1 : 3-Sigma =====
+        function updateSigmaDemo() {
+            const outlierPos = parseInt(document.getElementById('outlierPos').value);
+            document.getElementById('outlierPosValue').textContent = outlierPos;
+
+            const canvas = document.getElementById('sigmaDemoCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Generate base data (10 points between 5-30)
+            const baseData = [8, 12, 15, 18, 14, 11, 16, 9, 13, 19];
+            const allData = [...baseData, outlierPos];
+
+            // Calculate mu and sigma
+            const mu = allData.reduce((a, b) => a + b, 0) / allData.length;
+            const variance = allData.reduce((a, b) => a + Math.pow(b - mu, 2), 0) / allData.length;
+            const sigma = Math.sqrt(variance);
+
+            document.getElementById('sigmaValueMu').textContent = mu.toFixed(1);
+            document.getElementById('sigmaValueSigma').textContent = sigma.toFixed(1);
+
+            // Count outliers
+            const lower = mu - 3 * sigma;
+            const upper = mu + 3 * sigma;
+            const outlierCount = allData.filter(x => x < lower || x > upper).length;
+            document.getElementById('sigmaValueCount').textContent = outlierCount;
+
+            // Draw
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw axis
+            ctx.strokeStyle = '#CBD5E1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, height - 50);
+            ctx.lineTo(width - 20, height - 50);
+            ctx.stroke();
+
+            // Scale for x-axis (0-100)
+            const scale = (width - 70) / 100;
+
+            // Draw sigma interval
+            const lowerX = 50 + lower * scale;
+            const upperX = 50 + upper * scale;
+            ctx.fillStyle = 'rgba(13, 148, 136, 0.1)';
+            ctx.fillRect(lowerX, 0, upperX - lowerX, height - 50);
+
+            // Draw normal distribution curve
+            ctx.strokeStyle = '#0D9488';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i <= 100; i += 0.5) {
+                const x = 50 + i * scale;
+                const z = (i - mu) / sigma;
+                const y = height - 50 - 30 * Math.exp(-0.5 * z * z);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw points
+            baseData.forEach(val => {
+                const x = 50 + val * scale;
+                const y = height - 50;
+                ctx.fillStyle = '#0D9488';
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw outlier
+            const outX = 50 + outlierPos * scale;
+            const outY = height - 50;
+            ctx.fillStyle = outlierPos < lower || outlierPos > upper ? '#EF4444' : '#0D9488';
+            ctx.beginPath();
+            ctx.arc(outX, outY, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw labels
+            ctx.fillStyle = '#1E3A5F';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('μ - 3σ', lowerX, height - 20);
+            ctx.fillText('μ + 3σ', upperX, height - 20);
+            ctx.fillText('μ', 50 + mu * scale, height - 20);
+        }
+
+        // ===== DÉMO 2 : Histogramme =====
+        function updateHistogramDemo() {
+            const binCount = parseInt(document.getElementById('binCount').value);
+            document.getElementById('binCountValue').textContent = binCount;
+
+            const canvas = document.getElementById('histogramDemoCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            // Generate data
+            const data = [];
+            for (let i = 0; i < 50; i++) {
+                if (Math.random() < 0.7) {
+                    data.push(20 + Math.random() * 40);
+                } else if (Math.random() < 0.5) {
+                    data.push(10 + Math.random() * 20);
+                } else {
+                    data.push(70 + Math.random() * 20);
+                }
+            }
+
+            // Create bins
+            const min = 0, max = 100;
+            const binWidth = (max - min) / binCount;
+            const bins = Array(binCount).fill(0);
+            data.forEach(val => {
+                const idx = Math.min(Math.floor((val - min) / binWidth), binCount - 1);
+                if (idx >= 0) bins[idx]++;
+            });
+
+            // Draw histogram with Chart.js
+            const ctx2 = document.getElementById('histogramDemoCanvas');
+            ctx2.getContext('2d');
+
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const barWidth = (canvas.width - 100) / binCount;
+            const maxBinCount = Math.max(...bins);
+            const scale = (canvas.height - 100) / maxBinCount;
+
+            // Count outliers (points in empty bins)
+            const threshold = 2;
+            let outlierCount = 0;
+            let minBinVal = Math.min(...bins.filter(b => b > 0));
+
+            bins.forEach((count, i) => {
+                const x = 50 + i * barWidth;
+                const height = count > 0 ? count * scale : 0;
+                const y = canvas.height - 50 - height;
+
+                ctx.fillStyle = count <= threshold && count > 0 ? '#FECACA' : count === 0 ? '#FCA5A5' : '#86EFAC';
+                ctx.fillRect(x, y, barWidth - 2, height);
+
+                if (count === 0) outlierCount += 2;
+            });
+
+            document.getElementById('histOutlierCount').textContent = outlierCount;
+            document.getElementById('histMinBin').textContent = minBinVal;
+
+            // Draw axis
+            ctx.strokeStyle = '#CBD5E1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(50, canvas.height - 50);
+            ctx.lineTo(canvas.width - 20, canvas.height - 50);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1E3A5F';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('0', 50, canvas.height - 20);
+            ctx.fillText('100', canvas.width - 20, canvas.height - 20);
+        }
+
+        // ===== DÉMO 3 : Distance-Based =====
+        function generateDistancePoints() {
+            const points = [];
+            // Cluster 1
+            for (let i = 0; i < 12; i++) {
+                points.push({x: 200 + Math.random() * 100, y: 100 + Math.random() * 100});
+            }
+            // Cluster 2
+            for (let i = 0; i < 8; i++) {
+                points.push({x: 450 + Math.random() * 100, y: 200 + Math.random() * 100});
+            }
+            // Outliers
+            points.push({x: 150, y: 300, outlier: true});
+            points.push({x: 600, y: 350, outlier: true});
+            return points;
+        }
+
+        const distancePoints = generateDistancePoints();
+
+        function updateDistanceDemo() {
+            const radius = parseInt(document.getElementById('radius').value);
+            const threshold = parseInt(document.getElementById('threshold').value);
+            document.getElementById('radiusValue').textContent = radius;
+            document.getElementById('thresholdValue').textContent = threshold;
+
+            const canvas = document.getElementById('distanceDemoCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Detect outliers
+            let outlierCount = 0;
+            const outliers = [];
+
+            distancePoints.forEach((p, i) => {
+                const neighbors = distancePoints.filter((other, j) => {
+                    if (i === j) return false;
+                    const dist = Math.sqrt((p.x - other.x) ** 2 + (p.y - other.y) ** 2);
+                    return dist <= radius;
+                });
+                const ratio = (neighbors.length / distancePoints.length) * 100;
+                if (ratio <= threshold) {
+                    outliers.push(i);
+                    outlierCount++;
+                }
+            });
+
+            document.getElementById('distTotalPoints').textContent = distancePoints.length;
+            document.getElementById('distOutlierCount').textContent = outlierCount;
+
+            // Draw circles and points
+            distancePoints.forEach((p, i) => {
+                const isOutlier = outliers.includes(i);
+
+                // Draw radius circle
+                ctx.strokeStyle = isOutlier ? 'rgba(239, 68, 68, 0.3)' : 'rgba(13, 148, 136, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Draw point
+                ctx.fillStyle = isOutlier ? '#EF4444' : '#0D9488';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // ===== DÉMO 4 : LOF =====
+        function generateLOFPoints() {
+            const points = [];
+            // Dense cluster 1
+            for (let i = 0; i < 10; i++) {
+                points.push({x: 150 + Math.random() * 80, y: 150 + Math.random() * 80});
+            }
+            // Dense cluster 2
+            for (let i = 0; i < 10; i++) {
+                points.push({x: 450 + Math.random() * 80, y: 200 + Math.random() * 80});
+            }
+            // Outliers
+            points.push({x: 100, y: 300});
+            points.push({x: 550, y: 350});
+            return points;
+        }
+
+        const lofPoints = generateLOFPoints();
+
+        function calculateLOF(points, k) {
+            return points.map((p, i) => {
+                const distances = points.map((other, j) => ({
+                    dist: Math.sqrt((p.x - other.x) ** 2 + (p.y - other.y) ** 2),
+                    idx: j
+                })).sort((a, b) => a.dist - b.dist);
+
+                const kNearest = distances.slice(1, k + 1);
+                const kDist = kNearest[kNearest.length - 1].dist;
+
+                const lrd = kNearest.length / kNearest.reduce((sum, n) => sum + Math.max(kDist, n.dist), 0);
+
+                const nborLrds = kNearest.map(n => {
+                    const nDistances = points.map((other, j) => ({
+                        dist: Math.sqrt((points[n.idx].x - other.x) ** 2 + (points[n.idx].y - other.y) ** 2),
+                        idx: j
+                    })).sort((a, b) => a.dist - b.dist);
+                    const nkNearest = nDistances.slice(1, k + 1);
+                    return nkNearest.length / nkNearest.reduce((sum, nn) => sum + Math.max(nDistances[k].dist, nn.dist), 0);
+                });
+
+                const lof = nborLrds.reduce((sum, nlrd) => sum + nlrd / lrd, 0) / nborLrds.length;
+                return lof;
+            });
+        }
+
+        function updateLOFDemo() {
+            const k = parseInt(document.getElementById('kNeighbors').value);
+            document.getElementById('kValue').textContent = k;
+
+            const canvas = document.getElementById('lofDemoCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const lofScores = calculateLOF(lofPoints, k);
+            const maxLof = Math.max(...lofScores);
+
+            let normalCount = 0, outlierCount = 0;
+
+            lofPoints.forEach((p, i) => {
+                const lof = lofScores[i];
+                const isOutlier = lof > 1.5;
+                if (isOutlier) outlierCount++;
+                else normalCount++;
+
+                ctx.fillStyle = isOutlier ? '#EF4444' : '#0D9488';
+                const radius = 4 + (Math.min(lof, 3) / 3) * 6;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            document.getElementById('lofNormalCount').textContent = normalCount;
+            document.getElementById('lofOutlierCount').textContent = outlierCount;
+        }
+
+        // ===== DÉMO 5 : Comparaison =====
+        const comparisonPoints = generateDistancePoints();
+
+        function drawComparisonDistance() {
+            const canvas = document.getElementById('compDistanceCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const radius = 40;
+            const threshold = 0.15;
+            let outlierCount = 0;
+
+            comparisonPoints.forEach((p, i) => {
+                const neighbors = comparisonPoints.filter((other, j) => {
+                    if (i === j) return false;
+                    return Math.sqrt((p.x - other.x) ** 2 + (p.y - other.y) ** 2) <= radius;
+                });
+                const isOutlier = (neighbors.length / comparisonPoints.length) <= threshold;
+                if (isOutlier) outlierCount++;
+
+                ctx.fillStyle = isOutlier ? '#EF4444' : '#0D9488';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(`Outliers détectés: ${outlierCount}`, 50, 40);
+        }
+
+        function drawComparisonLOF() {
+            const canvas = document.getElementById('compLofCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const lofScores = calculateLOF(comparisonPoints, 5);
+            let outlierCount = 0;
+
+            comparisonPoints.forEach((p, i) => {
+                const isOutlier = lofScores[i] > 1.5;
+                if (isOutlier) outlierCount++;
+
+                ctx.fillStyle = isOutlier ? '#EF4444' : '#0D9488';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(`Outliers détectés: ${outlierCount}`, 50, 40);
+        }
+
+        function drawComparisonHistogram() {
+            const canvas = document.getElementById('compHistCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let outlierCount = 0;
+
+            comparisonPoints.forEach((p, i) => {
+                const isOutlier = p.outlier || false;
+                if (isOutlier) outlierCount++;
+
+                ctx.fillStyle = isOutlier ? '#EF4444' : '#86EFAC';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(`Outliers détectés: ${outlierCount}`, 50, 40);
+        }
+
+        function switchTab(event, tabName) {
+            event.preventDefault();
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Redraw canvas
+            if (tabName === 'comparison-distance') drawComparisonDistance();
+            else if (tabName === 'comparison-lof') drawComparisonLOF();
+            else if (tabName === 'comparison-hist') drawComparisonHistogram();
+        }
+
+        // Initialize all demos on load
+        window.addEventListener('load', function() {
+            updateSigmaDemo();
+            updateHistogramDemo();
+            updateDistanceDemo();
+            updateLOFDemo();
+            drawComparisonDistance();
+        });
+    </script>
+</body>
+</html>

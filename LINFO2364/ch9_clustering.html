@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 9 — Clustering</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8FAFC;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .explain-intro {
+            background: #FFFBEB;
+            border-left: 4px solid #F59E0B;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .math-block {
+            background: #F0FDF4;
+            border-left: 4px solid #0D9488;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .theory-box {
+            background: #EFF6FF;
+            border-left: 4px solid #1E3A5F;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1E3A5F;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #1E3A5F;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #0D9488;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #1E3A5F;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .icon-card {
+            text-align: center;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .icon-card-emoji {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .icon-card-text {
+            font-weight: 600;
+            color: #1E3A5F;
+        }
+
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .example-card {
+            padding: 15px;
+            background: #F0FDF4;
+            border: 1px solid #0D9488;
+            border-radius: 8px;
+        }
+
+        .pending-math {
+            display: block;
+            margin: 15px 0;
+            padding: 15px;
+            background: #F0FDF4;
+            border-radius: 8px;
+        }
+
+        .demo-section {
+            background: #F1F5F9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #0D9488;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        button {
+            background: #0D9488;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0F766E;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #E2E8F0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #1E3A5F;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #F8FAFC;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .tree-diagram {
+            background: #F0FDF4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre;
+            color: #1E3A5F;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-card {
+            padding: 15px;
+            background: #EFF6FF;
+            border: 1px solid #1E3A5F;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            color: #0D9488;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            color: #94A3B8;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: #0D9488;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-group {
+            margin: 15px 0;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+        }
+
+        .slider-label {
+            font-weight: 600;
+            color: #1E3A5F;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #F59E0B;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .rule-list {
+            background: #F0FDF4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .rule-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-left: 3px solid #0D9488;
+            border-radius: 4px;
+        }
+
+        .rule-condition {
+            font-weight: 600;
+            color: #1E3A5F;
+        }
+
+        .rule-confidence {
+            font-size: 0.9em;
+            color: #64748B;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 15px;
+            background: #1E3A5F;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .nav-button:hover {
+            background: #0F766E;
+        }
+
+        .nav-button.prev::before {
+            content: "← ";
+        }
+
+        .nav-button.next::after {
+            content: " →";
+        }
+
+        footer {
+            background: #1E3A5F;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        footer .title {
+            color: #F59E0B;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        footer .subtitle {
+            font-size: 0.95em;
+            color: #CBD5E1;
+        }
+
+        .canvas-wrapper {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-ok {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-info {
+            background: #DBEAFE;
+            color: #0C4A6E;
+        }
+
+        .dendrogram-label {
+            font-family: monospace;
+            font-size: 12px;
+            color: #1E3A5F;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="index.html">Accueil</a> / Chapitre 9
+        </div>
+
+        <!-- Title -->
+        <h1>Chapitre 9 : Clustering (Regroupement)</h1>
+        <span class="badge">Chapitre 9</span>
+
+        <!-- Introduction -->
+        <div class="section">
+            <div class="explain-intro">
+                <strong>Qu'est-ce que le Clustering ?</strong> Le clustering regroupe des objets similaires ensemble sans étiquettes prédéfinies. Contrairement à la classification (Ch7), nous ne connaissons pas les classes à l'avance. C'est du <strong>learning non supervisé</strong>.
+            </div>
+
+            <p><strong>Exemples d'applications :</strong></p>
+            <div class="examples">
+                <div class="example-card">📊 Segmentation de clients en groupes de profils similaires</div>
+                <div class="example-card">🔬 Classification de gènes similaires</div>
+                <div class="example-card">🗺️ Découverte de régions géographiques denses</div>
+                <div class="example-card">💬 Regroupement de documents similaires</div>
+            </div>
+
+            <p><strong>Défi principal :</strong> Comment mesurer la "similarité" ? Comment choisir le nombre de clusters ?</p>
+        </div>
+
+        <!-- Section 1: K-means -->
+        <div class="section">
+            <h2>Section 1 : K-means et Variantes</h2>
+
+            <h3>K-means : Partitionnement Simple et Efficace</h3>
+
+            <div class="explain-intro">
+                <strong>Principe :</strong> Partitionner n objets en k clusters disjoints (k ≤ n) pour minimiser la distance moyenne de chaque point à son centroïde.
+            </div>
+
+            <h4>Formule d'optimisation</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="E = \sum_{i=1}^{k} \sum_{p \in C_i} \text{dist}(p, c_i)^2"></div>
+                <p>Où <strong>c<sub>i</sub></strong> est le centroïde (moyenne) du cluster i.</p>
+            </div>
+
+            <h4>Algorithme K-means</h4>
+            <div class="theory-box">
+                <ol>
+                    <li><strong>Initialisation :</strong> Sélectionner aléatoirement k objets comme centroïdes initiaux</li>
+                    <li><strong>Assignation :</strong> Assigner chaque point au centroïde le plus proche</li>
+                    <li><strong>Mise à jour :</strong> Recalculer les centroïdes comme la moyenne de chaque cluster</li>
+                    <li><strong>Répétition :</strong> Répéter les étapes 2-3 jusqu'à convergence (centroïdes stables)</li>
+                </ol>
+            </div>
+
+            <h4>Exemple numérique concret</h4>
+            <div class="math-block">
+                <p>Points : P = {(1,1), (2,2), (5,5), (6,6)}</p>
+                <p>k=2</p>
+                <p><strong>Itération 1 :</strong> Centroïdes initiaux = (1,1) et (5,5)</p>
+                <p>Cluster 1 : {(1,1), (2,2)} → nouveau centroïde = (1.5, 1.5)</p>
+                <p>Cluster 2 : {(5,5), (6,6)} → nouveau centroïde = (5.5, 5.5)</p>
+                <p><strong>Itération 2 :</strong> Les centroïdes ne bougent plus → Convergence!</p>
+            </div>
+
+            <h4>Caractéristiques</h4>
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Complexité</td>
+                    <td>O(nkt) ≈ linéaire (n=objets, k=clusters, t=itérations)</td>
+                </tr>
+                <tr>
+                    <td>Avantages</td>
+                    <td>Simple, scalable, convergence locale garantie, efficace</td>
+                </tr>
+                <tr>
+                    <td>Limites</td>
+                    <td>k manuel, dépend de l'initialisation, sensible aux outliers, mauvais en haute dimension</td>
+                </tr>
+            </table>
+
+            <h3>DÉMO INTERACTIVE 1 : K-means Interactif</h3>
+            <div class="demo-section">
+                <p><strong>Instructions :</strong> Cliquez sur le canvas pour ajouter des points. Ajustez k, puis lancez K-means.</p>
+
+                <div class="slider-group">
+                    <label class="slider-label">Nombre de clusters k : <span class="slider-value" id="kValue">3</span></label>
+                    <input type="range" id="kSlider" min="2" max="5" value="3" onchange="updateKValue()">
+                </div>
+
+                <div class="canvas-wrapper">
+                    <canvas id="kmeansCanvas" width="600" height="400"></canvas>
+                </div>
+
+                <div style="text-align: center;">
+                    <button onclick="runKmeans()">Lancer K-means</button>
+                    <button onclick="resetKmeans()">Reset</button>
+                </div>
+
+                <div id="kmeansStatus" class="status-message status-info" style="display: none;"></div>
+            </div>
+
+            <h3>K-Medoids : Version Robuste aux Outliers</h3>
+
+            <div class="explain-intro">
+                <strong>Principe :</strong> Comme K-means, mais utilise des objets réels (medoids) comme représentants au lieu des centroïdes (moyennes).
+            </div>
+
+            <h4>Formule</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="E = \sum_{i=1}^{k} \sum_{p \in C_i} \text{dist}(p, o_i)^2"></div>
+                <p>Où <strong>o<sub>i</sub></strong> est un objet réel du cluster i (le medoid).</p>
+            </div>
+
+            <h4>Avantages par rapport à K-means</h4>
+            <ul>
+                <li>✅ Robuste aux outliers (un outlier ne peut pas être medoid)</li>
+                <li>✅ Fonctionne avec toute métrique de distance</li>
+                <li>✅ Plus facile à interpréter (ce sont des vrais objets)</li>
+                <li>⚠️ Plus lent : O(n²kt)</li>
+            </ul>
+
+            <h3>K-Modes : Pour les Données Catégorielles</h3>
+
+            <div class="explain-intro">
+                <strong>Principe :</strong> Adapte K-means aux données catégorielles en utilisant le <strong>mode</strong> (valeur la plus fréquente) au lieu de la moyenne.
+            </div>
+
+            <h4>Exemple</h4>
+            <div class="math-block">
+                <p><strong>Dataset :</strong></p>
+                <p>Objet 1 : {Couleur=rouge, Taille=grand}</p>
+                <p>Objet 2 : {Couleur=rouge, Taille=petit}</p>
+                <p>Objet 3 : {Couleur=bleu, Taille=grand}</p>
+                <p><strong>Mode du cluster {1,2} :</strong> {Couleur=rouge, Taille=?}</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Estimer le nombre de clusters -->
+        <div class="section">
+            <h2>Section 2 : Estimer le Nombre de Clusters</h2>
+
+            <h3>Index de Calinski-Harabasz</h3>
+
+            <div class="explain-intro">
+                <strong>Problème :</strong> Comment choisir le meilleur k ? L'index CH mesure la qualité d'un clustering : haute séparation entre clusters + haute compacité intra-cluster.
+            </div>
+
+            <h4>Formule CH(k)</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="B(k) = \sum_{i=1}^{k} n_i || c_i - \bar{c} ||^2"></div>
+                <p>Variance <strong>entre</strong> clusters (séparation)</p>
+            </div>
+
+            <div class="math-block">
+                <div class="pending-math" data-latex="W(k) = \sum_{i=1}^{k} \sum_{x \in C_i} || x - c_i ||^2"></div>
+                <p>Variance <strong>intra</strong>-cluster (compacité)</p>
+            </div>
+
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{CH}(k) = \frac{B(k) / (k-1)}{W(k) / (n-k)}"></div>
+                <p><strong>Maximiser CH(k)</strong> pour trouver le meilleur k !</p>
+            </div>
+
+            <h4>Interprétation</h4>
+            <ul>
+                <li>CH élevé = clusters bien séparés et compacts</li>
+                <li>CH faible = clusters mal séparés ou dispersés</li>
+                <li>Trouver le k où CH atteint son maximum</li>
+            </ul>
+
+            <h3>DÉMO INTERACTIVE 2 : Calinski-Harabasz pour Choisir k</h3>
+            <div class="demo-section">
+                <p><strong>Un dataset fixe de 20 points naturellement groupés.</strong> Observez comment CH(k) change avec k.</p>
+
+                <button onclick="runCHCalculation()">Calculer CH pour k=2 à 8</button>
+
+                <div class="canvas-wrapper">
+                    <canvas id="chChart" width="600" height="300"></canvas>
+                </div>
+
+                <div id="chResult" class="status-message status-info" style="display: none;"></div>
+
+                <h4>Meilleur k détecté</h4>
+                <div id="chBestK" class="metric-card" style="margin-top: 15px;">
+                    <div class="metric-label">k optimal</div>
+                    <div class="metric-value" id="chBestValue">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Clustering Hiérarchique -->
+        <div class="section">
+            <h2>Section 3 : Clustering Hiérarchique</h2>
+
+            <h3>Deux Approches</h3>
+
+            <div class="theory-box">
+                <p><strong>Agglomératif (Bottom-Up) :</strong> Commence par n clusters (1 objet chacun) et fusionne itérativement les clusters les plus proches.</p>
+                <p><strong>Divisif (Top-Down) :</strong> Commence par 1 cluster (tous les objets) et le divise récursivement.</p>
+            </div>
+
+            <h4>Mesures de Distance Entre Clusters</h4>
+            <table>
+                <tr>
+                    <th>Méthode</th>
+                    <th>Formule</th>
+                    <th>Caractéristique</th>
+                </tr>
+                <tr>
+                    <td><strong>Single Linkage</strong></td>
+                    <td>dist(C<sub>i</sub>, C<sub>j</sub>) = min distance</td>
+                    <td>Peut créer des chaînes longues</td>
+                </tr>
+                <tr>
+                    <td><strong>Complete Linkage</strong></td>
+                    <td>dist(C<sub>i</sub>, C<sub>j</sub>) = max distance</td>
+                    <td>Clusters compacts et sphériques</td>
+                </tr>
+                <tr>
+                    <td><strong>Average Linkage</strong></td>
+                    <td>dist(C<sub>i</sub>, C<sub>j</sub>) = moyenne distance</td>
+                    <td>Bon compromis, robuste</td>
+                </tr>
+                <tr>
+                    <td><strong>Ward's Method</strong></td>
+                    <td>Minimise variance intra-cluster</td>
+                    <td>Similaire à K-means mais hiérarchique</td>
+                </tr>
+            </table>
+
+            <h4>Résultat : Le Dendrogramme</h4>
+            <div class="explain-intro">
+                Un dendrogramme est un arbre qui montre comment les objets sont progressivement fusionnés ou divisés, avec les distances de fusion en ordonnée.
+            </div>
+
+            <h3>DÉMO INTERACTIVE 3 : Clustering Hiérarchique Agglomératif</h3>
+            <div class="demo-section">
+                <p><strong>8 points fixes. Cliquez "Step" pour fusionner progressivement les clusters (Single Linkage).</strong></p>
+
+                <div class="canvas-wrapper">
+                    <canvas id="hierarchicalCanvas" width="600" height="400"></canvas>
+                </div>
+
+                <div style="text-align: center;">
+                    <button onclick="hierarchicalStep()">Step (Fusionner les 2 plus proches)</button>
+                    <button onclick="resetHierarchical()">Reset</button>
+                </div>
+
+                <div id="hierarchicalStatus" class="status-message status-info"></div>
+
+                <h4>État du clustering</h4>
+                <div id="hierarchicalInfo" style="padding: 15px; background: #F0FDF4; border-radius: 8px; margin-top: 15px;">
+                    <p id="hierarchicalClusters">Clusters : 8 (chaque point est un cluster)</p>
+                    <p id="hierarchicalDistance">Dernière fusion : distance = --</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: DBSCAN -->
+        <div class="section">
+            <h2>Section 4 : Clustering Density-Based (DBSCAN)</h2>
+
+            <h3>Principe Fondamental</h3>
+
+            <div class="explain-intro">
+                <strong>DBSCAN :</strong> Regroupe les points en fonction de leur <strong>densité</strong> locale, pas en fonction d'une distance globale. Découvre des clusters de forme arbitraire et identifie les outliers.
+            </div>
+
+            <h4>Paramètres</h4>
+            <ul>
+                <li><strong>ε (epsilon) :</strong> Rayon de voisinage autour d'un point</li>
+                <li><strong>MinPts :</strong> Nombre minimum de points dans le rayon ε pour qu'un point soit un core object</li>
+            </ul>
+
+            <h4>Définitions Clés</h4>
+            <div class="theory-box">
+                <ul>
+                    <li><strong>Core object :</strong> Un point avec ≥ MinPts points dans son rayon ε (y compris lui-même)</li>
+                    <li><strong>Border point :</strong> Un point non-core mais dans le rayon d'un core object</li>
+                    <li><strong>Noise (Outlier) :</strong> Un point qui n'est ni core ni border</li>
+                    <li><strong>Cluster :</strong> Ensemble connecté de core objects + border points</li>
+                </ul>
+            </div>
+
+            <h4>Algorithme DBSCAN</h4>
+            <div class="theory-box">
+                <ol>
+                    <li>Marquer tous les points comme non-visités</li>
+                    <li>Sélectionner un point non-visité aléatoirement</li>
+                    <li>Si c'est un core object → créer un nouveau cluster et l'étendre avec tous les voisins accessibles</li>
+                    <li>Si c'est un border/noise → passer au suivant</li>
+                    <li>Répéter jusqu'à tous les points visités</li>
+                </ol>
+            </div>
+
+            <h4>Avantages vs Limites</h4>
+            <table>
+                <tr>
+                    <th>Avantages</th>
+                    <th>Limites</th>
+                </tr>
+                <tr>
+                    <td>✅ Ne nécessite pas de k</td>
+                    <td>⚠️ Sensible au choix de ε et MinPts</td>
+                </tr>
+                <tr>
+                    <td>✅ Découvre clusters arbitraires (non-sphériques)</td>
+                    <td>⚠️ Mauvais avec densités variables</td>
+                </tr>
+                <tr>
+                    <td>✅ Détecte les outliers</td>
+                    <td>⚠️ O(n²) dans le pire cas</td>
+                </tr>
+            </table>
+
+            <h3>HDBSCAN : Variante Hiérarchique</h3>
+
+            <div class="explain-intro">
+                <strong>HDBSCAN :</strong> Amélioration de DBSCAN qui ne nécessite qu'un paramètre (MinPts) au lieu de deux, et gère les densités variables.
+            </div>
+
+            <h4>Concepts clés</h4>
+            <ul>
+                <li><strong>Core distance d<sub>core</sub>(p) :</strong> Distance au MinPts-ème voisin</li>
+                <li><strong>Mutual reachability distance :</strong> d<sub>mreach</sub>(p,q) = max{d<sub>core</sub>(p), d<sub>core</sub>(q), d(p,q)}</li>
+                <li>Construit un Minimum Spanning Tree, puis une hiérarchie de clusters</li>
+            </ul>
+
+            <h3>DÉMO INTERACTIVE 4 : DBSCAN Visualisateur</h3>
+            <div class="demo-section">
+                <p><strong>Points aléatoires avec trois clusters naturels. Ajustez ε et MinPts pour trouver le meilleur clustering.</strong></p>
+
+                <div class="slider-group">
+                    <label class="slider-label">ε (rayon) : <span class="slider-value" id="epsValue">30</span></label>
+                    <input type="range" id="epsSlider" min="5" max="100" value="30" onchange="updateEpsValue()">
+                </div>
+
+                <div class="slider-group">
+                    <label class="slider-label">MinPts : <span class="slider-value" id="minptsValue">4</span></label>
+                    <input type="range" id="minptsSlider" min="2" max="10" value="4" onchange="updateMinptsValue()">
+                </div>
+
+                <div class="canvas-wrapper">
+                    <canvas id="dbscanCanvas" width="600" height="400"></canvas>
+                </div>
+
+                <div style="text-align: center;">
+                    <button onclick="runDBSCAN()">Exécuter DBSCAN</button>
+                    <button onclick="resetDBSCAN()">Reset</button>
+                </div>
+
+                <div id="dbscanStatus" class="status-message status-info"></div>
+
+                <h4>Résultats</h4>
+                <div id="dbscanResult" style="padding: 15px; background: #F0FDF4; border-radius: 8px; margin-top: 15px;">
+                    <p id="dbscanClusters">Nombre de clusters : --</p>
+                    <p id="dbscanOutliers">Nombre d'outliers : --</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Évaluation du Clustering -->
+        <div class="section">
+            <h2>Section 5 : Évaluation du Clustering</h2>
+
+            <h3>Hopkins Statistic : Tester la Clusterabilité</h3>
+
+            <div class="explain-intro">
+                <strong>Question :</strong> Les données contiennent-elles vraiment des clusters, ou sont-elles uniformément distribuées aléatoirement ?
+            </div>
+
+            <h4>Formule Hopkins Statistic</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="H = \frac{\sum x_i^d}{\sum x_i^d + \sum y_i^d}"></div>
+                <p>Où x<sub>i</sub> = distance du point uniforme aléatoire au plus proche point réel, y<sub>i</sub> = distance du point réel au plus proche point réel.</p>
+            </div>
+
+            <h4>Interprétation</h4>
+            <ul>
+                <li><strong>H ≈ 0.5 :</strong> Données uniformément distribuées (pas de clusters)</li>
+                <li><strong>H → 1.0 :</strong> Données fortement clusterisées (clusters clairs)</li>
+                <li>H ≈ 0 : Cas dégénéré (clusters très denses)</li>
+            </ul>
+
+            <h3>Dunn Index : Séparation vs Compacité</h3>
+
+            <div class="explain-intro">
+                <strong>Idée :</strong> Maximiser la distance entre clusters (séparation) tout en minimisant les distances intra-cluster (compacité).
+            </div>
+
+            <h4>Formule</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="\text{DI} = \frac{\delta}{\Delta}"></div>
+                <p>δ = distance minimale inter-clusters (séparation)</p>
+                <p>Δ = distance maximale intra-cluster (diamètre)</p>
+                <p><strong>Plus grand DI = meilleur clustering</strong></p>
+            </div>
+
+            <h3>Silhouette Coefficient : Mesure Complète</h3>
+
+            <div class="explain-intro">
+                <strong>Pour chaque point :</strong> Comparer sa distance à son propre cluster vs sa distance aux autres clusters.
+            </div>
+
+            <h4>Formules</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="a(o) = \text{distance moyenne à tous les autres objets du même cluster}"></div>
+            </div>
+
+            <div class="math-block">
+                <div class="pending-math" data-latex="b(o) = \text{distance moyenne minimale aux objets d'autres clusters}"></div>
+            </div>
+
+            <div class="math-block">
+                <div class="pending-math" data-latex="s(o) = \frac{b(o) - a(o)}{\max\{a(o), b(o)\}} \in [-1, 1]"></div>
+            </div>
+
+            <h4>Interprétation du Silhouette</h4>
+            <ul>
+                <li><strong>s(o) ≈ 1 :</strong> Point bien classé dans son cluster</li>
+                <li><strong>s(o) ≈ 0 :</strong> Point à la limite entre deux clusters</li>
+                <li><strong>s(o) ≈ -1 :</strong> Point probablement mal classé</li>
+            </ul>
+
+            <h3>DÉMO INTERACTIVE 5 : Silhouette Coefficient</h3>
+            <div class="demo-section">
+                <p><strong>Visualisez les silhouettes pour différentes valeurs de k.</strong></p>
+
+                <div class="slider-group">
+                    <label class="slider-label">Nombre de clusters k : <span class="slider-value" id="silkValue">3</span></label>
+                    <input type="range" id="silkSlider" min="2" max="6" value="3" onchange="updateSilkValue()">
+                </div>
+
+                <div class="canvas-wrapper">
+                    <canvas id="silhouetteChart" width="600" height="400"></canvas>
+                </div>
+
+                <div id="silhouetteStatus" class="status-message status-info"></div>
+
+                <h4>Score global de silhouette</h4>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Score Moyen</div>
+                        <div class="metric-value" id="silhouetteMeanScore">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Points bien classés</div>
+                        <div class="metric-value" id="silhouetteGoodCount">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Fuzzy Clustering -->
+        <div class="section">
+            <h2>Section 6 : Fuzzy Clustering</h2>
+
+            <h3>Clustering avec Appartenance Floue</h3>
+
+            <div class="explain-intro">
+                <strong>Au lieu de :</strong> Chaque point appartient à exactement un cluster.<br>
+                <strong>Fuzzy Clustering :</strong> Chaque point a un <strong>degré d'appartenance</strong> (entre 0 et 1) pour chaque cluster !
+            </div>
+
+            <h4>Formulation</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="w_{ij} \in [0,1] : \text{degré d'appartenance de l'objet } i \text{ au cluster } j"></div>
+                <div class="pending-math" data-latex="\sum_{j=1}^{k} w_{ij} = 1 \text{ pour chaque objet } i"></div>
+            </div>
+
+            <h4>Objectif à Minimiser</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="SSE(C) = \sum_{i=1}^{n} \sum_{j=1}^{k} w_{ij}^p \cdot \text{dist}(o_i, c_j)^2"></div>
+                <p>p ≥ 1 : paramètre de "flou" (fuzziness)</p>
+                <p>p=1 : dur (0 ou 1), p→∞ : très fuzzy</p>
+            </div>
+
+            <h4>Algorithme : Expectation-Maximization (EM)</h4>
+            <div class="theory-box">
+                <ol>
+                    <li><strong>E-step :</strong> Assigner les poids w<sub>ij</sub> en fonction des distances actuelles</li>
+                    <li><strong>M-step :</strong> Minimiser SSE en mettant à jour les centroïdes</li>
+                    <li><strong>Répéter</strong> jusqu'à convergence</li>
+                </ol>
+            </div>
+
+            <h4>Formule de Mise à Jour des Poids (k=2 clusters)</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="w_{i1} = \frac{\text{dist}(o_i, c_2)^2}{\text{dist}(o_i, c_1)^2 + \text{dist}(o_i, c_2)^2}"></div>
+                <p>Plus un point est proche du cluster 1, plus w<sub>i1</sub> est proche de 1.</p>
+            </div>
+
+            <h4>Exemple</h4>
+            <div class="example-card">
+                <p><strong>Point p entre deux clusters C1 et C2 :</strong></p>
+                <p>dist(p, C1) = 3, dist(p, C2) = 5</p>
+                <p>w<sub>p,C1</sub> = 25/(9+25) = 0.735 (73.5% dans C1)</p>
+                <p>w<sub>p,C2</sub> = 9/(9+25) = 0.265 (26.5% dans C2)</p>
+            </div>
+
+            <h4>Avantages et Cas d'Usage</h4>
+            <ul>
+                <li>✅ Plus flexible : représente l'incertitude</li>
+                <li>✅ Bon pour les clusters qui se chevauchent</li>
+                <li>⚠️ Plus complexe à interpréter</li>
+                <li>⚠️ Applications : segmentation d'images, classification d'ADN</li>
+            </ul>
+        </div>
+
+        <!-- Section 7: Clustering Avancé -->
+        <div class="section">
+            <h2>Section 7 : Clustering Avancé</h2>
+
+            <h3>Clustering de Données Haute Dimension</h3>
+
+            <div class="explain-intro">
+                <strong>Problème :</strong> En haute dimension (centaines de features), la plupart des points sont loin les uns des autres (malédiction de la dimensionnalité).
+            </div>
+
+            <h4>Solutions</h4>
+            <ul>
+                <li><strong>Réduction de dimension :</strong> PCA, t-SNE, UMAP avant clustering</li>
+                <li><strong>Subspace clustering :</strong> Cluster dans des sous-espaces de features</li>
+                <li><strong>Weighted features :</strong> Donner moins de poids aux features bruitées</li>
+            </ul>
+
+            <h3>Biclustering : Clustering sur 2 Dimensions</h3>
+
+            <div class="explain-intro">
+                <strong>Problème :</strong> On veut grouper à la fois des <strong>lignes (objets)</strong> et des <strong>colonnes (features)</strong> simultanément.
+            </div>
+
+            <h4>Exemple : Matrice Clients × Produits</h4>
+            <div class="math-block">
+                <table>
+                    <tr>
+                        <th></th>
+                        <th>Film A</th>
+                        <th>Film B</th>
+                        <th>Film C</th>
+                    </tr>
+                    <tr>
+                        <th>Client 1</th>
+                        <td>5</td>
+                        <td>4</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <th>Client 2</th>
+                        <td>5</td>
+                        <td>3</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <th>Client 3</th>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>5</td>
+                    </tr>
+                </table>
+                <p>Bicluster : {Client 1,2} × {Film A,B} : clients aiment les films A,B</p>
+            </div>
+
+            <h4>Types de Biclusters</h4>
+            <ul>
+                <li><strong>Constant values :</strong> e<sub>ij</sub> = c</li>
+                <li><strong>Constant rows :</strong> e<sub>ij</sub> = c + α<sub>i</sub> (même profil par ligne)</li>
+                <li><strong>Constant columns :</strong> e<sub>ij</sub> = c + β<sub>j</sub> (même profil par colonne)</li>
+                <li><strong>Coherent values :</strong> e<sub>ij</sub> = c + α<sub>i</sub> + β<sub>j</sub> (combinaison additif)</li>
+            </ul>
+
+            <h4>δ-bicluster</h4>
+            <div class="math-block">
+                <div class="pending-math" data-latex="H(I \times J) = \frac{1}{|I||J|} \sum_{i,j} (e_{ij} - \bar{e}_{iJ} - \bar{e}_{Ij} + \bar{e}_{IJ})^2 \leq \delta"></div>
+                <p>Mesure la variance résiduelle. δ faible = bon bicluster cohérent.</p>
+            </div>
+
+            <h3>Clustering de Graphes et Réseaux</h3>
+
+            <div class="explain-intro">
+                <strong>Problème :</strong> Grouper les nœuds d'un graphe pour détecter les communautés.
+            </div>
+
+            <h4>Métrique : Modularité</h4>
+            <div class="math-block">
+                <p>Mesure l'excès de liens dans les clusters vs ce qu'on attendrait aléatoirement.</p>
+            </div>
+
+            <h4>Exemples</h4>
+            <ul>
+                <li>🔗 Détection de communautés dans les réseaux sociaux</li>
+                <li>🧬 Groupes de gènes qui interagissent</li>
+                <li>📱 Détection de fraude bancaire (motifs d'interactions suspectes)</li>
+            </ul>
+
+            <h3>Semi-Supervised Clustering</h3>
+
+            <div class="explain-intro">
+                <strong>Idée :</strong> Utiliser quelques labels partiels pour guider le clustering.
+            </div>
+
+            <h4>Approche</h4>
+            <ul>
+                <li>Certains points ont des labels (partiellement supervisé)</li>
+                <li>Autres points sont non-labelisés</li>
+                <li>L'algorithme doit regrouper les points non-labelisés en respectant les contraintes des points labelisés</li>
+            </ul>
+
+            <h3>Clustering de Patterns Compressés/Approximatifs</h3>
+
+            <div class="explain-intro">
+                <strong>Objectif :</strong> Découvrir des patterns qui se répètent approximativement (avec variations).
+            </div>
+
+            <h4>Exemple : Time-Series Clustering</h4>
+            <p>Grouper les séries temporelles avec comportements similaires (même si pas identiques).</p>
+        </div>
+
+        <!-- Section 8: Méthodes Grid-Based et Autres -->
+        <div class="section">
+            <h2>Section 8 : Autres Méthodes de Clustering</h2>
+
+            <h3>CLIQUE : Clustering Grid-Based</h3>
+
+            <div class="explain-intro">
+                <strong>Principe :</strong> Diviser l'espace en une grille de cellules. Les cellules denses forment les clusters.
+            </div>
+
+            <h4>Avantages</h4>
+            <ul>
+                <li>✅ Efficace (complexité linéaire en général)</li>
+                <li>✅ Clusters de forme arbitraire</li>
+                <li>✅ Découvre aussi les clusters dans les sous-espaces</li>
+            </ul>
+
+            <h4>Limites</h4>
+            <ul>
+                <li>⚠️ Sensible à la taille de la grille</li>
+                <li>⚠️ Densités différentes par dimension</li>
+            </ul>
+
+            <h3>Comparaison des Méthodes</h3>
+
+            <table>
+                <tr>
+                    <th>Méthode</th>
+                    <th>Type</th>
+                    <th>Paramètres</th>
+                    <th>Formes découvertes</th>
+                    <th>Outliers</th>
+                </tr>
+                <tr>
+                    <td><strong>K-means</strong></td>
+                    <td>Partitionnement</td>
+                    <td>k</td>
+                    <td>Sphériques</td>
+                    <td>Non</td>
+                </tr>
+                <tr>
+                    <td><strong>DBSCAN</strong></td>
+                    <td>Density-based</td>
+                    <td>ε, MinPts</td>
+                    <td>Arbitraires</td>
+                    <td>Oui</td>
+                </tr>
+                <tr>
+                    <td><strong>Hiérarchique</strong></td>
+                    <td>Agglomératif</td>
+                    <td>Aucun (dendrogramme)</td>
+                    <td>Arbitraires</td>
+                    <td>Non</td>
+                </tr>
+                <tr>
+                    <td><strong>Fuzzy C-means</strong></td>
+                    <td>Partitionnement</td>
+                    <td>k, p (fuzziness)</td>
+                    <td>Sphériques</td>
+                    <td>Non</td>
+                </tr>
+                <tr>
+                    <td><strong>CLIQUE</strong></td>
+                    <td>Grid-based</td>
+                    <td>Taille grille</td>
+                    <td>Arbitraires</td>
+                    <td>Oui</td>
+                </tr>
+            </table>
+
+            <h3>Bonnes Pratiques</h3>
+
+            <div class="theory-box">
+                <ol>
+                    <li><strong>Prétraiter les données :</strong> Normaliser, enlever outliers extrêmes</li>
+                    <li><strong>Tester plusieurs méthodes :</strong> K-means, DBSCAN, hiérarchique</li>
+                    <li><strong>Évaluer la qualité :</strong> Hopkins, Silhouette, visibilité</li>
+                    <li><strong>Valider avec experts :</strong> Les clusters ont-ils du sens métier ?</li>
+                    <li><strong>Considérer la scalabilité :</strong> Gros dataset → K-means, CLIQUE</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <a href="ch8_association_rules.html" class="nav-button prev">Chapitre 8 : Association Rules</a>
+            <a href="ch10_evaluation.html" class="nav-button next">Chapitre 10 : Evaluation</a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="title">LINFO2364 — Mining Patterns in Data</div>
+        <div class="subtitle">Hélène Verhaeghe, UCLouvain, 2025-26 Q2</div>
+    </footer>
+
+    <script>
+        // ==================== DÉMO 1: K-means ====================
+        let kmeansPoints = [];
+        let kmeansRunning = false;
+        let kmeansClusters = [];
+        let kmeansCentroids = [];
+
+        function updateKValue() {
+            const val = document.getElementById('kSlider').value;
+            document.getElementById('kValue').textContent = val;
+        }
+
+        function drawKmeansCanvas() {
+            const canvas = document.getElementById('kmeansCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#E2E8F0';
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+            // Draw points
+            kmeansPoints.forEach((p, idx) => {
+                ctx.fillStyle = kmeansRunning && kmeansClusters[idx] !== undefined ?
+                    ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'][kmeansClusters[idx] % 5] : '#1E3A5F';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw centroids
+            kmeansCentroids.forEach((c, idx) => {
+                ctx.fillStyle = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'][idx];
+                ctx.beginPath();
+                ctx.moveTo(c.x - 8, c.y);
+                ctx.lineTo(c.x + 8, c.y);
+                ctx.moveTo(c.x, c.y - 8);
+                ctx.lineTo(c.x, c.y + 8);
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            });
+        }
+
+        canvas = document.getElementById('kmeansCanvas');
+        if (canvas) {
+            canvas.addEventListener('click', function(e) {
+                if (kmeansRunning) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                kmeansPoints.push({x, y});
+                drawKmeansCanvas();
+                const status = document.getElementById('kmeansStatus');
+                status.style.display = 'block';
+                status.textContent = `${kmeansPoints.length} points ajoutés`;
+            });
+        }
+
+        function initializeKmeans() {
+            const k = parseInt(document.getElementById('kSlider').value);
+            kmeansCentroids = [];
+            kmeansClusters = new Array(kmeansPoints.length).fill(0);
+
+            // Random initialization
+            for (let i = 0; i < k; i++) {
+                const p = kmeansPoints[Math.floor(Math.random() * kmeansPoints.length)];
+                kmeansCentroids.push({x: p.x, y: p.y});
+            }
+        }
+
+        function runKmeansIteration() {
+            const k = parseInt(document.getElementById('kSlider').value);
+            if (kmeansPoints.length === 0) return false;
+
+            // Assign points to nearest centroid
+            kmeansPoints.forEach((p, idx) => {
+                let minDist = Infinity;
+                let cluster = 0;
+                kmeansCentroids.forEach((c, cIdx) => {
+                    const dist = Math.hypot(p.x - c.x, p.y - c.y);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        cluster = cIdx;
+                    }
+                });
+                kmeansClusters[idx] = cluster;
+            });
+
+            // Update centroids
+            let changed = false;
+            kmeansCentroids.forEach((c, cIdx) => {
+                const clusterPoints = kmeansPoints.filter((p, idx) => kmeansClusters[idx] === cIdx);
+                if (clusterPoints.length > 0) {
+                    const newX = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+                    const newY = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+                    if (Math.hypot(newX - c.x, newY - c.y) > 0.1) {
+                        changed = true;
+                        kmeansCentroids[cIdx] = {x: newX, y: newY};
+                    }
+                }
+            });
+
+            drawKmeansCanvas();
+            return changed;
+        }
+
+        function runKmeans() {
+            if (kmeansPoints.length < 2) {
+                alert('Ajoutez au moins 2 points !');
+                return;
+            }
+            const k = parseInt(document.getElementById('kSlider').value);
+            if (k > kmeansPoints.length) {
+                alert(`k doit être ≤ ${kmeansPoints.length}`);
+                return;
+            }
+
+            kmeansRunning = true;
+            initializeKmeans();
+
+            let iterations = 0;
+            const maxIter = 20;
+
+            function iterate() {
+                const changed = runKmeansIteration();
+                iterations++;
+
+                if (!changed || iterations >= maxIter) {
+                    kmeansRunning = false;
+                    const status = document.getElementById('kmeansStatus');
+                    status.style.display = 'block';
+                    status.className = 'status-message status-ok';
+                    status.textContent = `K-means convergé après ${iterations} itérations. ${kmeansCentroids.length} clusters trouvés.`;
+                } else {
+                    setTimeout(iterate, 200);
+                }
+            }
+            iterate();
+        }
+
+        function resetKmeans() {
+            kmeansPoints = [];
+            kmeansClusters = [];
+            kmeansCentroids = [];
+            kmeansRunning = false;
+            drawKmeansCanvas();
+            const status = document.getElementById('kmeansStatus');
+            status.style.display = 'none';
+        }
+
+        // ==================== DÉMO 2: Calinski-Harabasz ====================
+        let chDataset = [];
+        let chChart = null;
+
+        function generateCHDataset() {
+            chDataset = [];
+            // 3 clusters naturels
+            for (let i = 0; i < 7; i++) {
+                chDataset.push({x: 50 + Math.random() * 40, y: 50 + Math.random() * 40});
+            }
+            for (let i = 0; i < 7; i++) {
+                chDataset.push({x: 150 + Math.random() * 40, y: 150 + Math.random() * 40});
+            }
+            for (let i = 0; i < 6; i++) {
+                chDataset.push({x: 250 + Math.random() * 40, y: 50 + Math.random() * 40});
+            }
+        }
+
+        function calculateCH(k) {
+            if (chDataset.length === 0) generateCHDataset();
+
+            // Simple K-means
+            let centroids = [];
+            let clusters = new Array(k).fill(null).map(() => []);
+
+            // Initialize
+            for (let i = 0; i < k; i++) {
+                const p = chDataset[Math.floor(Math.random() * chDataset.length)];
+                centroids.push({x: p.x, y: p.y});
+            }
+
+            // Run k-means a few iterations
+            for (let iter = 0; iter < 5; iter++) {
+                clusters = new Array(k).fill(null).map(() => []);
+                chDataset.forEach(p => {
+                    let minDist = Infinity;
+                    let cluster = 0;
+                    centroids.forEach((c, idx) => {
+                        const d = Math.hypot(p.x - c.x, p.y - c.y);
+                        if (d < minDist) {
+                            minDist = d;
+                            cluster = idx;
+                        }
+                    });
+                    clusters[cluster].push(p);
+                });
+
+                centroids.forEach((c, idx) => {
+                    if (clusters[idx].length > 0) {
+                        c.x = clusters[idx].reduce((s, p) => s + p.x, 0) / clusters[idx].length;
+                        c.y = clusters[idx].reduce((s, p) => s + p.y, 0) / clusters[idx].length;
+                    }
+                });
+            }
+
+            // Calculate B(k) - between clusters
+            const globalMean = {
+                x: chDataset.reduce((s, p) => s + p.x, 0) / chDataset.length,
+                y: chDataset.reduce((s, p) => s + p.y, 0) / chDataset.length
+            };
+
+            let B = 0;
+            clusters.forEach((cluster, idx) => {
+                const c = centroids[idx];
+                const n_i = cluster.length;
+                const dist = Math.hypot(c.x - globalMean.x, c.y - globalMean.y);
+                B += n_i * dist * dist;
+            });
+
+            // Calculate W(k) - within clusters
+            let W = 0;
+            clusters.forEach((cluster, idx) => {
+                const c = centroids[idx];
+                cluster.forEach(p => {
+                    const dist = Math.hypot(p.x - c.x, p.y - c.y);
+                    W += dist * dist;
+                });
+            });
+
+            const n = chDataset.length;
+            const CH = ((B / (k - 1)) / (W / (n - k))) || 0;
+            return CH;
+        }
+
+        function runCHCalculation() {
+            generateCHDataset();
+            const chValues = [];
+            for (let k = 2; k <= 8; k++) {
+                chValues.push({k, ch: calculateCH(k)});
+            }
+
+            const bestK = chValues.reduce((max, cur) => cur.ch > max.ch ? cur : max).k;
+
+            const canvas = document.getElementById('chChart');
+            if (!canvas) return;
+
+            if (chChart) chChart.destroy();
+            chChart = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: chValues.map(v => `k=${v.k}`),
+                    datasets: [{
+                        label: 'CH(k)',
+                        data: chValues.map(v => v.ch.toFixed(2)),
+                        backgroundColor: chValues.map(v => v.k === bestK ? '#10B981' : '#0D9488'),
+                        borderColor: '#1E3A5F',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {text: 'Calinski-Harabasz Index'},
+                        legend: {display: false}
+                    },
+                    scales: {
+                        y: {beginAtZero: true}
+                    }
+                }
+            });
+
+            document.getElementById('chBestValue').textContent = bestK;
+            const result = document.getElementById('chResult');
+            result.style.display = 'block';
+            result.className = 'status-message status-ok';
+            result.textContent = `Meilleur k = ${bestK} avec CH = ${chValues.find(v => v.k === bestK).ch.toFixed(2)}`;
+        }
+
+        // ==================== DÉMO 3: Hierarchical Clustering ====================
+        let hierarchicalPoints = [];
+        let hierarchicalClusters = [];
+        let hierarchicalStep = 0;
+
+        function generateHierarchicalData() {
+            hierarchicalPoints = [
+                {x: 100, y: 100, id: 0},
+                {x: 150, y: 120, id: 1},
+                {x: 200, y: 80, id: 2},
+                {x: 300, y: 150, id: 3},
+                {x: 350, y: 170, id: 4},
+                {x: 400, y: 200, id: 5},
+                {x: 150, y: 300, id: 6},
+                {x: 450, y: 100, id: 7}
+            ];
+
+            // Each point starts as its own cluster
+            hierarchicalClusters = hierarchicalPoints.map((p, idx) => ({
+                points: [idx],
+                color: ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#FBBF24'][idx]
+            }));
+
+            hierarchicalStep = 0;
+        }
+
+        function drawHierarchicalCanvas() {
+            const canvas = document.getElementById('hierarchicalCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#E2E8F0';
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+            // Draw clusters
+            hierarchicalClusters.forEach(cluster => {
+                const clusterPoints = cluster.points.map(idx => hierarchicalPoints[idx]);
+                ctx.fillStyle = cluster.color;
+
+                clusterPoints.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                // Draw convex hull or bounding box
+                if (clusterPoints.length > 1) {
+                    ctx.strokeStyle = cluster.color;
+                    ctx.globalAlpha = 0.3;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    const minX = Math.min(...clusterPoints.map(p => p.x));
+                    const maxX = Math.max(...clusterPoints.map(p => p.x));
+                    const minY = Math.min(...clusterPoints.map(p => p.y));
+                    const maxY = Math.max(...clusterPoints.map(p => p.y));
+                    ctx.rect(minX - 5, minY - 5, maxX - minX + 10, maxY - minY + 10);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1.0;
+                }
+            });
+        }
+
+        function calculateClusterDistance(c1, c2) {
+            const p1 = c1.points.map(idx => hierarchicalPoints[idx]);
+            const p2 = c2.points.map(idx => hierarchicalPoints[idx]);
+
+            // Single linkage
+            let minDist = Infinity;
+            p1.forEach(pt1 => {
+                p2.forEach(pt2 => {
+                    const d = Math.hypot(pt1.x - pt2.x, pt1.y - pt2.y);
+                    minDist = Math.min(minDist, d);
+                });
+            });
+            return minDist;
+        }
+
+        function hierarchicalStep() {
+            if (hierarchicalClusters.length <= 1) return;
+
+            // Find two closest clusters
+            let minDist = Infinity;
+            let idx1 = 0, idx2 = 1;
+
+            for (let i = 0; i < hierarchicalClusters.length; i++) {
+                for (let j = i + 1; j < hierarchicalClusters.length; j++) {
+                    const d = calculateClusterDistance(hierarchicalClusters[i], hierarchicalClusters[j]);
+                    if (d < minDist) {
+                        minDist = d;
+                        idx1 = i;
+                        idx2 = j;
+                    }
+                }
+            }
+
+            // Merge clusters
+            hierarchicalClusters[idx1].points.push(...hierarchicalClusters[idx2].points);
+            hierarchicalClusters.splice(idx2, 1);
+
+            hierarchicalStep++;
+            drawHierarchicalCanvas();
+
+            const info = document.getElementById('hierarchicalInfo');
+            info.innerHTML = `<p>Clusters : ${hierarchicalClusters.length} (était ${hierarchicalClusters.length + 1})</p>
+                             <p>Dernière fusion : distance = ${minDist.toFixed(2)}</p>`;
+        }
+
+        function resetHierarchical() {
+            generateHierarchicalData();
+            drawHierarchicalCanvas();
+            const info = document.getElementById('hierarchicalInfo');
+            info.innerHTML = '<p>Clusters : 8 (chaque point est un cluster)</p><p>Dernière fusion : distance = --</p>';
+        }
+
+        // ==================== DÉMO 4: DBSCAN ====================
+        let dbscanPoints = [];
+        let dbscanClusters = [];
+        let dbscanOutliers = [];
+
+        function generateDBSCANData() {
+            dbscanPoints = [];
+            // Cluster 1
+            for (let i = 0; i < 15; i++) {
+                dbscanPoints.push({
+                    x: 100 + (Math.random() - 0.5) * 80,
+                    y: 100 + (Math.random() - 0.5) * 80,
+                    visited: false,
+                    cluster: -2
+                });
+            }
+            // Cluster 2
+            for (let i = 0; i < 12; i++) {
+                dbscanPoints.push({
+                    x: 300 + (Math.random() - 0.5) * 80,
+                    y: 300 + (Math.random() - 0.5) * 80,
+                    visited: false,
+                    cluster: -2
+                });
+            }
+            // Cluster 3
+            for (let i = 0; i < 10; i++) {
+                dbscanPoints.push({
+                    x: 500 + (Math.random() - 0.5) * 60,
+                    y: 150 + (Math.random() - 0.5) * 60,
+                    visited: false,
+                    cluster: -2
+                });
+            }
+            // Outliers
+            for (let i = 0; i < 3; i++) {
+                dbscanPoints.push({
+                    x: Math.random() * 600,
+                    y: Math.random() * 400,
+                    visited: false,
+                    cluster: -2
+                });
+            }
+        }
+
+        function updateEpsValue() {
+            document.getElementById('epsValue').textContent = document.getElementById('epsSlider').value;
+        }
+
+        function updateMinptsValue() {
+            document.getElementById('minptsValue').textContent = document.getElementById('minptsSlider').value;
+        }
+
+        function drawDBSCANCanvas() {
+            const canvas = document.getElementById('dbscanCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#F8FAFC';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#E2E8F0';
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+            const colors = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+
+            dbscanPoints.forEach((p, idx) => {
+                if (p.cluster === -1) {
+                    ctx.fillStyle = '#EF4444';
+                } else if (p.cluster >= 0) {
+                    ctx.fillStyle = colors[p.cluster % colors.length];
+                } else {
+                    ctx.fillStyle = '#CBD5E1';
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function runDBSCAN() {
+            if (dbscanPoints.length === 0) generateDBSCANData();
+
+            const eps = parseInt(document.getElementById('epsSlider').value);
+            const minpts = parseInt(document.getElementById('minptsSlider').value);
+
+            dbscanPoints.forEach(p => {
+                p.visited = false;
+                p.cluster = -2;
+            });
+
+            let clusterId = 0;
+
+            function getNeighbors(idx) {
+                const neighbors = [];
+                const p = dbscanPoints[idx];
+                dbscanPoints.forEach((other, oIdx) => {
+                    const d = Math.hypot(p.x - other.x, p.y - other.y);
+                    if (d <= eps) neighbors.push(oIdx);
+                });
+                return neighbors;
+            }
+
+            function expandCluster(idx, cId) {
+                const seeds = getNeighbors(idx);
+                if (seeds.length < minpts) {
+                    dbscanPoints[idx].cluster = -1; // Noise
+                    return false;
+                }
+
+                seeds.forEach(s => {
+                    dbscanPoints[s].cluster = cId;
+                });
+
+                let i = 0;
+                while (i < seeds.length) {
+                    const q = seeds[i];
+                    if (!dbscanPoints[q].visited) {
+                        dbscanPoints[q].visited = true;
+                        const qNeighbors = getNeighbors(q);
+                        if (qNeighbors.length >= minpts) {
+                            qNeighbors.forEach(n => {
+                                if (dbscanPoints[n].cluster === -2) {
+                                    seeds.push(n);
+                                }
+                            });
+                        }
+                    }
+                    if (dbscanPoints[q].cluster === -2) {
+                        dbscanPoints[q].cluster = cId;
+                    }
+                    i++;
+                }
+                return true;
+            }
+
+            dbscanPoints.forEach((p, idx) => {
+                if (!p.visited) {
+                    p.visited = true;
+                    if (expandCluster(idx, clusterId)) {
+                        clusterId++;
+                    }
+                }
+            });
+
+            drawDBSCANCanvas();
+
+            const numClusters = Math.max(...dbscanPoints.map(p => p.cluster)) + 1;
+            const numOutliers = dbscanPoints.filter(p => p.cluster === -1).length;
+
+            document.getElementById('dbscanClusters').textContent = `Clusters trouvés : ${numClusters}`;
+            document.getElementById('dbscanOutliers').textContent = `Outliers détectés : ${numOutliers}`;
+
+            const status = document.getElementById('dbscanStatus');
+            status.style.display = 'block';
+            status.className = 'status-message status-ok';
+            status.textContent = `DBSCAN exécuté : ${numClusters} clusters, ${numOutliers} outliers`;
+        }
+
+        function resetDBSCAN() {
+            dbscanPoints = [];
+            generateDBSCANData();
+            drawDBSCANCanvas();
+            document.getElementById('dbscanClusters').textContent = 'Clusters trouvés : --';
+            document.getElementById('dbscanOutliers').textContent = 'Outliers détectés : --';
+            const status = document.getElementById('dbscanStatus');
+            status.style.display = 'none';
+        }
+
+        // ==================== DÉMO 5: Silhouette ====================
+        let silkDataset = [];
+        let silhouetteChart = null;
+
+        function generateSilkDataset() {
+            silkDataset = [];
+            for (let i = 0; i < 20; i++) {
+                silkDataset.push({
+                    x: 100 + (Math.random() - 0.5) * 60,
+                    y: 100 + (Math.random() - 0.5) * 60
+                });
+            }
+            for (let i = 0; i < 18; i++) {
+                silkDataset.push({
+                    x: 300 + (Math.random() - 0.5) * 60,
+                    y: 150 + (Math.random() - 0.5) * 60
+                });
+            }
+        }
+
+        function updateSilkValue() {
+            document.getElementById('silkValue').textContent = document.getElementById('silkSlider').value;
+            calculateAndDrawSilhouette();
+        }
+
+        function calculateAndDrawSilhouette() {
+            if (silkDataset.length === 0) generateSilkDataset();
+
+            const k = parseInt(document.getElementById('silkSlider').value);
+
+            // Simple K-means
+            let centroids = [];
+            let clusters = new Array(k).fill(null).map(() => []);
+
+            for (let i = 0; i < k; i++) {
+                const p = silkDataset[Math.floor(Math.random() * silkDataset.length)];
+                centroids.push({x: p.x, y: p.y});
+            }
+
+            for (let iter = 0; iter < 10; iter++) {
+                clusters = new Array(k).fill(null).map(() => []);
+                silkDataset.forEach((p, idx) => {
+                    let minDist = Infinity;
+                    let cluster = 0;
+                    centroids.forEach((c, cIdx) => {
+                        const d = Math.hypot(p.x - c.x, p.y - c.y);
+                        if (d < minDist) {
+                            minDist = d;
+                            cluster = cIdx;
+                        }
+                    });
+                    clusters[cluster].push(idx);
+                });
+
+                centroids.forEach((c, idx) => {
+                    if (clusters[idx].length > 0) {
+                        const pts = clusters[idx].map(i => silkDataset[i]);
+                        c.x = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+                        c.y = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+                    }
+                });
+            }
+
+            // Calculate silhouettes
+            let silhouettes = new Array(silkDataset.length).fill(0);
+            let goodCount = 0;
+
+            silkDataset.forEach((p, idx) => {
+                const cluster = clusters.findIndex(c => c.includes(idx));
+                const clusterPoints = clusters[cluster].map(i => silkDataset[i]);
+
+                // a(o): mean distance within cluster
+                let a = 0;
+                clusterPoints.forEach(cp => {
+                    if (cp !== p) {
+                        a += Math.hypot(p.x - cp.x, p.y - cp.y);
+                    }
+                });
+                a /= Math.max(clusterPoints.length - 1, 1);
+
+                // b(o): min mean distance to other clusters
+                let b = Infinity;
+                clusters.forEach((otherCluster, otherIdx) => {
+                    if (otherIdx !== cluster) {
+                        let dist = 0;
+                        otherCluster.forEach(oi => {
+                            const op = silkDataset[oi];
+                            dist += Math.hypot(p.x - op.x, p.y - op.y);
+                        });
+                        dist /= otherCluster.length;
+                        b = Math.min(b, dist);
+                    }
+                });
+
+                const s = (b - a) / Math.max(a, b);
+                silhouettes[idx] = s;
+                if (s > 0.3) goodCount++;
+            });
+
+            const meanSilhouette = silhouettes.reduce((a, b) => a + b, 0) / silhouettes.length;
+
+            const canvas = document.getElementById('silhouetteChart');
+            if (silhouetteChart) silhouetteChart.destroy();
+
+            silhouetteChart = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: silkDataset.map((p, idx) => `P${idx}`),
+                    datasets: [{
+                        label: 'Silhouette Coefficient',
+                        data: silhouettes,
+                        backgroundColor: silhouettes.map(s => s > 0.3 ? '#10B981' : '#F59E0B'),
+                        borderColor: '#1E3A5F',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: {display: false}
+                    },
+                    scales: {
+                        x: {min: -1, max: 1}
+                    }
+                }
+            });
+
+            document.getElementById('silhouetteMeanScore').textContent = meanSilhouette.toFixed(3);
+            document.getElementById('silhouetteGoodCount').textContent = goodCount;
+
+            const status = document.getElementById('silhouetteStatus');
+            status.style.display = 'block';
+            status.className = 'status-message status-ok';
+            status.textContent = `Silhouette moyen = ${meanSilhouette.toFixed(3)}, ${goodCount}/${silkDataset.length} points bien classés`;
+        }
+
+        // Initialize all demos on load
+        window.addEventListener('load', function() {
+            document.querySelectorAll('.pending-math').forEach(el => {
+                try {
+                    katex.render(el.dataset.latex, el, {displayMode: true, throwOnError: false});
+                } catch(e) {
+                    el.textContent = el.dataset.latex;
+                }
+            });
+
+            generateHierarchicalData();
+            drawHierarchicalCanvas();
+
+            generateDBSCANData();
+            drawDBSCANCanvas();
+
+            generateSilkDataset();
+
+            drawKmeansCanvas();
+        });
+    </script>
+</body>
+</html>
